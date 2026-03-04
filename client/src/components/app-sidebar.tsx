@@ -40,9 +40,9 @@ export function AppSidebar() {
 
   return (
     <Sidebar collapsible="icon">
-      <SidebarHeader className="p-4">
+      <SidebarHeader className={isCollapsed ? "p-2" : "p-4 pb-5"}>
         <div
-          className="flex items-center gap-3 cursor-pointer select-none"
+          className={`flex items-center cursor-pointer select-none ${isCollapsed ? "justify-center" : "gap-3.5"}`}
           onClick={toggleSidebar}
           data-testid="button-sidebar-toggle"
           role="button"
@@ -50,14 +50,14 @@ export function AppSidebar() {
           onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") toggleSidebar(); }}
           aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
-          <img src={logoImage} alt="MapAble" className="w-9 h-9 rounded-md object-contain shrink-0" data-testid="img-sidebar-logo" />
+          <img src={logoImage} alt="MapAble" className={`rounded-lg object-contain shrink-0 transition-all ${isCollapsed ? "w-8 h-8" : "w-12 h-12"}`} data-testid="img-sidebar-logo" />
           {!isCollapsed && (
             <div className="flex flex-col overflow-hidden">
-              <div className="flex items-center gap-1">
-                <span className="text-lg font-black tracking-tight">MapAble</span>
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-xl font-black tracking-tight">MapAble</span>
                 <span className="text-[10px] font-bold text-muted-foreground">4.0</span>
               </div>
-              <span className="text-[10px] text-muted-foreground leading-none tracking-wide">Empowering Independence</span>
+              <span className="text-[11px] text-muted-foreground leading-none tracking-wide mt-0.5">Empowering Independence</span>
             </div>
           )}
         </div>
