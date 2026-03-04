@@ -55,7 +55,7 @@ function MobileMenuToggle() {
       data-testid="button-mobile-menu"
       aria-label="Toggle menu"
     >
-      <img src={logoImage} alt="MapAble" className="h-8 w-auto" data-testid="img-header-logo" />
+      <img src={logoImage} alt="MapAble" className="h-10 w-auto" data-testid="img-header-logo" />
     </button>
   );
 }
