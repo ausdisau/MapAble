@@ -1,7 +1,7 @@
-# MapAble 3.0 - NDIS Support Services Super App
+# MapAble 4.0 - NDIS Support Services Super App
 
 ## Overview
-MapAble 3.0 is a full-stack superapp combining three core NDIS services:
+MapAble 4.0 is a full-stack superapp combining three core NDIS services:
 - **MapAble for Care** - Book verified support workers/carers
 - **MapAble for Transport** - Arrange wheelchair-accessible transport
 - **MapAble for Employment** - Find disability support jobs
@@ -13,14 +13,27 @@ MapAble 3.0 is a full-stack superapp combining three core NDIS services:
 - **Routing**: wouter (client-side)
 - **State Management**: TanStack React Query
 
+## Brand Identity
+- **Brand**: Australian Disability Ltd / MapAble — tagline "Empowering Independence"
+- **Logo**: `@assets/Accessible_Australia_Logo_Design_1772582762574.png`
+- **Colors**: Primary blue #1B6EB5, teal green #2EAA6E (verified/success), golden yellow #E6A817 (accents)
+- **Header**: Gradient blue bar (linear-gradient #14578F → #1B6EB5 → #2384C9)
+- **Dark mode**: Deep navy #0F1A2E background
+
 ## Key Features
-- Dashboard with stats, featured workers, and recent jobs
+- Dashboard with hero section, stats, featured workers, and recent jobs
 - Worker directory with search, filtering (verified/transport/accessible)
 - Job board with category filters (Care/Transport/Support/Employment)
 - Transport booking with wheelchair accessibility options
 - Messaging system
 - Settings with accessibility options (dark mode, high contrast)
 - NDIS Worker Screening verification indicators
+
+## UI Patterns
+- Sidebar is collapsible to icon-only rail; the MapAble logo in the sidebar header acts as the toggle button
+- Shadcn UI components with Inter font, softer border radii (--radius: 0.75rem), real visible shadows
+- Never apply hover:bg-* to Buttons; use Shadcn variants and elevation utilities
+- data-testid attributes on all interactive/display elements
 
 ## Structure
 ```

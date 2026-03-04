@@ -19,6 +19,7 @@ import {
   SidebarMenuItem,
   SidebarHeader,
   SidebarFooter,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { Badge } from "@/components/ui/badge";
 import logoImage from "@assets/Accessible_Australia_Logo_Design_1772582762574.png";
@@ -34,22 +35,32 @@ const navItems = [
 
 export function AppSidebar() {
   const [location] = useLocation();
+  const { toggleSidebar, state } = useSidebar();
+  const isCollapsed = state === "collapsed";
 
   return (
-    <Sidebar>
+    <Sidebar collapsible="icon">
       <SidebarHeader className="p-4">
-        <Link href="/">
-          <div className="flex items-center gap-3 cursor-pointer" data-testid="link-home">
-            <img src={logoImage} alt="MapAble" className="w-9 h-9 rounded-md object-contain" data-testid="img-sidebar-logo" />
-            <div className="flex flex-col">
+        <div
+          className="flex items-center gap-3 cursor-pointer select-none"
+          onClick={toggleSidebar}
+          data-testid="button-sidebar-toggle"
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") toggleSidebar(); }}
+          aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+        >
+          <img src={logoImage} alt="MapAble" className="w-9 h-9 rounded-md object-contain shrink-0" data-testid="img-sidebar-logo" />
+          {!isCollapsed && (
+            <div className="flex flex-col overflow-hidden">
               <div className="flex items-center gap-1">
                 <span className="text-lg font-black tracking-tight">MapAble</span>
                 <span className="text-[10px] font-bold text-muted-foreground">4.0</span>
               </div>
               <span className="text-[10px] text-muted-foreground leading-none tracking-wide">Empowering Independence</span>
             </div>
-          </div>
-        </Link>
+          )}
+        </div>
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
@@ -63,6 +74,7 @@ export function AppSidebar() {
                     <SidebarMenuButton
                       asChild
                       data-active={isActive}
+                      tooltip={item.title}
                       className={isActive ? "bg-sidebar-accent text-sidebar-accent-foreground" : ""}
                     >
                       <Link href={item.url} data-testid={`link-nav-${item.title.toLowerCase().replace(/\s/g, "-")}`}>
@@ -79,8 +91,8 @@ export function AppSidebar() {
       </SidebarContent>
       <SidebarFooter className="p-4">
         <Badge variant="outline" className="no-default-active-elevate gap-2 py-1.5 px-3 border-[#2EAA6E]/30 bg-[#2EAA6E]/10 text-[#2EAA6E] dark:text-[#3CC87F] justify-center" data-testid="badge-ndis-registered">
-          <ShieldCheck className="w-3.5 h-3.5" />
-          <span className="text-xs font-semibold">NDIS Registered Provider</span>
+          <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
+          {!isCollapsed && <span className="text-xs font-semibold">NDIS Registered Provider</span>}
         </Badge>
       </SidebarFooter>
     </Sidebar>
