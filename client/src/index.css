@@ -4,6 +4,9 @@
 
 /* LIGHT MODE */
 :root {
+  --map-teal: 160 58% 42%;
+  --map-navy: 210 65% 29%;
+  --map-gold: 42 82% 50%;
   --button-outline: rgba(0,0,0, .10);
   --badge-outline: rgba(0,0,0, .05);
   --opaque-button-border-intensity: -8;
@@ -82,6 +85,9 @@
 }
 
 .dark {
+  --map-teal: 160 58% 55%;
+  --map-navy: 210 65% 40%;
+  --map-gold: 42 82% 60%;
   --button-outline: rgba(255,255,255, .10);
   --badge-outline: rgba(255,255,255, .05);
   --opaque-button-border-intensity: 9;

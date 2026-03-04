@@ -7,9 +7,17 @@ import { SidebarProvider, useSidebar } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { ThemeProvider, useTheme } from "@/components/theme-provider";
 import { Button } from "@/components/ui/button";
-import { Moon, Sun, Search, Bell, Accessibility } from "lucide-react";
+import { Moon, Sun, Search, Bell, Accessibility, LayoutDashboard, HeartHandshake, Briefcase, Bus, MessageSquare, Settings, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { useState } from "react";
+import { useLocation } from "wouter";
 import logoImage from "@assets/Accessible_Australia_Logo_Design_1772582762574.png";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 import NotFound from "@/pages/not-found";
 import Dashboard from "@/pages/dashboard";
 import CarePage from "@/pages/care";
@@ -46,17 +54,68 @@ function HeaderSearchPill() {
   );
 }
 
+const mobileNavItems = [
+  { title: "Dashboard", url: "/", icon: LayoutDashboard, audioDesc: "View your dashboard overview" },
+  { title: "Book a Carer", url: "/care", icon: HeartHandshake, audioDesc: "Find and book verified NDIS support workers" },
+  { title: "Find a Job", url: "/jobs", icon: Briefcase, audioDesc: "Browse disability support employment opportunities" },
+  { title: "Get Transport", url: "/transport", icon: Bus, audioDesc: "Arrange wheelchair accessible transport services" },
+  { title: "Messages", url: "/messages", icon: MessageSquare, audioDesc: "View your conversations and messages" },
+  { title: "Settings", url: "/settings", icon: Settings, audioDesc: "Manage your account and accessibility preferences" },
+];
+
+function speakDescription(text: string) {
+  if (typeof window !== "undefined" && window.speechSynthesis) {
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 1;
+    utterance.pitch = 1;
+    window.speechSynthesis.speak(utterance);
+  }
+}
+
 function MobileMenuToggle() {
-  const { toggleSidebar } = useSidebar();
+  const { toggleSidebar, state } = useSidebar();
+  const [, setLocation] = useLocation();
+  const isCollapsed = state === "collapsed";
+
   return (
-    <button
-      onClick={toggleSidebar}
-      className="md:hidden flex items-center"
-      data-testid="button-mobile-menu"
-      aria-label="Toggle menu"
-    >
-      <img src={logoImage} alt="MapAble" className="h-10 w-auto" data-testid="img-header-logo" />
-    </button>
+    <div className="md:hidden flex items-center">
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button
+            className="flex items-center"
+            data-testid="button-mobile-menu"
+            aria-label="Open navigation menu"
+          >
+            <img src={logoImage} alt="MapAble" className="h-10 w-auto" data-testid="img-header-logo" />
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start" className="w-64">
+          {mobileNavItems.map((item) => (
+            <DropdownMenuItem
+              key={item.title}
+              onFocus={() => speakDescription(item.audioDesc)}
+              onSelect={() => setLocation(item.url)}
+              aria-description={item.audioDesc}
+              data-testid={`mobile-dropdown-nav-${item.title.toLowerCase().replace(/\s/g, "-")}`}
+            >
+              <item.icon className="w-4 h-4" />
+              <span>{item.title}</span>
+            </DropdownMenuItem>
+          ))}
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            onFocus={() => speakDescription("Toggle the sidebar open or closed")}
+            onSelect={toggleSidebar}
+            aria-description="Toggle the sidebar open or closed"
+            data-testid="mobile-dropdown-toggle-sidebar"
+          >
+            {isCollapsed ? <PanelLeftOpen className="w-4 h-4" /> : <PanelLeftClose className="w-4 h-4" />}
+            <span>Toggle Sidebar</span>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
   );
 }
 
@@ -107,6 +166,11 @@ function AppLayout() {
               <ThemeToggle />
             </div>
           </header>
+          <div className="flex h-[3px] shrink-0" data-testid="accent-tricolor-strip">
+            <div className="flex-1" style={{ backgroundColor: "#2EAA6E" }} />
+            <div className="flex-1" style={{ backgroundColor: "#1A4B7A" }} />
+            <div className="flex-1" style={{ backgroundColor: "#E6A817" }} />
+          </div>
           <main className="flex-1 overflow-auto">
             <Router />
           </main>

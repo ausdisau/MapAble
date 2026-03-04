@@ -14,10 +14,13 @@ import { randomUUID } from "crypto";
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
+  getUserByRole(role: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  updateUserAvatar(id: string, avatar: string): Promise<User | undefined>;
   getWorkers(): Promise<(Worker & { user?: User })[]>;
   getWorker(id: string): Promise<(Worker & { user?: User }) | undefined>;
   createWorker(worker: InsertWorker): Promise<Worker>;
+  updateWorkerPhoto(id: string, photo: string): Promise<Worker | undefined>;
   getBookings(): Promise<Booking[]>;
   createBooking(booking: InsertBooking): Promise<Booking>;
   getJobs(): Promise<Job[]>;
@@ -40,8 +43,18 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
+  async getUserByRole(role: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.role, role));
+    return user;
+  }
+
   async createUser(insertUser: InsertUser): Promise<User> {
     const [user] = await db.insert(users).values(insertUser).returning();
+    return user;
+  }
+
+  async updateUserAvatar(id: string, avatar: string): Promise<User | undefined> {
+    const [user] = await db.update(users).set({ avatar }).where(eq(users.id, id)).returning();
     return user;
   }
 
@@ -65,6 +78,11 @@ export class DatabaseStorage implements IStorage {
 
   async createWorker(insertWorker: InsertWorker): Promise<Worker> {
     const [worker] = await db.insert(workers).values(insertWorker).returning();
+    return worker;
+  }
+
+  async updateWorkerPhoto(id: string, photo: string): Promise<Worker | undefined> {
+    const [worker] = await db.update(workers).set({ photo }).where(eq(workers.id, id)).returning();
     return worker;
   }
 
