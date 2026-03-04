@@ -3,7 +3,7 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider, useSidebar } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { ThemeProvider, useTheme } from "@/components/theme-provider";
 import { Button } from "@/components/ui/button";
@@ -46,6 +46,20 @@ function HeaderSearchPill() {
   );
 }
 
+function MobileMenuToggle() {
+  const { toggleSidebar } = useSidebar();
+  return (
+    <button
+      onClick={toggleSidebar}
+      className="md:hidden flex items-center"
+      data-testid="button-mobile-menu"
+      aria-label="Toggle menu"
+    >
+      <img src={logoImage} alt="MapAble" className="h-8 w-auto" data-testid="img-header-logo" />
+    </button>
+  );
+}
+
 function Router() {
   return (
     <Switch>
@@ -80,8 +94,7 @@ function AppLayout() {
             data-testid="header-main"
           >
             <div className="flex items-center gap-3 flex-wrap">
-              <SidebarTrigger data-testid="button-sidebar-toggle" className="text-white/90" />
-              <img src={logoImage} alt="MapAble" className="h-8 w-auto md:hidden" data-testid="img-header-logo" />
+              <MobileMenuToggle />
               <HeaderSearchPill />
             </div>
             <div className="flex items-center gap-1 flex-wrap">
