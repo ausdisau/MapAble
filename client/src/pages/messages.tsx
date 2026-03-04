@@ -11,6 +11,22 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import type { Message } from "@shared/schema";
 
+const avatarColors = [
+  "bg-blue-100 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300",
+  "bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300",
+  "bg-violet-100 dark:bg-violet-950/40 text-violet-700 dark:text-violet-300",
+  "bg-amber-100 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300",
+  "bg-rose-100 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300",
+];
+
+function getAvatarColor(id: string) {
+  let hash = 0;
+  for (let i = 0; i < id.length; i++) {
+    hash = id.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return avatarColors[Math.abs(hash) % avatarColors.length];
+}
+
 function EmptyState() {
   return (
     <div className="flex flex-col items-center justify-center h-full py-20">
@@ -93,8 +109,8 @@ export default function MessagesPage() {
               {messages?.map((msg) => (
                 <Card key={msg.id} className="p-3 cursor-pointer hover-elevate">
                   <div className="flex items-center gap-3">
-                    <Avatar className="w-8 h-8">
-                      <AvatarFallback className="text-xs font-bold bg-primary/10 text-primary">
+                    <Avatar className="w-9 h-9">
+                      <AvatarFallback className={`text-xs font-bold ${getAvatarColor(msg.senderId)}`}>
                         {msg.senderId.slice(0, 2).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
@@ -121,46 +137,59 @@ export default function MessagesPage() {
             ) : (
               <>
                 <div className="flex-1 p-4 space-y-4 overflow-y-auto">
-                  {messages?.map((msg) => (
-                    <div key={msg.id} className="flex gap-3">
-                      <Avatar className="w-8 h-8 flex-shrink-0">
-                        <AvatarFallback className="text-xs font-bold bg-primary/10 text-primary">
-                          {msg.senderId.slice(0, 2).toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1">
-                        <div className="flex items-baseline gap-2">
-                          <span className="text-sm font-semibold">User</span>
-                          <span className="text-[10px] text-muted-foreground">
-                            {msg.timestamp ? new Date(msg.timestamp).toLocaleString() : ""}
-                          </span>
+                  {messages?.map((msg) => {
+                    const isOwn = msg.senderId === "demo-participant";
+                    return (
+                      <div key={msg.id} className={`flex gap-3 ${isOwn ? "flex-row-reverse" : ""}`}>
+                        <Avatar className="w-8 h-8 flex-shrink-0">
+                          <AvatarFallback className={`text-xs font-bold ${getAvatarColor(msg.senderId)}`}>
+                            {msg.senderId.slice(0, 2).toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className={`flex-1 max-w-[75%] ${isOwn ? "text-right" : ""}`}>
+                          <div className={`flex items-baseline gap-2 ${isOwn ? "justify-end" : ""}`}>
+                            <span className="text-sm font-semibold">
+                              {isOwn ? "You" : "User"}
+                            </span>
+                            <span className="text-[10px] text-muted-foreground">
+                              {msg.timestamp ? new Date(msg.timestamp).toLocaleString() : ""}
+                            </span>
+                          </div>
+                          <div className={`inline-block mt-1 px-3 py-2 rounded-md text-sm ${
+                            isOwn
+                              ? "bg-primary/10 dark:bg-primary/20 text-foreground"
+                              : "bg-muted text-foreground"
+                          }`}>
+                            {msg.body}
+                          </div>
                         </div>
-                        <p className="text-sm mt-1">{msg.body}</p>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
-                <div className="p-3 border-t flex gap-2">
-                  <Input
-                    placeholder="Type a message..."
-                    className="flex-1"
-                    value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" && newMessage.trim()) {
-                        sendMessage.mutate();
-                      }
-                    }}
-                    data-testid="input-message"
-                  />
-                  <Button
-                    size="icon"
-                    disabled={!newMessage.trim() || sendMessage.isPending}
-                    onClick={() => sendMessage.mutate()}
-                    data-testid="button-send-message"
-                  >
-                    <Send className="w-4 h-4" />
-                  </Button>
+                <div className="p-3 border-t">
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="Type a message..."
+                      className="flex-1"
+                      value={newMessage}
+                      onChange={(e) => setNewMessage(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && newMessage.trim()) {
+                          sendMessage.mutate();
+                        }
+                      }}
+                      data-testid="input-message"
+                    />
+                    <Button
+                      size="icon"
+                      disabled={!newMessage.trim() || sendMessage.isPending}
+                      onClick={() => sendMessage.mutate()}
+                      data-testid="button-send-message"
+                    >
+                      <Send className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </div>
               </>
             )}

@@ -102,76 +102,80 @@ export default function WorkerDetailPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-4">
-          <Card className="p-6">
-            <div className="flex items-start gap-4">
-              <Avatar className="w-20 h-20 border-4 border-background shadow-lg flex-shrink-0">
-                {worker.photo ? (
-                  <AvatarImage src={worker.photo} alt={worker.user?.fullName || "Worker"} />
-                ) : (
-                  <AvatarFallback className="text-2xl font-black bg-primary/10 text-primary">
-                    {initials}
-                  </AvatarFallback>
-                )}
-              </Avatar>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <h1 className="text-2xl font-black tracking-tight" data-testid="text-worker-name">
-                    {worker.user?.fullName}
-                  </h1>
-                  {worker.ndisVerified && (
-                    <Badge variant="secondary" className="gap-1 bg-green-100 dark:bg-green-950/50 text-green-800 dark:text-green-300">
-                      <ShieldCheck className="w-3 h-3" /> Verified
-                    </Badge>
+          <Card>
+            <div className="relative h-28 rounded-t-md bg-gradient-to-r from-primary via-blue-600 to-indigo-700 dark:from-primary dark:via-blue-800 dark:to-indigo-900" />
+            <div className="px-6 pb-6">
+              <div className="flex items-end gap-4 -mt-10 mb-4">
+                <Avatar className="w-20 h-20 border-4 border-card shadow-lg flex-shrink-0">
+                  {worker.photo ? (
+                    <AvatarImage src={worker.photo} alt={worker.user?.fullName || "Worker"} />
+                  ) : (
+                    <AvatarFallback className="text-2xl font-black bg-primary/10 text-primary">
+                      {initials}
+                    </AvatarFallback>
                   )}
-                </div>
-                <p className="text-sm text-muted-foreground mt-1">{worker.title}</p>
-                <div className="flex items-center gap-3 mt-2 text-sm text-muted-foreground flex-wrap">
-                  <span className="flex items-center gap-1">
-                    <MapPin className="w-3 h-3" /> {worker.user?.location}
-                  </span>
-                  {worker.rating && Number(worker.rating) > 0 && (
-                    <span className="flex items-center gap-1">
-                      <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                      {Number(worker.rating).toFixed(1)} ({worker.reviewCount} reviews)
-                    </span>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            <Separator className="my-4" />
-
-            <div>
-              <h3 className="font-bold text-sm mb-2">About</h3>
-              <p className="text-sm text-muted-foreground">{worker.user?.bio}</p>
-            </div>
-
-            <Separator className="my-4" />
-
-            <div>
-              <h3 className="font-bold text-sm mb-2">Specializations</h3>
-              <div className="flex flex-wrap gap-1.5">
-                {worker.specializations?.map((spec, i) => (
-                  <Badge key={i} variant="secondary" className="text-xs">{spec}</Badge>
-                ))}
-              </div>
-            </div>
-
-            {worker.user?.languages && worker.user.languages.length > 0 && (
-              <>
-                <Separator className="my-4" />
-                <div>
-                  <h3 className="font-bold text-sm mb-2 flex items-center gap-1">
-                    <Globe className="w-3 h-3" /> Languages
-                  </h3>
-                  <div className="flex flex-wrap gap-1.5">
-                    {worker.user.languages.map((lang, i) => (
-                      <Badge key={i} variant="secondary" className="text-xs">{lang}</Badge>
-                    ))}
+                </Avatar>
+                <div className="flex-1 min-w-0 pb-1">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h1 className="text-2xl font-black tracking-tight" data-testid="text-worker-name">
+                      {worker.user?.fullName}
+                    </h1>
+                    {worker.ndisVerified && (
+                      <Badge variant="secondary" className="gap-1 bg-green-100 dark:bg-green-950/50 text-green-800 dark:text-green-300">
+                        <ShieldCheck className="w-3 h-3" /> Verified
+                      </Badge>
+                    )}
                   </div>
+                  <p className="text-sm text-muted-foreground mt-0.5">{worker.title}</p>
                 </div>
-              </>
-            )}
+              </div>
+
+              <div className="flex items-center gap-3 text-sm text-muted-foreground flex-wrap mb-4">
+                <span className="flex items-center gap-1">
+                  <MapPin className="w-3 h-3" /> {worker.user?.location}
+                </span>
+                {worker.rating && Number(worker.rating) > 0 && (
+                  <span className="flex items-center gap-1">
+                    <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                    {Number(worker.rating).toFixed(1)} ({worker.reviewCount} reviews)
+                  </span>
+                )}
+              </div>
+
+              <Separator className="my-4" />
+
+              <div>
+                <h3 className="font-bold text-sm mb-2">About</h3>
+                <p className="text-sm text-muted-foreground">{worker.user?.bio}</p>
+              </div>
+
+              <Separator className="my-4" />
+
+              <div>
+                <h3 className="font-bold text-sm mb-2">Specializations</h3>
+                <div className="flex flex-wrap gap-1.5">
+                  {worker.specializations?.map((spec, i) => (
+                    <Badge key={i} variant="secondary" className="text-xs">{spec}</Badge>
+                  ))}
+                </div>
+              </div>
+
+              {worker.user?.languages && worker.user.languages.length > 0 && (
+                <>
+                  <Separator className="my-4" />
+                  <div>
+                    <h3 className="font-bold text-sm mb-2 flex items-center gap-1">
+                      <Globe className="w-3 h-3" /> Languages
+                    </h3>
+                    <div className="flex flex-wrap gap-1.5">
+                      {worker.user.languages.map((lang, i) => (
+                        <Badge key={i} variant="secondary" className="text-xs">{lang}</Badge>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
           </Card>
         </div>
 
@@ -180,22 +184,30 @@ export default function WorkerDetailPage() {
             <h3 className="font-bold text-sm mb-3">Quick Info</h3>
             <div className="space-y-3 text-sm">
               <div className="flex items-center gap-2">
-                <DollarSign className="w-4 h-4 text-muted-foreground" />
+                <div className="w-7 h-7 rounded-full bg-emerald-100 dark:bg-emerald-950/40 flex items-center justify-center flex-shrink-0">
+                  <DollarSign className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                </div>
                 <span>${worker.hourlyRate}/hr</span>
               </div>
               <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4 text-muted-foreground" />
+                <div className="w-7 h-7 rounded-full bg-blue-100 dark:bg-blue-950/40 flex items-center justify-center flex-shrink-0">
+                  <Clock className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                </div>
                 <span>{worker.availability}</span>
               </div>
               {worker.transportCapable && (
                 <div className="flex items-center gap-2">
-                  <Car className="w-4 h-4 text-muted-foreground" />
+                  <div className="w-7 h-7 rounded-full bg-violet-100 dark:bg-violet-950/40 flex items-center justify-center flex-shrink-0">
+                    <Car className="w-3.5 h-3.5 text-violet-600 dark:text-violet-400" />
+                  </div>
                   <span>{worker.transportType || "Transport Available"}</span>
                 </div>
               )}
               {worker.wheelchairAccessible && (
                 <div className="flex items-center gap-2">
-                  <Accessibility className="w-4 h-4 text-muted-foreground" />
+                  <div className="w-7 h-7 rounded-full bg-amber-100 dark:bg-amber-950/40 flex items-center justify-center flex-shrink-0">
+                    <Accessibility className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                  </div>
                   <span>Wheelchair Accessible</span>
                 </div>
               )}
@@ -207,9 +219,11 @@ export default function WorkerDetailPage() {
               Book This Worker
             </Button>
           ) : (
-            <Card className="p-5">
-              <h3 className="font-bold text-sm mb-3">Book {worker.user?.fullName?.split(" ")[0]}</h3>
-              <div className="space-y-3">
+            <Card className="overflow-visible">
+              <div className="rounded-t-md bg-gradient-to-r from-primary via-blue-600 to-indigo-700 dark:from-primary dark:via-blue-800 dark:to-indigo-900 px-5 py-3">
+                <h3 className="font-bold text-sm text-white">Book {worker.user?.fullName?.split(" ")[0]}</h3>
+              </div>
+              <div className="p-5 space-y-3">
                 <div>
                   <Label className="text-xs font-semibold">Date</Label>
                   <div className="relative mt-1">

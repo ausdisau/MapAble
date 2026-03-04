@@ -15,6 +15,22 @@ import {
   Globe,
 } from "lucide-react";
 
+function SectionHeader({ icon: Icon, title, description, iconColor }: { icon: any; title: string; description: string; iconColor?: string }) {
+  return (
+    <div className="rounded-t-md bg-gradient-to-r from-primary via-blue-600 to-indigo-700 dark:from-primary dark:via-blue-800 dark:to-indigo-900 px-5 py-4">
+      <div className="flex items-center gap-3">
+        <div className="w-8 h-8 rounded-md bg-white/20 flex items-center justify-center">
+          <Icon className="w-4 h-4 text-white" />
+        </div>
+        <div>
+          <h2 className="font-bold text-white">{title}</h2>
+          <p className="text-xs text-white/70">{description}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function SettingsPage() {
   const { theme, toggleTheme } = useTheme();
 
@@ -27,14 +43,9 @@ export default function SettingsPage() {
         </p>
       </div>
 
-      <Card className="p-6">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-8 h-8 rounded-md bg-primary/10 flex items-center justify-center">
-            <User className="w-4 h-4 text-primary" />
-          </div>
-          <h2 className="font-bold">Profile</h2>
-        </div>
-        <div className="grid gap-4">
+      <Card className="overflow-visible">
+        <SectionHeader icon={User} title="Profile" description="Your personal information" />
+        <div className="p-5 grid gap-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <Label className="text-sm font-semibold">Full Name</Label>
@@ -52,14 +63,9 @@ export default function SettingsPage() {
         </div>
       </Card>
 
-      <Card className="p-6">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-8 h-8 rounded-md bg-violet-100 dark:bg-violet-950/40 flex items-center justify-center">
-            <Accessibility className="w-4 h-4 text-violet-600 dark:text-violet-400" />
-          </div>
-          <h2 className="font-bold">Accessibility</h2>
-        </div>
-        <div className="space-y-4">
+      <Card className="overflow-visible">
+        <SectionHeader icon={Accessibility} title="Accessibility" description="Display and interaction preferences" />
+        <div className="p-5 space-y-4">
           <div className="flex items-center justify-between gap-4">
             <div>
               <p className="text-sm font-semibold">Dark Mode</p>
@@ -94,14 +100,9 @@ export default function SettingsPage() {
         </div>
       </Card>
 
-      <Card className="p-6">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-8 h-8 rounded-md bg-amber-100 dark:bg-amber-950/40 flex items-center justify-center">
-            <Bell className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-          </div>
-          <h2 className="font-bold">Notifications</h2>
-        </div>
-        <div className="space-y-4">
+      <Card className="overflow-visible">
+        <SectionHeader icon={Bell} title="Notifications" description="Choose what updates you receive" />
+        <div className="p-5 space-y-4">
           <div className="flex items-center justify-between gap-4">
             <div>
               <p className="text-sm font-semibold">Booking Updates</p>
@@ -128,14 +129,9 @@ export default function SettingsPage() {
         </div>
       </Card>
 
-      <Card className="p-6">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-8 h-8 rounded-md bg-emerald-100 dark:bg-emerald-950/40 flex items-center justify-center">
-            <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-          </div>
-          <h2 className="font-bold">NDIS & Verification</h2>
-        </div>
-        <div className="space-y-3">
+      <Card className="overflow-visible">
+        <SectionHeader icon={ShieldCheck} title="NDIS & Verification" description="Manage your credentials" />
+        <div className="p-5 space-y-3">
           <div className="flex items-center justify-between gap-4">
             <div>
               <p className="text-sm font-semibold">NDIS Worker Screening</p>

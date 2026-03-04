@@ -20,6 +20,8 @@ import {
   SidebarHeader,
   SidebarFooter,
 } from "@/components/ui/sidebar";
+import { Badge } from "@/components/ui/badge";
+import logoImage from "@assets/Accessible_Australia_Logo_Design_1772582762574.png";
 
 const navItems = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard },
@@ -38,12 +40,13 @@ export function AppSidebar() {
       <SidebarHeader className="p-4">
         <Link href="/">
           <div className="flex items-center gap-3 cursor-pointer" data-testid="link-home">
-            <div className="w-9 h-9 rounded-md bg-primary flex items-center justify-center">
-              <ShieldCheck className="w-5 h-5 text-primary-foreground" />
-            </div>
-            <div>
-              <span className="text-lg font-black tracking-tight">MapAble</span>
-              <span className="text-[10px] font-bold text-muted-foreground ml-1">3.0</span>
+            <img src={logoImage} alt="MapAble" className="w-9 h-9 rounded-md object-contain" data-testid="img-sidebar-logo" />
+            <div className="flex flex-col">
+              <div className="flex items-center gap-1">
+                <span className="text-lg font-black tracking-tight">MapAble</span>
+                <span className="text-[10px] font-bold text-muted-foreground">4.0</span>
+              </div>
+              <span className="text-[10px] text-muted-foreground leading-none tracking-wide">Empowering Independence</span>
             </div>
           </div>
         </Link>
@@ -57,10 +60,14 @@ export function AppSidebar() {
                 const isActive = location === item.url || (item.url !== "/" && location.startsWith(item.url));
                 return (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild data-active={isActive}>
+                    <SidebarMenuButton
+                      asChild
+                      data-active={isActive}
+                      className={isActive ? "bg-sidebar-accent text-sidebar-accent-foreground" : ""}
+                    >
                       <Link href={item.url} data-testid={`link-nav-${item.title.toLowerCase().replace(/\s/g, "-")}`}>
-                        <item.icon className="w-4 h-4" />
-                        <span>{item.title}</span>
+                        <item.icon className={`w-4 h-4 ${isActive ? "text-[#2EAA6E]" : ""}`} />
+                        <span className={isActive ? "font-semibold" : ""}>{item.title}</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -71,10 +78,10 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter className="p-4">
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <ShieldCheck className="w-3 h-3" />
-          <span>NDIS Registered</span>
-        </div>
+        <Badge variant="outline" className="no-default-active-elevate gap-2 py-1.5 px-3 border-[#2EAA6E]/30 bg-[#2EAA6E]/10 text-[#2EAA6E] dark:text-[#3CC87F] justify-center" data-testid="badge-ndis-registered">
+          <ShieldCheck className="w-3.5 h-3.5" />
+          <span className="text-xs font-semibold">NDIS Registered Provider</span>
+        </Badge>
       </SidebarFooter>
     </Sidebar>
   );

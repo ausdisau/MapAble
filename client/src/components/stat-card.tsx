@@ -11,13 +11,34 @@ interface StatCardProps {
 }
 
 export function StatCard({ title, value, description, icon: Icon, trend, color = "primary" }: StatCardProps) {
-  const colorMap: Record<string, string> = {
-    primary: "bg-primary/10 text-primary",
-    blue: "bg-blue-100 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400",
-    green: "bg-emerald-100 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400",
-    purple: "bg-violet-100 dark:bg-violet-950/40 text-violet-600 dark:text-violet-400",
-    amber: "bg-amber-100 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400",
+  const colorMap: Record<string, { icon: string; bg: string }> = {
+    primary: {
+      icon: "text-primary",
+      bg: "bg-primary/10",
+    },
+    blue: {
+      icon: "text-[#1B6EB5] dark:text-blue-400",
+      bg: "bg-[#1B6EB5]/10 dark:bg-blue-950/40",
+    },
+    green: {
+      icon: "text-[#2EAA6E] dark:text-emerald-400",
+      bg: "bg-[#2EAA6E]/10 dark:bg-emerald-950/40",
+    },
+    teal: {
+      icon: "text-[#2EAA6E]",
+      bg: "bg-[#2EAA6E]/15 dark:bg-[#2EAA6E]/20",
+    },
+    purple: {
+      icon: "text-violet-600 dark:text-violet-400",
+      bg: "bg-violet-100 dark:bg-violet-950/40",
+    },
+    amber: {
+      icon: "text-[#E6A817] dark:text-amber-400",
+      bg: "bg-[#E6A817]/10 dark:bg-amber-950/40",
+    },
   };
+
+  const colorStyle = colorMap[color] || colorMap.primary;
 
   return (
     <Card className="p-4 hover-elevate">
@@ -31,11 +52,11 @@ export function StatCard({ title, value, description, icon: Icon, trend, color =
             <p className="text-xs text-muted-foreground mt-1">{description}</p>
           )}
           {trend && (
-            <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 mt-1">{trend}</p>
+            <p className="text-xs font-semibold text-[#2EAA6E] mt-1">{trend}</p>
           )}
         </div>
-        <div className={`w-10 h-10 rounded-md flex items-center justify-center ${colorMap[color] || colorMap.primary}`}>
-          <Icon className="w-5 h-5" />
+        <div className={`w-11 h-11 rounded-md flex items-center justify-center ${colorStyle.bg}`}>
+          <Icon className={`w-5 h-5 ${colorStyle.icon}`} />
         </div>
       </div>
     </Card>
