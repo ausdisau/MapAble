@@ -26,6 +26,19 @@ function HeroSection() {
   return (
     <div className="relative rounded-md overflow-visible bg-gradient-to-r from-[#14578F] via-[#1B6EB5] to-[#2384C9] dark:from-[#0F1A2E] dark:via-[#14578F] dark:to-[#1B6EB5] p-8 md:p-12 text-white">
       <div className="absolute inset-0 rounded-md bg-[radial-gradient(ellipse_at_70%_20%,rgba(255,255,255,0.10)_0%,transparent_60%)]" />
+      <div
+        className="absolute right-8 md:right-16 top-1/2 -translate-y-1/2 w-20 h-28 md:w-28 md:h-40 opacity-[0.07] pointer-events-none"
+        style={{
+          background: "linear-gradient(180deg, #2EAA6E 33%, #1A4B7A 33% 66%, #E6A817 66%)",
+          borderRadius: "50% 50% 50% 50% / 35% 35% 65% 65%",
+        }}
+        data-testid="deco-pin-silhouette"
+      />
+      <div className="absolute top-6 right-24 md:right-40 w-2 h-2 rounded-full opacity-30 pointer-events-none" style={{ backgroundColor: "#E6A817" }} />
+      <div className="absolute top-12 right-12 md:right-24 w-1.5 h-1.5 rounded-full opacity-25 pointer-events-none" style={{ backgroundColor: "#E6A817" }} />
+      <div className="absolute bottom-8 right-20 md:right-36 w-1 h-1 rounded-full opacity-35 pointer-events-none" style={{ backgroundColor: "#E6A817" }} />
+      <div className="absolute bottom-16 right-32 md:right-48 w-1.5 h-1.5 rounded-full opacity-20 pointer-events-none" style={{ backgroundColor: "#E6A817" }} />
+      <div className="absolute top-20 right-36 md:right-56 w-1 h-1 rounded-full opacity-30 pointer-events-none" style={{ backgroundColor: "#E6A817" }} />
       <div className="relative z-10 max-w-3xl">
         <Badge className="mb-5 bg-white/15 text-white border-white/25 no-default-hover-elevate no-default-active-elevate">
           <ShieldCheck className="w-3 h-3 mr-1" /> NDIS Registered Platform

@@ -5,6 +5,11 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { useTheme } from "@/components/theme-provider";
+import { useUpload } from "@/hooks/use-upload";
+import { useToast } from "@/hooks/use-toast";
+import { useQuery } from "@tanstack/react-query";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useState, useRef, useEffect } from "react";
 import {
   User,
   Bell,
@@ -13,6 +18,9 @@ import {
   Sun,
   ShieldCheck,
   Globe,
+  Camera,
+  Upload,
+  Loader2,
 } from "lucide-react";
 
 function SectionHeader({ icon: Icon, title, description, iconColor }: { icon: any; title: string; description: string; iconColor?: string }) {
@@ -27,6 +35,96 @@ function SectionHeader({ icon: Icon, title, description, iconColor }: { icon: an
           <p className="text-xs text-white/70">{description}</p>
         </div>
       </div>
+    </div>
+  );
+}
+
+function ProfilePhotoUpload() {
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
+
+  const { data: currentUser } = useQuery<{ id: string; avatar: string | null }>({
+    queryKey: ["/api/me"],
+  });
+
+  useEffect(() => {
+    if (currentUser?.avatar) {
+      setAvatarUrl(currentUser.avatar);
+    }
+  }, [currentUser?.avatar]);
+
+  const { uploadFile, isUploading } = useUpload({
+    onSuccess: async (response) => {
+      setAvatarUrl(response.objectPath);
+      if (currentUser?.id) {
+        try {
+          await apiRequest("PATCH", `/api/users/${currentUser.id}/avatar`, { avatar: response.objectPath });
+          queryClient.invalidateQueries({ queryKey: ["/api/me"] });
+        } catch {
+        }
+      }
+      toast({ title: "Photo uploaded", description: "Your profile photo has been updated" });
+    },
+    onError: (error) => {
+      toast({ title: "Upload failed", description: error.message, variant: "destructive" });
+    },
+  });
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (!file.type.startsWith("image/")) {
+        toast({ title: "Invalid file", description: "Please select an image file", variant: "destructive" });
+        return;
+      }
+      await uploadFile(file);
+    }
+  };
+
+  return (
+    <div className="flex items-center gap-5" data-testid="profile-photo-upload">
+      <div className="relative">
+        <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#D4EAF7] to-[#E8F0F8] dark:from-[#1A4B7A] dark:to-[#14578F] flex items-center justify-center overflow-hidden border-2 border-border">
+          {avatarUrl ? (
+            <img src={avatarUrl} alt="Profile" className="w-full h-full object-cover" data-testid="img-profile-avatar" />
+          ) : (
+            <User className="w-8 h-8 text-muted-foreground" />
+          )}
+        </div>
+        <button
+          className="absolute bottom-0 right-0 w-7 h-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-md"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={isUploading}
+          data-testid="button-change-avatar"
+          aria-label="Change profile photo"
+        >
+          {isUploading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Camera className="w-3.5 h-3.5" />}
+        </button>
+      </div>
+      <div>
+        <p className="text-sm font-semibold">Profile Photo</p>
+        <p className="text-xs text-muted-foreground mb-2">Upload a photo to personalize your profile</p>
+        <Button
+          variant="secondary"
+          size="sm"
+          className="gap-1.5"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={isUploading}
+          data-testid="button-upload-photo"
+        >
+          {isUploading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5" />}
+          {isUploading ? "Uploading..." : "Upload Photo"}
+        </Button>
+      </div>
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={handleFileChange}
+        data-testid="input-file-avatar"
+      />
     </div>
   );
 }
@@ -46,6 +144,8 @@ export default function SettingsPage() {
       <Card className="overflow-visible">
         <SectionHeader icon={User} title="Profile" description="Your personal information" />
         <div className="p-5 grid gap-4">
+          <ProfilePhotoUpload />
+          <Separator />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <Label className="text-sm font-semibold">Full Name</Label>

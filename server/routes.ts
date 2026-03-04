@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { registerObjectStorageRoutes } from "./replit_integrations/object_storage";
 import {
   insertBookingSchema,
   insertJobSchema,
@@ -12,6 +13,15 @@ export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
+
+  registerObjectStorageRoutes(app);
+
+  app.get("/api/me", async (_req, res) => {
+    const user = await storage.getUserByRole("participant");
+    if (!user) return res.status(404).json({ message: "No user found" });
+    const { password, ...safeUser } = user;
+    res.json(safeUser);
+  });
 
   app.get("/api/workers", async (_req, res) => {
     const workers = await storage.getWorkers();
@@ -76,6 +86,22 @@ export async function registerRoutes(
     if (!parsed.success) return res.status(400).json({ message: parsed.error.message });
     const message = await storage.createMessage(parsed.data);
     res.status(201).json(message);
+  });
+
+  app.patch("/api/workers/:id/photo", async (req, res) => {
+    const { photo } = req.body;
+    if (!photo) return res.status(400).json({ message: "photo path required" });
+    const worker = await storage.updateWorkerPhoto(req.params.id, photo);
+    if (!worker) return res.status(404).json({ message: "Worker not found" });
+    res.json(worker);
+  });
+
+  app.patch("/api/users/:id/avatar", async (req, res) => {
+    const { avatar } = req.body;
+    if (!avatar) return res.status(400).json({ message: "avatar path required" });
+    const user = await storage.updateUserAvatar(req.params.id, avatar);
+    if (!user) return res.status(404).json({ message: "User not found" });
+    res.json(user);
   });
 
   return httpServer;

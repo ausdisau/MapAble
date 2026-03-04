@@ -74,6 +74,9 @@ export default {
           foreground: "hsl(var(--sidebar-accent-foreground) / <alpha-value>)",
           border: "var(--sidebar-accent-border)"
         },
+        "map-teal": "hsl(var(--map-teal) / <alpha-value>)",
+        "map-navy": "hsl(var(--map-navy) / <alpha-value>)",
+        "map-gold": "hsl(var(--map-gold) / <alpha-value>)",
         status: {
           online: "rgb(34 197 94)",
           away: "rgb(245 158 11)",
