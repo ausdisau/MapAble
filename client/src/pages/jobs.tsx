@@ -2,7 +2,6 @@ import { useQuery } from "@tanstack/react-query";
 import { JobCard } from "@/components/job-card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card } from "@/components/ui/card";
 import { Search, SlidersHorizontal, Briefcase } from "lucide-react";
@@ -41,11 +40,17 @@ export default function JobsPage() {
 
   return (
     <div className="p-4 md:p-6 max-w-7xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-2xl font-black tracking-tight" data-testid="text-page-title">Find a Job</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Discover employment opportunities in disability support services
-        </p>
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-black tracking-tight" data-testid="text-page-title">Find a Job</h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Discover employment opportunities in disability support services
+          </p>
+        </div>
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Briefcase className="w-4 h-4" />
+          <span>{jobs?.length || 0} opportunities</span>
+        </div>
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3">
@@ -64,19 +69,19 @@ export default function JobsPage() {
         </Button>
       </div>
 
-      <div className="flex flex-wrap gap-2">
+      <Card className="p-1.5 flex flex-wrap gap-1">
         {categoryFilters.map((cat) => (
-          <Badge
+          <Button
             key={cat.value}
-            variant={activeCategory === cat.value ? "default" : "secondary"}
-            className="cursor-pointer"
+            variant={activeCategory === cat.value ? "default" : "ghost"}
+            size="sm"
             onClick={() => setActiveCategory(cat.value)}
             data-testid={`button-category-${cat.value}`}
           >
             {cat.label}
-          </Badge>
+          </Button>
         ))}
-      </div>
+      </Card>
 
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

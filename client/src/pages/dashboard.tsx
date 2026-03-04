@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Input } from "@/components/ui/input";
 import {
   HeartHandshake,
   Briefcase,
@@ -16,45 +17,61 @@ import {
   ShieldCheck,
   Car,
   Accessibility,
+  CheckCircle2,
 } from "lucide-react";
 import { Link } from "wouter";
 import type { Worker, User, Job } from "@shared/schema";
 
 function HeroSection() {
   return (
-    <div className="relative rounded-md bg-gradient-to-br from-primary via-blue-600 to-indigo-700 dark:from-primary dark:via-blue-800 dark:to-indigo-900 p-8 md:p-12 text-white">
-      <div className="absolute inset-0 rounded-md bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.12)_0%,transparent_60%)]" />
-      <div className="relative z-10 max-w-2xl">
-        <Badge className="mb-4 bg-white/20 text-white border-white/30">
+    <div className="relative rounded-md overflow-visible bg-gradient-to-r from-[#14578F] via-[#1B6EB5] to-[#2384C9] dark:from-[#0F1A2E] dark:via-[#14578F] dark:to-[#1B6EB5] p-8 md:p-12 text-white">
+      <div className="absolute inset-0 rounded-md bg-[radial-gradient(ellipse_at_70%_20%,rgba(255,255,255,0.10)_0%,transparent_60%)]" />
+      <div className="relative z-10 max-w-3xl">
+        <Badge className="mb-5 bg-white/15 text-white border-white/25 no-default-hover-elevate no-default-active-elevate">
           <ShieldCheck className="w-3 h-3 mr-1" /> NDIS Registered Platform
         </Badge>
-        <h1 className="text-3xl md:text-4xl font-black tracking-tight leading-tight mb-3">
+        <h1 className="text-3xl md:text-5xl font-black tracking-tight leading-tight mb-5" data-testid="text-hero-heading">
           Find verified NDIS support workers & services
         </h1>
-        <p className="text-base text-white/80 mb-6 max-w-lg">
-          Book carers, arrange transport, and find employment opportunities - all in one accessible platform.
+        <p className="text-base md:text-lg text-white/80 mb-6 max-w-xl">
+          Book carers, arrange transport, and find employment opportunities — all in one accessible platform.
         </p>
-        <div className="flex flex-wrap gap-3">
-          <Link href="/care">
-            <Button size="lg" variant="secondary" className="font-bold gap-2" data-testid="button-hero-care">
-              <HeartHandshake className="w-4 h-4" /> Book a Carer
-            </Button>
-          </Link>
-          <Link href="/transport">
-            <Button size="lg" variant="outline" className="font-bold gap-2 bg-white/10 border-white/30 text-white backdrop-blur-sm" data-testid="button-hero-transport">
-              <Bus className="w-4 h-4" /> Get Transport
-            </Button>
-          </Link>
-          <Link href="/jobs">
-            <Button size="lg" variant="outline" className="font-bold gap-2 bg-white/10 border-white/30 text-white backdrop-blur-sm" data-testid="button-hero-jobs">
-              <Briefcase className="w-4 h-4" /> Find a Job
-            </Button>
-          </Link>
+
+        <div className="space-y-2 mb-8">
+          {[
+            "NDIS Worker Screening verified",
+            "Transport-capable support workers",
+            "Arrange services independently",
+          ].map((benefit) => (
+            <div key={benefit} className="flex items-center gap-2.5">
+              <CheckCircle2 className="w-4 h-4 text-[#2EAA6E] flex-shrink-0" />
+              <span className="text-sm md:text-base font-medium text-white/90">{benefit}</span>
+            </div>
+          ))}
+        </div>
+
+        <div className="flex flex-col sm:flex-row gap-3 max-w-xl">
+          <div className="relative flex-1">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              type="search"
+              placeholder="Search workers, services, locations..."
+              className="pl-10 bg-white dark:bg-white/10 text-foreground dark:text-white border-white/20 rounded-md text-sm"
+              data-testid="input-hero-search"
+            />
+          </div>
+          <Button
+            size="lg"
+            className="font-bold gap-2"
+            data-testid="button-hero-search"
+          >
+            <Search className="w-4 h-4" /> Search
+          </Button>
         </div>
       </div>
 
-      <div className="absolute bottom-0 right-0 w-48 h-48 md:w-64 md:h-64 opacity-10">
-        <div className="w-full h-full rounded-full bg-white/20 blur-3xl" />
+      <div className="absolute bottom-0 right-0 w-48 h-48 md:w-72 md:h-72 opacity-10 pointer-events-none">
+        <div className="w-full h-full rounded-full bg-white/30 blur-3xl" />
       </div>
     </div>
   );
@@ -67,21 +84,24 @@ function QuickActions() {
       description: "Find verified support workers near you",
       icon: HeartHandshake,
       href: "/care",
-      color: "bg-blue-100 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400",
+      iconBg: "bg-[#E6A817]/15 dark:bg-[#E6A817]/20",
+      iconColor: "text-[#C48F14] dark:text-[#E6A817]",
     },
     {
       title: "Get Transport",
       description: "Wheelchair accessible transport services",
       icon: Bus,
       href: "/transport",
-      color: "bg-emerald-100 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400",
+      iconBg: "bg-[#E6A817]/15 dark:bg-[#E6A817]/20",
+      iconColor: "text-[#C48F14] dark:text-[#E6A817]",
     },
     {
       title: "Find a Job",
       description: "Employment opportunities in disability support",
       icon: Briefcase,
       href: "/jobs",
-      color: "bg-violet-100 dark:bg-violet-950/40 text-violet-600 dark:text-violet-400",
+      iconBg: "bg-[#E6A817]/15 dark:bg-[#E6A817]/20",
+      iconColor: "text-[#C48F14] dark:text-[#E6A817]",
     },
   ];
 
@@ -90,10 +110,10 @@ function QuickActions() {
       {actions.map((action) => (
         <Link key={action.title} href={action.href}>
           <Card className="p-5 cursor-pointer hover-elevate h-full">
-            <div className={`w-10 h-10 rounded-md flex items-center justify-center ${action.color} mb-3`}>
-              <action.icon className="w-5 h-5" />
+            <div className={`w-11 h-11 rounded-md flex items-center justify-center ${action.iconBg} mb-3`}>
+              <action.icon className={`w-5 h-5 ${action.iconColor}`} />
             </div>
-            <h3 className="font-bold text-sm mb-1" data-testid={`text-action-${action.title.toLowerCase().replace(/\s/g, "-")}`}>
+            <h3 className="font-black text-sm mb-1" data-testid={`text-action-${action.title.toLowerCase().replace(/\s/g, "-")}`}>
               {action.title}
             </h3>
             <p className="text-xs text-muted-foreground">{action.description}</p>
@@ -130,7 +150,7 @@ function FeaturedWorkers() {
     <div>
       <div className="flex items-center justify-between gap-2 mb-4">
         <div>
-          <h2 className="text-lg font-black tracking-tight">Featured Support Workers</h2>
+          <h2 className="text-xl font-black tracking-tight" data-testid="text-section-featured-workers">Featured Support Workers</h2>
           <p className="text-sm text-muted-foreground">NDIS verified and ready to help</p>
         </div>
         <Link href="/care">
@@ -171,7 +191,7 @@ function RecentJobs() {
     <div>
       <div className="flex items-center justify-between gap-2 mb-4">
         <div>
-          <h2 className="text-lg font-black tracking-tight">Latest Job Opportunities</h2>
+          <h2 className="text-xl font-black tracking-tight" data-testid="text-section-latest-jobs">Latest Job Opportunities</h2>
           <p className="text-sm text-muted-foreground">Work in disability support services</p>
         </div>
         <Link href="/jobs">
@@ -199,12 +219,12 @@ function KeyFeatures() {
 
   return (
     <Card className="p-5">
-      <h3 className="font-bold text-sm mb-3">Why MapAble?</h3>
+      <h3 className="font-black text-base mb-4" data-testid="text-section-why-mapable">Why MapAble?</h3>
       <div className="space-y-3">
         {features.map((f, i) => (
           <div key={i} className="flex items-center gap-3">
-            <div className="w-7 h-7 rounded-full bg-emerald-100 dark:bg-emerald-950/40 flex items-center justify-center flex-shrink-0">
-              <f.icon className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+            <div className="w-8 h-8 rounded-md bg-[#2EAA6E]/15 dark:bg-[#2EAA6E]/20 flex items-center justify-center flex-shrink-0">
+              <f.icon className="w-4 h-4 text-[#2EAA6E]" />
             </div>
             <span className="text-sm font-medium">{f.label}</span>
           </div>
@@ -226,7 +246,7 @@ export default function Dashboard() {
         <StatCard title="Support Workers" value={workers?.length || 0} icon={Users} color="blue" />
         <StatCard title="Active Jobs" value={jobs?.filter(j => j.status === "open").length || 0} icon={Briefcase} color="purple" />
         <StatCard title="Transport Ready" value={workers?.filter(w => w.transportCapable).length || 0} icon={Bus} color="green" />
-        <StatCard title="Verified Workers" value={workers?.filter(w => w.ndisVerified).length || 0} icon={ShieldCheck} color="amber" />
+        <StatCard title="Verified Workers" value={workers?.filter(w => w.ndisVerified).length || 0} icon={ShieldCheck} color="teal" />
       </div>
 
       <QuickActions />

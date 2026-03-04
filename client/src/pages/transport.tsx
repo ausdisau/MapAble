@@ -18,6 +18,7 @@ import {
   Calendar,
   ArrowRight,
   ShieldCheck,
+  Star,
 } from "lucide-react";
 import { useState } from "react";
 import type { TransportRequest, Worker, User } from "@shared/schema";
@@ -60,9 +61,14 @@ function TransportBookingForm() {
   });
 
   return (
-    <Card className="p-6">
-      <h2 className="text-lg font-bold mb-4">Request Transport</h2>
-      <div className="space-y-4">
+    <Card className="overflow-visible">
+      <div className="rounded-t-md bg-gradient-to-r from-primary via-blue-600 to-indigo-700 dark:from-primary dark:via-blue-800 dark:to-indigo-900 px-5 py-4">
+        <h2 className="text-lg font-black text-white flex items-center gap-2">
+          <Bus className="w-5 h-5" /> Request Transport
+        </h2>
+        <p className="text-sm text-white/70 mt-0.5">Book accessible transport</p>
+      </div>
+      <div className="p-5 space-y-4">
         <div>
           <Label className="text-sm font-semibold">Pickup Location</Label>
           <div className="relative mt-1">
@@ -177,21 +183,26 @@ function TransportDrivers() {
 
   return (
     <div className="space-y-3">
-      <h2 className="text-lg font-bold">Available Drivers</h2>
+      <div className="flex items-center justify-between gap-2">
+        <h2 className="text-lg font-black tracking-tight">Available Drivers</h2>
+        <Badge variant="secondary">{transportWorkers?.length || 0} drivers</Badge>
+      </div>
       {transportWorkers?.map((w) => (
         <Card key={w.id} className="p-4 hover-elevate">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-950/40 flex items-center justify-center text-emerald-600 dark:text-emerald-400 font-bold text-sm flex-shrink-0">
+            <div className="w-11 h-11 rounded-full bg-gradient-to-br from-blue-100 to-indigo-50 dark:from-blue-950/40 dark:to-indigo-950/30 flex items-center justify-center font-bold text-sm flex-shrink-0 text-primary">
               {w.user?.fullName?.split(" ").map((n) => n[0]).join("") || "SW"}
             </div>
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <span className="font-bold text-sm truncate">{w.user?.fullName}</span>
                 {w.ndisVerified && (
-                  <ShieldCheck className="w-3 h-3 text-emerald-500 flex-shrink-0" />
+                  <Badge variant="secondary" className="gap-0.5 bg-green-100 dark:bg-green-950/50 text-green-800 dark:text-green-300 text-[10px]">
+                    <ShieldCheck className="w-3 h-3" /> Verified
+                  </Badge>
                 )}
               </div>
-              <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">
+              <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5 flex-wrap">
                 <span className="flex items-center gap-1">
                   <Car className="w-3 h-3" /> {w.transportType || "Car"}
                 </span>
@@ -203,9 +214,15 @@ function TransportDrivers() {
                 <span className="flex items-center gap-1">
                   <MapPin className="w-3 h-3" /> {w.user?.location}
                 </span>
+                {w.rating && Number(w.rating) > 0 && (
+                  <span className="flex items-center gap-1">
+                    <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                    {Number(w.rating).toFixed(1)}
+                  </span>
+                )}
               </div>
             </div>
-            <Button size="sm" variant="secondary" data-testid={`button-select-driver-${w.id}`}>
+            <Button size="sm" data-testid={`button-select-driver-${w.id}`}>
               Select
             </Button>
           </div>
@@ -242,13 +259,13 @@ function RecentRequests() {
 
   return (
     <div className="space-y-3">
-      <h2 className="text-lg font-bold">Recent Requests</h2>
+      <h2 className="text-lg font-black tracking-tight">Recent Requests</h2>
       {requests.map((r) => (
         <Card key={r.id} className="p-4 hover-elevate">
           <div className="flex items-start justify-between gap-2 mb-2">
             <div className="text-sm font-medium">
               <div className="flex items-center gap-1.5">
-                <MapPin className="w-3 h-3 text-muted-foreground" />
+                <MapPin className="w-3 h-3 text-primary" />
                 {r.pickupLocation}
               </div>
               <div className="flex items-center gap-1.5 mt-1">
@@ -258,7 +275,7 @@ function RecentRequests() {
             </div>
             <Badge className={statusColors[r.status] || ""}>{r.status.replace("_", " ")}</Badge>
           </div>
-          <div className="flex items-center gap-3 text-xs text-muted-foreground">
+          <div className="flex items-center gap-3 text-xs text-muted-foreground flex-wrap">
             <span className="flex items-center gap-1">
               <Calendar className="w-3 h-3" /> {r.date}
             </span>
