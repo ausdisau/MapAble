@@ -240,3 +240,40 @@
     inset: -1px;
   }
 }
+
+.easy-read {
+  font-size: 118%;
+  line-height: 1.8;
+  letter-spacing: 0.02em;
+  word-spacing: 0.12em;
+}
+
+.easy-read p,
+.easy-read span,
+.easy-read li,
+.easy-read label,
+.easy-read td,
+.easy-read th {
+  font-size: 1.05rem;
+  line-height: 1.85;
+}
+
+.easy-read h1 { font-size: 2.2rem; }
+.easy-read h2 { font-size: 1.75rem; }
+.easy-read h3 { font-size: 1.4rem; }
+
+.easy-read .gap-1 { gap: 0.5rem; }
+.easy-read .gap-1\.5 { gap: 0.625rem; }
+.easy-read .gap-2 { gap: 0.75rem; }
+.easy-read .gap-3 { gap: 1rem; }
+.easy-read .space-y-2 > * + * { margin-top: 0.75rem; }
+.easy-read .space-y-3 > * + * { margin-top: 1rem; }
+.easy-read .space-y-4 > * + * { margin-top: 1.25rem; }
+
+.easy-read button,
+.easy-read [role="button"] {
+  min-height: 44px;
+  min-width: 44px;
+  padding-top: 0.625rem;
+  padding-bottom: 0.625rem;
+}

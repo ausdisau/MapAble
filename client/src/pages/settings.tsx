@@ -21,7 +21,47 @@ import {
   Camera,
   Upload,
   Loader2,
+  BookOpen,
 } from "lucide-react";
+
+function EasyReadToggle() {
+  const [enabled, setEnabled] = useState(() => {
+    return localStorage.getItem("easy-read") === "true";
+  });
+
+  const toggle = (checked: boolean) => {
+    setEnabled(checked);
+    localStorage.setItem("easy-read", String(checked));
+    if (checked) {
+      document.documentElement.classList.add("easy-read");
+    } else {
+      document.documentElement.classList.remove("easy-read");
+    }
+  };
+
+  useEffect(() => {
+    if (enabled) {
+      document.documentElement.classList.add("easy-read");
+    }
+  }, []);
+
+  return (
+    <div className="flex items-center justify-between gap-4">
+      <div>
+        <p className="text-sm font-semibold flex items-center gap-1.5">
+          <BookOpen className="w-3.5 h-3.5" /> Easy Read Mode
+        </p>
+        <p className="text-xs text-muted-foreground">Larger text, simpler layout, more spacing for easier reading</p>
+      </div>
+      <Switch
+        checked={enabled}
+        onCheckedChange={toggle}
+        data-testid="switch-easy-read"
+        aria-label="Toggle easy read mode"
+      />
+    </div>
+  );
+}
 
 function SectionHeader({ icon: Icon, title, description, iconColor }: { icon: any; title: string; description: string; iconColor?: string }) {
   return (
@@ -197,6 +237,8 @@ export default function SettingsPage() {
             </div>
             <Switch data-testid="switch-screen-reader" />
           </div>
+          <Separator />
+          <EasyReadToggle />
         </div>
       </Card>
 

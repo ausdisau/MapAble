@@ -19,6 +19,8 @@ import {
   ArrowRight,
   ShieldCheck,
   Star,
+  DollarSign,
+  Navigation,
 } from "lucide-react";
 import { useState } from "react";
 import type { TransportRequest, Worker, User } from "@shared/schema";
@@ -232,6 +234,133 @@ function TransportDrivers() {
   );
 }
 
+function TripLogger() {
+  const { toast } = useToast();
+  const [distance, setDistance] = useState("");
+  const [driverId, setDriverId] = useState("");
+  const [accessible, setAccessible] = useState(false);
+  const [tolls, setTolls] = useState("");
+
+  const { data: me } = useQuery<User>({ queryKey: ["/api/me"] });
+
+  const { data: drivers } = useQuery<(Worker & { user?: User })[]>({
+    queryKey: ["/api/workers"],
+  });
+
+  const transportDrivers = drivers?.filter((d) => d.transportCapable) || [];
+
+  const logTrip = useMutation({
+    mutationFn: async () => {
+      const dist = Math.max(0, parseFloat(distance) || 0);
+      const tollAmount = Math.max(0, parseFloat(tolls) || 0);
+      if (dist <= 0) throw new Error("Distance must be greater than 0");
+      const today = new Date().toISOString().split("T")[0];
+      const res = await apiRequest("POST", "/api/trips", {
+        workerId: driverId,
+        participantId: me?.id || "demo-participant",
+        distanceKm: String(dist),
+        accessibleVehicle: accessible,
+        tolls: String(tollAmount),
+        date: today,
+      });
+      return res.json();
+    },
+    onSuccess: (data: any) => {
+      toast({
+        title: "Trip logged",
+        description: `${data.distanceKm}km at $${Number(data.perKmRate || 0).toFixed(2)}/km (${data.tierApplied}) — Total: $${Number(data.totalCharge || 0).toFixed(2)}`,
+      });
+      setDistance("");
+      setDriverId("");
+      setAccessible(false);
+      setTolls("");
+      queryClient.invalidateQueries({ queryKey: ["/api/trips"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/budget"] });
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to log trip.", variant: "destructive" });
+    },
+  });
+
+  return (
+    <Card className="overflow-hidden" data-testid="card-trip-logger">
+      <div className="bg-gradient-to-r from-[#2EAA6E] to-[#25905D] px-5 py-3">
+        <h3 className="font-bold text-sm text-white flex items-center gap-2">
+          <Navigation className="w-4 h-4" /> Log a Trip
+        </h3>
+      </div>
+      <div className="p-4 space-y-3">
+        <div>
+          <Label htmlFor="trip-driver" className="text-xs font-semibold">Driver</Label>
+          <select
+            id="trip-driver"
+            className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+            value={driverId}
+            onChange={(e) => setDriverId(e.target.value)}
+            data-testid="select-trip-driver"
+          >
+            <option value="">Select driver...</option>
+            {transportDrivers.map((d) => (
+              <option key={d.id} value={d.id}>{d.user?.fullName || "Driver"}</option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <Label htmlFor="trip-distance" className="text-xs font-semibold">Distance (km)</Label>
+          <div className="relative mt-1">
+            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              id="trip-distance"
+              type="number"
+              step="0.1"
+              min="0.1"
+              className="pl-9"
+              placeholder="e.g. 25.5"
+              value={distance}
+              onChange={(e) => setDistance(e.target.value)}
+              data-testid="input-trip-distance"
+            />
+          </div>
+        </div>
+        <div>
+          <Label htmlFor="trip-tolls" className="text-xs font-semibold">Tolls ($)</Label>
+          <div className="relative mt-1">
+            <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              id="trip-tolls"
+              type="number"
+              step="0.01"
+              min="0"
+              className="pl-9"
+              placeholder="0.00"
+              value={tolls}
+              onChange={(e) => setTolls(e.target.value)}
+              data-testid="input-trip-tolls"
+            />
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <Checkbox
+            id="trip-accessible"
+            checked={accessible}
+            onCheckedChange={(v) => setAccessible(v === true)}
+            data-testid="checkbox-trip-accessible"
+          />
+          <Label htmlFor="trip-accessible" className="text-xs">Wheelchair Accessible Vehicle ($2.76/km)</Label>
+        </div>
+        <Button
+          className="w-full gap-2"
+          disabled={!driverId || !distance || logTrip.isPending}
+          onClick={() => logTrip.mutate()}
+          data-testid="button-log-trip"
+        >
+          {logTrip.isPending ? "Logging..." : "Log Trip"}
+        </Button>
+      </div>
+    </Card>
+  );
+}
+
 function RecentRequests() {
   const { data: requests, isLoading } = useQuery<TransportRequest[]>({
     queryKey: ["/api/transport"],
@@ -307,6 +436,7 @@ export default function TransportPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1 space-y-6">
           <TransportBookingForm />
+          <TripLogger />
           <RecentRequests />
         </div>
         <div className="lg:col-span-2">
