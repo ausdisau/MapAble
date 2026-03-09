@@ -122,7 +122,12 @@ export function AppSidebar() {
                       tooltip={item.title}
                       className={isActive ? "bg-sidebar-accent text-sidebar-accent-foreground" : ""}
                     >
-                      <Link href={item.url} data-testid={`link-nav-${item.title.toLowerCase().replace(/\s/g, "-")}`}>
+                      <Link
+                        href={item.url}
+                        data-testid={`link-nav-${item.title.toLowerCase().replace(/\s/g, "-")}`}
+                        aria-label={`${item.title} — ${item.audioDesc}`}
+                        onFocus={() => speakDescription(item.audioDesc)}
+                      >
                         <item.icon className={`w-4 h-4 ${isActive ? "text-[#2EAA6E]" : ""}`} />
                         <span className={isActive ? "font-semibold" : ""}>{item.title}</span>
                       </Link>
