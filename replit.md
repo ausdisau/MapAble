@@ -5,6 +5,7 @@ MapAble 4.0 is a full-stack superapp combining three core NDIS services:
 - **MapAble for Care** - Book verified support workers/carers
 - **MapAble for Transport** - Arrange wheelchair-accessible transport
 - **MapAble for Employment** - Find disability support jobs
+- **MapAble Chat** - AI-powered accessibility-context chatbot for journey planning and support
 - **Pricing & Billing** - NDIS-aligned tiered pricing with automated invoicing
 - **Budget Tracking** - Real-time NDIS plan budget monitoring
 
@@ -12,6 +13,7 @@ MapAble 4.0 is a full-stack superapp combining three core NDIS services:
 - **Frontend**: React + TypeScript + Vite + Tailwind CSS + Shadcn UI
 - **Backend**: Express 5 + TypeScript
 - **Database**: PostgreSQL with Drizzle ORM
+- **AI**: OpenAI (via Replit AI Integrations) with function calling + rules engine
 - **Object Storage**: Replit App Storage (presigned URL upload flow)
 - **Routing**: wouter (client-side)
 - **State Management**: TanStack React Query
@@ -50,6 +52,17 @@ MapAble 4.0 is a full-stack superapp combining three core NDIS services:
 - **Hero search** — Dashboard hero search navigates to /care with query parameter
 - **Contact messaging** — Messages page supports selecting contacts from worker list
 
+## MapAble Chat (AI Chatbot)
+- **Chat Engine**: `server/chat-engine.ts` — OpenAI function calling with tools for profile lookup, worker search, barrier reports, transport pricing, booking, and escalation
+- **Rules Engine**: Safety layer that prevents suggesting stairs when profile says `stairs_allowed=false`, never exposes diagnosis data, always discloses confidence level
+- **Access Profile**: User accessibility context (mobility aids, transfer distance, stairs capability, sensory preferences, communication mode, assistance needs)
+- **Quick Action Chips**: Dynamic suggestions after AI responses — Book Transport, Report Barrier, View Workers, Get Human Help, Edit Profile, View Pricing
+- **Confidence Badges**: High/Medium/Low/General confidence indicators on AI responses
+- **Community Barrier Reports**: Users can report accessibility barriers (lift out, ramp blocked, path closed, etc.) with severity levels
+- **Session Management**: Persistent chat sessions with history
+- **Access Profile Wizard**: 3-step setup (Mobility → Sensory → Communication) accessible from chat page and settings
+- **WCAG 2.2 AA**: 44px touch targets, aria-live for messages, keyboard navigable, screen reader compatible
+
 ## Pricing Engine
 - **Care tiers**: Basic (1-10hrs, $70.23/hr), Standard (11-30hrs, $68/hr), High Support (31+hrs, $65/hr), Support Coordination ($100.14/hr)
 - **Transport tiers**: Basic (1-100km, $0.99/km), Standard (101-300km, $0.90/km), High (301+km, $0.85/km), Accessible Vehicle ($2.76/km)
@@ -86,6 +99,8 @@ client/src/
     job-card.tsx          - Job listing card component
     stat-card.tsx         - Statistics card component
     ObjectUploader.tsx    - Uppy-based file uploader component
+    access-profile-wizard.tsx - 3-step accessibility profile setup wizard
+    barrier-report-form.tsx   - Community barrier reporting modal
   hooks/
     use-upload.ts         - Presigned URL upload hook
     use-page-title.ts     - Dynamic document.title per page
@@ -96,23 +111,26 @@ client/src/
     jobs.tsx              - Job board
     job-detail.tsx        - Job detail page
     transport.tsx         - Transport booking
+    chat.tsx              - AI chatbot with session management, quick actions
     pricing.tsx           - NDIS-aligned pricing tables
     budget.tsx            - Budget dashboard with tier indicators
     invoices.tsx          - Invoice list + generation
     messages.tsx          - Messaging inbox
-    settings.tsx          - User/accessibility settings with photo upload
+    settings.tsx          - User/accessibility settings with photo upload + access profile
 
 server/
   index.ts               - Express server setup + seed
-  routes.ts              - API routes (including pricing, billing, reviews)
+  routes.ts              - API routes (including pricing, billing, reviews, chat, access profile)
   storage.ts             - Database storage interface with pricing engine
+  chat-engine.ts         - LLM orchestration + rules engine + tool implementations
   db.ts                  - Database connection
   seed.ts                - Seed data for demo (pricing tiers, budgets, sessions, reviews)
   replit_integrations/
     object_storage/       - Object storage service + routes
+    chat/                 - Chat storage adapter (uses chatSessions/chatMessages tables)
 
 shared/
-  schema.ts              - Drizzle schema + Zod validation (13 tables)
+  schema.ts              - Drizzle schema + Zod validation (17 tables)
 ```
 
 ## Database Tables
@@ -128,6 +146,10 @@ shared/
 - invoices (id, participantId, periodStart, periodEnd, totalAmount, ndisClaimable, status, lineItems)
 - reviews (id, participantId, workerId, rating, comment, createdAt)
 - participant_budgets (id, participantId, category, totalAllocated, totalUsed, periodStart, periodEnd)
+- access_context_profiles (id, userId, mobilityAids, maxTransferM, stairsAllowed, sensoryPreferences, communicationMode, assistancePreferences, consentScopes)
+- chat_sessions (id, userId, title, startedAt, endedAt)
+- chat_messages (id, sessionId, role, content, toolCalls, quickActions, confidence, createdAt)
+- community_reports (id, reporterUserId, locationRef, barrierType, severity, description, photoUrl, moderationStatus, confidenceWeight, expiresAt)
 
 ## API Endpoints
 - GET /api/me - Get current user (participant)
@@ -155,3 +177,12 @@ shared/
 - POST /api/reviews - Submit review
 - POST /api/uploads/request-url - Get presigned upload URL
 - GET /objects/* - Serve stored objects
+- GET /api/access-profile - Get current user's accessibility profile
+- PUT /api/access-profile - Create/update accessibility profile
+- POST /api/chat/sessions - Create new chat session
+- GET /api/chat/sessions - List user's chat sessions
+- GET /api/chat/sessions/:id/messages - Get messages for a session
+- DELETE /api/chat/sessions/:id - Delete a chat session
+- POST /api/chat/send - Send message and get AI response
+- GET /api/community-reports - List barrier reports
+- POST /api/community-reports - Submit a barrier report

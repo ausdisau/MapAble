@@ -11,8 +11,11 @@ import {
   type Invoice, type InsertInvoice,
   type Review, type InsertReview,
   type ParticipantBudget, type InsertParticipantBudget,
+  type AccessContextProfile, type InsertAccessContextProfile,
+  type CommunityReport, type InsertCommunityReport,
   users, workers, bookings, jobs, transportRequests, messages,
   pricingTiers, serviceSessions, transportTrips, invoices, reviews, participantBudgets,
+  accessContextProfiles, communityReports,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, sql, gte, lte } from "drizzle-orm";
@@ -52,6 +55,10 @@ export interface IStorage {
   updateBudgetUsage(participantId: string, category: string, amount: number): Promise<ParticipantBudget | undefined>;
   createReview(data: InsertReview): Promise<Review>;
   getReviewsForWorker(workerId: string): Promise<(Review & { participant?: User })[]>;
+  getAccessProfile(userId: string): Promise<AccessContextProfile | undefined>;
+  upsertAccessProfile(userId: string, data: Partial<InsertAccessContextProfile>): Promise<AccessContextProfile>;
+  getCommunityReports(): Promise<CommunityReport[]>;
+  createCommunityReport(data: InsertCommunityReport): Promise<CommunityReport>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -337,6 +344,43 @@ export class DatabaseStorage implements IStorage {
       const participant = await this.getUser(r.participantId);
       return { ...r, participant: participant || undefined };
     }));
+  }
+
+  async getAccessProfile(userId: string): Promise<AccessContextProfile | undefined> {
+    const [profile] = await db.select().from(accessContextProfiles)
+      .where(eq(accessContextProfiles.userId, userId));
+    return profile;
+  }
+
+  async upsertAccessProfile(userId: string, data: Partial<InsertAccessContextProfile>): Promise<AccessContextProfile> {
+    const existing = await this.getAccessProfile(userId);
+    if (existing) {
+      const [updated] = await db.update(accessContextProfiles)
+        .set({ ...data, updatedAt: new Date() })
+        .where(eq(accessContextProfiles.userId, userId))
+        .returning();
+      return updated;
+    }
+    const [created] = await db.insert(accessContextProfiles)
+      .values({ ...data, userId })
+      .returning();
+    return created;
+  }
+
+  async getCommunityReports(): Promise<CommunityReport[]> {
+    return db.select().from(communityReports)
+      .orderBy(desc(communityReports.createdAt))
+      .limit(50);
+  }
+
+  async createCommunityReport(data: InsertCommunityReport): Promise<CommunityReport> {
+    const [report] = await db.insert(communityReports)
+      .values({
+        ...data,
+        expiresAt: data.expiresAt || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      })
+      .returning();
+    return report;
   }
 }
 

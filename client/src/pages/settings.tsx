@@ -23,7 +23,9 @@ import {
   Upload,
   Loader2,
   BookOpen,
+  UserCog,
 } from "lucide-react";
+import { AccessProfileWizard } from "@/components/access-profile-wizard";
 
 function EasyReadToggle() {
   const [enabled, setEnabled] = useState(() => {
@@ -226,6 +228,48 @@ function ScreenReaderToggle() {
   );
 }
 
+function AccessProfileSection() {
+  const [showWizard, setShowWizard] = useState(false);
+  const profileQuery = useQuery<any>({ queryKey: ["/api/access-profile"] });
+  const hasProfile = profileQuery.data && profileQuery.data.id;
+
+  return (
+    <>
+      <Card className="overflow-visible">
+        <SectionHeader icon={UserCog} title="Access Profile" description="Your mobility and accessibility needs for MapAble Chat" />
+        <div className="p-5 space-y-3">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <p className="text-sm font-semibold">{hasProfile ? "Edit Access Profile" : "Set Up Access Profile"}</p>
+              <p className="text-xs text-muted-foreground">
+                {hasProfile
+                  ? "Update your mobility aids, sensory preferences, and communication mode"
+                  : "Tell MapAble Chat about your accessibility needs for personalised guidance"}
+              </p>
+            </div>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setShowWizard(true)}
+              data-testid="button-edit-access-profile"
+            >
+              {hasProfile ? "Edit" : "Set Up"}
+            </Button>
+          </div>
+        </div>
+      </Card>
+      {showWizard && (
+        <AccessProfileWizard
+          onClose={() => {
+            setShowWizard(false);
+            queryClient.invalidateQueries({ queryKey: ["/api/access-profile"] });
+          }}
+        />
+      )}
+    </>
+  );
+}
+
 export default function SettingsPage() {
   usePageTitle("Settings");
   const { theme, toggleTheme } = useTheme();
@@ -323,6 +367,8 @@ export default function SettingsPage() {
           <EasyReadToggle />
         </div>
       </Card>
+
+      <AccessProfileSection />
 
       <Card className="overflow-visible">
         <SectionHeader icon={Bell} title="Notifications" description="Choose what updates you receive" />

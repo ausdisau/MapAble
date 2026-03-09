@@ -12,6 +12,7 @@ import {
   DollarSign,
   Wallet,
   FileText,
+  Bot,
 } from "lucide-react";
 import {
   Sidebar,
@@ -41,6 +42,7 @@ const navItems = [
   { title: "Book a Carer", url: "/care", icon: HeartHandshake, audioDesc: "Find and book verified NDIS support workers" },
   { title: "Find a Job", url: "/jobs", icon: Briefcase, audioDesc: "Browse disability support employment opportunities" },
   { title: "Get Transport", url: "/transport", icon: Bus, audioDesc: "Arrange wheelchair accessible transport services" },
+  { title: "MapAble Chat", url: "/chat", icon: Bot, audioDesc: "Chat with your accessibility-aware travel assistant" },
   { title: "Pricing", url: "/pricing", icon: DollarSign, audioDesc: "View NDIS-aligned pricing for care and transport services" },
   { title: "Budget", url: "/budget", icon: Wallet, audioDesc: "View your NDIS budget usage and remaining funds" },
   { title: "Invoices", url: "/invoices", icon: FileText, audioDesc: "View and manage your NDIS invoices and claims" },
