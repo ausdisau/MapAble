@@ -7,6 +7,9 @@ import {
   insertJobSchema,
   insertTransportRequestSchema,
   insertMessageSchema,
+  insertServiceSessionSchema,
+  insertTransportTripSchema,
+  insertReviewSchema,
 } from "@shared/schema";
 
 export async function registerRoutes(
@@ -102,6 +105,146 @@ export async function registerRoutes(
     const user = await storage.updateUserAvatar(req.params.id, avatar);
     if (!user) return res.status(404).json({ message: "User not found" });
     res.json(user);
+  });
+
+  app.get("/api/pricing/care", async (_req, res) => {
+    const tiers = await storage.getPricingTiers("care");
+    res.json(tiers);
+  });
+
+  app.get("/api/pricing/transport", async (_req, res) => {
+    const tiers = await storage.getPricingTiers("transport");
+    res.json(tiers);
+  });
+
+  app.get("/api/pricing/care/rate", async (req, res) => {
+    const participantId = req.query.participantId as string;
+    if (!participantId) return res.status(400).json({ message: "participantId required" });
+    const now = new Date().toISOString();
+    const result = await storage.calculateCareRate(participantId, now);
+    res.json(result);
+  });
+
+  app.get("/api/pricing/transport/rate", async (req, res) => {
+    const participantId = req.query.participantId as string;
+    if (!participantId) return res.status(400).json({ message: "participantId required" });
+    const now = new Date().toISOString();
+    const result = await storage.calculateTransportRate(participantId, now);
+    res.json(result);
+  });
+
+  app.post("/api/sessions", async (req, res) => {
+    const parsed = insertServiceSessionSchema.safeParse(req.body);
+    if (!parsed.success) return res.status(400).json({ message: parsed.error.message });
+
+    const data = parsed.data;
+    if (data.actualHours && !data.hourlyRate) {
+      const rateInfo = await storage.calculateCareRate(data.participantId, data.date);
+      data.hourlyRate = rateInfo.rate.toFixed(2);
+      data.tierApplied = rateInfo.tier;
+      data.totalCharge = (Number(data.actualHours) * rateInfo.rate).toFixed(2);
+      data.ndisItemCode = data.ndisItemCode || "01_011_0107_1_1";
+    }
+
+    if (data.endTime && data.actualHours) {
+      (data as any).status = "completed";
+    }
+
+    const session = await storage.createServiceSession(data);
+
+    if (session.totalCharge) {
+      await storage.updateBudgetUsage(data.participantId, "daily_living", Number(session.totalCharge));
+    }
+
+    res.status(201).json(session);
+  });
+
+  app.get("/api/sessions", async (req, res) => {
+    const participantId = req.query.participantId as string;
+    if (!participantId) return res.status(400).json({ message: "participantId required" });
+    const sessions = await storage.getServiceSessions(participantId);
+    res.json(sessions);
+  });
+
+  app.post("/api/trips", async (req, res) => {
+    const parsed = insertTransportTripSchema.safeParse(req.body);
+    if (!parsed.success) return res.status(400).json({ message: parsed.error.message });
+
+    const data = parsed.data;
+    if (data.distanceKm && !data.perKmRate) {
+      const rateInfo = await storage.calculateTransportRate(data.participantId, data.date);
+      let kmRate = rateInfo.rate;
+
+      if (data.accessibleVehicle) {
+        kmRate = 2.76;
+        data.tierApplied = "Accessible Vehicle";
+        data.accessibleSurcharge = "0";
+      } else {
+        data.tierApplied = rateInfo.tier;
+      }
+
+      data.perKmRate = kmRate.toFixed(2);
+      let charge = Number(data.distanceKm) * kmRate;
+      charge += Number(data.tolls || 0);
+      data.totalCharge = charge.toFixed(2);
+      data.ndisItemCode = data.ndisItemCode || "02_051_0108_1_1";
+    }
+
+    if (data.distanceKm) {
+      (data as any).status = "completed";
+    }
+
+    const trip = await storage.createTransportTrip(data);
+
+    if (trip.totalCharge) {
+      await storage.updateBudgetUsage(data.participantId, "transport", Number(trip.totalCharge));
+    }
+
+    res.status(201).json(trip);
+  });
+
+  app.get("/api/trips", async (req, res) => {
+    const participantId = req.query.participantId as string;
+    if (!participantId) return res.status(400).json({ message: "participantId required" });
+    const trips = await storage.getTransportTrips(participantId);
+    res.json(trips);
+  });
+
+  app.post("/api/invoices/generate", async (req, res) => {
+    const { participantId, periodStart, periodEnd } = req.body;
+    if (!participantId || !periodStart || !periodEnd) {
+      return res.status(400).json({ message: "participantId, periodStart, and periodEnd required" });
+    }
+    const invoice = await storage.generateInvoice(participantId, periodStart, periodEnd);
+    res.status(201).json(invoice);
+  });
+
+  app.get("/api/invoices", async (req, res) => {
+    const participantId = req.query.participantId as string;
+    if (!participantId) return res.status(400).json({ message: "participantId required" });
+    const invoiceList = await storage.getInvoices(participantId);
+    res.json(invoiceList);
+  });
+
+  app.get("/api/budget", async (req, res) => {
+    const participantId = req.query.participantId as string;
+    if (!participantId) return res.status(400).json({ message: "participantId required" });
+    const budgets = await storage.getParticipantBudgets(participantId);
+    const careRate = await storage.calculateCareRate(participantId, new Date().toISOString());
+    const transportRate = await storage.calculateTransportRate(participantId, new Date().toISOString());
+    res.json({ budgets, currentCareTier: careRate, currentTransportTier: transportRate });
+  });
+
+  app.post("/api/reviews", async (req, res) => {
+    const parsed = insertReviewSchema.safeParse(req.body);
+    if (!parsed.success) return res.status(400).json({ message: parsed.error.message });
+    const review = await storage.createReview(parsed.data);
+    res.status(201).json(review);
+  });
+
+  app.get("/api/workers/:id/reviews", async (req, res) => {
+    const workerReviews = await storage.getReviewsForWorker(req.params.id);
+    res.json(workerReviews);
   });
 
   return httpServer;
