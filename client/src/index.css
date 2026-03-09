@@ -277,3 +277,37 @@
   padding-top: 0.625rem;
   padding-bottom: 0.625rem;
 }
+
+.high-contrast {
+  --border: 0 0% 30%;
+  --foreground: 0 0% 0%;
+  --ring: 210 100% 40%;
+}
+.high-contrast.dark {
+  --border: 0 0% 70%;
+  --foreground: 0 0% 100%;
+  --ring: 210 100% 60%;
+}
+.high-contrast * {
+  font-weight: 600;
+}
+.high-contrast button,
+.high-contrast [role="button"] {
+  border: 2px solid currentColor;
+}
+.high-contrast a {
+  text-decoration: underline;
+}
+
+.screen-reader-optimized [data-testid="deco-pin-silhouette"],
+.screen-reader-optimized [data-testid="accent-tricolor-strip"] {
+  display: none !important;
+}
+.screen-reader-optimized *:focus {
+  outline: 3px solid #1B6EB5 !important;
+  outline-offset: 2px;
+}
+.screen-reader-optimized .blur-3xl,
+.screen-reader-optimized [class*="opacity-[0.0"] {
+  display: none !important;
+}

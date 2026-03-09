@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useState, useRef, useEffect } from "react";
+import { usePageTitle } from "@/hooks/use-page-title";
 import {
   User,
   Bell,
@@ -169,8 +170,101 @@ function ProfilePhotoUpload() {
   );
 }
 
+function HighContrastToggle() {
+  const [enabled, setEnabled] = useState(() => localStorage.getItem("high-contrast") === "true");
+
+  const toggle = (checked: boolean) => {
+    setEnabled(checked);
+    localStorage.setItem("high-contrast", String(checked));
+    if (checked) {
+      document.documentElement.classList.add("high-contrast");
+    } else {
+      document.documentElement.classList.remove("high-contrast");
+    }
+  };
+
+  useEffect(() => {
+    if (enabled) document.documentElement.classList.add("high-contrast");
+  }, []);
+
+  return (
+    <div className="flex items-center justify-between gap-4">
+      <div>
+        <p className="text-sm font-semibold">High Contrast Mode</p>
+        <p className="text-xs text-muted-foreground">Increase contrast for better visibility</p>
+      </div>
+      <Switch checked={enabled} onCheckedChange={toggle} data-testid="switch-high-contrast" aria-label="Toggle high contrast mode" />
+    </div>
+  );
+}
+
+function ScreenReaderToggle() {
+  const [enabled, setEnabled] = useState(() => localStorage.getItem("screen-reader-optimized") === "true");
+
+  const toggle = (checked: boolean) => {
+    setEnabled(checked);
+    localStorage.setItem("screen-reader-optimized", String(checked));
+    if (checked) {
+      document.documentElement.classList.add("screen-reader-optimized");
+    } else {
+      document.documentElement.classList.remove("screen-reader-optimized");
+    }
+  };
+
+  useEffect(() => {
+    if (enabled) document.documentElement.classList.add("screen-reader-optimized");
+  }, []);
+
+  return (
+    <div className="flex items-center justify-between gap-4">
+      <div>
+        <p className="text-sm font-semibold">Screen Reader Optimization</p>
+        <p className="text-xs text-muted-foreground">Hide decorative elements, enhance focus outlines</p>
+      </div>
+      <Switch checked={enabled} onCheckedChange={toggle} data-testid="switch-screen-reader" aria-label="Toggle screen reader optimization" />
+    </div>
+  );
+}
+
 export default function SettingsPage() {
+  usePageTitle("Settings");
   const { theme, toggleTheme } = useTheme();
+  const { toast } = useToast();
+
+  const { data: currentUser } = useQuery<{ id: string; fullName: string; email: string; location: string }>({
+    queryKey: ["/api/me"],
+  });
+
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [location, setLocation] = useState("");
+  const [profileLoaded, setProfileLoaded] = useState(false);
+
+  useEffect(() => {
+    if (currentUser && !profileLoaded) {
+      setFullName(currentUser.fullName || "");
+      setEmail(currentUser.email || "");
+      setLocation(currentUser.location || "");
+      setProfileLoaded(true);
+    }
+  }, [currentUser, profileLoaded]);
+
+  const isSaveDisabled = !profileLoaded;
+
+  const saveProfile = async () => {
+    if (!profileLoaded) return;
+    if (!fullName.trim()) {
+      toast({ title: "Validation error", description: "Full name is required.", variant: "destructive" });
+      return;
+    }
+    try {
+      await apiRequest("PATCH", "/api/me", { fullName: fullName.trim(), email: email.trim(), location: location.trim() });
+      queryClient.invalidateQueries({ queryKey: ["/api/me"] });
+      toast({ title: "Settings saved", description: "Your profile has been updated." });
+    } catch {
+      toast({ title: "Error", description: "Failed to save settings.", variant: "destructive" });
+    }
+  };
 
   return (
     <div className="p-4 md:p-6 max-w-3xl mx-auto space-y-6">
@@ -188,17 +282,17 @@ export default function SettingsPage() {
           <Separator />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <Label className="text-sm font-semibold">Full Name</Label>
-              <Input placeholder="Your full name" className="mt-1" data-testid="input-full-name" />
+              <Label htmlFor="settings-name" className="text-sm font-semibold">Full Name</Label>
+              <Input id="settings-name" placeholder="Your full name" className="mt-1" value={fullName} onChange={(e) => setFullName(e.target.value)} data-testid="input-full-name" />
             </div>
             <div>
-              <Label className="text-sm font-semibold">Email</Label>
-              <Input placeholder="email@example.com" className="mt-1" data-testid="input-email" />
+              <Label htmlFor="settings-email" className="text-sm font-semibold">Email</Label>
+              <Input id="settings-email" placeholder="email@example.com" className="mt-1" value={email} onChange={(e) => setEmail(e.target.value)} data-testid="input-email" />
             </div>
           </div>
           <div>
-            <Label className="text-sm font-semibold">Location</Label>
-            <Input placeholder="City, State" className="mt-1" data-testid="input-location" />
+            <Label htmlFor="settings-location" className="text-sm font-semibold">Location</Label>
+            <Input id="settings-location" placeholder="City, State" className="mt-1" value={location} onChange={(e) => setLocation(e.target.value)} data-testid="input-location" />
           </div>
         </div>
       </Card>
@@ -222,21 +316,9 @@ export default function SettingsPage() {
             </div>
           </div>
           <Separator />
-          <div className="flex items-center justify-between gap-4">
-            <div>
-              <p className="text-sm font-semibold">High Contrast Mode</p>
-              <p className="text-xs text-muted-foreground">Increase contrast for better visibility</p>
-            </div>
-            <Switch data-testid="switch-high-contrast" />
-          </div>
+          <HighContrastToggle />
           <Separator />
-          <div className="flex items-center justify-between gap-4">
-            <div>
-              <p className="text-sm font-semibold">Screen Reader Optimization</p>
-              <p className="text-xs text-muted-foreground">Optimize layout for screen readers</p>
-            </div>
-            <Switch data-testid="switch-screen-reader" />
-          </div>
+          <ScreenReaderToggle />
           <Separator />
           <EasyReadToggle />
         </div>
@@ -300,7 +382,7 @@ export default function SettingsPage() {
 
       <div className="flex justify-end gap-3">
         <Button variant="secondary" data-testid="button-cancel">Cancel</Button>
-        <Button data-testid="button-save-settings">Save Changes</Button>
+        <Button onClick={saveProfile} disabled={isSaveDisabled} data-testid="button-save-settings">Save Changes</Button>
       </div>
     </div>
   );

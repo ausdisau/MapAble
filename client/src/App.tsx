@@ -42,6 +42,14 @@ function ThemeToggle() {
 
 function HeaderSearchPill() {
   const [query, setQuery] = useState("");
+  const [, setLocation] = useLocation();
+
+  const handleSearch = () => {
+    if (query.trim()) {
+      setLocation("/care?q=" + encodeURIComponent(query.trim()));
+    }
+  };
+
   return (
     <div className="hidden md:flex items-center gap-2 bg-white/15 backdrop-blur-md border border-white/20 rounded-full px-4 py-1.5 min-w-[240px] lg:min-w-[320px]" data-testid="input-header-search-container">
       <Search className="w-4 h-4 text-white/70 shrink-0" />
@@ -50,10 +58,58 @@ function HeaderSearchPill() {
         placeholder="Search workers, jobs, services..."
         value={query}
         onChange={(e) => setQuery(e.target.value)}
+        onKeyDown={(e) => { if (e.key === "Enter") handleSearch(); }}
         className="bg-transparent border-none outline-none text-sm text-white placeholder:text-white/50 w-full"
         data-testid="input-header-search"
       />
     </div>
+  );
+}
+
+function MobileSearchButton() {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const [, setLocation] = useLocation();
+
+  const handleSearch = () => {
+    if (query.trim()) {
+      setLocation("/care?q=" + encodeURIComponent(query.trim()));
+      setOpen(false);
+      setQuery("");
+    }
+  };
+
+  return (
+    <>
+      <Button
+        size="icon"
+        variant="ghost"
+        className="md:hidden text-white/90"
+        onClick={() => setOpen(!open)}
+        data-testid="button-mobile-search"
+      >
+        <Search className="w-4 h-4" />
+      </Button>
+      {open && (
+        <div className="md:hidden absolute top-full left-0 right-0 p-2 z-50" style={{ background: "linear-gradient(90deg, #14578F, #1B6EB5, #2384C9)" }}>
+          <div className="flex gap-2">
+            <input
+              type="search"
+              placeholder="Search workers, jobs, services..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter") handleSearch(); }}
+              className="flex-1 bg-white/15 backdrop-blur-md border border-white/20 rounded-md px-3 py-2 text-sm text-white placeholder:text-white/50 outline-none"
+              autoFocus
+              data-testid="input-mobile-search"
+            />
+            <Button size="sm" onClick={handleSearch} data-testid="button-mobile-search-submit">
+              <Search className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 
@@ -164,7 +220,7 @@ function AppLayout() {
         <AppSidebar />
         <div className="flex flex-col flex-1 min-w-0">
           <header
-            className="flex items-center justify-between gap-3 px-4 py-2 sticky top-0 z-40"
+            className="flex items-center justify-between gap-3 px-4 py-2 sticky top-0 z-40 relative"
             style={{ background: "linear-gradient(90deg, #14578F, #1B6EB5, #2384C9)" }}
             data-testid="header-main"
           >
@@ -173,6 +229,7 @@ function AppLayout() {
               <HeaderSearchPill />
             </div>
             <div className="flex items-center gap-1 flex-wrap">
+              <MobileSearchButton />
               <Button size="icon" variant="ghost" className="text-white/90" data-testid="button-accessibility">
                 <Accessibility className="w-4 h-4" />
               </Button>

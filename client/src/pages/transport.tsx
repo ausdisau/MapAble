@@ -21,8 +21,10 @@ import {
   Star,
   DollarSign,
   Navigation,
+  AlertCircle,
 } from "lucide-react";
 import { useState } from "react";
+import { usePageTitle } from "@/hooks/use-page-title";
 import type { TransportRequest, Worker, User } from "@shared/schema";
 
 function TransportBookingForm() {
@@ -34,10 +36,12 @@ function TransportBookingForm() {
   const [wheelchair, setWheelchair] = useState(false);
   const [notes, setNotes] = useState("");
 
+  const { data: me } = useQuery<User>({ queryKey: ["/api/me"] });
+
   const createRequest = useMutation({
     mutationFn: async () => {
       const res = await apiRequest("POST", "/api/transport", {
-        participantId: "demo-participant",
+        participantId: me?.id || "demo-participant",
         pickupLocation: pickup,
         dropoffLocation: dropoff,
         date,
@@ -164,11 +168,22 @@ function TransportBookingForm() {
 }
 
 function TransportDrivers() {
-  const { data: workers, isLoading } = useQuery<(Worker & { user?: User })[]>({
+  const { data: workers, isLoading, isError, refetch } = useQuery<(Worker & { user?: User })[]>({
     queryKey: ["/api/workers"],
   });
 
   const transportWorkers = workers?.filter((w) => w.transportCapable);
+
+  if (isError) {
+    return (
+      <Card className="p-12 text-center">
+        <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+        <h3 className="font-bold text-lg mb-1">Something went wrong</h3>
+        <p className="text-sm text-muted-foreground mb-4">We couldn't load the data. Please try again.</p>
+        <Button onClick={() => refetch()} data-testid="button-retry">Try Again</Button>
+      </Card>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -424,6 +439,7 @@ function RecentRequests() {
 }
 
 export default function TransportPage() {
+  usePageTitle("Get Transport");
   return (
     <div className="p-4 md:p-6 max-w-7xl mx-auto space-y-6">
       <div>
