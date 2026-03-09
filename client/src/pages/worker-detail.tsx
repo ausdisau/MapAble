@@ -29,7 +29,7 @@ import {
   Send,
 } from "lucide-react";
 import { Link } from "wouter";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { Worker, User, Review } from "@shared/schema";
 
 function VerificationChecklist({ worker }: { worker: Worker & { user?: User } }) {
@@ -167,6 +167,122 @@ function ReviewForm({ workerId, participantId }: { workerId: string; participant
         <Send className="w-4 h-4" />
         {submitReview.isPending ? "Submitting..." : "Submit Review"}
       </Button>
+    </Card>
+  );
+}
+
+function ShiftManager({ workerId, participantId, workerName }: { workerId: string; participantId: string; workerName: string }) {
+  const { toast } = useToast();
+  const [shiftActive, setShiftActive] = useState(false);
+  const [shiftStartTimestamp, setShiftStartTimestamp] = useState<number>(0);
+  const [shiftStartTime, setShiftStartTime] = useState<string>("");
+  const [shiftNotes, setShiftNotes] = useState("");
+  const [elapsed, setElapsed] = useState("00:00:00");
+
+  useEffect(() => {
+    if (!shiftActive || !shiftStartTimestamp) return;
+    const interval = setInterval(() => {
+      const diff = Math.max(0, Math.floor((Date.now() - shiftStartTimestamp) / 1000));
+      const hrs = Math.floor(diff / 3600);
+      const mins = Math.floor((diff % 3600) / 60);
+      const secs = diff % 60;
+      setElapsed(`${String(hrs).padStart(2, "0")}:${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [shiftActive, shiftStartTimestamp]);
+
+  const endShift = useMutation({
+    mutationFn: async () => {
+      const now = new Date();
+      const endTime = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+      const diffMs = Math.max(0, now.getTime() - shiftStartTimestamp);
+      const hours = Math.max(diffMs / 3600000, 0.25).toFixed(2);
+      const today = now.toISOString().split("T")[0];
+
+      const res = await apiRequest("POST", "/api/sessions", {
+        workerId,
+        participantId,
+        startTime: shiftStartTime,
+        endTime,
+        actualHours: hours,
+        date: today,
+        shiftNotes: shiftNotes || undefined,
+      });
+      return res.json();
+    },
+    onSuccess: (data: any) => {
+      toast({
+        title: "Shift completed",
+        description: `Session logged: ${data.actualHours}hrs at $${Number(data.hourlyRate || 0).toFixed(2)}/hr (${data.tierApplied}) — Total: $${Number(data.totalCharge || 0).toFixed(2)}`,
+      });
+      setShiftActive(false);
+      setShiftStartTimestamp(0);
+      setShiftStartTime("");
+      setShiftNotes("");
+      setElapsed("00:00:00");
+      queryClient.invalidateQueries({ queryKey: ["/api/sessions"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/budget"] });
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to end shift.", variant: "destructive" });
+    },
+  });
+
+  const startShift = () => {
+    const now = new Date();
+    const time = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+    setShiftStartTimestamp(Date.now());
+    setShiftStartTime(time);
+    setShiftActive(true);
+  };
+
+  return (
+    <Card className="overflow-hidden" data-testid="card-shift-manager">
+      <div className="bg-gradient-to-r from-[#2EAA6E] to-[#25905D] px-5 py-3">
+        <h3 className="font-bold text-sm text-white flex items-center gap-2">
+          <Clock className="w-4 h-4" /> Shift Management
+        </h3>
+      </div>
+      <div className="p-5 space-y-3">
+        {!shiftActive ? (
+          <Button
+            className="w-full gap-2"
+            onClick={startShift}
+            data-testid="button-start-shift"
+          >
+            <Clock className="w-4 h-4" /> Start Shift with {workerName}
+          </Button>
+        ) : (
+          <>
+            <div className="text-center">
+              <div className="text-3xl font-mono font-black tracking-wider" data-testid="text-shift-timer" role="timer" aria-label="Shift duration">
+                {elapsed}
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">Started at {shiftStartTime}</p>
+            </div>
+            <div>
+              <Label htmlFor="shift-notes" className="text-xs font-semibold">Shift Notes</Label>
+              <Textarea
+                id="shift-notes"
+                className="mt-1 resize-none"
+                placeholder="Log activities performed during this shift..."
+                value={shiftNotes}
+                onChange={(e) => setShiftNotes(e.target.value)}
+                data-testid="input-shift-notes"
+              />
+            </div>
+            <Button
+              variant="destructive"
+              className="w-full gap-2"
+              onClick={() => endShift.mutate()}
+              disabled={endShift.isPending}
+              data-testid="button-end-shift"
+            >
+              {endShift.isPending ? "Ending..." : "End Shift"}
+            </Button>
+          </>
+        )}
+      </div>
     </Card>
   );
 }
@@ -435,6 +551,14 @@ export default function WorkerDetailPage() {
           </Card>
 
           <VerificationChecklist worker={worker} />
+
+          {me && (
+            <ShiftManager
+              workerId={params.id!}
+              participantId={me.id}
+              workerName={worker.user?.fullName?.split(" ")[0] || "Worker"}
+            />
+          )}
 
           {!showBooking ? (
             <Button className="w-full" onClick={() => setShowBooking(true)} data-testid="button-start-booking">

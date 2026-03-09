@@ -30,7 +30,7 @@ MapAble 4.0 is a full-stack superapp combining three core NDIS services:
 - Job board with category filters (Care/Transport/Support/Employment)
 - Transport booking with wheelchair accessibility options
 - Messaging system
-- Settings with accessibility options (dark mode, high contrast)
+- Settings with accessibility options (dark mode, high contrast, Easy Read mode)
 - NDIS Worker Screening verification indicators
 - Profile photo upload via object storage
 - Audio-described logo dropdown navigation (Web Speech API)
@@ -39,6 +39,9 @@ MapAble 4.0 is a full-stack superapp combining three core NDIS services:
 - **Invoices page** — Generate NDIS-ready invoices with line items and NDIS support item codes
 - **Reviews system** — Star ratings + comments on worker detail page
 - **Verification checklist** — ABN, WWCC, First Aid, Insurance display on worker profiles
+- **Shift management** — Start/End Shift timer on worker detail page, auto-creates care sessions
+- **Trip logger** — Log transport trips on transport page with distance, tolls, accessible vehicle
+- **Easy Read mode** — Toggle in Settings for larger text, more spacing, 44px min touch targets (WCAG 2.2)
 - **WCAG 2.2 accessibility** — Skip-to-content link, aria-live regions, proper heading hierarchy
 
 ## Pricing Engine
