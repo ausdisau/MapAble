@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, integer, boolean, timestamp, decimal, pgEnum, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, integer, boolean, timestamp, decimal, pgEnum, jsonb, serial } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -347,3 +347,97 @@ export type InsertReview = z.infer<typeof insertReviewSchema>;
 export type Review = typeof reviews.$inferSelect;
 export type InsertParticipantBudget = z.infer<typeof insertParticipantBudgetSchema>;
 export type ParticipantBudget = typeof participantBudgets.$inferSelect;
+
+export const moderationStatusEnum = pgEnum("moderation_status", ["unverified", "verified", "rejected", "expired"]);
+export const barrierTypeEnum = pgEnum("barrier_type", ["lift_out", "ramp_blocked", "path_closed", "door_too_heavy", "kerb_ramp_missing", "inaccessible_toilet", "unsafe_crossing", "driver_bypass", "helpful_staff", "other"]);
+export const barrierSeverityEnum = pgEnum("barrier_severity", ["low", "medium", "high", "critical"]);
+
+export const accessContextProfiles = pgTable("access_context_profiles", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull(),
+  mobilityAids: jsonb("mobility_aids").$type<string[]>().default([]),
+  maxTransferM: integer("max_transfer_m").default(200),
+  stairsAllowed: boolean("stairs_allowed").default(true),
+  sensoryPreferences: jsonb("sensory_preferences").$type<{
+    noiseSensitivity?: string;
+    crowdSensitivity?: string;
+    lightingSensitivity?: string;
+    fewerInterchanges?: boolean;
+  }>().default({}),
+  communicationMode: text("communication_mode").default("text"),
+  assistancePreferences: jsonb("assistance_preferences").$type<{
+    needsStaffAssistance?: boolean;
+    canTravelAlone?: boolean;
+    emergencyContact?: string;
+  }>().default({}),
+  consentScopes: jsonb("consent_scopes").$type<Record<string, boolean>>().default({}),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const chatSessions = pgTable("chat_sessions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull(),
+  title: text("title").default("New conversation"),
+  channel: text("channel").default("web"),
+  startedAt: timestamp("started_at").defaultNow(),
+  endedAt: timestamp("ended_at"),
+});
+
+export const chatMessages = pgTable("chat_messages", {
+  id: serial("id").primaryKey(),
+  sessionId: varchar("session_id").notNull(),
+  role: text("role").notNull(),
+  content: text("content").notNull(),
+  toolCalls: jsonb("tool_calls"),
+  quickActions: jsonb("quick_actions").$type<string[]>(),
+  confidence: text("confidence"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const communityReports = pgTable("community_reports", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  reporterUserId: varchar("reporter_user_id"),
+  locationRef: text("location_ref").notNull(),
+  barrierType: barrierTypeEnum("barrier_type").notNull(),
+  severity: barrierSeverityEnum("severity").notNull().default("medium"),
+  description: text("description"),
+  photoUrl: text("photo_url"),
+  createdAt: timestamp("created_at").defaultNow(),
+  expiresAt: timestamp("expires_at"),
+  moderationStatus: moderationStatusEnum("moderation_status").notNull().default("unverified"),
+  confidenceWeight: decimal("confidence_weight", { precision: 3, scale: 2 }).default("0.5"),
+});
+
+export const insertAccessContextProfileSchema = createInsertSchema(accessContextProfiles).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertChatSessionSchema = createInsertSchema(chatSessions).omit({
+  id: true,
+  startedAt: true,
+  endedAt: true,
+});
+
+export const insertChatMessageSchema = createInsertSchema(chatMessages).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertCommunityReportSchema = createInsertSchema(communityReports).omit({
+  id: true,
+  createdAt: true,
+  moderationStatus: true,
+  confidenceWeight: true,
+});
+
+export type InsertAccessContextProfile = z.infer<typeof insertAccessContextProfileSchema>;
+export type AccessContextProfile = typeof accessContextProfiles.$inferSelect;
+export type InsertChatSession = z.infer<typeof insertChatSessionSchema>;
+export type ChatSession = typeof chatSessions.$inferSelect;
+export type InsertChatMessage = z.infer<typeof insertChatMessageSchema>;
+export type ChatMessage = typeof chatMessages.$inferSelect;
+export type InsertCommunityReport = z.infer<typeof insertCommunityReportSchema>;
+export type CommunityReport = typeof communityReports.$inferSelect;

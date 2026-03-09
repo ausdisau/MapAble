@@ -10,8 +10,16 @@ import {
   insertServiceSessionSchema,
   insertTransportTripSchema,
   insertReviewSchema,
+  insertCommunityReportSchema,
 } from "@shared/schema";
 import { z } from "zod";
+import {
+  processChat,
+  createChatSession,
+  getUserSessions,
+  getSessionMessages,
+  deleteChatSession,
+} from "./chat-engine";
 
 const patchUserSchema = z.object({
   fullName: z.string().min(1).max(200).optional(),
@@ -264,6 +272,93 @@ export async function registerRoutes(
   app.get("/api/workers/:id/reviews", async (req, res) => {
     const workerReviews = await storage.getReviewsForWorker(req.params.id);
     res.json(workerReviews);
+  });
+
+  app.get("/api/access-profile", async (_req, res) => {
+    const user = await storage.getUserByRole("participant");
+    if (!user) return res.status(404).json({ message: "No user found" });
+    const profile = await storage.getAccessProfile(user.id);
+    res.json(profile || null);
+  });
+
+  app.put("/api/access-profile", async (req, res) => {
+    const user = await storage.getUserByRole("participant");
+    if (!user) return res.status(404).json({ message: "No user found" });
+    const profile = await storage.upsertAccessProfile(user.id, req.body);
+    res.json(profile);
+  });
+
+  app.post("/api/chat/sessions", async (_req, res) => {
+    const user = await storage.getUserByRole("participant");
+    if (!user) return res.status(404).json({ message: "No user found" });
+    const session = await createChatSession(user.id);
+    res.status(201).json(session);
+  });
+
+  app.get("/api/chat/sessions", async (_req, res) => {
+    const user = await storage.getUserByRole("participant");
+    if (!user) return res.status(404).json({ message: "No user found" });
+    const sessions = await getUserSessions(user.id);
+    res.json(sessions);
+  });
+
+  app.get("/api/chat/sessions/:id/messages", async (req, res) => {
+    const user = await storage.getUserByRole("participant");
+    if (!user) return res.status(404).json({ message: "No user found" });
+    const sessions = await getUserSessions(user.id);
+    const owns = sessions.some((s) => s.id === req.params.id);
+    if (!owns) return res.status(403).json({ message: "Access denied" });
+    const msgs = await getSessionMessages(req.params.id);
+    res.json(msgs);
+  });
+
+  app.delete("/api/chat/sessions/:id", async (req, res) => {
+    const user = await storage.getUserByRole("participant");
+    if (!user) return res.status(404).json({ message: "No user found" });
+    const sessions = await getUserSessions(user.id);
+    const owns = sessions.some((s) => s.id === req.params.id);
+    if (!owns) return res.status(403).json({ message: "Access denied" });
+    await deleteChatSession(req.params.id);
+    res.status(204).send();
+  });
+
+  app.post("/api/chat/send", async (req, res) => {
+    try {
+      const user = await storage.getUserByRole("participant");
+      if (!user) return res.status(404).json({ message: "No user found" });
+      const { sessionId, message } = req.body;
+      if (!sessionId || !message) return res.status(400).json({ message: "sessionId and message required" });
+      const sessions = await getUserSessions(user.id);
+      const owns = sessions.some((s) => s.id === sessionId);
+      if (!owns) return res.status(403).json({ message: "Access denied" });
+      const response = await processChat(sessionId, user.id, message);
+      res.json(response);
+    } catch (error) {
+      console.error("Chat error:", error);
+      res.status(500).json({ message: "Failed to process chat message" });
+    }
+  });
+
+  app.get("/api/community-reports", async (_req, res) => {
+    const reports = await storage.getCommunityReports();
+    res.json(reports);
+  });
+
+  app.post("/api/community-reports", async (req, res) => {
+    const user = await storage.getUserByRole("participant");
+    if (!user) return res.status(404).json({ message: "No user found" });
+    const { locationRef, barrierType, severity, description } = req.body;
+    if (!locationRef || !barrierType || !severity) {
+      return res.status(400).json({ message: "locationRef, barrierType, and severity are required" });
+    }
+    const report = await storage.createCommunityReport({
+      reporterUserId: user.id,
+      locationRef,
+      barrierType,
+      severity,
+      description: description || null,
+    });
+    res.status(201).json(report);
   });
 
   return httpServer;
