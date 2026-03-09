@@ -16,6 +16,7 @@ import {
   Bookmark,
 } from "lucide-react";
 import { Link } from "wouter";
+import { usePageTitle } from "@/hooks/use-page-title";
 import type { Job } from "@shared/schema";
 
 export default function JobDetailPage() {
@@ -24,6 +25,8 @@ export default function JobDetailPage() {
   const { data: job, isLoading } = useQuery<Job>({
     queryKey: ["/api/jobs", params.id],
   });
+
+  usePageTitle(job?.title ? `${job.title} | Find a Job` : "Job Detail");
 
   if (isLoading) {
     return (

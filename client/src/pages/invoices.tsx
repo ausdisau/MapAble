@@ -7,8 +7,9 @@ import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { FileText, ChevronDown, ChevronUp, Calendar, DollarSign, ShieldCheck } from "lucide-react";
+import { FileText, ChevronDown, ChevronUp, Calendar, DollarSign, ShieldCheck, AlertCircle } from "lucide-react";
 import { useState } from "react";
+import { usePageTitle } from "@/hooks/use-page-title";
 import type { Invoice, User } from "@shared/schema";
 
 const statusColors: Record<string, string> = {
@@ -104,12 +105,17 @@ function InvoiceRow({ invoice }: { invoice: Invoice }) {
 }
 
 export default function InvoicesPage() {
+  usePageTitle("Invoices");
   const { toast } = useToast();
   const { data: me } = useQuery<User>({ queryKey: ["/api/me"] });
-  const [periodStart, setPeriodStart] = useState("2026-02-01");
-  const [periodEnd, setPeriodEnd] = useState("2026-03-31");
+  const now = new Date();
+  const firstOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const lastOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  const formatDate = (d: Date) => d.toISOString().split("T")[0];
+  const [periodStart, setPeriodStart] = useState(formatDate(firstOfMonth));
+  const [periodEnd, setPeriodEnd] = useState(formatDate(lastOfMonth));
 
-  const { data: invoiceList, isLoading } = useQuery<Invoice[]>({
+  const { data: invoiceList, isLoading, isError, refetch } = useQuery<Invoice[]>({
     queryKey: ["/api/invoices", me?.id],
     queryFn: async () => {
       const res = await fetch(`/api/invoices?participantId=${me?.id}`);
@@ -136,6 +142,19 @@ export default function InvoicesPage() {
       toast({ title: "Error", description: "Failed to generate invoice.", variant: "destructive" });
     },
   });
+
+  if (isError) {
+    return (
+      <div className="p-4 md:p-6 max-w-7xl mx-auto">
+        <Card className="p-12 text-center">
+          <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+          <h3 className="font-bold text-lg mb-1">Something went wrong</h3>
+          <p className="text-sm text-muted-foreground mb-4">We couldn't load the data. Please try again.</p>
+          <Button onClick={() => refetch()} data-testid="button-retry">Try Again</Button>
+        </Card>
+      </div>
+    );
+  }
 
   if (isLoading || !me) {
     return (

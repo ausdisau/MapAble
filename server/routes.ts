@@ -11,6 +11,13 @@ import {
   insertTransportTripSchema,
   insertReviewSchema,
 } from "@shared/schema";
+import { z } from "zod";
+
+const patchUserSchema = z.object({
+  fullName: z.string().min(1).max(200).optional(),
+  email: z.string().email().max(200).optional(),
+  location: z.string().max(200).optional(),
+});
 
 export async function registerRoutes(
   httpServer: Server,
@@ -23,6 +30,18 @@ export async function registerRoutes(
     const user = await storage.getUserByRole("participant");
     if (!user) return res.status(404).json({ message: "No user found" });
     const { password, ...safeUser } = user;
+    res.json(safeUser);
+  });
+
+  app.patch("/api/me", async (req, res) => {
+    const user = await storage.getUserByRole("participant");
+    if (!user) return res.status(404).json({ message: "No user found" });
+    const parsed = patchUserSchema.safeParse(req.body);
+    if (!parsed.success) return res.status(400).json({ message: "Invalid data", errors: parsed.error.flatten() });
+    const { fullName, email, location } = parsed.data;
+    const updated = await storage.updateUserProfile(user.id, { fullName, email, location });
+    if (!updated) return res.status(500).json({ message: "Update failed" });
+    const { password, ...safeUser } = updated;
     res.json(safeUser);
   });
 

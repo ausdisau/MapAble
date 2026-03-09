@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ShieldCheck, DollarSign, Clock, Car, Info } from "lucide-react";
+import { usePageTitle } from "@/hooks/use-page-title";
 import type { PricingTier } from "@shared/schema";
 
 function TierTable({ tiers, unit }: { tiers: PricingTier[]; unit: string }) {
@@ -61,6 +62,7 @@ function TierTable({ tiers, unit }: { tiers: PricingTier[]; unit: string }) {
 }
 
 export default function PricingPage() {
+  usePageTitle("Pricing");
   const { data: careTiers, isLoading: careLoading } = useQuery<PricingTier[]>({
     queryKey: ["/api/pricing/care"],
   });

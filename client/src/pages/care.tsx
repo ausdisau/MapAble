@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card } from "@/components/ui/card";
-import { Search, SlidersHorizontal, ShieldCheck, Car, Accessibility, Globe, Users } from "lucide-react";
+import { Search, SlidersHorizontal, ShieldCheck, Car, Accessibility, Globe, Users, AlertCircle } from "lucide-react";
 import { useState } from "react";
+import { usePageTitle } from "@/hooks/use-page-title";
 import type { Worker, User } from "@shared/schema";
 
 const filterTags = [
@@ -17,10 +18,13 @@ const filterTags = [
 ];
 
 export default function CarePage() {
-  const [search, setSearch] = useState("");
+  usePageTitle("Book a Carer");
+  const searchParams = new URLSearchParams(window.location.search);
+  const initialQuery = searchParams.get("q") || "";
+  const [search, setSearch] = useState(initialQuery);
   const [activeFilter, setActiveFilter] = useState("all");
 
-  const { data: workers, isLoading } = useQuery<(Worker & { user?: User })[]>({
+  const { data: workers, isLoading, isError, refetch } = useQuery<(Worker & { user?: User })[]>({
     queryKey: ["/api/workers"],
   });
 
@@ -108,7 +112,14 @@ export default function CarePage() {
         </span>
       </div>
 
-      {isLoading ? (
+      {isError ? (
+        <Card className="p-12 text-center">
+          <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+          <h3 className="font-bold text-lg mb-1">Something went wrong</h3>
+          <p className="text-sm text-muted-foreground mb-4">We couldn't load the data. Please try again.</p>
+          <Button onClick={() => refetch()} data-testid="button-retry">Try Again</Button>
+        </Card>
+      ) : isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {[1, 2, 3, 4, 5, 6].map((i) => (
             <Card key={i} className="p-4">

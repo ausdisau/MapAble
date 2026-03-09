@@ -42,7 +42,13 @@ MapAble 4.0 is a full-stack superapp combining three core NDIS services:
 - **Shift management** — Start/End Shift timer on worker detail page, auto-creates care sessions
 - **Trip logger** — Log transport trips on transport page with distance, tolls, accessible vehicle
 - **Easy Read mode** — Toggle in Settings for larger text, more spacing, 44px min touch targets (WCAG 2.2)
+- **High Contrast mode** — Toggle in Settings for stronger borders, bolder text, underlined links
+- **Screen Reader Optimization** — Toggle in Settings to hide decorative elements, enhance focus outlines
 - **WCAG 2.2 accessibility** — Skip-to-content link, aria-live regions, proper heading hierarchy
+- **Dynamic page titles** — usePageTitle hook sets document.title per page for SEO
+- **Error states** — All pages handle API errors with retry buttons
+- **Hero search** — Dashboard hero search navigates to /care with query parameter
+- **Contact messaging** — Messages page supports selecting contacts from worker list
 
 ## Pricing Engine
 - **Care tiers**: Basic (1-10hrs, $70.23/hr), Standard (11-30hrs, $68/hr), High Support (31+hrs, $65/hr), Support Coordination ($100.14/hr)
@@ -82,6 +88,7 @@ client/src/
     ObjectUploader.tsx    - Uppy-based file uploader component
   hooks/
     use-upload.ts         - Presigned URL upload hook
+    use-page-title.ts     - Dynamic document.title per page
   pages/
     dashboard.tsx         - Main dashboard with hero, stats, featured content
     care.tsx              - Support worker directory
@@ -124,6 +131,7 @@ shared/
 
 ## API Endpoints
 - GET /api/me - Get current user (participant)
+- PATCH /api/me - Update current user profile (fullName, email, location)
 - GET/POST /api/workers - List/create workers
 - GET /api/workers/:id - Get worker detail
 - GET /api/workers/:id/reviews - Get reviews for worker

@@ -30,6 +30,7 @@ import {
 } from "lucide-react";
 import { Link } from "wouter";
 import { useState, useEffect } from "react";
+import { usePageTitle } from "@/hooks/use-page-title";
 import type { Worker, User, Review } from "@shared/schema";
 
 function VerificationChecklist({ worker }: { worker: Worker & { user?: User } }) {
@@ -104,6 +105,10 @@ function ReviewForm({ workerId, participantId }: { workerId: string; participant
 
   const submitReview = useMutation({
     mutationFn: async () => {
+      if (rating === 0) {
+        toast({ title: "Please select a star rating", variant: "destructive" });
+        throw new Error("Rating required");
+      }
       const res = await apiRequest("POST", "/api/reviews", {
         participantId,
         workerId,
@@ -350,6 +355,8 @@ export default function WorkerDetailPage() {
   const { data: worker, isLoading } = useQuery<Worker & { user?: User }>({
     queryKey: ["/api/workers", params.id],
   });
+
+  usePageTitle(worker?.user?.fullName ? `${worker.user.fullName} | Book a Carer` : "Worker Detail");
 
   const createBooking = useMutation({
     mutationFn: async () => {

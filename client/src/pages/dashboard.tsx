@@ -18,11 +18,23 @@ import {
   Car,
   Accessibility,
   CheckCircle2,
+  AlertCircle,
 } from "lucide-react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
+import { useState } from "react";
+import { usePageTitle } from "@/hooks/use-page-title";
 import type { Worker, User, Job } from "@shared/schema";
 
 function HeroSection() {
+  const [heroQuery, setHeroQuery] = useState("");
+  const [, setLocation] = useLocation();
+
+  const handleHeroSearch = () => {
+    if (heroQuery.trim()) {
+      setLocation("/care?q=" + encodeURIComponent(heroQuery.trim()));
+    }
+  };
+
   return (
     <div className="relative rounded-md overflow-visible bg-gradient-to-r from-[#14578F] via-[#1B6EB5] to-[#2384C9] dark:from-[#0F1A2E] dark:via-[#14578F] dark:to-[#1B6EB5] p-8 md:p-12 text-white">
       <div className="absolute inset-0 rounded-md bg-[radial-gradient(ellipse_at_70%_20%,rgba(255,255,255,0.10)_0%,transparent_60%)]" />
@@ -70,12 +82,16 @@ function HeroSection() {
               type="search"
               placeholder="Search workers, services, locations..."
               className="pl-10 bg-white dark:bg-white/10 text-foreground dark:text-white border-white/20 rounded-md text-sm"
+              value={heroQuery}
+              onChange={(e) => setHeroQuery(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter") handleHeroSearch(); }}
               data-testid="input-hero-search"
             />
           </div>
           <Button
             size="lg"
             className="font-bold gap-2"
+            onClick={handleHeroSearch}
             data-testid="button-hero-search"
           >
             <Search className="w-4 h-4" /> Search
@@ -141,9 +157,22 @@ function QuickActions() {
 }
 
 function FeaturedWorkers() {
-  const { data: workers, isLoading } = useQuery<(Worker & { user?: User })[]>({
+  const { data: workers, isLoading, isError, refetch } = useQuery<(Worker & { user?: User })[]>({
     queryKey: ["/api/workers"],
   });
+
+  if (isError) {
+    return (
+      <div>
+        <Card className="p-12 text-center">
+          <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+          <h3 className="font-bold text-lg mb-1">Something went wrong</h3>
+          <p className="text-sm text-muted-foreground mb-4">We couldn't load the workers. Please try again.</p>
+          <Button onClick={() => refetch()} data-testid="button-retry-workers">Try Again</Button>
+        </Card>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -182,9 +211,22 @@ function FeaturedWorkers() {
 }
 
 function RecentJobs() {
-  const { data: jobs, isLoading } = useQuery<Job[]>({
+  const { data: jobs, isLoading, isError, refetch } = useQuery<Job[]>({
     queryKey: ["/api/jobs"],
   });
+
+  if (isError) {
+    return (
+      <div>
+        <Card className="p-12 text-center">
+          <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+          <h3 className="font-bold text-lg mb-1">Something went wrong</h3>
+          <p className="text-sm text-muted-foreground mb-4">We couldn't load the jobs. Please try again.</p>
+          <Button onClick={() => refetch()} data-testid="button-retry-jobs">Try Again</Button>
+        </Card>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -248,6 +290,7 @@ function KeyFeatures() {
 }
 
 export default function Dashboard() {
+  usePageTitle("Dashboard");
   const { data: workers } = useQuery<Worker[]>({ queryKey: ["/api/workers"] });
   const { data: jobs } = useQuery<Job[]>({ queryKey: ["/api/jobs"] });
 

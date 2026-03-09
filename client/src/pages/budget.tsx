@@ -2,7 +2,9 @@ import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { AlertTriangle, Wallet, TrendingUp, Clock, Car, GraduationCap, DollarSign } from "lucide-react";
+import { AlertTriangle, Wallet, TrendingUp, Clock, Car, GraduationCap, DollarSign, AlertCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { usePageTitle } from "@/hooks/use-page-title";
 import type { ParticipantBudget, ServiceSession, TransportTrip, User } from "@shared/schema";
 
 interface BudgetResponse {
@@ -86,9 +88,10 @@ function TierIndicator({ label, tier, rate, usage, unit }: { label: string; tier
 }
 
 export default function BudgetPage() {
+  usePageTitle("Budget Dashboard");
   const { data: me } = useQuery<User>({ queryKey: ["/api/me"] });
 
-  const { data: budgetData, isLoading: budgetLoading } = useQuery<BudgetResponse>({
+  const { data: budgetData, isLoading: budgetLoading, isError: budgetError, refetch: budgetRefetch } = useQuery<BudgetResponse>({
     queryKey: ["/api/budget", me?.id],
     queryFn: async () => {
       const res = await fetch(`/api/budget?participantId=${me?.id}`);
@@ -117,6 +120,19 @@ export default function BudgetPage() {
     },
     enabled: !!me?.id,
   });
+
+  if (budgetError) {
+    return (
+      <div className="p-4 md:p-6 max-w-7xl mx-auto">
+        <Card className="p-12 text-center">
+          <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+          <h3 className="font-bold text-lg mb-1">Something went wrong</h3>
+          <p className="text-sm text-muted-foreground mb-4">We couldn't load the data. Please try again.</p>
+          <Button onClick={() => budgetRefetch()} data-testid="button-retry">Try Again</Button>
+        </Card>
+      </div>
+    );
+  }
 
   if (budgetLoading || !me) {
     return (
