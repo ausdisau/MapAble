@@ -1,10 +1,17 @@
 import { db } from "./db";
-import { users, workers, jobs, messages } from "@shared/schema";
-import { sql } from "drizzle-orm";
+import { users, workers, jobs, messages, pricingTiers, participantBudgets, serviceSessions, transportTrips, reviews } from "@shared/schema";
+import { sql, eq, isNull } from "drizzle-orm";
 
 export async function seedDatabase() {
   const existingUsers = await db.select().from(users);
-  if (existingUsers.length > 0) return;
+  if (existingUsers.length > 0) {
+    const existingTiers = await db.select().from(pricingTiers);
+    if (existingTiers.length === 0) {
+      await seedPricingAndBudgets();
+    }
+    await backfillVerificationData();
+    return;
+  }
 
   const seedUsers = await db.insert(users).values([
     {
@@ -18,6 +25,7 @@ export async function seedDatabase() {
       languages: ["English", "Arabic"],
       skills: ["Manual Handling", "Transport", "Community Access"],
       isVerified: true,
+      phoneNumber: "0412 345 678",
     },
     {
       username: "sam_t",
@@ -30,6 +38,7 @@ export async function seedDatabase() {
       languages: ["English", "Auslan"],
       skills: ["Personal Care", "Domestic Assistance", "Auslan"],
       isVerified: true,
+      phoneNumber: "0423 456 789",
     },
     {
       username: "sarah_j",
@@ -42,6 +51,7 @@ export async function seedDatabase() {
       languages: ["English"],
       skills: ["Transport", "Meal Prep", "Personal Care"],
       isVerified: true,
+      phoneNumber: "0434 567 890",
     },
     {
       username: "priya_k",
@@ -54,6 +64,7 @@ export async function seedDatabase() {
       languages: ["English", "Hindi", "Tamil"],
       skills: ["Cultural Safety", "Community Access", "Social Support"],
       isVerified: true,
+      phoneNumber: "0445 678 901",
     },
     {
       username: "liam_w",
@@ -66,6 +77,7 @@ export async function seedDatabase() {
       languages: ["English"],
       skills: ["Recreation", "Exercise Physiology", "Community Access"],
       isVerified: true,
+      phoneNumber: "0456 789 012",
     },
     {
       username: "demo_participant",
@@ -75,6 +87,10 @@ export async function seedDatabase() {
       role: "participant",
       location: "Sydney, NSW",
       accessNeeds: ["Wheelchair Accessible", "Low Sensory Environment"],
+      ndisNumber: "430 123 456",
+      planStartDate: "2025-07-01",
+      planEndDate: "2026-06-30",
+      phoneNumber: "0467 890 123",
     },
     {
       username: "ndis_provider",
@@ -101,6 +117,11 @@ export async function seedDatabase() {
       rating: "4.80",
       reviewCount: 47,
       availability: "Mon-Fri, 7am-6pm",
+      abn: "12 345 678 901",
+      insuranceExpiry: "2027-03-15",
+      firstAidExpiry: "2027-06-20",
+      wwccNumber: "WWC1234567E",
+      wwccExpiry: "2028-01-10",
     },
     {
       userId: carerIds[1].id,
@@ -114,6 +135,11 @@ export async function seedDatabase() {
       rating: "4.90",
       reviewCount: 62,
       availability: "Mon-Sat, 8am-8pm",
+      abn: "23 456 789 012",
+      insuranceExpiry: "2027-05-01",
+      firstAidExpiry: "2027-09-15",
+      wwccNumber: "WWC2345678E",
+      wwccExpiry: "2027-11-20",
     },
     {
       userId: carerIds[2].id,
@@ -127,6 +153,11 @@ export async function seedDatabase() {
       rating: "4.70",
       reviewCount: 35,
       availability: "Tue-Sun, 6am-4pm",
+      abn: "34 567 890 123",
+      insuranceExpiry: "2027-02-28",
+      firstAidExpiry: "2027-04-10",
+      wwccNumber: "WWC3456789E",
+      wwccExpiry: "2028-03-15",
     },
     {
       userId: carerIds[3].id,
@@ -139,6 +170,11 @@ export async function seedDatabase() {
       rating: "4.95",
       reviewCount: 78,
       availability: "Mon-Fri, 9am-5pm",
+      abn: "45 678 901 234",
+      insuranceExpiry: "2027-08-20",
+      firstAidExpiry: "2028-01-05",
+      wwccNumber: "WWC4567890E",
+      wwccExpiry: "2027-09-30",
     },
     {
       userId: carerIds[4].id,
@@ -152,6 +188,11 @@ export async function seedDatabase() {
       rating: "4.85",
       reviewCount: 41,
       availability: "Mon-Sun, flexible",
+      abn: "56 789 012 345",
+      insuranceExpiry: "2027-07-10",
+      firstAidExpiry: "2027-12-01",
+      wwccNumber: "WWC5678901E",
+      wwccExpiry: "2028-06-15",
     },
   ]);
 
@@ -231,5 +272,269 @@ export async function seedDatabase() {
     },
   ]);
 
+  await seedPricingAndBudgets();
+
   console.log("Database seeded successfully");
+}
+
+async function seedPricingAndBudgets() {
+  await db.insert(pricingTiers).values([
+    {
+      serviceType: "care",
+      tierName: "Basic Care",
+      minUsage: "1",
+      maxUsage: "10",
+      rate: "70.23",
+      ndisCategory: "Core Supports - Assistance with Daily Life",
+      ndisItemCode: "01_011_0107_1_1",
+      description: "Standard weekday rate for personal care and daily living assistance",
+    },
+    {
+      serviceType: "care",
+      tierName: "Standard Care",
+      minUsage: "11",
+      maxUsage: "30",
+      rate: "68.00",
+      ndisCategory: "Core Supports - Assistance with Daily Life",
+      ndisItemCode: "01_011_0107_1_1",
+      description: "3% volume discount for moderate usage, below NDIS price cap",
+    },
+    {
+      serviceType: "care",
+      tierName: "High Support",
+      minUsage: "31",
+      rate: "65.00",
+      ndisCategory: "Core Supports - Assistance with Daily Life",
+      ndisItemCode: "01_011_0107_1_1",
+      description: "Volume rate for high needs usage, ensuring sustainability within NDIS funding",
+    },
+    {
+      serviceType: "care",
+      tierName: "Support Coordination",
+      minUsage: "0",
+      rate: "100.14",
+      ndisCategory: "Capacity Building - Coordination of Supports",
+      ndisItemCode: "07_002_0106_8_3",
+      description: "Level 2 Coordination of Supports, billed only when care planning support is provided",
+    },
+    {
+      serviceType: "transport",
+      tierName: "Basic Mobility",
+      minUsage: "1",
+      maxUsage: "100",
+      rate: "0.99",
+      ndisCategory: "Core Supports - Transport",
+      ndisItemCode: "02_051_0108_1_1",
+      description: "Standard provider-owned vehicle rate matching NDIS cap",
+    },
+    {
+      serviceType: "transport",
+      tierName: "Standard Mobility",
+      minUsage: "101",
+      maxUsage: "300",
+      rate: "0.90",
+      ndisCategory: "Core Supports - Transport",
+      ndisItemCode: "02_051_0108_1_1",
+      description: "10% volume discount for moderate transport usage",
+    },
+    {
+      serviceType: "transport",
+      tierName: "High Mobility",
+      minUsage: "301",
+      rate: "0.85",
+      ndisCategory: "Core Supports - Transport",
+      ndisItemCode: "02_051_0108_1_1",
+      description: "Bulk rate for very high transport needs",
+    },
+    {
+      serviceType: "transport",
+      tierName: "Accessible Vehicle",
+      minUsage: "0",
+      rate: "2.76",
+      ndisCategory: "Core Supports - Transport (Modified Vehicle)",
+      ndisItemCode: "02_051_0108_1_1",
+      description: "NDIS rate for modified/wheelchair-accessible vehicles, applied per-trip",
+    },
+  ]);
+
+  const participant = await db.select().from(users).where(sql`${users.role} = 'participant'`);
+  if (participant.length > 0) {
+    const pid = participant[0].id;
+
+    await db.insert(participantBudgets).values([
+      {
+        participantId: pid,
+        category: "daily_living",
+        totalAllocated: "28000.00",
+        totalUsed: "8450.00",
+        periodStart: "2025-07-01",
+        periodEnd: "2026-06-30",
+      },
+      {
+        participantId: pid,
+        category: "transport",
+        totalAllocated: "3456.00",
+        totalUsed: "892.50",
+        periodStart: "2025-07-01",
+        periodEnd: "2026-06-30",
+      },
+      {
+        participantId: pid,
+        category: "capacity_building",
+        totalAllocated: "12000.00",
+        totalUsed: "3200.00",
+        periodStart: "2025-07-01",
+        periodEnd: "2026-06-30",
+      },
+    ]);
+
+    const allWorkers = await db.select().from(workers);
+    if (allWorkers.length > 0) {
+      await db.insert(serviceSessions).values([
+        {
+          workerId: allWorkers[0].id,
+          participantId: pid,
+          startTime: "09:00",
+          endTime: "13:00",
+          actualHours: "4.00",
+          hourlyRate: "70.23",
+          tierApplied: "Basic Care",
+          ndisItemCode: "01_011_0107_1_1",
+          totalCharge: "280.92",
+          shiftNotes: "Community access outing to Parramatta Park. Participant engaged well with activities.",
+          status: "completed",
+          date: "2026-02-20",
+        },
+        {
+          workerId: allWorkers[1].id,
+          participantId: pid,
+          startTime: "14:00",
+          endTime: "17:00",
+          actualHours: "3.00",
+          hourlyRate: "70.23",
+          tierApplied: "Basic Care",
+          ndisItemCode: "01_011_0107_1_1",
+          totalCharge: "210.69",
+          shiftNotes: "Personal care assistance and meal preparation. Worked on daily living skills.",
+          status: "completed",
+          date: "2026-02-22",
+        },
+        {
+          workerId: allWorkers[0].id,
+          participantId: pid,
+          startTime: "08:00",
+          endTime: "14:00",
+          actualHours: "6.00",
+          hourlyRate: "68.00",
+          tierApplied: "Standard Care",
+          ndisItemCode: "01_011_0107_1_1",
+          totalCharge: "408.00",
+          shiftNotes: "Full morning support including transport to medical appointment and community access.",
+          status: "completed",
+          date: "2026-03-01",
+        },
+      ]);
+
+      await db.insert(transportTrips).values([
+        {
+          workerId: allWorkers[0].id,
+          participantId: pid,
+          distanceKm: "25.5",
+          perKmRate: "0.99",
+          tierApplied: "Basic Mobility",
+          accessibleVehicle: true,
+          accessibleSurcharge: "0",
+          tolls: "6.50",
+          totalCharge: "31.75",
+          ndisItemCode: "02_051_0108_1_1",
+          status: "completed",
+          date: "2026-02-20",
+        },
+        {
+          workerId: allWorkers[2].id,
+          participantId: pid,
+          distanceKm: "42.0",
+          perKmRate: "0.99",
+          tierApplied: "Basic Mobility",
+          accessibleVehicle: true,
+          accessibleSurcharge: "0",
+          tolls: "0",
+          totalCharge: "41.58",
+          ndisItemCode: "02_051_0108_1_1",
+          status: "completed",
+          date: "2026-03-05",
+        },
+      ]);
+
+      await db.insert(reviews).values([
+        {
+          participantId: pid,
+          workerId: allWorkers[0].id,
+          rating: 5,
+          comment: "Alex is absolutely wonderful. Always on time, great with communication, and makes me feel comfortable and safe during transport.",
+          createdAt: new Date("2026-02-21"),
+        },
+        {
+          participantId: pid,
+          workerId: allWorkers[1].id,
+          rating: 5,
+          comment: "Sam is incredibly patient and skilled with Auslan. The personal care support has been life-changing.",
+          createdAt: new Date("2026-02-23"),
+        },
+        {
+          participantId: pid,
+          workerId: allWorkers[0].id,
+          rating: 4,
+          comment: "Good session overall, slight delay due to traffic but communicated well throughout.",
+          createdAt: new Date("2026-03-02"),
+        },
+      ]);
+    }
+  }
+
+  console.log("Pricing tiers, budgets, and sample data seeded");
+}
+
+async function backfillVerificationData() {
+  const verificationData = [
+    { username: "alex_m", abn: "12 345 678 901", insuranceExpiry: "2027-03-15", firstAidExpiry: "2027-06-20", wwccNumber: "WWC1234567E", wwccExpiry: "2028-01-10", phoneNumber: "0412 345 678" },
+    { username: "sam_t", abn: "23 456 789 012", insuranceExpiry: "2027-05-01", firstAidExpiry: "2027-09-15", wwccNumber: "WWC2345678E", wwccExpiry: "2027-11-20", phoneNumber: "0423 456 789" },
+    { username: "sarah_j", abn: "34 567 890 123", insuranceExpiry: "2027-02-28", firstAidExpiry: "2027-04-10", wwccNumber: "WWC3456789E", wwccExpiry: "2028-03-15", phoneNumber: "0434 567 890" },
+    { username: "priya_k", abn: "45 678 901 234", insuranceExpiry: "2027-08-20", firstAidExpiry: "2028-01-05", wwccNumber: "WWC4567890E", wwccExpiry: "2027-09-30", phoneNumber: "0445 678 901" },
+    { username: "liam_w", abn: "56 789 012 345", insuranceExpiry: "2027-07-10", firstAidExpiry: "2027-12-01", wwccNumber: "WWC5678901E", wwccExpiry: "2028-06-15", phoneNumber: "0456 789 012" },
+  ];
+
+  for (const data of verificationData) {
+    const [user] = await db.select().from(users).where(eq(users.username, data.username));
+    if (!user) continue;
+
+    if (!user.phoneNumber) {
+      await db.update(users).set({ phoneNumber: data.phoneNumber }).where(eq(users.id, user.id));
+    }
+
+    const workerRows = await db.select().from(workers).where(eq(workers.userId, user.id));
+    for (const w of workerRows) {
+      if (!w.abn) {
+        await db.update(workers).set({
+          abn: data.abn,
+          insuranceExpiry: data.insuranceExpiry,
+          firstAidExpiry: data.firstAidExpiry,
+          wwccNumber: data.wwccNumber,
+          wwccExpiry: data.wwccExpiry,
+        }).where(eq(workers.id, w.id));
+      }
+    }
+  }
+
+  const participant = await db.select().from(users).where(eq(users.username, "demo_participant"));
+  if (participant.length > 0 && !participant[0].ndisNumber) {
+    await db.update(users).set({
+      ndisNumber: "430 123 456",
+      planStartDate: "2025-07-01",
+      planEndDate: "2026-06-30",
+      phoneNumber: "0467 890 123",
+    }).where(eq(users.id, participant[0].id));
+  }
+
+  console.log("Verification data backfilled");
 }

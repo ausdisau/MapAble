@@ -7,7 +7,7 @@ import { SidebarProvider, useSidebar } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { ThemeProvider, useTheme } from "@/components/theme-provider";
 import { Button } from "@/components/ui/button";
-import { Moon, Sun, Search, Bell, Accessibility, LayoutDashboard, HeartHandshake, Briefcase, Bus, MessageSquare, Settings, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { Moon, Sun, Search, Bell, Accessibility, LayoutDashboard, HeartHandshake, Briefcase, Bus, MessageSquare, Settings, PanelLeftClose, PanelLeftOpen, DollarSign, Wallet, FileText } from "lucide-react";
 import { useState } from "react";
 import { useLocation } from "wouter";
 import logoImage from "@assets/Accessible_Australia_Logo_Design_1772582762574.png";
@@ -27,6 +27,9 @@ import JobDetailPage from "@/pages/job-detail";
 import TransportPage from "@/pages/transport";
 import MessagesPage from "@/pages/messages";
 import SettingsPage from "@/pages/settings";
+import PricingPage from "@/pages/pricing";
+import BudgetPage from "@/pages/budget";
+import InvoicesPage from "@/pages/invoices";
 
 function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
@@ -59,6 +62,9 @@ const mobileNavItems = [
   { title: "Book a Carer", url: "/care", icon: HeartHandshake, audioDesc: "Find and book verified NDIS support workers" },
   { title: "Find a Job", url: "/jobs", icon: Briefcase, audioDesc: "Browse disability support employment opportunities" },
   { title: "Get Transport", url: "/transport", icon: Bus, audioDesc: "Arrange wheelchair accessible transport services" },
+  { title: "Pricing", url: "/pricing", icon: DollarSign, audioDesc: "View NDIS-aligned pricing for care and transport services" },
+  { title: "Budget", url: "/budget", icon: Wallet, audioDesc: "View your NDIS budget usage and remaining funds" },
+  { title: "Invoices", url: "/invoices", icon: FileText, audioDesc: "View and manage your NDIS invoices and claims" },
   { title: "Messages", url: "/messages", icon: MessageSquare, audioDesc: "View your conversations and messages" },
   { title: "Settings", url: "/settings", icon: Settings, audioDesc: "Manage your account and accessibility preferences" },
 ];
@@ -129,6 +135,9 @@ function Router() {
       <Route path="/jobs" component={JobsPage} />
       <Route path="/jobs/:id" component={JobDetailPage} />
       <Route path="/transport" component={TransportPage} />
+      <Route path="/pricing" component={PricingPage} />
+      <Route path="/budget" component={BudgetPage} />
+      <Route path="/invoices" component={InvoicesPage} />
       <Route path="/messages" component={MessagesPage} />
       <Route path="/settings" component={SettingsPage} />
       <Route component={NotFound} />
@@ -144,6 +153,13 @@ function AppLayout() {
 
   return (
     <SidebarProvider style={style as React.CSSProperties}>
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:z-[100] focus:top-2 focus:left-2 focus:bg-primary focus:text-primary-foreground focus:px-4 focus:py-2 focus:rounded-md focus:text-sm focus:font-bold"
+        data-testid="link-skip-to-content"
+      >
+        Skip to main content
+      </a>
       <div className="flex h-screen w-full">
         <AppSidebar />
         <div className="flex flex-col flex-1 min-w-0">
@@ -171,7 +187,7 @@ function AppLayout() {
             <div className="flex-1" style={{ backgroundColor: "#1A4B7A" }} />
             <div className="flex-1" style={{ backgroundColor: "#E6A817" }} />
           </div>
-          <main className="flex-1 overflow-auto">
+          <main id="main-content" className="flex-1 overflow-auto" role="main" aria-label="Main content">
             <Router />
           </main>
         </div>

@@ -22,10 +22,204 @@ import {
   Globe,
   ArrowLeft,
   Calendar,
+  CheckCircle2,
+  AlertCircle,
+  FileCheck,
+  Heart,
+  Send,
 } from "lucide-react";
 import { Link } from "wouter";
 import { useState } from "react";
-import type { Worker, User } from "@shared/schema";
+import type { Worker, User, Review } from "@shared/schema";
+
+function VerificationChecklist({ worker }: { worker: Worker & { user?: User } }) {
+  const items = [
+    {
+      label: "NDIS Worker Screening",
+      verified: worker.ndisVerified,
+      detail: worker.ndisVerified ? "Verified" : "Pending",
+    },
+    {
+      label: "First Aid Certificate",
+      verified: !!worker.firstAidExpiry,
+      detail: worker.firstAidExpiry ? `Expires ${worker.firstAidExpiry}` : "Not provided",
+    },
+    {
+      label: "Working With Children Check",
+      verified: !!worker.wwccNumber,
+      detail: worker.wwccNumber
+        ? `${worker.wwccNumber} (Expires ${worker.wwccExpiry || "N/A"})`
+        : "Not provided",
+    },
+    {
+      label: "Professional Insurance",
+      verified: !!worker.insuranceExpiry,
+      detail: worker.insuranceExpiry ? `Expires ${worker.insuranceExpiry}` : "Not provided",
+    },
+    {
+      label: "ABN Registered",
+      verified: !!worker.abn,
+      detail: worker.abn
+        ? `XX XXX XXX ${worker.abn.slice(-3)}`
+        : "Not provided",
+    },
+  ];
+
+  const verifiedCount = items.filter((i) => i.verified).length;
+
+  return (
+    <Card className="p-5" data-testid="card-verification-checklist">
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="font-bold text-sm flex items-center gap-2">
+          <FileCheck className="w-4 h-4 text-[#2EAA6E]" /> Verification
+        </h3>
+        <Badge variant="secondary" className="text-[10px]">
+          {verifiedCount}/{items.length} verified
+        </Badge>
+      </div>
+      <div className="space-y-2.5">
+        {items.map((item) => (
+          <div key={item.label} className="flex items-start gap-2.5" data-testid={`verification-${item.label.toLowerCase().replace(/\s/g, "-")}`}>
+            {item.verified ? (
+              <CheckCircle2 className="w-4 h-4 text-[#2EAA6E] flex-shrink-0 mt-0.5" />
+            ) : (
+              <AlertCircle className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
+            )}
+            <div>
+              <span className="text-sm font-medium">{item.label}</span>
+              <p className="text-xs text-muted-foreground">{item.detail}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </Card>
+  );
+}
+
+function ReviewForm({ workerId, participantId }: { workerId: string; participantId: string }) {
+  const { toast } = useToast();
+  const [rating, setRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [comment, setComment] = useState("");
+
+  const submitReview = useMutation({
+    mutationFn: async () => {
+      const res = await apiRequest("POST", "/api/reviews", {
+        participantId,
+        workerId,
+        rating,
+        comment: comment || undefined,
+      });
+      return res.json();
+    },
+    onSuccess: () => {
+      toast({ title: "Review submitted", description: "Thank you for your feedback." });
+      queryClient.invalidateQueries({ queryKey: ["/api/workers", workerId, "reviews"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/workers", workerId] });
+      setRating(0);
+      setComment("");
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to submit review.", variant: "destructive" });
+    },
+  });
+
+  return (
+    <Card className="p-5" data-testid="card-review-form">
+      <h3 className="font-bold text-sm mb-3 flex items-center gap-2">
+        <Heart className="w-4 h-4 text-[#E6A817]" /> Leave a Review
+      </h3>
+      <div className="flex gap-1 mb-3" role="radiogroup" aria-label="Rating">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <button
+            key={star}
+            type="button"
+            onClick={() => setRating(star)}
+            onMouseEnter={() => setHoverRating(star)}
+            onMouseLeave={() => setHoverRating(0)}
+            className="p-0.5 focus:outline-none focus:ring-2 focus:ring-primary rounded"
+            aria-label={`${star} star${star !== 1 ? "s" : ""}`}
+            data-testid={`button-star-${star}`}
+          >
+            <Star
+              className={`w-6 h-6 transition-colors ${
+                star <= (hoverRating || rating)
+                  ? "fill-yellow-400 text-yellow-400"
+                  : "text-muted-foreground/30"
+              }`}
+            />
+          </button>
+        ))}
+      </div>
+      <Textarea
+        placeholder="Share your experience..."
+        value={comment}
+        onChange={(e) => setComment(e.target.value)}
+        className="resize-none mb-3"
+        data-testid="input-review-comment"
+      />
+      <Button
+        onClick={() => submitReview.mutate()}
+        disabled={rating === 0 || submitReview.isPending}
+        className="w-full gap-2"
+        data-testid="button-submit-review"
+      >
+        <Send className="w-4 h-4" />
+        {submitReview.isPending ? "Submitting..." : "Submit Review"}
+      </Button>
+    </Card>
+  );
+}
+
+function ReviewsList({ workerId }: { workerId: string }) {
+  const { data: reviewsData, isLoading } = useQuery<(Review & { participant?: User })[]>({
+    queryKey: ["/api/workers", workerId, "reviews"],
+  });
+
+  if (isLoading) {
+    return <Card className="p-5"><Skeleton className="h-24 w-full" /></Card>;
+  }
+
+  if (!reviewsData?.length) {
+    return (
+      <Card className="p-5 text-center text-sm text-muted-foreground" data-testid="card-no-reviews">
+        No reviews yet. Be the first to leave feedback.
+      </Card>
+    );
+  }
+
+  return (
+    <div className="space-y-3" data-testid="list-reviews">
+      {reviewsData.map((review) => (
+        <Card key={review.id} className="p-4" data-testid={`card-review-${review.id}`}>
+          <div className="flex items-start justify-between mb-2">
+            <div>
+              <span className="font-bold text-sm">{review.participant?.fullName || "Participant"}</span>
+              <div className="flex gap-0.5 mt-0.5">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <Star
+                    key={star}
+                    className={`w-3.5 h-3.5 ${
+                      star <= review.rating
+                        ? "fill-yellow-400 text-yellow-400"
+                        : "text-muted-foreground/30"
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
+            <span className="text-xs text-muted-foreground">
+              {review.createdAt ? new Date(review.createdAt).toLocaleDateString("en-AU") : ""}
+            </span>
+          </div>
+          {review.comment && (
+            <p className="text-sm text-muted-foreground">{review.comment}</p>
+          )}
+        </Card>
+      ))}
+    </div>
+  );
+}
 
 export default function WorkerDetailPage() {
   const params = useParams<{ id: string }>();
@@ -35,6 +229,8 @@ export default function WorkerDetailPage() {
   const [bookingNotes, setBookingNotes] = useState("");
   const [showBooking, setShowBooking] = useState(false);
 
+  const { data: me } = useQuery<User>({ queryKey: ["/api/me"] });
+
   const { data: worker, isLoading } = useQuery<Worker & { user?: User }>({
     queryKey: ["/api/workers", params.id],
   });
@@ -42,7 +238,7 @@ export default function WorkerDetailPage() {
   const createBooking = useMutation({
     mutationFn: async () => {
       const res = await apiRequest("POST", "/api/bookings", {
-        participantId: "demo-participant",
+        participantId: me?.id || "demo-participant",
         workerId: params.id,
         serviceType: "General Support",
         date: bookingDate,
@@ -175,8 +371,32 @@ export default function WorkerDetailPage() {
                   </div>
                 </>
               )}
+
+              {worker.transportCapable && (
+                <>
+                  <Separator className="my-4" />
+                  <div>
+                    <h3 className="font-bold text-sm mb-2 flex items-center gap-1">
+                      <Car className="w-3 h-3" /> Vehicle Details
+                    </h3>
+                    <div className="flex flex-wrap gap-1.5">
+                      <Badge variant="secondary" className="text-xs">{worker.transportType || "Car"}</Badge>
+                      {worker.wheelchairAccessible && (
+                        <Badge variant="secondary" className="text-xs gap-1">
+                          <Accessibility className="w-3 h-3" /> Wheelchair Accessible
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           </Card>
+
+          <div>
+            <h2 className="text-lg font-black tracking-tight mb-3" data-testid="text-reviews-heading">Reviews</h2>
+            <ReviewsList workerId={params.id!} />
+          </div>
         </div>
 
         <div className="space-y-4">
@@ -214,6 +434,8 @@ export default function WorkerDetailPage() {
             </div>
           </Card>
 
+          <VerificationChecklist worker={worker} />
+
           {!showBooking ? (
             <Button className="w-full" onClick={() => setShowBooking(true)} data-testid="button-start-booking">
               Book This Worker
@@ -225,10 +447,11 @@ export default function WorkerDetailPage() {
               </div>
               <div className="p-5 space-y-3">
                 <div>
-                  <Label className="text-xs font-semibold">Date</Label>
+                  <Label htmlFor="booking-date" className="text-xs font-semibold">Date</Label>
                   <div className="relative mt-1">
                     <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                     <Input
+                      id="booking-date"
                       type="date"
                       className="pl-9"
                       value={bookingDate}
@@ -238,10 +461,11 @@ export default function WorkerDetailPage() {
                   </div>
                 </div>
                 <div>
-                  <Label className="text-xs font-semibold">Time</Label>
+                  <Label htmlFor="booking-time" className="text-xs font-semibold">Time</Label>
                   <div className="relative mt-1">
                     <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                     <Input
+                      id="booking-time"
                       type="time"
                       className="pl-9"
                       value={bookingTime}
@@ -251,8 +475,9 @@ export default function WorkerDetailPage() {
                   </div>
                 </div>
                 <div>
-                  <Label className="text-xs font-semibold">Notes</Label>
+                  <Label htmlFor="booking-notes" className="text-xs font-semibold">Notes</Label>
                   <Textarea
+                    id="booking-notes"
                     className="mt-1 resize-none"
                     placeholder="Any specific requirements..."
                     value={bookingNotes}
@@ -276,6 +501,8 @@ export default function WorkerDetailPage() {
               </div>
             </Card>
           )}
+
+          {me && <ReviewForm workerId={params.id!} participantId={me.id} />}
         </div>
       </div>
     </div>

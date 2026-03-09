@@ -5,11 +5,17 @@ import {
   type Job, type InsertJob,
   type TransportRequest, type InsertTransportRequest,
   type Message, type InsertMessage,
+  type PricingTier, type InsertPricingTier,
+  type ServiceSession, type InsertServiceSession,
+  type TransportTrip, type InsertTransportTrip,
+  type Invoice, type InsertInvoice,
+  type Review, type InsertReview,
+  type ParticipantBudget, type InsertParticipantBudget,
   users, workers, bookings, jobs, transportRequests, messages,
+  pricingTiers, serviceSessions, transportTrips, invoices, reviews, participantBudgets,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc } from "drizzle-orm";
-import { randomUUID } from "crypto";
+import { eq, desc, and, sql, gte, lte } from "drizzle-orm";
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
@@ -30,6 +36,21 @@ export interface IStorage {
   createTransportRequest(req: InsertTransportRequest): Promise<TransportRequest>;
   getMessages(): Promise<Message[]>;
   createMessage(msg: InsertMessage): Promise<Message>;
+
+  getPricingTiers(serviceType: string): Promise<PricingTier[]>;
+  calculateCareRate(participantId: string, month: string): Promise<{ tier: string; rate: number; hoursUsed: number }>;
+  calculateTransportRate(participantId: string, month: string): Promise<{ tier: string; rate: number; kmUsed: number }>;
+  createServiceSession(data: InsertServiceSession): Promise<ServiceSession>;
+  getServiceSessions(participantId: string): Promise<ServiceSession[]>;
+  createTransportTrip(data: InsertTransportTrip): Promise<TransportTrip>;
+  getTransportTrips(participantId: string): Promise<TransportTrip[]>;
+  createInvoice(data: InsertInvoice): Promise<Invoice>;
+  getInvoices(participantId: string): Promise<Invoice[]>;
+  generateInvoice(participantId: string, periodStart: string, periodEnd: string): Promise<Invoice>;
+  getParticipantBudgets(participantId: string): Promise<ParticipantBudget[]>;
+  updateBudgetUsage(participantId: string, category: string, amount: number): Promise<ParticipantBudget | undefined>;
+  createReview(data: InsertReview): Promise<Review>;
+  getReviewsForWorker(workerId: string): Promise<(Review & { participant?: User })[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -125,6 +146,186 @@ export class DatabaseStorage implements IStorage {
   async createMessage(insertMsg: InsertMessage): Promise<Message> {
     const [msg] = await db.insert(messages).values(insertMsg).returning();
     return msg;
+  }
+
+  async getPricingTiers(serviceType: string): Promise<PricingTier[]> {
+    return db.select().from(pricingTiers).where(eq(pricingTiers.serviceType, serviceType));
+  }
+
+  async calculateCareRate(participantId: string, month: string): Promise<{ tier: string; rate: number; hoursUsed: number }> {
+    const monthPrefix = month.substring(0, 7);
+    const sessions = await db.select().from(serviceSessions)
+      .where(and(
+        eq(serviceSessions.participantId, participantId),
+        sql`${serviceSessions.date} LIKE ${monthPrefix + '%'}`,
+        eq(serviceSessions.status, "completed")
+      ));
+
+    const totalHours = sessions.reduce((sum, s) => sum + Number(s.actualHours || 0), 0);
+
+    if (totalHours >= 31) return { tier: "High Support", rate: 65.00, hoursUsed: totalHours };
+    if (totalHours >= 11) return { tier: "Standard Care", rate: 68.00, hoursUsed: totalHours };
+    return { tier: "Basic Care", rate: 70.23, hoursUsed: totalHours };
+  }
+
+  async calculateTransportRate(participantId: string, month: string): Promise<{ tier: string; rate: number; kmUsed: number }> {
+    const monthPrefix = month.substring(0, 7);
+    const trips = await db.select().from(transportTrips)
+      .where(and(
+        eq(transportTrips.participantId, participantId),
+        sql`${transportTrips.date} LIKE ${monthPrefix + '%'}`,
+        eq(transportTrips.status, "completed")
+      ));
+
+    const totalKm = trips.reduce((sum, t) => sum + Number(t.distanceKm || 0), 0);
+
+    if (totalKm >= 301) return { tier: "High Mobility", rate: 0.85, kmUsed: totalKm };
+    if (totalKm >= 101) return { tier: "Standard Mobility", rate: 0.90, kmUsed: totalKm };
+    return { tier: "Basic Mobility", rate: 0.99, kmUsed: totalKm };
+  }
+
+  async createServiceSession(data: InsertServiceSession): Promise<ServiceSession> {
+    const [session] = await db.insert(serviceSessions).values(data).returning();
+    return session;
+  }
+
+  async getServiceSessions(participantId: string): Promise<ServiceSession[]> {
+    return db.select().from(serviceSessions)
+      .where(eq(serviceSessions.participantId, participantId))
+      .orderBy(desc(serviceSessions.date));
+  }
+
+  async createTransportTrip(data: InsertTransportTrip): Promise<TransportTrip> {
+    const [trip] = await db.insert(transportTrips).values(data).returning();
+    return trip;
+  }
+
+  async getTransportTrips(participantId: string): Promise<TransportTrip[]> {
+    return db.select().from(transportTrips)
+      .where(eq(transportTrips.participantId, participantId))
+      .orderBy(desc(transportTrips.date));
+  }
+
+  async createInvoice(data: InsertInvoice): Promise<Invoice> {
+    const [invoice] = await db.insert(invoices).values(data).returning();
+    return invoice;
+  }
+
+  async getInvoices(participantId: string): Promise<Invoice[]> {
+    return db.select().from(invoices)
+      .where(eq(invoices.participantId, participantId))
+      .orderBy(desc(invoices.generatedAt));
+  }
+
+  async generateInvoice(participantId: string, periodStart: string, periodEnd: string): Promise<Invoice> {
+    const sessions = await db.select().from(serviceSessions)
+      .where(and(
+        eq(serviceSessions.participantId, participantId),
+        eq(serviceSessions.status, "completed"),
+        gte(serviceSessions.date, periodStart),
+        lte(serviceSessions.date, periodEnd)
+      ));
+
+    const trips = await db.select().from(transportTrips)
+      .where(and(
+        eq(transportTrips.participantId, participantId),
+        eq(transportTrips.status, "completed"),
+        gte(transportTrips.date, periodStart),
+        lte(transportTrips.date, periodEnd)
+      ));
+
+    const lineItems: any[] = [];
+    let totalAmount = 0;
+
+    for (const s of sessions) {
+      const charge = Number(s.totalCharge || 0);
+      totalAmount += charge;
+      lineItems.push({
+        type: "care",
+        ndisItemCode: s.ndisItemCode || "01_011_0107_1_1",
+        description: `Care session - ${s.tierApplied || "Standard"}`,
+        quantity: Number(s.actualHours || 0),
+        unitRate: Number(s.hourlyRate || 0),
+        subtotal: charge,
+        date: s.date,
+      });
+    }
+
+    for (const t of trips) {
+      const charge = Number(t.totalCharge || 0);
+      totalAmount += charge;
+      lineItems.push({
+        type: "transport",
+        ndisItemCode: t.ndisItemCode || "02_051_0108_1_1",
+        description: `Transport trip - ${t.tierApplied || "Standard"}${t.accessibleVehicle ? " (Accessible Vehicle)" : ""}`,
+        quantity: Number(t.distanceKm || 0),
+        unitRate: Number(t.perKmRate || 0),
+        subtotal: charge,
+        date: t.date,
+      });
+    }
+
+    const [invoice] = await db.insert(invoices).values({
+      participantId,
+      periodStart,
+      periodEnd,
+      totalAmount: totalAmount.toFixed(2),
+      ndisClaimable: totalAmount.toFixed(2),
+      lineItems,
+    }).returning();
+
+    return invoice;
+  }
+
+  async getParticipantBudgets(participantId: string): Promise<ParticipantBudget[]> {
+    return db.select().from(participantBudgets)
+      .where(eq(participantBudgets.participantId, participantId));
+  }
+
+  async updateBudgetUsage(participantId: string, category: string, amount: number): Promise<ParticipantBudget | undefined> {
+    const [budget] = await db.select().from(participantBudgets)
+      .where(and(
+        eq(participantBudgets.participantId, participantId),
+        eq(participantBudgets.category, category)
+      ));
+
+    if (!budget) return undefined;
+
+    const newUsed = Number(budget.totalUsed) + amount;
+    const [updated] = await db.update(participantBudgets)
+      .set({ totalUsed: newUsed.toFixed(2) })
+      .where(eq(participantBudgets.id, budget.id))
+      .returning();
+
+    return updated;
+  }
+
+  async createReview(data: InsertReview): Promise<Review> {
+    const [review] = await db.insert(reviews).values(data).returning();
+
+    const workerReviews = await db.select().from(reviews)
+      .where(eq(reviews.workerId, data.workerId));
+    const avgRating = workerReviews.reduce((sum, r) => sum + r.rating, 0) / workerReviews.length;
+
+    await db.update(workers)
+      .set({
+        rating: avgRating.toFixed(2),
+        reviewCount: workerReviews.length,
+      })
+      .where(eq(workers.id, data.workerId));
+
+    return review;
+  }
+
+  async getReviewsForWorker(workerId: string): Promise<(Review & { participant?: User })[]> {
+    const workerReviews = await db.select().from(reviews)
+      .where(eq(reviews.workerId, workerId))
+      .orderBy(desc(reviews.createdAt));
+
+    return Promise.all(workerReviews.map(async (r) => {
+      const participant = await this.getUser(r.participantId);
+      return { ...r, participant: participant || undefined };
+    }));
   }
 }
 
