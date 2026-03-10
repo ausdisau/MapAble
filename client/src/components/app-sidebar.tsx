@@ -1,4 +1,5 @@
 import { useLocation, Link } from "wouter";
+import { useAuth } from "@/hooks/use-auth";
 import {
   LayoutDashboard,
   HeartHandshake,
@@ -13,6 +14,7 @@ import {
   Wallet,
   FileText,
   Bot,
+  LogOut,
 } from "lucide-react";
 import {
   Sidebar,
@@ -63,6 +65,7 @@ function speakDescription(text: string) {
 export function AppSidebar() {
   const [location, setLocation] = useLocation();
   const { toggleSidebar, state } = useSidebar();
+  const { user, logout } = useAuth();
   const isCollapsed = state === "collapsed";
 
   return (
@@ -147,10 +150,36 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter className="p-4 relative">
+      <SidebarFooter className="p-4 relative space-y-2">
         <div className="absolute top-1 left-6 w-1.5 h-1.5 rounded-full opacity-40" style={{ backgroundColor: "#E6A817" }} />
         <div className="absolute top-3 right-5 w-1 h-1 rounded-full opacity-30" style={{ backgroundColor: "#E6A817" }} />
         <div className="absolute bottom-2 left-10 w-1 h-1 rounded-full opacity-25" style={{ backgroundColor: "#E6A817" }} />
+        {user && !isCollapsed && (
+          <div className="flex items-center justify-between px-1">
+            <span className="text-xs text-muted-foreground truncate">{user.fullName}</span>
+            <button
+              onClick={() => logout()}
+              className="text-muted-foreground/60 p-1 rounded-md transition-colors"
+              aria-label="Sign out"
+              data-testid="button-logout"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        )}
+        {user && isCollapsed && (
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                onClick={() => logout()}
+                tooltip="Sign out"
+                data-testid="button-logout-collapsed"
+              >
+                <LogOut className="w-4 h-4" />
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        )}
         <Badge variant="outline" className="no-default-active-elevate gap-2 py-1.5 px-3 border-[#2EAA6E]/30 bg-[#2EAA6E]/10 text-[#2EAA6E] dark:text-[#3CC87F] justify-center" data-testid="badge-ndis-registered">
           <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
           {!isCollapsed && <span className="text-xs font-semibold">NDIS Registered Provider</span>}
