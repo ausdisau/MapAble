@@ -4,6 +4,7 @@ $userId = currentUserId();
 $workers = getWorkers($pdo);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'send') {
+    requireCsrf();
     createMessage($pdo, [
         'sender_id' => $userId,
         'receiver_id' => $_POST['receiver_id'],
@@ -76,6 +77,7 @@ require __DIR__ . '/../includes/layout_header.php';
                 </div>
 
                 <form method="POST" class="flex gap-2">
+                    <?= csrfField() ?>
                     <input type="hidden" name="action" value="send">
                     <input type="hidden" name="receiver_id" value="<?= h($selectedReceiver) ?>">
                     <input type="text" name="body" class="input flex-1" placeholder="Type a message..." required data-testid="input-message-body">

@@ -4,6 +4,7 @@ $userId = currentUserId();
 $invoices = getInvoices($pdo, $userId);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'generate') {
+    requireCsrf();
     $invoice = generateInvoice($pdo, $userId, $_POST['period_start'], $_POST['period_end']);
     setFlash('success', 'Invoice generated: ' . formatCurrency($invoice['total_amount']));
     redirect('/invoices');
@@ -22,6 +23,7 @@ require __DIR__ . '/../includes/layout_header.php';
     <div class="card" data-testid="section-generate-invoice">
         <h2 class="font-semibold mb-4">Generate Invoice</h2>
         <form method="POST" class="flex flex-wrap items-end gap-4">
+            <?= csrfField() ?>
             <input type="hidden" name="action" value="generate">
             <div>
                 <label class="label">Period Start</label>

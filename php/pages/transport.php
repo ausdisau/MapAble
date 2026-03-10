@@ -6,6 +6,7 @@ $requests = getTransportRequests($pdo);
 $trips = getTransportTrips($pdo, $userId);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    requireCsrf();
     $action = $_POST['action'] ?? '';
     if ($action === 'request') {
         createTransportRequest($pdo, [
@@ -60,6 +61,7 @@ require __DIR__ . '/../includes/layout_header.php';
         <div class="card" data-testid="section-book-transport">
             <h2 class="font-semibold mb-4">Book Transport</h2>
             <form method="POST" class="space-y-4">
+                <?= csrfField() ?>
                 <input type="hidden" name="action" value="request">
                 <div>
                     <label class="label">Pickup Location</label>
@@ -103,6 +105,7 @@ require __DIR__ . '/../includes/layout_header.php';
         <div class="card" data-testid="section-log-trip">
             <h2 class="font-semibold mb-4">Log a Trip</h2>
             <form method="POST" class="space-y-4">
+                <?= csrfField() ?>
                 <input type="hidden" name="action" value="log_trip">
                 <div>
                     <label class="label">Driver</label>

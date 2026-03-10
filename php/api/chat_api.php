@@ -4,6 +4,10 @@ require_once __DIR__ . '/../api/chat_engine.php';
 $method = $_SERVER['REQUEST_METHOD'];
 $userId = currentUserId();
 
+if (in_array($method, ['POST', 'DELETE']) && !verifyCsrf()) {
+    jsonResponse(['error' => 'Invalid CSRF token'], 403);
+}
+
 $path = str_replace('/api/chat', '', parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
 $path = rtrim($path, '/');
 

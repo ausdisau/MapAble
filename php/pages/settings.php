@@ -4,6 +4,7 @@ $user = currentUser($pdo);
 $userId = currentUserId();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    requireCsrf();
     $action = $_POST['action'] ?? '';
     if ($action === 'update_profile') {
         updateUserProfile($pdo, $userId, [
@@ -36,6 +37,7 @@ require __DIR__ . '/../includes/layout_header.php';
     <div class="card" data-testid="section-profile">
         <h2 class="font-semibold mb-4">Profile</h2>
         <form method="POST" class="space-y-4">
+            <?= csrfField() ?>
             <input type="hidden" name="action" value="update_profile">
             <div class="flex items-center gap-4 mb-4">
                 <div class="w-16 h-16 rounded-full bg-map-blue/10 flex items-center justify-center text-map-blue font-bold text-2xl">
@@ -87,6 +89,7 @@ require __DIR__ . '/../includes/layout_header.php';
         <h2 class="font-semibold mb-4">Access Profile</h2>
         <p class="text-sm text-gray-500 mb-4">Configure your mobility and accessibility needs. This helps our AI chatbot provide personalized transport recommendations.</p>
         <form method="POST" class="space-y-4">
+            <?= csrfField() ?>
             <input type="hidden" name="action" value="update_access">
             <div>
                 <label class="label">Mobility Aids (comma separated)</label>
