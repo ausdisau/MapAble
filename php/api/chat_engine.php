@@ -2,6 +2,7 @@
 
 function getSystemPrompt($user, $accessProfile) {
     $name = $user['full_name'] ?? 'there';
+    $role = $user['role'] ?? 'participant';
     $mobility = '';
     if ($accessProfile) {
         $aids = json_decode($accessProfile['mobility_aids'] ?? '[]', true);
@@ -12,23 +13,38 @@ function getSystemPrompt($user, $accessProfile) {
     }
 
     return <<<PROMPT
-You are MapAble Chat, the AI assistant for MapAble 4.0 — an NDIS superapp by Australian Disability Ltd.
-You help participants with care bookings, transport planning, job searches, NDIS pricing, and accessibility guidance.
+You are **MapAble Assistant**, the intelligent agentic AI for MapAble 4.0 — an NDIS superapp by Australian Disability Ltd.
 
-Current user: {$name}
-Role: {$user['role']}{$mobility}
+## Identity
+You are an autonomous assistant that helps NDIS participants manage their care, transport, employment, budgets, and accessibility needs. You can plan, reason, and execute multi-step tasks independently.
 
-SAFETY-FIRST RULES:
-1. If a user mentions stairs and their profile says stairs_allowed = false, ALWAYS warn them about the safety risk
-2. If the transfer distance exceeds their max_transfer_m, warn them and suggest alternatives
-3. Never provide medical advice — always recommend consulting their support coordinator
-4. Be warm, inclusive, and use plain language
-5. Reference NDIS item codes when discussing pricing
-6. Suggest relevant quick actions based on the conversation
+## Current User
+- Name: {$name}
+- Role: {$role}{$mobility}
 
-You can use tools to look up user profiles, search for transport workers, check barrier reports, get pricing, submit barrier reports, book transport, and escalate to a human agent.
+## Agent Behaviour
+1. **Think step-by-step**: Before responding, reason about what the user needs. If a request requires multiple actions, plan your steps, then execute them in sequence.
+2. **Use tools proactively**: When data is available via a tool, ALWAYS use it rather than guessing. Fetch real data to give accurate, personalised answers.
+3. **Multi-step execution**: For complex requests (e.g., "find me a carer and check my budget"), call multiple tools and synthesise a unified response.
+4. **Be proactive**: After completing a task, suggest logical next steps the user might want to take.
+5. **Personalise**: Use the user's access profile, budget state, and conversation history to tailor your responses.
 
-Respond in a helpful, concise manner. Use Australian English.
+## Safety-First Rules
+1. If a user mentions stairs and their profile says stairs_allowed = false, ALWAYS warn them about the safety risk.
+2. If the transfer distance exceeds their max_transfer_m, warn them and suggest alternatives.
+3. Never provide medical advice — always recommend consulting their support coordinator.
+4. Be warm, inclusive, and use plain language.
+5. Reference NDIS item codes when discussing pricing.
+
+## Output Format
+- Use **markdown** formatting: bold for emphasis, bullet lists for data, headers for sections.
+- Structure longer responses with clear sections.
+- When presenting data from tools (workers, jobs, budgets), format as organised lists.
+- Use Australian English.
+- Keep responses helpful and concise, but thorough when the user needs detail.
+
+## Available Capabilities
+You have tools to: look up user profiles, search care workers, search transport workers, search jobs, check budgets, get pricing, view bookings/sessions/trips/invoices, report barriers, book transport, and escalate to human support.
 PROMPT;
 }
 
@@ -38,8 +54,38 @@ function getToolDefinitions() {
             'type' => 'function',
             'function' => [
                 'name' => 'get_user_profile',
-                'description' => 'Get the current user\'s full profile including access needs and NDIS details',
+                'description' => 'Get the current user\'s full profile including access needs, NDIS details, and budget overview',
                 'parameters' => ['type' => 'object', 'properties' => new \stdClass(), 'required' => []],
+            ]
+        ],
+        [
+            'type' => 'function',
+            'function' => [
+                'name' => 'search_care_workers',
+                'description' => 'Search for available care/support workers with optional filters',
+                'parameters' => [
+                    'type' => 'object',
+                    'properties' => [
+                        'verified_only' => ['type' => 'boolean', 'description' => 'Only show verified workers'],
+                        'transport_capable' => ['type' => 'boolean', 'description' => 'Only show workers who can provide transport'],
+                        'location' => ['type' => 'string', 'description' => 'Filter by location'],
+                    ],
+                    'required' => [],
+                ],
+            ]
+        ],
+        [
+            'type' => 'function',
+            'function' => [
+                'name' => 'get_worker_details',
+                'description' => 'Get a specific worker\'s full profile including reviews, skills, and availability',
+                'parameters' => [
+                    'type' => 'object',
+                    'properties' => [
+                        'worker_id' => ['type' => 'string', 'description' => 'The worker ID to look up'],
+                    ],
+                    'required' => ['worker_id'],
+                ],
             ]
         ],
         [
@@ -59,6 +105,92 @@ function getToolDefinitions() {
         [
             'type' => 'function',
             'function' => [
+                'name' => 'check_budget',
+                'description' => 'Get the user\'s current NDIS budget breakdown showing all categories with allocated vs used amounts',
+                'parameters' => ['type' => 'object', 'properties' => new \stdClass(), 'required' => []],
+            ]
+        ],
+        [
+            'type' => 'function',
+            'function' => [
+                'name' => 'get_care_pricing',
+                'description' => 'Get the current care pricing tier and hourly rate for the user based on their usage this month',
+                'parameters' => ['type' => 'object', 'properties' => new \stdClass(), 'required' => []],
+            ]
+        ],
+        [
+            'type' => 'function',
+            'function' => [
+                'name' => 'get_transport_pricing',
+                'description' => 'Get the current transport pricing tier and per-km rate for the user based on their usage this month',
+                'parameters' => ['type' => 'object', 'properties' => new \stdClass(), 'required' => []],
+            ]
+        ],
+        [
+            'type' => 'function',
+            'function' => [
+                'name' => 'search_jobs',
+                'description' => 'Search for disability support jobs with optional filters',
+                'parameters' => [
+                    'type' => 'object',
+                    'properties' => [
+                        'category' => ['type' => 'string', 'description' => 'Job category filter', 'enum' => ['care', 'transport', 'support', 'employment']],
+                        'location' => ['type' => 'string', 'description' => 'Location filter'],
+                        'job_type' => ['type' => 'string', 'description' => 'Job type filter', 'enum' => ['full-time', 'part-time', 'casual', 'contract']],
+                    ],
+                    'required' => [],
+                ],
+            ]
+        ],
+        [
+            'type' => 'function',
+            'function' => [
+                'name' => 'get_job_details',
+                'description' => 'Get full details of a specific job posting',
+                'parameters' => [
+                    'type' => 'object',
+                    'properties' => [
+                        'job_id' => ['type' => 'string', 'description' => 'The job ID to look up'],
+                    ],
+                    'required' => ['job_id'],
+                ],
+            ]
+        ],
+        [
+            'type' => 'function',
+            'function' => [
+                'name' => 'get_my_bookings',
+                'description' => 'Get the user\'s care bookings (upcoming and past)',
+                'parameters' => ['type' => 'object', 'properties' => new \stdClass(), 'required' => []],
+            ]
+        ],
+        [
+            'type' => 'function',
+            'function' => [
+                'name' => 'get_my_care_sessions',
+                'description' => 'Get the user\'s completed and in-progress care sessions with hours and charges',
+                'parameters' => ['type' => 'object', 'properties' => new \stdClass(), 'required' => []],
+            ]
+        ],
+        [
+            'type' => 'function',
+            'function' => [
+                'name' => 'get_my_transport_trips',
+                'description' => 'Get the user\'s transport trip history with distances and charges',
+                'parameters' => ['type' => 'object', 'properties' => new \stdClass(), 'required' => []],
+            ]
+        ],
+        [
+            'type' => 'function',
+            'function' => [
+                'name' => 'get_my_invoices',
+                'description' => 'Get the user\'s invoices with totals and status',
+                'parameters' => ['type' => 'object', 'properties' => new \stdClass(), 'required' => []],
+            ]
+        ],
+        [
+            'type' => 'function',
+            'function' => [
                 'name' => 'check_barrier_reports',
                 'description' => 'Check community-reported accessibility barriers at a location',
                 'parameters' => [
@@ -73,16 +205,8 @@ function getToolDefinitions() {
         [
             'type' => 'function',
             'function' => [
-                'name' => 'get_transport_pricing',
-                'description' => 'Get the current transport pricing tier for the user',
-                'parameters' => ['type' => 'object', 'properties' => new \stdClass(), 'required' => []],
-            ]
-        ],
-        [
-            'type' => 'function',
-            'function' => [
                 'name' => 'submit_barrier_report',
-                'description' => 'Submit an accessibility barrier report',
+                'description' => 'Submit an accessibility barrier report to the community',
                 'parameters' => [
                     'type' => 'object',
                     'properties' => [
@@ -117,7 +241,7 @@ function getToolDefinitions() {
             'type' => 'function',
             'function' => [
                 'name' => 'escalate_to_human',
-                'description' => 'Escalate the conversation to a human support coordinator',
+                'description' => 'Escalate the conversation to a human support coordinator when the user needs specialised help',
                 'parameters' => [
                     'type' => 'object',
                     'properties' => [
@@ -130,6 +254,29 @@ function getToolDefinitions() {
     ];
 }
 
+function getToolFriendlyName($name) {
+    $names = [
+        'get_user_profile' => 'Fetching your profile',
+        'search_care_workers' => 'Searching care workers',
+        'get_worker_details' => 'Looking up worker details',
+        'search_transport_workers' => 'Searching transport workers',
+        'check_budget' => 'Checking your budget',
+        'get_care_pricing' => 'Getting care pricing',
+        'get_transport_pricing' => 'Getting transport pricing',
+        'search_jobs' => 'Searching jobs',
+        'get_job_details' => 'Looking up job details',
+        'get_my_bookings' => 'Fetching your bookings',
+        'get_my_care_sessions' => 'Fetching care sessions',
+        'get_my_transport_trips' => 'Fetching transport trips',
+        'get_my_invoices' => 'Fetching your invoices',
+        'check_barrier_reports' => 'Checking barrier reports',
+        'submit_barrier_report' => 'Submitting barrier report',
+        'book_transport' => 'Booking transport',
+        'escalate_to_human' => 'Connecting to support',
+    ];
+    return $names[$name] ?? $name;
+}
+
 function executeTool($pdo, $userId, $name, $args) {
     switch ($name) {
         case 'get_user_profile':
@@ -138,16 +285,111 @@ function executeTool($pdo, $userId, $name, $args) {
             $budgets = getParticipantBudgets($pdo, $userId);
             return json_encode(['user' => $user, 'access_profile' => $access, 'budgets' => $budgets]);
 
+        case 'search_care_workers':
+            $workers = getWorkers($pdo);
+            if (!empty($args['verified_only'])) {
+                $workers = array_filter($workers, fn($w) => $w['is_verified']);
+            }
+            if (!empty($args['transport_capable'])) {
+                $workers = array_filter($workers, fn($w) => $w['transport_capable']);
+            }
+            if (!empty($args['location'])) {
+                $loc = strtolower($args['location']);
+                $workers = array_filter($workers, fn($w) => str_contains(strtolower($w['location'] ?? ''), $loc));
+            }
+            $result = array_map(fn($w) => [
+                'id' => $w['id'], 'name' => $w['full_name'], 'rating' => $w['rating'],
+                'hourly_rate' => $w['hourly_rate'], 'is_verified' => $w['is_verified'],
+                'specializations' => $w['specializations'] ?? null,
+                'location' => $w['location'] ?? null,
+                'transport_capable' => $w['transport_capable'],
+            ], array_values($workers));
+            return json_encode($result);
+
+        case 'get_worker_details':
+            $worker = getWorker($pdo, $args['worker_id']);
+            if (!$worker) return json_encode(['error' => 'Worker not found']);
+            $reviews = getReviewsForWorker($pdo, $args['worker_id']);
+            return json_encode(['worker' => $worker, 'reviews' => $reviews]);
+
         case 'search_transport_workers':
             $workers = array_filter(getWorkers($pdo), fn($w) => $w['transport_capable']);
             if (!empty($args['wheelchair_accessible'])) {
                 $workers = array_filter($workers, fn($w) => $w['wheelchair_accessible']);
             }
             $result = array_map(fn($w) => [
-                'name' => $w['full_name'], 'rating' => $w['rating'],
+                'id' => $w['id'], 'name' => $w['full_name'], 'rating' => $w['rating'],
                 'hourly_rate' => $w['hourly_rate'], 'transport_type' => $w['transport_type'],
                 'wheelchair_accessible' => $w['wheelchair_accessible'],
             ], array_values($workers));
+            return json_encode($result);
+
+        case 'check_budget':
+            $budgets = getParticipantBudgets($pdo, $userId);
+            $summary = array_map(fn($b) => [
+                'category' => $b['category'],
+                'total_allocated' => (float)$b['total_allocated'],
+                'total_used' => (float)$b['total_used'],
+                'remaining' => (float)$b['total_allocated'] - (float)$b['total_used'],
+                'percent_used' => $b['total_allocated'] > 0 ? round(((float)$b['total_used'] / (float)$b['total_allocated']) * 100, 1) : 0,
+            ], $budgets);
+            return json_encode($summary);
+
+        case 'get_care_pricing':
+            $rate = calculateCareRate($pdo, $userId, date('Y-m'));
+            return json_encode($rate);
+
+        case 'get_transport_pricing':
+            $rate = calculateTransportRate($pdo, $userId, date('Y-m'));
+            return json_encode($rate);
+
+        case 'search_jobs':
+            $jobs = getJobs($pdo);
+            if (!empty($args['category'])) {
+                $cat = strtolower($args['category']);
+                $jobs = array_filter($jobs, fn($j) => strtolower($j['category'] ?? '') === $cat);
+            }
+            if (!empty($args['location'])) {
+                $loc = strtolower($args['location']);
+                $jobs = array_filter($jobs, fn($j) => str_contains(strtolower($j['location'] ?? ''), $loc));
+            }
+            if (!empty($args['job_type'])) {
+                $jt = strtolower($args['job_type']);
+                $jobs = array_filter($jobs, fn($j) => strtolower($j['job_type'] ?? '') === $jt);
+            }
+            $result = array_map(fn($j) => [
+                'id' => $j['id'], 'title' => $j['title'], 'location' => $j['location'],
+                'job_type' => $j['job_type'], 'salary' => $j['salary'], 'category' => $j['category'],
+            ], array_values($jobs));
+            return json_encode($result);
+
+        case 'get_job_details':
+            $job = getJob($pdo, $args['job_id']);
+            if (!$job) return json_encode(['error' => 'Job not found']);
+            return json_encode($job);
+
+        case 'get_my_bookings':
+            $stmt = $pdo->prepare('SELECT b.*, u.full_name as worker_name FROM bookings b
+                LEFT JOIN workers w ON b.worker_id = w.id LEFT JOIN users u ON w.user_id = u.id
+                WHERE b.participant_id = ? ORDER BY b.date DESC LIMIT 20');
+            $stmt->execute([$userId]);
+            return json_encode($stmt->fetchAll());
+
+        case 'get_my_care_sessions':
+            $sessions = getServiceSessions($pdo, $userId);
+            return json_encode(array_slice($sessions, 0, 20));
+
+        case 'get_my_transport_trips':
+            $trips = getTransportTrips($pdo, $userId);
+            return json_encode(array_slice($trips, 0, 20));
+
+        case 'get_my_invoices':
+            $invoices = getInvoices($pdo, $userId);
+            $result = array_map(fn($inv) => [
+                'id' => $inv['id'], 'period_start' => $inv['period_start'], 'period_end' => $inv['period_end'],
+                'total_amount' => (float)($inv['total_amount'] ?? 0), 'ndis_claimable' => (float)($inv['ndis_claimable'] ?? 0),
+                'status' => $inv['status'], 'generated_at' => $inv['generated_at'],
+            ], $invoices);
             return json_encode($result);
 
         case 'check_barrier_reports':
@@ -155,10 +397,6 @@ function executeTool($pdo, $userId, $name, $args) {
             $location = strtolower($args['location'] ?? '');
             $filtered = array_filter($reports, fn($r) => str_contains(strtolower($r['location_ref']), $location));
             return json_encode(array_values($filtered));
-
-        case 'get_transport_pricing':
-            $rate = calculateTransportRate($pdo, $userId, date('Y-m'));
-            return json_encode($rate);
 
         case 'submit_barrier_report':
             $report = createCommunityReport($pdo, [
@@ -212,35 +450,6 @@ function applyRulesEngine($pdo, $userId, $message, $accessProfile) {
     return $warnings;
 }
 
-function generateQuickActions($message) {
-    $actions = [];
-    $msgLower = strtolower($message);
-
-    if (str_contains($msgLower, 'transport') || str_contains($msgLower, 'ride') || str_contains($msgLower, 'trip')) {
-        $actions[] = 'Book Transport';
-        $actions[] = 'View Pricing';
-    }
-    if (str_contains($msgLower, 'carer') || str_contains($msgLower, 'care') || str_contains($msgLower, 'support worker')) {
-        $actions[] = 'Find a Carer';
-        $actions[] = 'View Budget';
-    }
-    if (str_contains($msgLower, 'job') || str_contains($msgLower, 'work') || str_contains($msgLower, 'employ')) {
-        $actions[] = 'Browse Jobs';
-    }
-    if (str_contains($msgLower, 'budget') || str_contains($msgLower, 'ndis') || str_contains($msgLower, 'plan')) {
-        $actions[] = 'View Budget';
-        $actions[] = 'View Invoices';
-    }
-    if (str_contains($msgLower, 'barrier') || str_contains($msgLower, 'accessible') || str_contains($msgLower, 'ramp')) {
-        $actions[] = 'Report Barrier';
-    }
-    if (str_contains($msgLower, 'help') || str_contains($msgLower, 'human') || str_contains($msgLower, 'coordinator')) {
-        $actions[] = 'Talk to Human';
-    }
-
-    return array_unique(array_slice($actions, 0, 3));
-}
-
 function assessConfidence($response, $toolsUsed) {
     if ($toolsUsed > 0) return 'high';
     $len = strlen($response);
@@ -248,7 +457,7 @@ function assessConfidence($response, $toolsUsed) {
     return 'general';
 }
 
-function callOpenAI($messages, $tools = null) {
+function callOpenAI($messages, $tools = null, $maxTokens = 1024, $temperature = 0.7) {
     $apiKey = OPENAI_API_KEY;
     $baseUrl = rtrim(OPENAI_BASE_URL, '/');
 
@@ -259,8 +468,8 @@ function callOpenAI($messages, $tools = null) {
     $payload = [
         'model' => 'gpt-4o',
         'messages' => $messages,
-        'max_tokens' => 1024,
-        'temperature' => 0.7,
+        'max_tokens' => $maxTokens,
+        'temperature' => $temperature,
     ];
     if ($tools) {
         $payload['tools'] = $tools;
@@ -304,18 +513,41 @@ function processChat($pdo, $userId, $sessionId, $userMessage) {
 
     $tools = getToolDefinitions();
     $toolsUsed = 0;
+    $toolsCalled = [];
+    $reasoningSteps = 0;
+    $agentStatus = 'completed';
 
-    for ($i = 0; $i < 5; $i++) {
+    for ($i = 0; $i < 10; $i++) {
+        $reasoningSteps++;
         $result = callOpenAI($messages, $tools);
 
         if (isset($result['error'])) {
             $content = "I'm sorry, I encountered an issue: " . $result['error'] . ". Please try again or contact support.";
-            return ['content' => $content, 'quick_actions' => ['Talk to Human'], 'confidence' => 'general', 'warnings' => $warnings];
+            $agentStatus = 'partial';
+            return [
+                'content' => $content,
+                'quick_actions' => ['Talk to Human'],
+                'confidence' => 'general',
+                'warnings' => $warnings,
+                'tools_used' => $toolsUsed,
+                'tools_called' => $toolsCalled,
+                'reasoning_steps' => $reasoningSteps,
+                'agent_status' => $agentStatus,
+            ];
         }
 
         $choice = $result['choices'][0] ?? null;
         if (!$choice) {
-            return ['content' => "I'm having trouble processing your request. Please try again.", 'quick_actions' => [], 'confidence' => 'general', 'warnings' => $warnings];
+            return [
+                'content' => "I'm having trouble processing your request. Please try again.",
+                'quick_actions' => [],
+                'confidence' => 'general',
+                'warnings' => $warnings,
+                'tools_used' => $toolsUsed,
+                'tools_called' => $toolsCalled,
+                'reasoning_steps' => $reasoningSteps,
+                'agent_status' => 'partial',
+            ];
         }
 
         $msg = $choice['message'];
@@ -328,6 +560,7 @@ function processChat($pdo, $userId, $sessionId, $userMessage) {
                 $toolResult = executeTool($pdo, $userId, $fnName, $fnArgs);
                 $messages[] = ['role' => 'tool', 'tool_call_id' => $tc['id'], 'content' => $toolResult];
                 $toolsUsed++;
+                $toolsCalled[] = ['name' => $fnName, 'summary' => getToolFriendlyName($fnName)];
             }
             continue;
         }
@@ -338,23 +571,81 @@ function processChat($pdo, $userId, $sessionId, $userMessage) {
             $content = implode("\n\n", $warnings) . "\n\n" . $content;
         }
 
-        $quickActions = generateQuickActions($userMessage . ' ' . $content);
         $confidence = assessConfidence($content, $toolsUsed);
 
+        if ($toolsUsed > 0 && str_contains(strtolower($content), 'escalat')) {
+            $agentStatus = 'escalated';
+        }
+
         if (count($history) === 0) {
-            $titleWords = array_slice(explode(' ', $userMessage), 0, 5);
+            $titleWords = array_slice(explode(' ', $userMessage), 0, 6);
             $title = implode(' ', $titleWords);
+            if (strlen($title) > 50) $title = substr($title, 0, 47) . '...';
             $pdo->prepare('UPDATE chat_sessions SET title = ? WHERE id = ?')->execute([$title, $sessionId]);
         }
 
         return [
             'content' => $content,
-            'quick_actions' => $quickActions,
+            'quick_actions' => [],
             'confidence' => $confidence,
             'warnings' => $warnings,
             'tools_used' => $toolsUsed,
+            'tools_called' => $toolsCalled,
+            'reasoning_steps' => $reasoningSteps,
+            'agent_status' => $agentStatus,
         ];
     }
 
-    return ['content' => 'I\'ve been thinking about this quite a bit. Let me try a simpler approach — could you rephrase your question?', 'quick_actions' => ['Talk to Human'], 'confidence' => 'general', 'warnings' => $warnings];
+    return [
+        'content' => "I've been working through a complex request. Could you rephrase or break it into smaller questions?",
+        'quick_actions' => ['Talk to Human'],
+        'confidence' => 'general',
+        'warnings' => $warnings,
+        'tools_used' => $toolsUsed,
+        'tools_called' => $toolsCalled,
+        'reasoning_steps' => $reasoningSteps,
+        'agent_status' => 'partial',
+    ];
+}
+
+function generatePredictions($pdo, $userId, $text, $sessionId = null) {
+    $apiKey = OPENAI_API_KEY;
+    if (!$apiKey || strlen($text) < 3) {
+        return [];
+    }
+
+    $contextMessages = [];
+    if ($sessionId) {
+        $history = getChatMessages($pdo, $sessionId);
+        $recent = array_slice($history, -4);
+        foreach ($recent as $h) {
+            $contextMessages[] = ['role' => $h['role'], 'content' => substr($h['content'], 0, 200)];
+        }
+    }
+
+    $messages = [
+        ['role' => 'system', 'content' => 'You are a text prediction assistant for an NDIS disability services app called MapAble. Given the partial text the user is typing, suggest 1-3 short completions (the remaining words/phrase to complete their thought). Each prediction should be just the continuation, not the full text. Keep predictions concise (2-8 words). Consider NDIS terminology: support worker, wheelchair accessible, transport booking, NDIS budget, care plan, accessibility, barrier report, service session. Return predictions as a JSON array of strings, nothing else.'],
+    ];
+
+    foreach ($contextMessages as $cm) {
+        $messages[] = $cm;
+    }
+
+    $messages[] = ['role' => 'user', 'content' => 'Complete this partial text: "' . $text . '"'];
+
+    $result = callOpenAI($messages, null, 60, 0.3);
+
+    if (isset($result['error'])) return [];
+
+    $content = $result['choices'][0]['message']['content'] ?? '[]';
+    $content = trim($content);
+    if (str_starts_with($content, '```')) {
+        $content = preg_replace('/^```(?:json)?\s*/', '', $content);
+        $content = preg_replace('/\s*```$/', '', $content);
+    }
+
+    $predictions = json_decode($content, true);
+    if (!is_array($predictions)) return [];
+
+    return array_slice(array_filter($predictions, 'is_string'), 0, 3);
 }

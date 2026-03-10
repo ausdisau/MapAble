@@ -21,6 +21,24 @@ if ($path === '/sessions' && $method === 'POST') {
     jsonResponse($session, 201);
 }
 
+if ($path === '/predict' && $method === 'POST') {
+    $input = json_decode(file_get_contents('php://input'), true);
+    $text = $input['text'] ?? '';
+    $sessionId = $input['session_id'] ?? null;
+    if (strlen($text) < 3) {
+        jsonResponse(['predictions' => []]);
+    }
+    if ($sessionId) {
+        $stmt = $pdo->prepare('SELECT id FROM chat_sessions WHERE id = ? AND user_id = ?');
+        $stmt->execute([$sessionId, $userId]);
+        if (!$stmt->fetch()) {
+            $sessionId = null;
+        }
+    }
+    $predictions = generatePredictions($pdo, $userId, $text, $sessionId);
+    jsonResponse(['predictions' => $predictions]);
+}
+
 function verifyChatSessionOwnership($pdo, $sessionId, $userId) {
     $stmt = $pdo->prepare('SELECT id FROM chat_sessions WHERE id = ? AND user_id = ?');
     $stmt->execute([$sessionId, $userId]);
@@ -55,13 +73,19 @@ if (preg_match('#^/sessions/([^/]+)/messages$#', $path, $m) && $method === 'POST
 
     $result = processChat($pdo, $userId, $sessionId, $userMessage);
 
+    $toolCallsJson = !empty($result['tools_called']) ? $result['tools_called'] : null;
+
     $saved = saveChatMessage($pdo, $sessionId, 'assistant', $result['content'],
-        null, $result['quick_actions'] ?? null, $result['confidence'] ?? null);
+        $toolCallsJson, $result['quick_actions'] ?? null, $result['confidence'] ?? null);
 
     jsonResponse([
         'message' => $saved,
         'quick_actions' => $result['quick_actions'] ?? [],
         'confidence' => $result['confidence'] ?? 'general',
+        'tools_called' => $result['tools_called'] ?? [],
+        'tools_used' => $result['tools_used'] ?? 0,
+        'reasoning_steps' => $result['reasoning_steps'] ?? 0,
+        'agent_status' => $result['agent_status'] ?? 'completed',
     ]);
 }
 

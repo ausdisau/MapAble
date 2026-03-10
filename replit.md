@@ -90,7 +90,11 @@ php/
 - Worker detail with booking form, shift timer, reviews, verification checklist
 - Job board with category filters (Care/Transport/Support/Employment)
 - Transport booking with wheelchair options + trip logger with tier pricing
-- AI chatbot with 7 tools, rules engine, quick actions, confidence badges
+- **MapAble Assistant** — agentic AI with 17 tools, autonomous multi-step reasoning, voice recognition (Web Speech API), predictive text (OpenAI-powered), markdown rendering, confidence badges, and agent activity tracking
+  - Voice input: Web Speech API with continuous recognition, en-AU locale, visual feedback
+  - Predictive text: debounced API calls, NDIS-context-aware completions, Tab/Enter to accept, arrow keys to navigate
+  - Agent tools: user profile, care workers, worker details, transport workers, budget, care pricing, transport pricing, jobs, job details, bookings, care sessions, transport trips, invoices, barrier reports, submit barrier, book transport, escalate to human
+  - Prediction API: `POST /api/chat/predict` with `{text, session_id}`
 - NDIS pricing tiers (4 care + 4 transport) with automatic tier calculation
 - Budget dashboard with category progress bars and tier indicators
 - Invoice generation with NDIS line items and item codes
