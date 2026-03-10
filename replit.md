@@ -12,7 +12,7 @@ MapAble 4.0 is a full-stack superapp combining three core NDIS services:
 ## Architecture
 - **Frontend**: React + TypeScript + Vite + Tailwind CSS + Shadcn UI
 - **Backend**: Express 5 + TypeScript
-- **Database**: PostgreSQL with Drizzle ORM
+- **Database**: Neon PostgreSQL (serverless) with Drizzle ORM via `@neondatabase/serverless` driver
 - **AI**: OpenAI (via Replit AI Integrations) with function calling + rules engine
 - **Object Storage**: Replit App Storage (presigned URL upload flow)
 - **Routing**: wouter (client-side)
@@ -123,7 +123,7 @@ server/
   routes.ts              - API routes (including pricing, billing, reviews, chat, access profile)
   storage.ts             - Database storage interface with pricing engine
   chat-engine.ts         - LLM orchestration + rules engine + tool implementations
-  db.ts                  - Database connection
+  db.ts                  - Neon serverless database connection (uses NEON_DATABASE_URL, falls back to DATABASE_URL)
   seed.ts                - Seed data for demo (pricing tiers, budgets, sessions, reviews)
   replit_integrations/
     object_storage/       - Object storage service + routes
