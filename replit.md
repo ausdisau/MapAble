@@ -36,6 +36,8 @@ MapAble 4.0 is a PHP superapp combining core NDIS services:
 - `AI_INTEGRATIONS_OPENAI_API_KEY` — OpenAI API key (via Replit integrations)
 - `AI_INTEGRATIONS_OPENAI_BASE_URL` — OpenAI base URL (via Replit integrations)
 - `SESSION_SECRET` — Session secret key
+- `AUTH0_DOMAIN` — Auth0 tenant domain (default: `adid.au.auth0.com`)
+- `AUTH0_CLIENT_ID` — Auth0 application Client ID (SPA type)
 
 ## Project Structure
 ```
@@ -98,10 +100,16 @@ php/
 - WCAG 2.2 AA: 44px min touch targets, skip-to-content, ARIA landmarks
 
 ## Auth
+- **Auth0 federated login**: Domain `adid.au.auth0.com`, Client ID via `AUTH0_CLIENT_ID` env var
+  - SPA-type app with PKCE (no client secret needed)
+  - Routes: `/auth/login` (Universal Login), `/auth/login/google`, `/auth/login/microsoft`, `/auth/callback`
+  - Federated logout: `/logout` → destroys session + redirects to Auth0 `/v2/logout`
+  - User matching: auth0_sub column → email fallback → auto-create new user
+  - Auth0 dashboard must have Callback URL and Logout URL configured
 - Demo accounts: `demo_participant` / `hashed_password` (Jordan Lee), `alex_m` / `hashed_password` (Alex Mehmet)
 - Login POST to /login, redirect to dashboard
 - All routes except /login require authentication
-- Logout destroys session, redirects to /login
+- Logout destroys session; if Auth0 login, also signs out of Auth0
 
 ## Pricing Engine
 - Care tiers: Basic (0-10hrs, $70.23/hr), Standard (11-30hrs, $68/hr), High Support (31+hrs, $65/hr)
