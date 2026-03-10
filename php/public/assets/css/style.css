@@ -1,0 +1,121 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+body { font-family: 'Inter', system-ui, sans-serif; }
+
+.card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    transition: box-shadow 0.2s;
+}
+.dark .card {
+    background: #1a1f2e;
+    border-color: #2d3548;
+}
+.card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+.dark .card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+.badge-teal { background: rgba(46,170,110,0.1); color: #2EAA6E; border: 1px solid rgba(46,170,110,0.3); }
+.badge-blue { background: rgba(27,110,181,0.1); color: #1B6EB5; border: 1px solid rgba(27,110,181,0.3); }
+.badge-gold { background: rgba(230,168,23,0.1); color: #b8860b; border: 1px solid rgba(230,168,23,0.3); }
+.badge-red { background: rgba(239,68,68,0.1); color: #dc2626; border: 1px solid rgba(239,68,68,0.3); }
+.badge-gray { background: rgba(107,114,128,0.1); color: #6b7280; border: 1px solid rgba(107,114,128,0.3); }
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.25rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    min-height: 44px;
+    min-width: 44px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    border: none;
+    text-decoration: none;
+}
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-primary { background: #1B6EB5; color: white; }
+.btn-teal { background: #2EAA6E; color: white; }
+.btn-outline { background: transparent; border: 1px solid #d1d5db; color: #374151; }
+.dark .btn-outline { border-color: #4b5563; color: #d1d5db; }
+.btn-ghost { background: transparent; color: #6b7280; }
+.btn-sm { padding: 0.375rem 0.75rem; font-size: 0.75rem; min-height: 36px; }
+
+.input {
+    width: 100%;
+    padding: 0.625rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    background: white;
+    color: #111827;
+    min-height: 44px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+.input:focus { border-color: #1B6EB5; box-shadow: 0 0 0 3px rgba(27,110,181,0.1); }
+.dark .input { background: #1a1f2e; border-color: #4b5563; color: #e5e7eb; }
+.dark .input:focus { border-color: #3b82f6; }
+
+.label { display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.375rem; color: #374151; }
+.dark .label { color: #d1d5db; }
+
+.progress-bar {
+    height: 0.625rem;
+    background: #e5e7eb;
+    border-radius: 9999px;
+    overflow: hidden;
+}
+.dark .progress-bar { background: #374151; }
+.progress-fill {
+    height: 100%;
+    border-radius: 9999px;
+    transition: width 0.5s ease;
+}
+
+.stat-card { text-align: center; }
+.stat-value { font-size: 1.875rem; font-weight: 800; color: #1B6EB5; }
+.dark .stat-value { color: #60a5fa; }
+.stat-label { font-size: 0.75rem; color: #6b7280; margin-top: 0.25rem; }
+
+.chat-bubble {
+    max-width: 80%;
+    padding: 0.75rem 1rem;
+    border-radius: 1rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+.chat-user { background: #1B6EB5; color: white; border-bottom-right-radius: 0.25rem; margin-left: auto; }
+.chat-assistant { background: #f3f4f6; color: #111827; border-bottom-left-radius: 0.25rem; }
+.dark .chat-assistant { background: #1e2538; color: #e5e7eb; }
+
+.confidence-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.125rem 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.625rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.star-rating { color: #E6A817; font-size: 1rem; letter-spacing: 1px; }
+
+.hero-gradient {
+    background: linear-gradient(135deg, #14578F 0%, #1B6EB5 50%, #2384C9 100%);
+}
