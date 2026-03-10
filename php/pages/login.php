@@ -36,19 +36,51 @@
                 </div>
             </div>
 
+            <?php
+                $flashError = '';
+                if (!empty($_SESSION['login_error'])) {
+                    $flashError = $_SESSION['login_error'];
+                    unset($_SESSION['login_error']);
+                }
+            ?>
             <div class="border border-white/10 bg-white/5 backdrop-blur-xl shadow-2xl rounded-xl">
                 <div class="pb-4 pt-6 px-6">
                     <h2 class="text-lg font-semibold text-white text-center">Sign in to your account</h2>
+                    <p class="text-xs text-white/50 text-center mt-1">Australian Disability Ltd Services</p>
                 </div>
                 <div class="px-6 pb-6">
+                    <?php if (!empty($loginError) || !empty($flashError)): ?>
+                    <div class="flex items-center gap-2 text-sm text-red-300 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2.5 mb-4" data-testid="text-login-error">
+                        <span>⚠</span>
+                        <span><?= h($loginError ?: $flashError) ?></span>
+                    </div>
+                    <?php endif; ?>
+
+                    <?php if (AUTH0_ENABLED): ?>
+                    <div class="space-y-3 mb-5">
+                        <a href="/auth/login/google" class="flex items-center justify-center gap-3 w-full h-11 bg-white text-gray-700 font-medium text-sm rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors" data-testid="button-login-google">
+                            <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.997 8.997 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 2.58 9 3.58z"/></svg>
+                            Sign in with Google
+                        </a>
+                        <a href="/auth/login/microsoft" class="flex items-center justify-center gap-3 w-full h-11 bg-[#2F2F2F] text-white font-medium text-sm rounded-lg border border-[#2F2F2F] hover:bg-[#404040] transition-colors" data-testid="button-login-microsoft">
+                            <svg width="18" height="18" viewBox="0 0 21 21"><rect x="1" y="1" width="9" height="9" fill="#F25022"/><rect x="11" y="1" width="9" height="9" fill="#7FBA00"/><rect x="1" y="11" width="9" height="9" fill="#00A4EF"/><rect x="11" y="11" width="9" height="9" fill="#FFB900"/></svg>
+                            Sign in with Microsoft
+                        </a>
+                        <a href="/auth/login" class="flex items-center justify-center gap-2 w-full h-9 text-white/60 text-xs hover:text-white/80 transition-colors" data-testid="link-login-auth0">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                            More sign-in options
+                        </a>
+                    </div>
+
+                    <div class="flex items-center gap-3 mb-5">
+                        <div class="flex-1 h-px bg-white/10"></div>
+                        <span class="text-[11px] text-white/40 whitespace-nowrap">or sign in with a demo account</span>
+                        <div class="flex-1 h-px bg-white/10"></div>
+                    </div>
+                    <?php endif; ?>
+
                     <form method="POST" action="/login" class="space-y-4">
                         <?= csrfField() ?>
-                        <?php if (!empty($loginError)): ?>
-                        <div class="flex items-center gap-2 text-sm text-red-300 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2.5" data-testid="text-login-error">
-                            <span>⚠</span>
-                            <span><?= h($loginError) ?></span>
-                        </div>
-                        <?php endif; ?>
 
                         <div class="space-y-2">
                             <label for="username" class="text-white/80 text-sm block">Username</label>
@@ -69,7 +101,7 @@
                         </button>
                     </form>
 
-                    <div class="mt-6 pt-4 border-t border-white/10">
+                    <div class="mt-4 pt-3 border-t border-white/10">
                         <p class="text-[11px] text-white/40 text-center mb-3">Demo Accounts</p>
                         <div class="grid grid-cols-2 gap-2">
                             <button type="button" onclick="document.getElementById('username').value='demo_participant';document.getElementById('password').value='hashed_password';"

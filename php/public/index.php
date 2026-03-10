@@ -25,8 +25,81 @@ if ($uri === '/login') {
     exit;
 }
 
+if ($uri === '/auth/login' || $uri === '/auth/login/google' || $uri === '/auth/login/microsoft') {
+    if (!AUTH0_ENABLED) {
+        redirect('/login');
+    }
+    $connection = null;
+    if ($uri === '/auth/login/google') $connection = 'google-oauth2';
+    if ($uri === '/auth/login/microsoft') $connection = 'windowslive';
+    $url = getAuth0AuthorizeUrl($connection);
+    header('Location: ' . $url);
+    exit;
+}
+
+if ($uri === '/auth/callback') {
+    if (!AUTH0_ENABLED) {
+        redirect('/login');
+    }
+    $code = $_GET['code'] ?? '';
+    $state = $_GET['state'] ?? '';
+    $error = $_GET['error'] ?? '';
+
+    $cleanupAuth0Session = function() {
+        unset($_SESSION['auth0_state'], $_SESSION['auth0_code_verifier']);
+    };
+
+    if ($error) {
+        $cleanupAuth0Session();
+        $_SESSION['login_error'] = 'Authentication failed: ' . ($_GET['error_description'] ?? $error);
+        redirect('/login');
+    }
+
+    if (!$state || !hash_equals($_SESSION['auth0_state'] ?? '', $state)) {
+        $cleanupAuth0Session();
+        $_SESSION['login_error'] = 'Invalid authentication state. Please try again.';
+        redirect('/login');
+    }
+
+    $storedVerifier = $_SESSION['auth0_code_verifier'] ?? '';
+    if (!$code || !$storedVerifier) {
+        $cleanupAuth0Session();
+        $_SESSION['login_error'] = 'No authorization code received.';
+        redirect('/login');
+    }
+
+    $tokens = exchangeAuth0Code($code);
+    $cleanupAuth0Session();
+    if (!$tokens || empty($tokens['access_token'])) {
+        $_SESSION['login_error'] = 'Failed to exchange authorization code.';
+        redirect('/login');
+    }
+
+    $userInfo = getAuth0UserInfo($tokens['access_token']);
+    if (!$userInfo) {
+        $_SESSION['login_error'] = 'Failed to retrieve user information.';
+        redirect('/login');
+    }
+
+    $user = findOrCreateAuth0User($pdo, $userInfo);
+    if (!$user) {
+        $_SESSION['login_error'] = 'Failed to create or find user account.';
+        redirect('/login');
+    }
+
+    redirect('/');
+}
+
 if ($uri === '/logout') {
-    logout();
+    $wasAuth0 = logout();
+    if ($wasAuth0 && AUTH0_ENABLED) {
+        $logoutUrl = 'https://' . AUTH0_DOMAIN . '/v2/logout?' . http_build_query([
+            'client_id' => AUTH0_CLIENT_ID,
+            'returnTo' => AUTH0_LOGOUT_RETURN_URL,
+        ]);
+        header('Location: ' . $logoutUrl);
+        exit;
+    }
     redirect('/login');
 }
 
