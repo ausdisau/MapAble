@@ -8,6 +8,7 @@ $user = currentUser($pdo);
 $userId = currentUserId();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    requireCsrf();
     $action = $_POST['action'] ?? '';
     if ($action === 'book') {
         createBooking($pdo, [
@@ -151,6 +152,7 @@ require __DIR__ . '/../includes/layout_header.php';
             </div>
             <div class="text-3xl font-bold text-center" id="shift-timer" data-start="<?= h($activeSession['start_time']) ?>" data-date="<?= h($activeSession['date']) ?>">00:00:00</div>
             <form method="POST" class="flex items-center gap-2">
+                <?= csrfField() ?>
                 <input type="hidden" name="action" value="end_shift">
                 <input type="hidden" name="session_id" value="<?= h($activeSession['id']) ?>">
                 <input type="number" name="hours" step="0.25" min="0.25" placeholder="Hours worked" class="input flex-1" required data-testid="input-shift-hours">
@@ -160,6 +162,7 @@ require __DIR__ . '/../includes/layout_header.php';
         </div>
         <?php else: ?>
         <form method="POST">
+            <?= csrfField() ?>
             <input type="hidden" name="action" value="start_shift">
             <button type="submit" class="btn btn-teal w-full" data-testid="button-start-shift">Start Shift</button>
         </form>
@@ -169,6 +172,7 @@ require __DIR__ . '/../includes/layout_header.php';
     <div class="card" data-testid="section-booking">
         <h2 class="font-semibold mb-3">Book This Worker</h2>
         <form method="POST" class="space-y-4">
+            <?= csrfField() ?>
             <input type="hidden" name="action" value="book">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -220,6 +224,7 @@ require __DIR__ . '/../includes/layout_header.php';
         <div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800">
             <h3 class="text-sm font-semibold mb-3">Leave a Review</h3>
             <form method="POST" class="space-y-3">
+                <?= csrfField() ?>
                 <input type="hidden" name="action" value="review">
                 <div>
                     <label class="label">Rating</label>

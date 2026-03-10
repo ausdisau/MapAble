@@ -50,5 +50,6 @@ require __DIR__ . '/../includes/layout_header.php';
     </div>
 </div>
 
+<script>window.csrfToken = '<?= h(csrfToken()) ?>';</script>
 <script src="/assets/js/chat.js"></script>
 <?php require __DIR__ . '/../includes/layout_footer.php'; ?>

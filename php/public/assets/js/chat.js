@@ -2,6 +2,7 @@ let currentSessionId = null;
 
 async function chatApi(path, method = 'GET', body = null) {
     const opts = { method, headers: { 'Content-Type': 'application/json' } };
+    if (window.csrfToken) opts.headers['X-CSRF-TOKEN'] = window.csrfToken;
     if (body) opts.body = JSON.stringify(body);
     const res = await fetch('/api/chat' + path, opts);
     return res.json();
