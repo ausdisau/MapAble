@@ -16,6 +16,7 @@ MapAble 4.0 is a full-stack superapp combining three core NDIS services:
 - **AI**: OpenAI (via Replit AI Integrations) with function calling + rules engine
 - **Object Storage**: Replit App Storage (presigned URL upload flow)
 - **Routing**: wouter (client-side)
+- **Auth**: Session-based (express-session + connect-pg-simple) with login/logout flow
 - **State Management**: TanStack React Query
 
 ## Brand Identity
@@ -51,6 +52,7 @@ MapAble 4.0 is a full-stack superapp combining three core NDIS services:
 - **Error states** — All pages handle API errors with retry buttons
 - **Hero search** — Dashboard hero search navigates to /care with query parameter
 - **Contact messaging** — Messages page supports selecting contacts from worker list
+- **Login/Logout** — Session-based auth with branded login page, demo account quick-fill buttons, logout in sidebar footer
 
 ## MapAble Chat (AI Chatbot)
 - **Chat Engine**: `server/chat-engine.ts` — OpenAI function calling with tools for profile lookup, worker search, barrier reports, transport pricing, booking, and escalation
@@ -102,9 +104,11 @@ client/src/
     access-profile-wizard.tsx - 3-step accessibility profile setup wizard
     barrier-report-form.tsx   - Community barrier reporting modal
   hooks/
+    use-auth.ts           - Authentication hook (login, logout, session check)
     use-upload.ts         - Presigned URL upload hook
     use-page-title.ts     - Dynamic document.title per page
   pages/
+    login.tsx             - Branded login page with demo account quick-fill
     dashboard.tsx         - Main dashboard with hero, stats, featured content
     care.tsx              - Support worker directory
     worker-detail.tsx     - Worker profile + booking + reviews + verification
@@ -152,7 +156,10 @@ shared/
 - community_reports (id, reporterUserId, locationRef, barrierType, severity, description, photoUrl, moderationStatus, confidenceWeight, expiresAt)
 
 ## API Endpoints
-- GET /api/me - Get current user (participant)
+- POST /api/auth/login - Login with username/password, creates session
+- POST /api/auth/logout - Destroy session, clear cookie
+- GET /api/auth/me - Check current auth status (returns user or 401)
+- GET /api/me - Get current authenticated user
 - PATCH /api/me - Update current user profile (fullName, email, location)
 - GET/POST /api/workers - List/create workers
 - GET /api/workers/:id - Get worker detail

@@ -6,8 +6,9 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { SidebarProvider, useSidebar } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { ThemeProvider, useTheme } from "@/components/theme-provider";
+import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
-import { Moon, Sun, Search, Bell, Accessibility, LayoutDashboard, HeartHandshake, Briefcase, Bus, MessageSquare, Settings, PanelLeftClose, PanelLeftOpen, DollarSign, Wallet, FileText, Bot } from "lucide-react";
+import { Moon, Sun, Search, Bell, Accessibility, LayoutDashboard, HeartHandshake, Briefcase, Bus, MessageSquare, Settings, PanelLeftClose, PanelLeftOpen, DollarSign, Wallet, FileText, Bot, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useLocation } from "wouter";
 import logoImage from "@assets/Accessible_Australia_Logo_Design_1772582762574.png";
@@ -19,6 +20,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import NotFound from "@/pages/not-found";
+import LoginPage from "@/pages/login";
 import Dashboard from "@/pages/dashboard";
 import CarePage from "@/pages/care";
 import WorkerDetailPage from "@/pages/worker-detail";
@@ -256,12 +258,30 @@ function AppLayout() {
   );
 }
 
+function AuthGate() {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ background: "linear-gradient(135deg, #0F1A2E 0%, #14578F 50%, #1B6EB5 100%)" }}>
+        <Loader2 className="w-8 h-8 animate-spin text-white/60" />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <LoginPage />;
+  }
+
+  return <AppLayout />;
+}
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <ThemeProvider>
-          <AppLayout />
+          <AuthGate />
           <Toaster />
         </ThemeProvider>
       </TooltipProvider>

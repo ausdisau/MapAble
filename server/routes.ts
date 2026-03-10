@@ -1,4 +1,4 @@
-import type { Express } from "express";
+import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { registerObjectStorageRoutes } from "./replit_integrations/object_storage";
@@ -27,22 +27,73 @@ const patchUserSchema = z.object({
   location: z.string().max(200).optional(),
 });
 
+function requireAuth(req: Request, res: Response, next: NextFunction) {
+  if (!req.session.userId) {
+    return res.status(401).json({ message: "Not authenticated" });
+  }
+  next();
+}
+
 export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
 
+  app.post("/api/auth/login", async (req, res) => {
+    const { username, password } = req.body;
+    if (!username || !password) {
+      return res.status(400).json({ message: "Username and password are required" });
+    }
+    const user = await storage.getUserByUsername(username);
+    if (!user || user.password !== password) {
+      return res.status(401).json({ message: "Invalid username or password" });
+    }
+    req.session.userId = user.id;
+    const { password: _, ...safeUser } = user;
+    res.json(safeUser);
+  });
+
+  app.post("/api/auth/logout", (req, res) => {
+    req.session.destroy((err) => {
+      if (err) {
+        return res.status(500).json({ message: "Failed to log out" });
+      }
+      res.clearCookie("connect.sid");
+      res.json({ message: "Logged out" });
+    });
+  });
+
+  app.get("/api/auth/me", async (req, res) => {
+    if (!req.session.userId) {
+      return res.status(401).json({ message: "Not authenticated" });
+    }
+    const user = await storage.getUser(req.session.userId);
+    if (!user) {
+      req.session.destroy(() => {});
+      return res.status(401).json({ message: "User not found" });
+    }
+    const { password, ...safeUser } = user;
+    res.json(safeUser);
+  });
+
+  app.use("/api", (req, res, next) => {
+    if (req.path === "/auth/login" || req.path === "/auth/logout" || req.path === "/auth/me") {
+      return next();
+    }
+    requireAuth(req, res, next);
+  });
+
   registerObjectStorageRoutes(app);
 
-  app.get("/api/me", async (_req, res) => {
-    const user = await storage.getUserByRole("participant");
+  app.get("/api/me", async (req, res) => {
+    const user = await storage.getUser(req.session.userId!);
     if (!user) return res.status(404).json({ message: "No user found" });
     const { password, ...safeUser } = user;
     res.json(safeUser);
   });
 
   app.patch("/api/me", async (req, res) => {
-    const user = await storage.getUserByRole("participant");
+    const user = await storage.getUser(req.session.userId!);
     if (!user) return res.status(404).json({ message: "No user found" });
     const parsed = patchUserSchema.safeParse(req.body);
     if (!parsed.success) return res.status(400).json({ message: "Invalid data", errors: parsed.error.flatten() });
@@ -274,38 +325,28 @@ export async function registerRoutes(
     res.json(workerReviews);
   });
 
-  app.get("/api/access-profile", async (_req, res) => {
-    const user = await storage.getUserByRole("participant");
-    if (!user) return res.status(404).json({ message: "No user found" });
-    const profile = await storage.getAccessProfile(user.id);
+  app.get("/api/access-profile", async (req, res) => {
+    const profile = await storage.getAccessProfile(req.session.userId!);
     res.json(profile || null);
   });
 
   app.put("/api/access-profile", async (req, res) => {
-    const user = await storage.getUserByRole("participant");
-    if (!user) return res.status(404).json({ message: "No user found" });
-    const profile = await storage.upsertAccessProfile(user.id, req.body);
+    const profile = await storage.upsertAccessProfile(req.session.userId!, req.body);
     res.json(profile);
   });
 
-  app.post("/api/chat/sessions", async (_req, res) => {
-    const user = await storage.getUserByRole("participant");
-    if (!user) return res.status(404).json({ message: "No user found" });
-    const session = await createChatSession(user.id);
+  app.post("/api/chat/sessions", async (req, res) => {
+    const session = await createChatSession(req.session.userId!);
     res.status(201).json(session);
   });
 
-  app.get("/api/chat/sessions", async (_req, res) => {
-    const user = await storage.getUserByRole("participant");
-    if (!user) return res.status(404).json({ message: "No user found" });
-    const sessions = await getUserSessions(user.id);
+  app.get("/api/chat/sessions", async (req, res) => {
+    const sessions = await getUserSessions(req.session.userId!);
     res.json(sessions);
   });
 
   app.get("/api/chat/sessions/:id/messages", async (req, res) => {
-    const user = await storage.getUserByRole("participant");
-    if (!user) return res.status(404).json({ message: "No user found" });
-    const sessions = await getUserSessions(user.id);
+    const sessions = await getUserSessions(req.session.userId!);
     const owns = sessions.some((s) => s.id === req.params.id);
     if (!owns) return res.status(403).json({ message: "Access denied" });
     const msgs = await getSessionMessages(req.params.id);
@@ -313,9 +354,7 @@ export async function registerRoutes(
   });
 
   app.delete("/api/chat/sessions/:id", async (req, res) => {
-    const user = await storage.getUserByRole("participant");
-    if (!user) return res.status(404).json({ message: "No user found" });
-    const sessions = await getUserSessions(user.id);
+    const sessions = await getUserSessions(req.session.userId!);
     const owns = sessions.some((s) => s.id === req.params.id);
     if (!owns) return res.status(403).json({ message: "Access denied" });
     await deleteChatSession(req.params.id);
@@ -324,14 +363,12 @@ export async function registerRoutes(
 
   app.post("/api/chat/send", async (req, res) => {
     try {
-      const user = await storage.getUserByRole("participant");
-      if (!user) return res.status(404).json({ message: "No user found" });
       const { sessionId, message } = req.body;
       if (!sessionId || !message) return res.status(400).json({ message: "sessionId and message required" });
-      const sessions = await getUserSessions(user.id);
+      const sessions = await getUserSessions(req.session.userId!);
       const owns = sessions.some((s) => s.id === sessionId);
       if (!owns) return res.status(403).json({ message: "Access denied" });
-      const response = await processChat(sessionId, user.id, message);
+      const response = await processChat(sessionId, req.session.userId!, message);
       res.json(response);
     } catch (error) {
       console.error("Chat error:", error);
@@ -345,14 +382,12 @@ export async function registerRoutes(
   });
 
   app.post("/api/community-reports", async (req, res) => {
-    const user = await storage.getUserByRole("participant");
-    if (!user) return res.status(404).json({ message: "No user found" });
     const { locationRef, barrierType, severity, description } = req.body;
     if (!locationRef || !barrierType || !severity) {
       return res.status(400).json({ message: "locationRef, barrierType, and severity are required" });
     }
     const report = await storage.createCommunityReport({
-      reporterUserId: user.id,
+      reporterUserId: req.session.userId!,
       locationRef,
       barrierType,
       severity,
