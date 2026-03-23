@@ -102,7 +102,24 @@ php/
 - Messaging system with contact sidebar
 - Settings with profile editing, accessibility toggles, access profile wizard
 - Dark mode toggle with cookie persistence
-- WCAG 2.2 AA: 44px min touch targets, skip-to-content, ARIA landmarks
+- **WCAG 2.2 AA / W3C / WAVE accessibility**:
+  - Skip links: 3 skip links (main content, navigation, search) on authenticated pages; section-based skip links on landing and login
+  - ARIA landmarks: `banner`, `main`, `navigation`, `complementary`, `contentinfo`, `search`, `log`, `status`, `alert` across all pages
+  - `aria-current="page"` on active nav item, `aria-expanded` on toggleable menus, `aria-pressed` on toggle buttons
+  - `aria-live="polite"` on chat messages + announcer, `aria-live="assertive"` on toast/alert regions
+  - `aria-hidden="true"` on all decorative elements (icons, gradients, tri-colour bars, background orbs)
+  - `aria-labelledby` linking sections to their headings, `aria-describedby` on forms with errors
+  - `role="listbox"` + `role="option"` + `aria-selected` on prediction dropdown
+  - `aria-autocomplete="list"` + `aria-haspopup="listbox"` on chat input
+  - `role="alert"` on login error messages, `role="status"` on speech status
+  - Audio description buttons (TTS via Web Speech API) on landing page and login page
+  - `#a11y-announcer` live region for dynamic state changes (theme toggle, menu open/close, voice state)
+  - `focus-visible` outlines (3px solid blue, 2px offset) for keyboard navigation
+  - `prefers-reduced-motion`: disables all animations/transitions
+  - `prefers-contrast: more`: thicker borders on cards, badges, buttons, inputs
+  - 44px minimum touch targets on all interactive elements
+  - Proper form labels with `for`/`id` binding, `aria-required` on required fields
+  - Escape key closes mobile menu and returns focus to trigger
 
 ## Auth
 - **Auth0 federated login**: Domain `adid.au.auth0.com`, Client ID via `AUTH0_CLIENT_ID` env var

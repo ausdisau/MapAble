@@ -3,21 +3,23 @@ $pageTitle = 'MapAble Assistant';
 require __DIR__ . '/../includes/layout_header.php';
 ?>
 <div class="flex h-[calc(100vh-60px)]" data-testid="chat-container">
-    <div id="chat-sidebar" class="hidden md:flex flex-col w-64 border-r border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 shrink-0">
+    <aside id="chat-sidebar" class="hidden md:flex flex-col w-64 border-r border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 shrink-0" role="complementary" aria-label="Chat sessions">
         <div class="p-3 border-b border-gray-200 dark:border-gray-800">
-            <button onclick="chatNewSession()" class="btn btn-teal w-full btn-sm" data-testid="button-new-chat">
+            <button onclick="chatNewSession()" class="btn btn-teal w-full btn-sm" data-testid="button-new-chat" aria-label="Start a new conversation">
                 + New Conversation
             </button>
         </div>
-        <div id="chat-sessions" class="flex-1 overflow-y-auto p-2 space-y-1" data-testid="chat-session-list">
+        <div id="chat-sessions" class="flex-1 overflow-y-auto p-2 space-y-1" role="list" aria-label="Previous conversations" data-testid="chat-session-list">
         </div>
-    </div>
+    </aside>
 
-    <div class="flex-1 flex flex-col min-w-0">
+    <div class="flex-1 flex flex-col min-w-0" role="region" aria-label="Chat conversation">
         <div class="flex items-center gap-3 px-4 py-2 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
-            <button onclick="document.getElementById('chat-sidebar').classList.toggle('hidden')" class="md:hidden btn btn-ghost btn-sm" data-testid="button-toggle-chat-sidebar">☰</button>
+            <button onclick="document.getElementById('chat-sidebar').classList.toggle('hidden')" class="md:hidden btn btn-ghost btn-sm" data-testid="button-toggle-chat-sidebar" aria-label="Toggle chat history sidebar" aria-expanded="false" aria-controls="chat-sidebar">
+                <span aria-hidden="true">☰</span>
+            </button>
             <div class="flex items-center gap-2">
-                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-map-teal to-map-blue flex items-center justify-center text-white text-sm font-bold" data-testid="img-agent-avatar">M</div>
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-map-teal to-map-blue flex items-center justify-center text-white text-sm font-bold" aria-hidden="true" data-testid="img-agent-avatar">M</div>
                 <div>
                     <h2 class="font-semibold text-sm" data-testid="text-chat-title">MapAble Assistant</h2>
                     <p class="text-[10px] text-gray-400" data-testid="text-agent-subtitle">Agentic AI · Voice · Predictive Text</p>
@@ -25,7 +27,7 @@ require __DIR__ . '/../includes/layout_header.php';
             </div>
         </div>
 
-        <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4" data-testid="chat-messages">
+        <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4" role="log" aria-label="Chat messages" aria-live="polite" data-testid="chat-messages">
             <div class="text-center py-10 text-gray-400 space-y-4" id="chat-empty">
                 <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-map-teal to-map-blue flex items-center justify-center text-white text-2xl font-bold mx-auto shadow-lg">M</div>
                 <div>
@@ -49,18 +51,18 @@ require __DIR__ . '/../includes/layout_header.php';
 
         <div id="chat-quick-actions" class="px-4 py-1 flex flex-wrap gap-2 hidden" data-testid="chat-quick-actions"></div>
 
-        <div class="border-t border-gray-200 dark:border-gray-800 p-3 bg-white dark:bg-gray-900 relative">
-            <div id="prediction-dropdown" class="hidden absolute bottom-full left-3 right-3 mb-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg overflow-hidden z-10" data-testid="prediction-dropdown"></div>
-            <div id="speech-status" class="hidden text-xs text-red-500 font-medium mb-1 flex items-center gap-1.5 px-1" aria-live="polite" data-testid="text-speech-status">
-                <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+        <div class="border-t border-gray-200 dark:border-gray-800 p-3 bg-white dark:bg-gray-900 relative" role="region" aria-label="Message input">
+            <div id="prediction-dropdown" class="hidden absolute bottom-full left-3 right-3 mb-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg overflow-hidden z-10" role="listbox" aria-label="Text predictions" data-testid="prediction-dropdown"></div>
+            <div id="speech-status" class="hidden text-xs text-red-500 font-medium mb-1 flex items-center gap-1.5 px-1" aria-live="polite" role="status" data-testid="text-speech-status">
+                <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse" aria-hidden="true"></span>
                 Listening...
             </div>
-            <form id="chat-form" onsubmit="chatSend(event)" class="flex gap-2">
-                <input type="text" id="chat-input" class="input flex-1" placeholder="Ask me anything — type or use voice..." autocomplete="off" data-testid="input-chat-message">
-                <button type="button" id="chat-mic-btn" onclick="toggleVoice()" class="btn btn-ghost px-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg transition-all" aria-label="Start voice input" data-testid="button-voice-input">
-                    <span class="mic-icon text-lg">🎤</span>
+            <form id="chat-form" onsubmit="chatSend(event)" class="flex gap-2" role="form" aria-label="Send a message to MapAble Assistant">
+                <input type="text" id="chat-input" class="input flex-1" placeholder="Ask me anything — type or use voice..." autocomplete="off" aria-label="Type your message" aria-autocomplete="list" aria-controls="prediction-dropdown" aria-haspopup="listbox" data-testid="input-chat-message">
+                <button type="button" id="chat-mic-btn" onclick="toggleVoice()" class="btn btn-ghost px-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg transition-all" aria-label="Start voice input" aria-pressed="false" data-testid="button-voice-input">
+                    <span class="mic-icon text-lg" aria-hidden="true">🎤</span>
                 </button>
-                <button type="submit" id="chat-send-btn" class="btn btn-primary min-w-[44px] min-h-[44px]" data-testid="button-send-chat">Send</button>
+                <button type="submit" id="chat-send-btn" class="btn btn-primary min-w-[44px] min-h-[44px]" aria-label="Send message" data-testid="button-send-chat">Send</button>
             </form>
         </div>
     </div>
