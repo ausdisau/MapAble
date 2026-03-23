@@ -100,7 +100,12 @@ if ($uri === '/logout') {
         header('Location: ' . $logoutUrl);
         exit;
     }
-    redirect('/login');
+    redirect('/');
+}
+
+if ($uri === '/' && !isLoggedIn()) {
+    require __DIR__ . '/../pages/landing.php';
+    exit;
 }
 
 requireAuth();

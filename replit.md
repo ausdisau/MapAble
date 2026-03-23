@@ -85,6 +85,7 @@ php/
 - community_reports
 
 ## Key Features
+- **Landing page** (pre-login) at `/` — hero section, 6 service cards, features showcase, AI assistant preview, CTA, footer with brand tri-colour bar; unauthenticated users see landing, authenticated see dashboard
 - Dashboard with hero search, stats, featured workers, recent jobs
 - Worker directory with search, filtering (verified/transport/accessible)
 - Worker detail with booking form, shift timer, reviews, verification checklist
