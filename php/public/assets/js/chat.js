@@ -321,10 +321,12 @@ function initVoiceRecognition() {
         if (micBtn) {
             micBtn.classList.add('text-red-500', 'bg-red-50', 'dark:bg-red-900/20', 'ring-2', 'ring-red-300');
             micBtn.setAttribute('aria-label', 'Stop voice input');
+            micBtn.setAttribute('aria-pressed', 'true');
             micBtn.querySelector('.mic-icon').textContent = '⏹';
         }
         const sr = document.getElementById('speech-status');
         if (sr) { sr.textContent = 'Listening...'; sr.classList.remove('hidden'); }
+        if (typeof announce === 'function') announce('Voice input started. Speak now.');
     };
 
     speechRecognition.onresult = (event) => {
@@ -347,6 +349,7 @@ function initVoiceRecognition() {
         if (micBtn) {
             micBtn.classList.remove('text-red-500', 'bg-red-50', 'dark:bg-red-900/20', 'ring-2', 'ring-red-300');
             micBtn.setAttribute('aria-label', 'Start voice input');
+            micBtn.setAttribute('aria-pressed', 'false');
             micBtn.querySelector('.mic-icon').textContent = '🎤';
         }
         const sr = document.getElementById('speech-status');
@@ -456,7 +459,10 @@ function showPredictions(currentText, predictions) {
         item.className = 'px-3 py-2 text-sm cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/20 text-gray-700 dark:text-gray-300 flex items-center gap-2 min-h-[36px]' + (i === 0 ? ' prediction-active bg-blue-50 dark:bg-blue-900/20' : '');
         item.dataset.prediction = pred;
         item.dataset.testid = 'prediction-item-' + i;
-        item.innerHTML = `<span class="text-map-teal text-xs">↳</span><span class="truncate"><span class="text-gray-400">${escHtml(currentText)}</span>${escHtml(pred)}</span>`;
+        item.setAttribute('role', 'option');
+        item.setAttribute('aria-selected', i === 0 ? 'true' : 'false');
+        item.id = 'prediction-option-' + i;
+        item.innerHTML = `<span class="text-map-teal text-xs" aria-hidden="true">↳</span><span class="truncate"><span class="text-gray-400">${escHtml(currentText)}</span>${escHtml(pred)}</span>`;
         item.onclick = () => acceptPrediction(pred);
         dropdown.appendChild(item);
     });
