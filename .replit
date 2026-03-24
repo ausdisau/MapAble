@@ -53,3 +53,7 @@ integrations = ["javascript_object_storage:2.0.0", "javascript_openai_ai_integra
 [userenv.shared]
 AUTH0_DOMAIN = "adid.au.auth0.com"
 AUTH0_CLIENT_ID = "ggZYPtlnLhP55XtJQCEQj4780TiAZfOe"
+
+[postMerge]
+path = "scripts/post-merge.sh"
+timeoutMs = 120000
