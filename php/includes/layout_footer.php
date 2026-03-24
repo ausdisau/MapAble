@@ -19,5 +19,6 @@
     <div aria-live="polite" aria-atomic="true" id="a11y-announcer" class="sr-only" role="status" data-testid="text-a11y-announcer"></div>
 
     <script src="/assets/js/app.js"></script>
+    <?php require __DIR__ . '/accessibe_widget.php'; ?>
 </body>
 </html>

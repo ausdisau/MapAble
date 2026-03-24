@@ -40,6 +40,10 @@ MapAble 4.0 is a fullstack TypeScript superapp combining core NDIS services:
 - `STRIPE_PUBLISHABLE_KEY` — Stripe publishable key (exposed to frontend)
 - `STRIPE_WEBHOOK_SECRET` — Stripe webhook signing secret
 - `ORB_API_KEY` — Orb API key for usage-based billing
+- `AUTH0_DOMAIN` — Auth0 tenant domain (default: `adid.au.auth0.com`)
+- `AUTH0_CLIENT_ID` — Auth0 application Client ID (SPA type)
+- `ACCESSIBE_SITE_KEY` — accessiBe widget site key for PHP pages (placeholder; replace with real key from accessiBe account)
+- `VITE_ACCESSIBE_SITE_KEY` — accessiBe widget site key for React frontend (set to same value as ACCESSIBE_SITE_KEY)
 
 ## Project Structure
 ```
@@ -56,6 +60,10 @@ server/
   seed.ts                - Database seeding
   vite.ts                - Vite dev server integration
   static.ts              - Production static file serving
+php/
+  includes/
+    accessibe_widget.php   - Reusable accessiBe accessibility widget snippet
+    layout_footer.php      - Footer, scripts, toast messages (includes accessiBe widget)
 client/src/
   App.tsx                - Root app with routing, sidebar, header
   pages/
@@ -85,6 +93,22 @@ client/src/
 - **Orb Webhooks**: POST `/api/webhooks/orb` handles billing_period_ended → auto-generates invoices
 - **Invoice statuses**: draft, submitted, pending, processing, paid, failed
 - **Orb customer setup**: POST `/api/billing/setup-orb` creates Orb customer + subscription for a user
+
+## Key Features
+- Dashboard with stats, featured workers, recent jobs
+- Worker directory with search, filtering (verified/transport/accessible)
+- Worker detail with booking form, shift timer, reviews, verification checklist
+- Job board with category filters (Care/Transport/Support/Employment)
+- Transport booking with wheelchair options + trip logger with tier pricing
+- AI-powered chat assistant with OpenAI
+- NDIS pricing tiers (4 care + 4 transport) with automatic tier calculation
+- Budget dashboard with category progress bars and tier indicators
+- Invoice generation with NDIS line items, Stripe payments, and Orb usage metering
+- Messaging system with contact sidebar
+- Settings with profile editing and accessibility toggles
+- Dark mode toggle
+- **WCAG 2.2 AA accessibility** with skip links, ARIA landmarks, live regions, and keyboard navigation
+- **accessiBe widget**: Floating accessibility overlay (bottom-left) on all pages; loads from `acsbapp.com` CDN async; branded with MapAble blue (#1B6EB5)
 
 ## Pricing Engine
 - Care tiers: Basic (0-10hrs, $70.23/hr), Standard (11-30hrs, $68/hr), High Support (31+hrs, $65/hr)

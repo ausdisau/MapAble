@@ -141,5 +141,6 @@
         <p>MapAble 4.0 by Australian Disability Ltd. NDIS Registered Provider.</p>
     </footer>
     <script src="/assets/js/app.js"></script>
+    <?php require __DIR__ . '/../includes/accessibe_widget.php'; ?>
 </body>
 </html>

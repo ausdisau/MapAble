@@ -438,5 +438,6 @@
         });
     });
     </script>
+    <?php require __DIR__ . '/../includes/accessibe_widget.php'; ?>
 </body>
 </html>
