@@ -356,32 +356,6 @@ export type Review = typeof reviews.$inferSelect;
 export type InsertParticipantBudget = z.infer<typeof insertParticipantBudgetSchema>;
 export type ParticipantBudget = typeof participantBudgets.$inferSelect;
 
-export const shiftStatusEnum = pgEnum("shift_status", ["scheduled", "confirmed", "in_progress", "completed", "cancelled"]);
-
-export const shifts = pgTable("shifts", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  participantId: varchar("participant_id").notNull(),
-  workerId: varchar("worker_id").notNull(),
-  date: text("date").notNull(),
-  startTime: text("start_time").notNull(),
-  endTime: text("end_time").notNull(),
-  ndisGoal: text("ndis_goal"),
-  ndisCategory: text("ndis_category"),
-  status: shiftStatusEnum("status").notNull().default("scheduled"),
-  recurrenceRule: text("recurrence_rule"),
-  notes: text("notes"),
-  serviceSessionId: varchar("service_session_id"),
-  createdAt: timestamp("created_at").defaultNow(),
-});
-
-export const ndisPlanCache = pgTable("ndis_plan_cache", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  participantId: varchar("participant_id").notNull(),
-  planData: jsonb("plan_data"),
-  goals: jsonb("goals"),
-  fetchedAt: timestamp("fetched_at").defaultNow(),
-});
-
 export const session = pgTable("session", {
   sid: varchar("sid").primaryKey(),
   sess: json("sess").notNull(),
@@ -396,22 +370,6 @@ export const session = pgTable("session", {
   ipAddress: text("ipAddress"),
   userAgent: text("userAgent"),
   impersonatedBy: text("impersonatedBy"),
-});
-
-export const workerAvailability = pgTable("worker_availability", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  workerId: varchar("worker_id").notNull(),
-  dayOfWeek: integer("day_of_week").notNull(),
-  startTime: text("start_time").notNull(),
-  endTime: text("end_time").notNull(),
-  isRecurring: boolean("is_recurring").default(true),
-});
-
-export const workerBlockouts = pgTable("worker_blockouts", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  workerId: varchar("worker_id").notNull(),
-  date: text("date").notNull(),
-  reason: text("reason"),
 });
 
 export const moderationStatusEnum = pgEnum("moderation_status", ["unverified", "verified", "rejected", "expired"]);

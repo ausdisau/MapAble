@@ -1,6 +1,7 @@
 import OpenAI from "openai";
 import { db } from "./db";
 import { eq, desc } from "drizzle-orm";
+import { storage } from "./storage";
 import {
   accessContextProfiles,
   chatSessions,
@@ -21,7 +22,7 @@ const openai = new OpenAI({
   baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
 });
 
-const SYSTEM_PROMPT = `You are MapAble Chat, an accessibility-context travel and support assistant for the MapAble 4.0 platform — an Australian NDIS superapp. You help people with disability plan accessible journeys, understand transport options, report accessibility barriers, and navigate NDIS support services.
+const SYSTEM_PROMPT = `You are MapAble Chat, an accessibility-context travel and support assistant for the MapAble 4.0 platform — an Australian NDIS superapp. You help people with disability plan accessible journeys, understand transport options, report accessibility barriers, navigate NDIS support services, manage shifts and billing.
 
 Your core principles:
 - SAFETY FIRST: Never suggest stairs if the user's profile says stairs_allowed=false. Never suggest routes that exceed their max transfer distance.
@@ -39,6 +40,18 @@ You have access to tools to:
 - Look up transport pricing
 - Help book transport
 - Escalate to human support when needed
+- View upcoming shifts and book new shifts
+- Check pending invoices and billing
+- View NDIS budget summary across categories
+- Look up NDIS plan goals
+
+Billing & Shifts guidance:
+- When discussing shifts, always confirm the date, time, and worker before booking. Ask the user to confirm before creating a shift.
+- For invoices, show the amount and period. You cannot process payments directly — provide a quick action to navigate to the payment page.
+- When discussing budgets, show remaining allocation vs used amounts. Warn the user if they are approaching their budget limit (>80% used).
+- For NDIS plan goals, present them clearly and relate them to the user's current services.
+- You cannot cancel shifts through chat — direct the user to the shifts page instead.
+- You cannot modify NDIS plan data — only display it.
 
 When the user asks about journey planning, always consider their accessibility profile (mobility aids, stairs capability, transfer distance, sensory preferences). When providing transport options, reference MapAble's real workers and pricing tiers.
 
@@ -143,6 +156,57 @@ const tools: OpenAI.Chat.Completions.ChatCompletionTool[] = [
         },
         required: ["reason"],
       },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "get_upcoming_shifts",
+      description: "Retrieve the user's upcoming scheduled or confirmed shifts including worker name, date, time, and NDIS category.",
+      parameters: { type: "object", properties: {}, required: [] },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "book_shift",
+      description: "Book a new shift for the user with a specific worker on a given date and time. Always confirm details with the user before calling this tool.",
+      parameters: {
+        type: "object",
+        properties: {
+          workerId: { type: "string", description: "ID of the worker to book the shift with" },
+          date: { type: "string", description: "Date for the shift (YYYY-MM-DD)" },
+          startTime: { type: "string", description: "Start time (HH:MM format, 24h)" },
+          endTime: { type: "string", description: "End time (HH:MM format, 24h)" },
+          ndisCategory: { type: "string", description: "NDIS category for this shift (e.g. daily_living, transport, capacity_building)" },
+          notes: { type: "string", description: "Any additional notes for the shift" },
+        },
+        required: ["workerId", "date", "startTime", "endTime"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "get_pending_invoices",
+      description: "Retrieve the user's pending/unpaid invoices including amounts, periods, and status.",
+      parameters: { type: "object", properties: {}, required: [] },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "get_budget_summary",
+      description: "Get the user's NDIS budget summary showing allocated vs used amounts across all budget categories (daily living, transport, capacity building).",
+      parameters: { type: "object", properties: {}, required: [] },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "get_ndis_plan_goals",
+      description: "Retrieve the user's NDIS plan goals from the cached plan data.",
+      parameters: { type: "object", properties: {}, required: [] },
     },
   },
 ];
@@ -300,6 +364,180 @@ async function executeToolCall(
       });
     }
 
+    case "get_upcoming_shifts": {
+      const upcomingShifts = await storage.getUpcomingShifts(userId);
+      if (upcomingShifts.length === 0) {
+        return JSON.stringify({
+          message: "No upcoming shifts found.",
+          shifts: [],
+          quickAction: "view_shifts",
+        });
+      }
+
+      const shiftsWithWorkers = await Promise.all(
+        upcomingShifts.map(async (shift) => {
+          const workerRows = await db
+            .select()
+            .from(workers)
+            .innerJoin(users, eq(workers.userId, users.id))
+            .where(eq(workers.id, shift.workerId));
+          const workerInfo = workerRows[0];
+          return {
+            id: shift.id,
+            date: shift.date,
+            startTime: shift.startTime,
+            endTime: shift.endTime,
+            workerName: workerInfo?.users.fullName || "Unknown worker",
+            ndisCategory: shift.ndisCategory,
+            ndisGoal: shift.ndisGoal,
+            status: shift.status,
+            notes: shift.notes,
+          };
+        })
+      );
+
+      return JSON.stringify({
+        shifts: shiftsWithWorkers,
+        count: shiftsWithWorkers.length,
+        quickAction: "view_shifts",
+      });
+    }
+
+    case "book_shift": {
+      if (!args.workerId || !args.date || !args.startTime || !args.endTime) {
+        return JSON.stringify({
+          error: "Missing required fields: workerId, date, startTime, and endTime are all required.",
+        });
+      }
+
+      const budgets = await storage.getParticipantBudgets(userId);
+      const category = args.ndisCategory || "daily_living";
+      const relevantBudget = budgets.find((b) => b.category === category);
+      let budgetWarning: string | null = null;
+
+      if (relevantBudget) {
+        const used = Number(relevantBudget.totalUsed);
+        const allocated = Number(relevantBudget.totalAllocated);
+        const percentUsed = allocated > 0 ? (used / allocated) * 100 : 0;
+        if (percentUsed >= 100) {
+          return JSON.stringify({
+            error: `Cannot book shift: Your ${category.replace("_", " ")} budget is fully used ($${used.toFixed(2)} of $${allocated.toFixed(2)}).`,
+            quickAction: "check_budget",
+          });
+        }
+        if (percentUsed >= 80) {
+          budgetWarning = `Warning: Your ${category.replace("_", " ")} budget is ${percentUsed.toFixed(0)}% used ($${used.toFixed(2)} of $${allocated.toFixed(2)}). This shift will further reduce your remaining budget.`;
+        }
+      }
+
+      const shift = await storage.createShift({
+        participantId: userId,
+        workerId: args.workerId,
+        date: args.date,
+        startTime: args.startTime,
+        endTime: args.endTime,
+        ndisCategory: args.ndisCategory || null,
+        ndisGoal: null,
+        status: "scheduled",
+        notes: args.notes || null,
+        recurrenceRule: null,
+        serviceSessionId: null,
+      });
+
+      const workerRows = await db
+        .select()
+        .from(workers)
+        .innerJoin(users, eq(workers.userId, users.id))
+        .where(eq(workers.id, args.workerId));
+      const workerInfo = workerRows[0];
+
+      return JSON.stringify({
+        success: true,
+        shiftId: shift.id,
+        workerName: workerInfo?.users.fullName || "Unknown worker",
+        date: shift.date,
+        startTime: shift.startTime,
+        endTime: shift.endTime,
+        message: `Shift booked successfully for ${shift.date} from ${shift.startTime} to ${shift.endTime}.`,
+        budgetWarning,
+        quickAction: "view_shifts",
+      });
+    }
+
+    case "get_pending_invoices": {
+      const pendingInvoices = await storage.getPendingInvoices(userId);
+      if (pendingInvoices.length === 0) {
+        return JSON.stringify({
+          message: "No pending invoices. You're all caught up!",
+          invoices: [],
+        });
+      }
+
+      return JSON.stringify({
+        invoices: pendingInvoices.map((inv) => ({
+          id: inv.id,
+          periodStart: inv.periodStart,
+          periodEnd: inv.periodEnd,
+          totalAmount: `$${Number(inv.totalAmount).toFixed(2)}`,
+          ndisClaimable: inv.ndisClaimable ? `$${Number(inv.ndisClaimable).toFixed(2)}` : null,
+          status: inv.status,
+          generatedAt: inv.generatedAt,
+        })),
+        totalOwing: `$${pendingInvoices.reduce((sum, inv) => sum + Number(inv.totalAmount), 0).toFixed(2)}`,
+        count: pendingInvoices.length,
+        quickAction: "pay_invoice",
+      });
+    }
+
+    case "get_budget_summary": {
+      const budgets = await storage.getParticipantBudgets(userId);
+      if (budgets.length === 0) {
+        return JSON.stringify({
+          message: "No NDIS budget allocations found for your account.",
+          budgets: [],
+        });
+      }
+
+      const budgetSummary = budgets.map((b) => {
+        const allocated = Number(b.totalAllocated);
+        const used = Number(b.totalUsed);
+        const remaining = allocated - used;
+        const percentUsed = allocated > 0 ? (used / allocated) * 100 : 0;
+        return {
+          category: b.category,
+          allocated: `$${allocated.toFixed(2)}`,
+          used: `$${used.toFixed(2)}`,
+          remaining: `$${remaining.toFixed(2)}`,
+          percentUsed: `${percentUsed.toFixed(0)}%`,
+          periodStart: b.periodStart,
+          periodEnd: b.periodEnd,
+          nearLimit: percentUsed >= 80,
+        };
+      });
+
+      return JSON.stringify({
+        budgets: budgetSummary,
+        quickAction: "check_budget",
+      });
+    }
+
+    case "get_ndis_plan_goals": {
+      const planCache = await storage.getNdisPlanGoals(userId);
+      if (!planCache || !planCache.goals) {
+        return JSON.stringify({
+          message: "No NDIS plan goals found. Your plan data may not have been synced yet.",
+          goals: [],
+        });
+      }
+
+      return JSON.stringify({
+        goals: planCache.goals,
+        planData: planCache.planData,
+        fetchedAt: planCache.fetchedAt,
+        note: "This data is cached from the NDIS API. Contact your NDIS planner for the most current information.",
+      });
+    }
+
     default:
       return JSON.stringify({ error: `Unknown tool: ${toolName}` });
   }
@@ -307,7 +545,9 @@ async function executeToolCall(
 
 function applyRulesEngine(
   response: string,
-  profile: AccessContextProfile | null
+  profile: AccessContextProfile | null,
+  toolsUsed: string[] = [],
+  toolOutputs: string[] = []
 ): { content: string; warnings: string[] } {
   const warnings: string[] = [];
 
@@ -321,6 +561,20 @@ function applyRulesEngine(
         warnings.push(`Note: Your maximum transfer distance is ${profile.maxTransferM}m. Routes with longer transfers have been flagged.`);
       }
     }
+  }
+
+  const combinedToolOutput = toolOutputs.join(" ");
+
+  if (toolsUsed.includes("book_shift") && /budgetWarning/i.test(combinedToolOutput)) {
+    warnings.push("Budget alert: This shift may impact your remaining NDIS allocation. Check your budget summary for details.");
+  }
+
+  if (toolsUsed.includes("get_budget_summary") && /nearLimit.*true|"nearLimit":true/i.test(combinedToolOutput)) {
+    warnings.push("Budget warning: One or more of your NDIS budget categories is approaching or has exceeded its allocation.");
+  }
+
+  if (toolsUsed.includes("book_shift") && /Cannot book shift/i.test(combinedToolOutput)) {
+    warnings.push("Shift booking was blocked due to insufficient NDIS budget. Please review your budget allocation.");
   }
 
   return { content: response, warnings };
@@ -366,6 +620,7 @@ export async function processChat(
     .where(eq(accessContextProfiles.userId, userId));
 
   const toolsUsed: string[] = [];
+  const toolOutputs: string[] = [];
   let response: OpenAI.Chat.Completions.ChatCompletion;
   let assistantContent = "";
   let iterations = 0;
@@ -396,6 +651,8 @@ export async function processChat(
           userId
         );
 
+        toolOutputs.push(toolResult);
+
         chatHistory.push({
           role: "tool",
           tool_call_id: toolCall.id,
@@ -411,7 +668,9 @@ export async function processChat(
 
   const { content: processedContent, warnings } = applyRulesEngine(
     assistantContent,
-    profile || null
+    profile || null,
+    toolsUsed,
+    toolOutputs
   );
 
   const quickActions = extractQuickActions(processedContent, toolsUsed);
@@ -461,8 +720,17 @@ function extractQuickActions(content: string, toolsUsed: string[]): string[] {
   if (/profile|preference|mobility|access need/i.test(content)) {
     actions.push("edit_profile");
   }
-  if (/pric|cost|rate|budget/i.test(content)) {
+  if (/pric|cost|rate/i.test(content) && !toolsUsed.includes("get_budget_summary")) {
     actions.push("view_pricing");
+  }
+  if (toolsUsed.includes("get_upcoming_shifts") || toolsUsed.includes("book_shift") || /shift|schedule/i.test(content)) {
+    actions.push("view_shifts");
+  }
+  if (toolsUsed.includes("get_pending_invoices") || /invoice|payment|pay|owe/i.test(content)) {
+    actions.push("pay_invoice");
+  }
+  if (toolsUsed.includes("get_budget_summary") || /budget|allocation|ndis.*fund/i.test(content)) {
+    actions.push("check_budget");
   }
 
   return [...new Set(actions)];
@@ -472,7 +740,16 @@ function determineConfidence(toolsUsed: string[]): string {
   if (toolsUsed.includes("get_transport_pricing") || toolsUsed.includes("search_transport_workers")) {
     return "high";
   }
+  if (toolsUsed.includes("get_upcoming_shifts") || toolsUsed.includes("get_pending_invoices") || toolsUsed.includes("get_budget_summary")) {
+    return "high";
+  }
+  if (toolsUsed.includes("book_shift")) {
+    return "high";
+  }
   if (toolsUsed.includes("check_barrier_reports")) {
+    return "medium";
+  }
+  if (toolsUsed.includes("get_ndis_plan_goals")) {
     return "medium";
   }
   if (toolsUsed.length === 0) {

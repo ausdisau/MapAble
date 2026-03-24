@@ -16,13 +16,14 @@ import {
   type WorkerAvailability, type InsertWorkerAvailability,
   type WorkerBlockout, type InsertWorkerBlockout,
   type Shift, type InsertShift,
+  type NdisPlanCache, type InsertNdisPlanCache,
   users, workers, bookings, jobs, transportRequests, messages,
   pricingTiers, serviceSessions, transportTrips, invoices, reviews, participantBudgets,
   accessContextProfiles, communityReports,
-  workerAvailability, workerBlockouts, shifts,
+  workerAvailability, workerBlockouts, shifts, ndisPlanCache,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, and, sql, gte, lte } from "drizzle-orm";
+import { eq, desc, and, sql, gte, lte, inArray } from "drizzle-orm";
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
@@ -82,6 +83,9 @@ export interface IStorage {
   createShift(data: InsertShift): Promise<Shift>;
   updateShiftStatus(id: string, status: string, serviceSessionId?: string): Promise<Shift | undefined>;
   deleteShift(id: string): Promise<void>;
+  getUpcomingShifts(participantId: string): Promise<Shift[]>;
+  getNdisPlanGoals(participantId: string): Promise<NdisPlanCache | undefined>;
+  getPendingInvoices(participantId: string): Promise<Invoice[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -512,6 +516,22 @@ export class DatabaseStorage implements IStorage {
     return shift;
   }
 
+  async getUpcomingShifts(participantId: string): Promise<Shift[]> {
+    const today = new Date().toISOString().split("T")[0];
+    return db
+      .select()
+      .from(shifts)
+      .where(
+        and(
+          eq(shifts.participantId, participantId),
+          gte(shifts.date, today),
+          inArray(shifts.status, ["scheduled", "confirmed"]),
+        )
+      )
+      .orderBy(shifts.date, shifts.startTime)
+      .limit(20);
+  }
+
   async createShift(data: InsertShift): Promise<Shift> {
     const [shift] = await db.insert(shifts).values(data).returning();
     return shift;
@@ -529,6 +549,29 @@ export class DatabaseStorage implements IStorage {
 
   async deleteShift(id: string): Promise<void> {
     await db.delete(shifts).where(eq(shifts.id, id));
+  }
+
+  async getNdisPlanGoals(participantId: string): Promise<NdisPlanCache | undefined> {
+    const [plan] = await db
+      .select()
+      .from(ndisPlanCache)
+      .where(eq(ndisPlanCache.participantId, participantId))
+      .orderBy(desc(ndisPlanCache.fetchedAt))
+      .limit(1);
+    return plan;
+  }
+
+  async getPendingInvoices(participantId: string): Promise<Invoice[]> {
+    return db
+      .select()
+      .from(invoices)
+      .where(
+        and(
+          eq(invoices.participantId, participantId),
+          inArray(invoices.status, ["draft", "submitted", "pending"]),
+        )
+      )
+      .orderBy(desc(invoices.generatedAt));
   }
 }
 
