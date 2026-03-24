@@ -7,7 +7,7 @@ export const userRoleEnum = pgEnum("user_role", ["participant", "carer", "provid
 export const bookingStatusEnum = pgEnum("booking_status", ["pending", "confirmed", "in_progress", "completed", "cancelled"]);
 export const jobStatusEnum = pgEnum("job_status", ["open", "applied", "interviewing", "filled", "closed"]);
 export const transportStatusEnum = pgEnum("transport_status", ["requested", "accepted", "in_transit", "completed", "cancelled"]);
-export const invoiceStatusEnum = pgEnum("invoice_status", ["draft", "submitted", "paid"]);
+export const invoiceStatusEnum = pgEnum("invoice_status", ["draft", "submitted", "pending", "processing", "paid", "failed"]);
 export const sessionStatusEnum = pgEnum("session_status", ["in_progress", "completed", "cancelled"]);
 export const budgetCategoryEnum = pgEnum("budget_category", ["daily_living", "transport", "capacity_building"]);
 
@@ -29,6 +29,9 @@ export const users = pgTable("users", {
   planStartDate: text("plan_start_date"),
   planEndDate: text("plan_end_date"),
   phoneNumber: text("phone_number"),
+  stripeCustomerId: text("stripe_customer_id"),
+  orbCustomerId: text("orb_customer_id"),
+  orbSubscriptionId: text("orb_subscription_id"),
 });
 
 export const workers = pgTable("workers", {
@@ -158,6 +161,8 @@ export const invoices = pgTable("invoices", {
   status: invoiceStatusEnum("status").notNull().default("draft"),
   lineItems: jsonb("line_items"),
   generatedAt: timestamp("generated_at").defaultNow(),
+  stripePaymentIntentId: text("stripe_payment_intent_id"),
+  stripePaymentStatus: text("stripe_payment_status"),
 });
 
 export const reviews = pgTable("reviews", {
@@ -279,6 +284,7 @@ export const insertServiceSessionSchema = createInsertSchema(serviceSessions).pi
   totalCharge: true,
   shiftNotes: true,
   date: true,
+  status: true,
 });
 
 export const insertTransportTripSchema = createInsertSchema(transportTrips).pick({
@@ -294,6 +300,7 @@ export const insertTransportTripSchema = createInsertSchema(transportTrips).pick
   totalCharge: true,
   ndisItemCode: true,
   date: true,
+  status: true,
 });
 
 export const insertInvoiceSchema = createInsertSchema(invoices).pick({
