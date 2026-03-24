@@ -77,7 +77,7 @@ client/src/
   lib/                   - queryClient, utils
 ```
 
-## Database Tables
+## Database Tables (23)
 - users (with stripe_customer_id, orb_customer_id, orb_subscription_id)
 - workers, bookings, jobs, transport_requests, messages
 - pricing_tiers, service_sessions, transport_trips
@@ -85,6 +85,7 @@ client/src/
 - reviews, participant_budgets
 - access_context_profiles, chat_sessions, chat_messages
 - community_reports
+- worker_availability, worker_blockouts, shifts, ndis_plan_cache
 
 ## Stripe & Orb Billing Integration
 - **Stripe Link Checkout**: When user clicks "Pay Now" on an invoice, creates a PaymentIntent with `link` + `card` methods, opens embedded Stripe checkout
@@ -102,6 +103,8 @@ client/src/
 - Transport booking with wheelchair options + trip logger with tier pricing
 - AI-powered chat assistant with OpenAI
 - NDIS pricing tiers (4 care + 4 transport) with automatic tier calculation
+- **Shift Scheduler** — dedicated Shifts page with weekly/monthly calendar views, worker availability management, shift booking with NDIS goal alignment, recurring shift creation (weekly/fortnightly), shift status workflow (scheduled → confirmed → in_progress → completed), automatic service session creation on completion
+- **NDIS API Integration** — PRODA authentication module (OAuth2), myplace portal client for participant plan/goals, Price Guide data fetcher for NDIS rates, plan data caching, rate validation against NDIS price guide
 - Budget dashboard with category progress bars and tier indicators
 - Invoice generation with NDIS line items, Stripe payments, and Orb usage metering
 - Messaging system with contact sidebar

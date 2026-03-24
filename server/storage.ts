@@ -13,9 +13,13 @@ import {
   type ParticipantBudget, type InsertParticipantBudget,
   type AccessContextProfile, type InsertAccessContextProfile,
   type CommunityReport, type InsertCommunityReport,
+  type WorkerAvailability, type InsertWorkerAvailability,
+  type WorkerBlockout, type InsertWorkerBlockout,
+  type Shift, type InsertShift,
   users, workers, bookings, jobs, transportRequests, messages,
   pricingTiers, serviceSessions, transportTrips, invoices, reviews, participantBudgets,
   accessContextProfiles, communityReports,
+  workerAvailability, workerBlockouts, shifts,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, sql, gte, lte } from "drizzle-orm";
@@ -63,6 +67,21 @@ export interface IStorage {
   updateUserOrbIds(userId: string, orbCustomerId: string, orbSubscriptionId: string | null): Promise<User | undefined>;
   getInvoiceById(id: string): Promise<Invoice | undefined>;
   updateInvoicePayment(invoiceId: string, data: { stripePaymentIntentId?: string; stripePaymentStatus?: string; status?: string }): Promise<Invoice | undefined>;
+  getWorkerAvailability(workerId: string): Promise<WorkerAvailability[]>;
+  getWorkerAvailabilityById(id: string): Promise<WorkerAvailability | undefined>;
+  createWorkerAvailability(data: InsertWorkerAvailability): Promise<WorkerAvailability>;
+  deleteWorkerAvailability(id: string): Promise<void>;
+  setWorkerAvailabilityBulk(workerId: string, slots: InsertWorkerAvailability[]): Promise<WorkerAvailability[]>;
+  getWorkerBlockouts(workerId: string): Promise<WorkerBlockout[]>;
+  getWorkerBlockoutById(id: string): Promise<WorkerBlockout | undefined>;
+  createWorkerBlockout(data: InsertWorkerBlockout): Promise<WorkerBlockout>;
+  deleteWorkerBlockout(id: string): Promise<void>;
+  getWorkerByUserId(userId: string): Promise<(import("@shared/schema").Worker) | undefined>;
+  getShifts(filters: { participantId?: string; workerId?: string; dateFrom?: string; dateTo?: string }): Promise<Shift[]>;
+  getShift(id: string): Promise<Shift | undefined>;
+  createShift(data: InsertShift): Promise<Shift>;
+  updateShiftStatus(id: string, status: string, serviceSessionId?: string): Promise<Shift | undefined>;
+  deleteShift(id: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -418,6 +437,98 @@ export class DatabaseStorage implements IStorage {
       .where(eq(invoices.id, invoiceId))
       .returning();
     return invoice;
+  }
+
+  async getWorkerAvailabilityById(id: string): Promise<WorkerAvailability | undefined> {
+    const [slot] = await db.select().from(workerAvailability)
+      .where(eq(workerAvailability.id, id));
+    return slot;
+  }
+  async getWorkerAvailability(workerId: string): Promise<WorkerAvailability[]> {
+    return db.select().from(workerAvailability)
+      .where(eq(workerAvailability.workerId, workerId));
+  }
+
+  async createWorkerAvailability(data: InsertWorkerAvailability): Promise<WorkerAvailability> {
+    const [slot] = await db.insert(workerAvailability).values(data).returning();
+    return slot;
+  }
+
+  async deleteWorkerAvailability(id: string): Promise<void> {
+    await db.delete(workerAvailability).where(eq(workerAvailability.id, id));
+  }
+
+  async setWorkerAvailabilityBulk(workerId: string, slots: InsertWorkerAvailability[]): Promise<WorkerAvailability[]> {
+    await db.delete(workerAvailability).where(eq(workerAvailability.workerId, workerId));
+    if (slots.length === 0) return [];
+    const results = await db.insert(workerAvailability)
+      .values(slots.map(s => ({ ...s, workerId })))
+      .returning();
+    return results;
+  }
+
+  async getWorkerBlockoutById(id: string): Promise<WorkerBlockout | undefined> {
+    const [blockout] = await db.select().from(workerBlockouts)
+      .where(eq(workerBlockouts.id, id));
+    return blockout;
+  }
+
+  async getWorkerBlockouts(workerId: string): Promise<WorkerBlockout[]> {
+    return db.select().from(workerBlockouts)
+      .where(eq(workerBlockouts.workerId, workerId));
+  }
+
+  async createWorkerBlockout(data: InsertWorkerBlockout): Promise<WorkerBlockout> {
+    const [blockout] = await db.insert(workerBlockouts).values(data).returning();
+    return blockout;
+  }
+
+  async deleteWorkerBlockout(id: string): Promise<void> {
+    await db.delete(workerBlockouts).where(eq(workerBlockouts.id, id));
+  }
+
+  async getWorkerByUserId(userId: string): Promise<(import("@shared/schema").Worker) | undefined> {
+    const [worker] = await db.select().from(workers).where(eq(workers.userId, userId));
+    return worker;
+  }
+
+  async getShifts(filters: { participantId?: string; workerId?: string; dateFrom?: string; dateTo?: string }): Promise<Shift[]> {
+    const conditions = [];
+    if (filters.participantId) conditions.push(eq(shifts.participantId, filters.participantId));
+    if (filters.workerId) conditions.push(eq(shifts.workerId, filters.workerId));
+    if (filters.dateFrom) conditions.push(gte(shifts.date, filters.dateFrom));
+    if (filters.dateTo) conditions.push(lte(shifts.date, filters.dateTo));
+
+    if (conditions.length === 0) {
+      return db.select().from(shifts).orderBy(desc(shifts.date));
+    }
+    return db.select().from(shifts)
+      .where(and(...conditions))
+      .orderBy(desc(shifts.date));
+  }
+
+  async getShift(id: string): Promise<Shift | undefined> {
+    const [shift] = await db.select().from(shifts).where(eq(shifts.id, id));
+    return shift;
+  }
+
+  async createShift(data: InsertShift): Promise<Shift> {
+    const [shift] = await db.insert(shifts).values(data).returning();
+    return shift;
+  }
+
+  async updateShiftStatus(id: string, status: string, serviceSessionId?: string): Promise<Shift | undefined> {
+    const updateData: Partial<{ status: string; serviceSessionId: string }> = { status };
+    if (serviceSessionId) updateData.serviceSessionId = serviceSessionId;
+    const [shift] = await db.update(shifts)
+      .set(updateData)
+      .where(eq(shifts.id, id))
+      .returning();
+    return shift;
+  }
+
+  async deleteShift(id: string): Promise<void> {
+    await db.delete(shifts).where(eq(shifts.id, id));
   }
 }
 

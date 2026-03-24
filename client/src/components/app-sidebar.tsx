@@ -15,6 +15,7 @@ import {
   FileText,
   Bot,
   LogOut,
+  CalendarDays,
 } from "lucide-react";
 import {
   Sidebar,
@@ -42,6 +43,7 @@ import logoImage from "@assets/Accessible_Australia_Logo_Design_1772582762574.pn
 const navItems = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard, audioDesc: "View your dashboard overview" },
   { title: "Book a Carer", url: "/care", icon: HeartHandshake, audioDesc: "Find and book verified NDIS support workers" },
+  { title: "Shifts", url: "/shifts", icon: CalendarDays, audioDesc: "Manage shift schedules and track NDIS goal alignment" },
   { title: "Find a Job", url: "/jobs", icon: Briefcase, audioDesc: "Browse disability support employment opportunities" },
   { title: "Get Transport", url: "/transport", icon: Bus, audioDesc: "Arrange wheelchair accessible transport services" },
   { title: "MapAble Chat", url: "/chat", icon: Bot, audioDesc: "Chat with your accessibility-aware travel assistant" },
