@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, integer, boolean, timestamp, decimal, pgEnum, jsonb, serial } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, integer, boolean, timestamp, decimal, pgEnum, jsonb, json, serial, uuid } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -7,7 +7,7 @@ export const userRoleEnum = pgEnum("user_role", ["participant", "carer", "provid
 export const bookingStatusEnum = pgEnum("booking_status", ["pending", "confirmed", "in_progress", "completed", "cancelled"]);
 export const jobStatusEnum = pgEnum("job_status", ["open", "applied", "interviewing", "filled", "closed"]);
 export const transportStatusEnum = pgEnum("transport_status", ["requested", "accepted", "in_transit", "completed", "cancelled"]);
-export const invoiceStatusEnum = pgEnum("invoice_status", ["draft", "submitted", "paid"]);
+export const invoiceStatusEnum = pgEnum("invoice_status", ["draft", "submitted", "pending", "processing", "paid", "failed"]);
 export const sessionStatusEnum = pgEnum("session_status", ["in_progress", "completed", "cancelled"]);
 export const budgetCategoryEnum = pgEnum("budget_category", ["daily_living", "transport", "capacity_building"]);
 
@@ -29,6 +29,10 @@ export const users = pgTable("users", {
   planStartDate: text("plan_start_date"),
   planEndDate: text("plan_end_date"),
   phoneNumber: text("phone_number"),
+  auth0Sub: text("auth0_sub"),
+  stripeCustomerId: text("stripe_customer_id"),
+  orbCustomerId: text("orb_customer_id"),
+  orbSubscriptionId: text("orb_subscription_id"),
 });
 
 export const workers = pgTable("workers", {
@@ -158,6 +162,8 @@ export const invoices = pgTable("invoices", {
   status: invoiceStatusEnum("status").notNull().default("draft"),
   lineItems: jsonb("line_items"),
   generatedAt: timestamp("generated_at").defaultNow(),
+  stripePaymentIntentId: text("stripe_payment_intent_id"),
+  stripePaymentStatus: text("stripe_payment_status"),
 });
 
 export const reviews = pgTable("reviews", {
@@ -279,6 +285,7 @@ export const insertServiceSessionSchema = createInsertSchema(serviceSessions).pi
   totalCharge: true,
   shiftNotes: true,
   date: true,
+  status: true,
 });
 
 export const insertTransportTripSchema = createInsertSchema(transportTrips).pick({
@@ -294,6 +301,7 @@ export const insertTransportTripSchema = createInsertSchema(transportTrips).pick
   totalCharge: true,
   ndisItemCode: true,
   date: true,
+  status: true,
 });
 
 export const insertInvoiceSchema = createInsertSchema(invoices).pick({
@@ -347,6 +355,64 @@ export type InsertReview = z.infer<typeof insertReviewSchema>;
 export type Review = typeof reviews.$inferSelect;
 export type InsertParticipantBudget = z.infer<typeof insertParticipantBudgetSchema>;
 export type ParticipantBudget = typeof participantBudgets.$inferSelect;
+
+export const shiftStatusEnum = pgEnum("shift_status", ["scheduled", "confirmed", "in_progress", "completed", "cancelled"]);
+
+export const shifts = pgTable("shifts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  participantId: varchar("participant_id").notNull(),
+  workerId: varchar("worker_id").notNull(),
+  date: text("date").notNull(),
+  startTime: text("start_time").notNull(),
+  endTime: text("end_time").notNull(),
+  ndisGoal: text("ndis_goal"),
+  ndisCategory: text("ndis_category"),
+  status: shiftStatusEnum("status").notNull().default("scheduled"),
+  recurrenceRule: text("recurrence_rule"),
+  notes: text("notes"),
+  serviceSessionId: varchar("service_session_id"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const ndisPlanCache = pgTable("ndis_plan_cache", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  participantId: varchar("participant_id").notNull(),
+  planData: jsonb("plan_data"),
+  goals: jsonb("goals"),
+  fetchedAt: timestamp("fetched_at").defaultNow(),
+});
+
+export const session = pgTable("session", {
+  sid: varchar("sid").primaryKey(),
+  sess: json("sess").notNull(),
+  expire: timestamp("expire", { precision: 6 }).notNull(),
+  id: uuid("id"),
+  userId: uuid("userId"),
+  expiresAt: timestamp("expiresAt", { withTimezone: true }),
+  createdAt: timestamp("createdAt", { withTimezone: true }),
+  updatedAt: timestamp("updatedAt", { withTimezone: true }),
+  activeOrganizationId: text("activeOrganizationId"),
+  token: text("token"),
+  ipAddress: text("ipAddress"),
+  userAgent: text("userAgent"),
+  impersonatedBy: text("impersonatedBy"),
+});
+
+export const workerAvailability = pgTable("worker_availability", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  workerId: varchar("worker_id").notNull(),
+  dayOfWeek: integer("day_of_week").notNull(),
+  startTime: text("start_time").notNull(),
+  endTime: text("end_time").notNull(),
+  isRecurring: boolean("is_recurring").default(true),
+});
+
+export const workerBlockouts = pgTable("worker_blockouts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  workerId: varchar("worker_id").notNull(),
+  date: text("date").notNull(),
+  reason: text("reason"),
+});
 
 export const moderationStatusEnum = pgEnum("moderation_status", ["unverified", "verified", "rejected", "expired"]);
 export const barrierTypeEnum = pgEnum("barrier_type", ["lift_out", "ramp_blocked", "path_closed", "door_too_heavy", "kerb_ramp_missing", "inaccessible_toilet", "unsafe_crossing", "driver_bypass", "helpful_staff", "other"]);

@@ -20,6 +20,8 @@ import {
   getSessionMessages,
   deleteChatSession,
 } from "./chat-engine";
+import { getStripe, stripeEnabled } from "./stripe";
+import { orbEnabled, createOrbCustomer, createOrbSubscription, ingestCareHoursEvent, ingestTransportKmEvent, getCustomerUsage, verifyAndUnwrapWebhook } from "./orb";
 
 const patchUserSchema = z.object({
   fullName: z.string().min(1).max(200).optional(),
@@ -39,6 +41,23 @@ export async function registerRoutes(
   app: Express
 ): Promise<Server> {
 
+  async function provisionOrbBilling(user: { id: string; fullName: string; email: string; orbCustomerId: string | null }) {
+    if (user.orbCustomerId || !orbEnabled()) return;
+    try {
+      const orbCustomer = await createOrbCustomer(user.id, user.fullName, user.email);
+      let orbSubId: string | null = null;
+      try {
+        const sub = await createOrbSubscription(orbCustomer.id);
+        orbSubId = sub?.id || null;
+      } catch (e) {
+        console.error("Orb subscription creation failed:", e);
+      }
+      await storage.updateUserOrbIds(user.id, orbCustomer.id, orbSubId);
+    } catch (e) {
+      console.error("Orb customer provisioning failed:", e);
+    }
+  }
+
   app.post("/api/auth/login", async (req, res) => {
     const { username, password } = req.body;
     if (!username || !password) {
@@ -49,6 +68,7 @@ export async function registerRoutes(
       return res.status(401).json({ message: "Invalid username or password" });
     }
     req.session.userId = user.id;
+
     const { password: _, ...safeUser } = user;
     res.json(safeUser);
   });
@@ -77,7 +97,14 @@ export async function registerRoutes(
   });
 
   app.use("/api", (req, res, next) => {
-    if (req.path === "/auth/login" || req.path === "/auth/logout" || req.path === "/auth/me") {
+    if (
+      req.path === "/auth/login" ||
+      req.path === "/auth/logout" ||
+      req.path === "/auth/me" ||
+      req.path === "/webhooks/stripe" ||
+      req.path === "/webhooks/orb" ||
+      req.path === "/stripe/config"
+    ) {
       return next();
     }
     requireAuth(req, res, next);
@@ -225,13 +252,30 @@ export async function registerRoutes(
     }
 
     if (data.endTime && data.actualHours) {
-      (data as any).status = "completed";
+      data.status = "completed";
     }
 
     const session = await storage.createServiceSession(data);
 
     if (session.totalCharge) {
       await storage.updateBudgetUsage(data.participantId, "daily_living", Number(session.totalCharge));
+    }
+
+    if (session.status === "completed" && orbEnabled()) {
+      const participant = await storage.getUser(data.participantId);
+      if (participant && !participant.orbCustomerId) {
+        await provisionOrbBilling(participant);
+      }
+      try {
+        await ingestCareHoursEvent(
+          data.participantId,
+          Number(session.actualHours || 0),
+          session.tierApplied || "Standard",
+          session.id,
+        );
+      } catch (e) {
+        console.error("Orb usage ingest failed for session:", e);
+      }
     }
 
     res.status(201).json(session);
@@ -269,13 +313,30 @@ export async function registerRoutes(
     }
 
     if (data.distanceKm) {
-      (data as any).status = "completed";
+      data.status = "completed";
     }
 
     const trip = await storage.createTransportTrip(data);
 
     if (trip.totalCharge) {
       await storage.updateBudgetUsage(data.participantId, "transport", Number(trip.totalCharge));
+    }
+
+    if (trip.status === "completed" && orbEnabled()) {
+      const participant = await storage.getUser(data.participantId);
+      if (participant && !participant.orbCustomerId) {
+        await provisionOrbBilling(participant);
+      }
+      try {
+        await ingestTransportKmEvent(
+          data.participantId,
+          Number(trip.distanceKm || 0),
+          trip.tierApplied || "Standard",
+          trip.id,
+        );
+      } catch (e) {
+        console.error("Orb usage ingest failed for trip:", e);
+      }
     }
 
     res.status(201).json(trip);
@@ -394,6 +455,207 @@ export async function registerRoutes(
       description: description || null,
     });
     res.status(201).json(report);
+  });
+
+  app.get("/api/stripe/config", (_req, res) => {
+    res.json({
+      publishableKey: process.env.STRIPE_PUBLISHABLE_KEY || "",
+      enabled: stripeEnabled(),
+    });
+  });
+
+  app.post("/api/payments/create-intent", requireAuth, async (req, res) => {
+    if (!stripeEnabled()) {
+      return res.status(503).json({ message: "Stripe is not configured" });
+    }
+    const { invoiceId } = req.body;
+    if (!invoiceId) return res.status(400).json({ message: "invoiceId required" });
+
+    const invoice = await storage.getInvoiceById(invoiceId);
+    if (!invoice) return res.status(404).json({ message: "Invoice not found" });
+    if (invoice.participantId !== req.session.userId) {
+      return res.status(403).json({ message: "Not authorized to pay this invoice" });
+    }
+    if (invoice.status === "paid") return res.status(400).json({ message: "Invoice already paid" });
+
+    if (invoice.status === "pending" || invoice.status === "processing") {
+      if (invoice.stripePaymentIntentId) {
+        const existingPi = await getStripe().paymentIntents.retrieve(invoice.stripePaymentIntentId);
+        if (existingPi.status !== "canceled" && existingPi.status !== "succeeded") {
+          return res.json({ clientSecret: existingPi.client_secret, paymentIntentId: existingPi.id });
+        }
+      }
+    }
+
+    const user = await storage.getUser(invoice.participantId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    let stripeCustomerId = user.stripeCustomerId;
+    if (!stripeCustomerId) {
+      const customer = await getStripe().customers.create({
+        name: user.fullName,
+        email: user.email,
+        metadata: { userId: user.id, ndisNumber: user.ndisNumber || "" },
+      });
+      stripeCustomerId = customer.id;
+      await storage.updateUserStripeCustomerId(user.id, stripeCustomerId);
+    }
+
+    const amountCents = Math.round(Number(invoice.totalAmount) * 100);
+
+    const paymentIntent = await getStripe().paymentIntents.create({
+      amount: amountCents,
+      currency: "aud",
+      customer: stripeCustomerId,
+      payment_method_types: ["link", "card"],
+      metadata: {
+        invoiceId: invoice.id,
+        participantId: invoice.participantId,
+        periodStart: invoice.periodStart,
+        periodEnd: invoice.periodEnd,
+      },
+    });
+
+    await storage.updateInvoicePayment(invoice.id, {
+      stripePaymentIntentId: paymentIntent.id,
+      stripePaymentStatus: paymentIntent.status,
+      status: "pending",
+    });
+
+    res.json({ clientSecret: paymentIntent.client_secret, paymentIntentId: paymentIntent.id });
+  });
+
+  app.post("/api/webhooks/stripe", async (req, res) => {
+    if (!stripeEnabled()) return res.status(503).send();
+
+    const sig = req.headers["stripe-signature"] as string;
+    let event;
+
+    try {
+      event = getStripe().webhooks.constructEvent(
+        req.rawBody as Buffer,
+        sig,
+        process.env.STRIPE_WEBHOOK_SECRET!,
+      );
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Unknown error";
+      console.error("Stripe webhook signature verification failed:", message);
+      return res.status(400).send(`Webhook Error: ${message}`);
+    }
+
+    switch (event.type) {
+      case "payment_intent.succeeded": {
+        const pi = event.data.object;
+        const invoiceId = pi.metadata?.invoiceId;
+        if (invoiceId) {
+          await storage.updateInvoicePayment(invoiceId, {
+            stripePaymentStatus: "succeeded",
+            status: "paid",
+          });
+        }
+        break;
+      }
+      case "payment_intent.processing": {
+        const pi = event.data.object;
+        const invoiceId = pi.metadata?.invoiceId;
+        if (invoiceId) {
+          await storage.updateInvoicePayment(invoiceId, {
+            stripePaymentStatus: "processing",
+            status: "processing",
+          });
+        }
+        break;
+      }
+      case "payment_intent.payment_failed": {
+        const pi = event.data.object;
+        const invoiceId = pi.metadata?.invoiceId;
+        if (invoiceId) {
+          await storage.updateInvoicePayment(invoiceId, {
+            stripePaymentStatus: "failed",
+            status: "failed",
+          });
+        }
+        break;
+      }
+    }
+
+    res.json({ received: true });
+  });
+
+  app.post("/api/webhooks/orb", async (req, res) => {
+    if (!orbEnabled()) {
+      return res.status(503).json({ message: "Orb not configured" });
+    }
+
+    let event: Record<string, unknown>;
+    try {
+      const rawBody = typeof req.rawBody === "string" ? req.rawBody : (req.rawBody as Buffer).toString("utf8");
+      event = verifyAndUnwrapWebhook(rawBody, req.headers as Record<string, string | string[] | undefined>);
+    } catch (e) {
+      console.error("Orb webhook verification failed:", e);
+      return res.status(401).json({ message: "Invalid Orb webhook signature" });
+    }
+    const eventData = event.data as Record<string, unknown> | undefined;
+    const eventCustomer = (eventData?.customer as Record<string, unknown>) || {};
+
+    if (event.type === "subscription.billing_period_ended") {
+      const customerId = eventCustomer.external_customer_id as string | undefined;
+      if (customerId) {
+        const periodStart = eventData?.billing_period_start as string | undefined;
+        const periodEnd = eventData?.billing_period_end as string | undefined;
+        if (periodStart && periodEnd) {
+          try {
+            await storage.generateInvoice(customerId, periodStart, periodEnd);
+          } catch (e) {
+            console.error("Orb webhook invoice generation failed:", e);
+          }
+        }
+      }
+    } else if (event.type === "invoice.issued") {
+      const externalCustomerId = eventCustomer.external_customer_id as string | undefined;
+      const orbInvoiceTotal = eventData?.total;
+      if (externalCustomerId) {
+        console.log(`Orb invoice issued for customer ${externalCustomerId}, total: ${orbInvoiceTotal}`);
+      }
+    }
+    res.json({ received: true });
+  });
+
+  app.post("/api/billing/setup-orb", requireAuth, async (req, res) => {
+    if (!orbEnabled()) return res.status(503).json({ message: "Orb is not configured" });
+
+    const user = await storage.getUser(req.session.userId!);
+    if (!user) return res.status(404).json({ message: "User not found" });
+    if (user.role !== "participant") return res.status(403).json({ message: "Only participants can set up billing" });
+
+    if (user.orbCustomerId) {
+      return res.json({ orbCustomerId: user.orbCustomerId, orbSubscriptionId: user.orbSubscriptionId });
+    }
+
+    await provisionOrbBilling(user);
+
+    const updatedUser = await storage.getUser(user.id);
+    if (!updatedUser?.orbCustomerId) {
+      return res.status(500).json({ message: "Failed to set up Orb billing" });
+    }
+    res.json({ orbCustomerId: updatedUser.orbCustomerId, orbSubscriptionId: updatedUser.orbSubscriptionId });
+  });
+
+  app.get("/api/billing/usage", requireAuth, async (req, res) => {
+    const user = await storage.getUser(req.session.userId!);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    if (!user.orbCustomerId || !orbEnabled()) {
+      return res.json({ usage: null, orbEnabled: orbEnabled() });
+    }
+
+    try {
+      const usageData = await getCustomerUsage(user.orbCustomerId);
+      res.json({ usage: usageData, orbEnabled: true });
+    } catch (e) {
+      console.error("Failed to fetch Orb usage:", e);
+      res.json({ usage: null, orbEnabled: true });
+    }
   });
 
   return httpServer;

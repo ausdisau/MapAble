@@ -59,6 +59,10 @@ export interface IStorage {
   upsertAccessProfile(userId: string, data: Partial<InsertAccessContextProfile>): Promise<AccessContextProfile>;
   getCommunityReports(): Promise<CommunityReport[]>;
   createCommunityReport(data: InsertCommunityReport): Promise<CommunityReport>;
+  updateUserStripeCustomerId(userId: string, stripeCustomerId: string): Promise<User | undefined>;
+  updateUserOrbIds(userId: string, orbCustomerId: string, orbSubscriptionId: string | null): Promise<User | undefined>;
+  getInvoiceById(id: string): Promise<Invoice | undefined>;
+  updateInvoicePayment(invoiceId: string, data: { stripePaymentIntentId?: string; stripePaymentStatus?: string; status?: string }): Promise<Invoice | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -381,6 +385,39 @@ export class DatabaseStorage implements IStorage {
       })
       .returning();
     return report;
+  }
+
+  async updateUserStripeCustomerId(userId: string, stripeCustomerId: string): Promise<User | undefined> {
+    const [user] = await db.update(users)
+      .set({ stripeCustomerId })
+      .where(eq(users.id, userId))
+      .returning();
+    return user;
+  }
+
+  async updateUserOrbIds(userId: string, orbCustomerId: string, orbSubscriptionId: string | null): Promise<User | undefined> {
+    const [user] = await db.update(users)
+      .set({ orbCustomerId, orbSubscriptionId })
+      .where(eq(users.id, userId))
+      .returning();
+    return user;
+  }
+
+  async getInvoiceById(id: string): Promise<Invoice | undefined> {
+    const [invoice] = await db.select().from(invoices).where(eq(invoices.id, id));
+    return invoice;
+  }
+
+  async updateInvoicePayment(invoiceId: string, data: { stripePaymentIntentId?: string; stripePaymentStatus?: string; status?: string }): Promise<Invoice | undefined> {
+    const setData: Record<string, any> = {};
+    if (data.stripePaymentIntentId) setData.stripePaymentIntentId = data.stripePaymentIntentId;
+    if (data.stripePaymentStatus) setData.stripePaymentStatus = data.stripePaymentStatus;
+    if (data.status) setData.status = data.status;
+    const [invoice] = await db.update(invoices)
+      .set(setData)
+      .where(eq(invoices.id, invoiceId))
+      .returning();
+    return invoice;
   }
 }
 

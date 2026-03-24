@@ -34,13 +34,13 @@ args = "Start application"
 name = "Start application"
 author = "agent"
 
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "php -S 0.0.0.0:5000 -t php/public"
-waitForPort = 5000
-
 [workflows.workflow.metadata]
 outputType = "webview"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run dev"
+waitForPort = 5000
 
 [objectStorage]
 defaultBucketID = "replit-objstore-f974be9b-d8e8-48b3-99db-cb41e9ac325e"
@@ -53,3 +53,7 @@ integrations = ["javascript_object_storage:2.0.0", "javascript_openai_ai_integra
 [userenv.shared]
 AUTH0_DOMAIN = "adid.au.auth0.com"
 AUTH0_CLIENT_ID = "ggZYPtlnLhP55XtJQCEQj4780TiAZfOe"
+
+[postMerge]
+path = "scripts/post-merge.sh"
+timeoutMs = 120000
