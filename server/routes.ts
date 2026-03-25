@@ -17,7 +17,7 @@ import {
   insertShiftSchema,
 } from "@shared/schema";
 import { z } from "zod";
-import { syncParticipantPlan, getCachedPlan, fetchPriceGuide, validateRateAgainstPriceGuide, submitNdisClaim } from "./ndis-api";
+import { syncParticipantPlan, getCachedPlan, fetchPriceGuide, validateRateAgainstPriceGuide, submitNdisClaim, lookupParticipant, lookupProvider, lookupWorkerScreening } from "./ndis-api";
 
 async function getWorkerIdForUser(userId: string): Promise<string | null> {
   const worker = await storage.getWorkerByUserId(userId);
@@ -74,7 +74,18 @@ export async function registerRoutes(
       return res.status(400).json({ message: "Username and password are required" });
     }
     const user = await storage.getUserByUsername(username);
-    if (!user || user.password !== password) {
+    if (!user) {
+      return res.status(401).json({ message: "Invalid username or password" });
+    }
+    let passwordMatch = false;
+    if (user.password.includes(":")) {
+      const [salt, hash] = user.password.split(":");
+      const inputHash = crypto.createHash("sha256").update(salt + password).digest("hex");
+      passwordMatch = hash === inputHash;
+    } else {
+      passwordMatch = user.password === password;
+    }
+    if (!passwordMatch) {
       return res.status(401).json({ message: "Invalid username or password" });
     }
     req.session.userId = user.id;
@@ -298,15 +309,182 @@ export async function registerRoutes(
     });
   });
 
+  const lookupRateLimit = new Map<string, { count: number; resetAt: number }>();
+
+  function checkLookupRateLimit(ip: string): boolean {
+    const now = Date.now();
+    const entry = lookupRateLimit.get(ip);
+    if (!entry || now > entry.resetAt) {
+      lookupRateLimit.set(ip, { count: 1, resetAt: now + 60000 });
+      return true;
+    }
+    if (entry.count >= 10) return false;
+    entry.count++;
+    return true;
+  }
+
+  app.get("/api/ndis/lookup/participant/:ndisNumber", async (req, res) => {
+    const ip = req.ip || "unknown";
+    if (!checkLookupRateLimit(ip)) {
+      return res.status(429).json({ message: "Too many lookup requests. Try again later." });
+    }
+    const ndisNumber = req.params.ndisNumber.replace(/\s/g, "");
+    if (!/^\d{6,12}$/.test(ndisNumber)) {
+      return res.status(400).json({ message: "Invalid NDIS number format" });
+    }
+    try {
+      const result = await lookupParticipant(ndisNumber);
+      res.json({
+        ndisNumber: result.ndisNumber,
+        fullName: result.fullName,
+        planStartDate: result.planStartDate,
+        planEndDate: result.planEndDate,
+        managementType: result.managementType,
+      });
+    } catch (error) {
+      console.error("Participant lookup error:", error);
+      res.status(500).json({ message: "Failed to look up participant" });
+    }
+  });
+
+  app.get("/api/ndis/lookup/provider/:identifier", async (req, res) => {
+    const ip = req.ip || "unknown";
+    if (!checkLookupRateLimit(ip)) {
+      return res.status(429).json({ message: "Too many lookup requests. Try again later." });
+    }
+    const identifier = req.params.identifier.replace(/\s/g, "");
+    if (!/^[\w\d]{5,20}$/.test(identifier)) {
+      return res.status(400).json({ message: "Invalid provider identifier format" });
+    }
+    try {
+      const result = await lookupProvider(identifier);
+      res.json({
+        providerNumber: result.providerNumber,
+        businessName: result.businessName,
+        abn: result.abn,
+        registrationGroups: result.registrationGroups,
+      });
+    } catch (error) {
+      console.error("Provider lookup error:", error);
+      res.status(500).json({ message: "Failed to look up provider" });
+    }
+  });
+
+  app.get("/api/ndis/lookup/worker/:screeningNumber", async (req, res) => {
+    const ip = req.ip || "unknown";
+    if (!checkLookupRateLimit(ip)) {
+      return res.status(429).json({ message: "Too many lookup requests. Try again later." });
+    }
+    const screeningNumber = req.params.screeningNumber.replace(/\s/g, "");
+    if (!/^[A-Za-z0-9]{5,20}$/.test(screeningNumber)) {
+      return res.status(400).json({ message: "Invalid screening number format" });
+    }
+    try {
+      const result = await lookupWorkerScreening(screeningNumber);
+      res.json({
+        screeningNumber: result.screeningNumber,
+        fullName: result.fullName,
+        clearanceStatus: result.clearanceStatus,
+        expiryDate: result.expiryDate,
+      });
+    } catch (error) {
+      console.error("Worker screening lookup error:", error);
+      res.status(500).json({ message: "Failed to look up worker screening" });
+    }
+  });
+
+  const registerSchema = z.object({
+    username: z.string().min(3).max(50),
+    password: z.string().min(6).max(100),
+    fullName: z.string().min(1).max(200),
+    email: z.string().email().max(200),
+    role: z.enum(["participant", "carer", "provider"]),
+    ndisNumber: z.string().optional(),
+    planStartDate: z.string().optional(),
+    planEndDate: z.string().optional(),
+    managementType: z.string().optional(),
+    location: z.string().optional(),
+    workerTitle: z.string().optional(),
+    workerSpecializations: z.array(z.string()).optional(),
+    abn: z.string().optional(),
+    providerBusinessName: z.string().optional(),
+    providerRegistrationGroups: z.array(z.string()).optional(),
+    screeningNumber: z.string().optional(),
+    screeningClearanceStatus: z.string().optional(),
+    screeningExpiry: z.string().optional(),
+  });
+
+  app.post("/api/auth/register", async (req, res) => {
+    try {
+      const data = registerSchema.parse(req.body);
+
+      const existingUsername = await storage.getUserByUsername(data.username);
+      if (existingUsername) {
+        return res.status(400).json({ message: "Username already taken" });
+      }
+
+      const existingEmail = await storage.getUserByEmail(data.email);
+      if (existingEmail) {
+        return res.status(400).json({ message: "Email already registered" });
+      }
+
+      const userId = crypto.randomBytes(8).toString("hex");
+      const salt = crypto.randomBytes(16).toString("hex");
+      const hashedPassword = salt + ":" + crypto.createHash("sha256").update(salt + data.password).digest("hex");
+      const user = await storage.createUser({
+        id: userId,
+        username: data.username,
+        password: hashedPassword,
+        fullName: data.fullName,
+        email: data.email,
+        role: data.role === "carer" ? "carer" : data.role,
+        ndisNumber: data.ndisNumber || null,
+        planStartDate: data.planStartDate || null,
+        planEndDate: data.planEndDate || null,
+        location: data.location || null,
+        isVerified: false,
+        managementType: data.role === "participant" ? (data.managementType || null) : null,
+        providerAbn: data.role === "provider" ? (data.abn || null) : null,
+        providerBusinessName: data.role === "provider" ? (data.providerBusinessName || null) : null,
+        providerRegistrationGroups: data.role === "provider" ? (data.providerRegistrationGroups || null) : null,
+      });
+
+      if (data.role === "carer") {
+        await storage.createWorker({
+          userId: user.id,
+          title: data.workerTitle || "Support Worker",
+          specializations: data.workerSpecializations || [],
+          ndisVerified: false,
+          abn: data.abn || null,
+          screeningNumber: data.screeningNumber || null,
+          screeningClearanceStatus: data.screeningClearanceStatus || null,
+          screeningExpiry: data.screeningExpiry || null,
+        });
+      }
+
+      req.session.userId = user.id;
+      const { password: _, ...safeUser } = user;
+      res.status(201).json(safeUser);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      console.error("Registration error:", error);
+      res.status(500).json({ message: "Registration failed" });
+    }
+  });
+
   app.use("/api", (req, res, next) => {
     if (
       req.path === "/auth/login" ||
       req.path === "/auth/logout" ||
       req.path === "/auth/me" ||
+      req.path === "/auth/register" ||
       req.path === "/auth/auth0/config" ||
       req.path === "/auth/auth0/login" ||
       req.path === "/auth/auth0/callback" ||
       req.path === "/auth/auth0/logout" ||
+      req.path.startsWith("/ndis/lookup/") ||
       req.path === "/webhooks/stripe" ||
       req.path === "/webhooks/orb" ||
       req.path === "/stripe/config"
