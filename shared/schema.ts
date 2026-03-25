@@ -165,6 +165,8 @@ export const invoices = pgTable("invoices", {
   periodStart: text("period_start").notNull(),
   periodEnd: text("period_end").notNull(),
   totalAmount: decimal("total_amount", { precision: 10, scale: 2 }).notNull(),
+  gstAmount: decimal("gst_amount", { precision: 10, scale: 2 }).default("0"),
+  totalIncGst: decimal("total_inc_gst", { precision: 10, scale: 2 }),
   ndisClaimable: decimal("ndis_claimable", { precision: 10, scale: 2 }),
   status: invoiceStatusEnum("status").notNull().default("draft"),
   lineItems: jsonb("line_items"),

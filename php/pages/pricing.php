@@ -1,16 +1,16 @@
 <?php
 $pageTitle = 'Pricing';
 $careTiers = [
-    ['name' => 'Basic Care', 'rate' => '$70.23/hr', 'range' => '0–10 hours/month', 'code' => '01_011_0107_1_1', 'color' => 'teal'],
-    ['name' => 'Standard Care', 'rate' => '$68.00/hr', 'range' => '11–30 hours/month', 'code' => '01_011_0107_1_1', 'color' => 'blue'],
-    ['name' => 'High Support', 'rate' => '$65.00/hr', 'range' => '31+ hours/month', 'code' => '01_011_0107_1_1', 'color' => 'gold'],
-    ['name' => 'Complex Care', 'rate' => '$85.00/hr', 'range' => 'Specialist support', 'code' => '01_015_0107_1_1', 'color' => 'red'],
+    ['name' => 'Basic Care', 'rate' => '$70.23/hr', 'range' => '0–10 hours/month', 'code' => '01_011_0107_1_1', 'color' => 'teal', 'gst' => 'free'],
+    ['name' => 'Standard Care', 'rate' => '$68.00/hr', 'range' => '11–30 hours/month', 'code' => '01_011_0107_1_1', 'color' => 'blue', 'gst' => 'free'],
+    ['name' => 'High Support', 'rate' => '$65.00/hr', 'range' => '31+ hours/month', 'code' => '01_011_0107_1_1', 'color' => 'gold', 'gst' => 'free'],
+    ['name' => 'Complex Care', 'rate' => '$85.00/hr', 'range' => 'Specialist support', 'code' => '01_015_0107_1_1', 'color' => 'red', 'gst' => 'free'],
 ];
 $transportTiers = [
-    ['name' => 'Basic Mobility', 'rate' => '$0.99/km', 'range' => '0–100 km/month', 'code' => '02_051_0108_1_1', 'color' => 'teal'],
-    ['name' => 'Standard Mobility', 'rate' => '$0.90/km', 'range' => '101–300 km/month', 'code' => '02_051_0108_1_1', 'color' => 'blue'],
-    ['name' => 'High Mobility', 'rate' => '$0.85/km', 'range' => '301+ km/month', 'code' => '02_051_0108_1_1', 'color' => 'gold'],
-    ['name' => 'Accessible Vehicle', 'rate' => '+$0.15/km', 'range' => 'Wheelchair capable', 'code' => '02_051_0108_1_1', 'color' => 'red'],
+    ['name' => 'Basic Mobility', 'rate' => '$0.99/km', 'range' => '0–100 km/month', 'code' => '02_051_0108_1_1', 'color' => 'teal', 'gst' => '10%'],
+    ['name' => 'Standard Mobility', 'rate' => '$0.90/km', 'range' => '101–300 km/month', 'code' => '02_051_0108_1_1', 'color' => 'blue', 'gst' => '10%'],
+    ['name' => 'High Mobility', 'rate' => '$0.85/km', 'range' => '301+ km/month', 'code' => '02_051_0108_1_1', 'color' => 'gold', 'gst' => '10%'],
+    ['name' => 'Accessible Vehicle', 'rate' => '+$0.15/km', 'range' => 'Wheelchair capable', 'code' => '02_051_0108_1_1', 'color' => 'red', 'gst' => '10%'],
 ];
 require __DIR__ . '/../includes/layout_header.php';
 ?>

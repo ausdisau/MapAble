@@ -52,7 +52,18 @@ require __DIR__ . '/../includes/layout_header.php';
                 <p class="text-sm text-gray-500 mt-1"><?= formatDate($inv['period_start']) ?> — <?= formatDate($inv['period_end']) ?></p>
             </div>
             <div class="text-right">
-                <p class="text-xl font-bold text-map-blue"><?= formatCurrency($inv['total_amount']) ?></p>
+                <?php
+                $invGst = (float)($inv['gst_amount'] ?? 0);
+                $invTotalIncGst = (float)($inv['total_inc_gst'] ?? $inv['total_amount']);
+                ?>
+                <?php if ($invGst > 0): ?>
+                <p class="text-sm text-gray-500 dark:text-gray-400" data-testid="text-subtotal-<?= h($inv['id']) ?>">Subtotal: <?= formatCurrency($inv['total_amount']) ?></p>
+                <p class="text-sm text-gray-500 dark:text-gray-400" data-testid="text-gst-<?= h($inv['id']) ?>">GST (10%): <?= formatCurrency($invGst) ?></p>
+                <p class="text-xl font-bold text-map-blue" data-testid="text-total-<?= h($inv['id']) ?>"><?= formatCurrency($invTotalIncGst) ?> <span class="text-xs font-normal text-gray-400">inc. GST</span></p>
+                <?php else: ?>
+                <p class="text-xl font-bold text-map-blue" data-testid="text-total-<?= h($inv['id']) ?>"><?= formatCurrency($inv['total_amount']) ?></p>
+                <p class="text-xs text-map-teal" data-testid="text-gst-free-<?= h($inv['id']) ?>">GST-Free (NDIS)</p>
+                <?php endif; ?>
                 <span class="badge badge-<?= match($inv['status']) { 'paid' => 'teal', 'submitted' => 'blue', default => 'gold' } ?>"><?= ucfirst($inv['status']) ?></span>
             </div>
         </div>
@@ -70,7 +81,9 @@ require __DIR__ . '/../includes/layout_header.php';
                         <th class="text-left py-2 font-medium text-gray-500">NDIS Code</th>
                         <th class="text-right py-2 font-medium text-gray-500">Qty</th>
                         <th class="text-right py-2 font-medium text-gray-500">Rate</th>
-                        <th class="text-right py-2 font-medium text-gray-500">Subtotal</th>
+                        <th class="text-right py-2 font-medium text-gray-500">Ex-GST</th>
+                        <th class="text-right py-2 font-medium text-gray-500">GST</th>
+                        <th class="text-right py-2 font-medium text-gray-500">Total</th>
                     </tr></thead>
                     <tbody>
                     <?php foreach ($lineItems as $li): ?>
@@ -79,7 +92,15 @@ require __DIR__ . '/../includes/layout_header.php';
                         <td class="py-2 font-mono text-xs"><?= h($li['ndisItemCode'] ?? '') ?></td>
                         <td class="py-2 text-right"><?= number_format($li['quantity'] ?? 0, 1) ?> <?= h($li['unit'] ?? '') ?></td>
                         <td class="py-2 text-right"><?= formatCurrency($li['rate'] ?? 0) ?></td>
-                        <td class="py-2 text-right font-semibold"><?= formatCurrency($li['subtotal'] ?? 0) ?></td>
+                        <td class="py-2 text-right"><?= formatCurrency($li['subtotal'] ?? 0) ?></td>
+                        <td class="py-2 text-right">
+                            <?php if (!empty($li['gst_free'])): ?>
+                            <span class="text-map-teal text-xs">Free</span>
+                            <?php else: ?>
+                            <?= formatCurrency($li['gst_amount'] ?? 0) ?>
+                            <?php endif; ?>
+                        </td>
+                        <td class="py-2 text-right font-semibold"><?= formatCurrency($li['total_inc_gst'] ?? $li['subtotal'] ?? 0) ?></td>
                     </tr>
                     <?php endforeach; ?>
                     </tbody>
@@ -88,8 +109,13 @@ require __DIR__ . '/../includes/layout_header.php';
         </details>
         <?php endif; ?>
 
-        <div class="text-xs text-gray-400">
-            NDIS Claimable: <?= formatCurrency($inv['ndis_claimable'] ?? $inv['total_amount']) ?> · Generated: <?= formatDateTime($inv['generated_at']) ?>
+        <div class="text-xs text-gray-400 space-y-0.5">
+            <p>NDIS Claimable (ex-GST): <?= formatCurrency($inv['ndis_claimable'] ?? $inv['total_amount']) ?> · Generated: <?= formatDateTime($inv['generated_at']) ?></p>
+            <?php if ($invGst > 0): ?>
+            <p class="text-gray-500 dark:text-gray-400">Note: GST of <?= formatCurrency($invGst) ?> applies to transport services. NDIS disability support services are GST-free under Division 38 of the GST Act.</p>
+            <?php else: ?>
+            <p class="text-map-teal">All items on this invoice are GST-free NDIS disability supports.</p>
+            <?php endif; ?>
         </div>
     </div>
     <?php endforeach; ?>
