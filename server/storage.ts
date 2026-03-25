@@ -28,7 +28,10 @@ import { eq, desc, and, sql, gte, lte, inArray } from "drizzle-orm";
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
+  getUserByAuth0Sub(auth0Sub: string): Promise<User | undefined>;
   getUserByRole(role: string): Promise<User | undefined>;
+  updateUserAuth0Sub(id: string, auth0Sub: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUserAvatar(id: string, avatar: string): Promise<User | undefined>;
   updateUserProfile(id: string, data: Partial<{ fullName: string; email: string; location: string }>): Promise<User | undefined>;
@@ -99,8 +102,23 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user;
+  }
+
+  async getUserByAuth0Sub(auth0Sub: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.auth0Sub, auth0Sub));
+    return user;
+  }
+
   async getUserByRole(role: string): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.role, role));
+    return user;
+  }
+
+  async updateUserAuth0Sub(id: string, auth0Sub: string): Promise<User | undefined> {
+    const [user] = await db.update(users).set({ auth0Sub }).where(eq(users.id, id)).returning();
     return user;
   }
 

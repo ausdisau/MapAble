@@ -17,7 +17,7 @@ MapAble 4.0 is a fullstack TypeScript superapp combining core NDIS services:
 - **AI**: OpenAI (via Replit AI Integrations)
 - **Payments**: Stripe (Payment Intents with Link + Card methods)
 - **Usage Metering**: Orb (care hours and transport km billing)
-- **Auth**: Express sessions with login/logout
+- **Auth**: Express sessions with login/logout + Auth0 SSO (Google/Microsoft via PKCE)
 - **Routing**: wouter (frontend), Express (backend API)
 
 ## Brand Identity
@@ -41,7 +41,8 @@ MapAble 4.0 is a fullstack TypeScript superapp combining core NDIS services:
 - `STRIPE_WEBHOOK_SECRET` — Stripe webhook signing secret
 - `ORB_API_KEY` — Orb API key for usage-based billing
 - `AUTH0_DOMAIN` — Auth0 tenant domain (default: `adid.au.auth0.com`)
-- `AUTH0_CLIENT_ID` — Auth0 application Client ID (SPA type)
+- `AUTH0_CLIENT_ID` — Auth0 application Client ID
+- `AUTH0_CLIENT_SECRET` — Auth0 application Client Secret (required for SSO)
 - `ACCESSIBE_SITE_KEY` — accessiBe widget site key for PHP pages (placeholder; replace with real key from accessiBe account)
 - `VITE_ACCESSIBE_SITE_KEY` — accessiBe widget site key for React frontend (set to same value as ACCESSIBE_SITE_KEY)
 
