@@ -567,6 +567,12 @@ export default function WorkerDetailPage() {
             />
           )}
 
+          <Link href="/shifts">
+            <Button variant="outline" className="w-full gap-2 text-xs" data-testid="link-view-shifts">
+              <Calendar className="w-3 h-3" /> View Shift Schedule
+            </Button>
+          </Link>
+
           {!showBooking ? (
             <Button className="w-full" onClick={() => setShowBooking(true)} data-testid="button-start-booking">
               Book This Worker

@@ -5,10 +5,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { AlertCircle, LogIn, Loader2, HeartHandshake, Bus, Briefcase, Bot, ShieldCheck } from "lucide-react";
+import { SiGoogle } from "react-icons/si";
 import logoImage from "@assets/Accessible_Australia_Logo_Design_1772582762574.png";
 
 export default function LoginPage() {
-  const { login, isLoggingIn, loginError } = useAuth();
+  const { login, isLoggingIn, loginError, auth0Enabled } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
@@ -126,6 +127,40 @@ export default function LoginPage() {
                   )}
                 </Button>
               </form>
+
+              {auth0Enabled && (
+                <div className="mt-5">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="flex-1 h-px bg-white/10" />
+                    <span className="text-xs text-white/40 font-medium">or</span>
+                    <div className="flex-1 h-px bg-white/10" />
+                  </div>
+
+                  <div className="space-y-2.5">
+                    <a
+                      href="/api/auth/auth0/login?connection=google-oauth2"
+                      className="flex items-center justify-center gap-2.5 w-full h-11 rounded-md border border-white/15 bg-white/5 text-white text-sm font-medium transition-colors hover:bg-white/10"
+                      data-testid="button-sso-google"
+                    >
+                      <SiGoogle className="w-4 h-4" />
+                      Sign in with Google
+                    </a>
+                    <a
+                      href="/api/auth/auth0/login?connection=windowslive"
+                      className="flex items-center justify-center gap-2.5 w-full h-11 rounded-md border border-white/15 bg-white/5 text-white text-sm font-medium transition-colors hover:bg-white/10"
+                      data-testid="button-sso-microsoft"
+                    >
+                      <svg className="w-4 h-4" viewBox="0 0 21 21" fill="none">
+                        <rect x="1" y="1" width="9" height="9" fill="#F25022"/>
+                        <rect x="11" y="1" width="9" height="9" fill="#7FBA00"/>
+                        <rect x="1" y="11" width="9" height="9" fill="#00A4EF"/>
+                        <rect x="11" y="11" width="9" height="9" fill="#FFB900"/>
+                      </svg>
+                      Sign in with Microsoft
+                    </a>
+                  </div>
+                </div>
+              )}
 
               <div className="mt-6 pt-4 border-t border-white/10">
                 <p className="text-[11px] text-white/40 text-center mb-3">Demo Accounts</p>

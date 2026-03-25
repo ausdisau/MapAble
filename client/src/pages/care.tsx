@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card } from "@/components/ui/card";
-import { Search, SlidersHorizontal, ShieldCheck, Car, Accessibility, Globe, Users, AlertCircle } from "lucide-react";
+import { Search, SlidersHorizontal, ShieldCheck, Car, Accessibility, Globe, Users, AlertCircle, CalendarDays } from "lucide-react";
+import { Link } from "wouter";
 import { useState } from "react";
 import { usePageTitle } from "@/hooks/use-page-title";
 import type { Worker, User } from "@shared/schema";
@@ -55,6 +56,11 @@ export default function CarePage() {
           Find NDIS verified support workers near you. Browse profiles, check qualifications,
           and book services with confidence.
         </p>
+        <Link href="/shifts">
+          <Button variant="outline" className="mt-3 gap-2" data-testid="link-view-shifts">
+            <CalendarDays className="w-4 h-4" /> View Shift Schedule
+          </Button>
+        </Link>
       </div>
 
       <Card className="p-3 shadow-md">

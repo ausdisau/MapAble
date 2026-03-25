@@ -2,7 +2,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import type { User } from "@shared/schema";
 
-type SafeUser = Omit<User, "password">;
+type SafeUser = Omit<User, "password"> & { auth0Login?: boolean };
 
 export function useAuth() {
   const { data: user, isLoading } = useQuery<SafeUser | null>({
@@ -11,6 +11,17 @@ export function useAuth() {
       const res = await fetch("/api/auth/me", { credentials: "include" });
       if (res.status === 401) return null;
       if (!res.ok) throw new Error("Failed to check auth");
+      return res.json();
+    },
+    staleTime: Infinity,
+    retry: false,
+  });
+
+  const { data: auth0Config } = useQuery<{ enabled: boolean; domain: string | null }>({
+    queryKey: ["/api/auth/auth0/config"],
+    queryFn: async () => {
+      const res = await fetch("/api/auth/auth0/config");
+      if (!res.ok) return { enabled: false, domain: null };
       return res.json();
     },
     staleTime: Infinity,
@@ -29,11 +40,22 @@ export function useAuth() {
 
   const logoutMutation = useMutation({
     mutationFn: async () => {
-      await apiRequest("POST", "/api/auth/logout");
-    },
-    onSuccess: () => {
-      queryClient.setQueryData(["/api/auth/me"], null);
-      queryClient.clear();
+      const isAuth0Session = !!user?.auth0Login;
+
+      if (isAuth0Session) {
+        const res = await apiRequest("POST", "/api/auth/auth0/logout");
+        const data = await res.json();
+        queryClient.setQueryData(["/api/auth/me"], null);
+        queryClient.clear();
+        if (data.auth0LogoutUrl) {
+          window.location.href = data.auth0LogoutUrl;
+          return;
+        }
+      } else {
+        await apiRequest("POST", "/api/auth/logout");
+        queryClient.setQueryData(["/api/auth/me"], null);
+        queryClient.clear();
+      }
     },
   });
 
@@ -41,6 +63,7 @@ export function useAuth() {
     user: user ?? null,
     isLoading,
     isAuthenticated: !!user,
+    auth0Enabled: auth0Config?.enabled ?? false,
     login: loginMutation.mutateAsync,
     loginError: loginMutation.error,
     isLoggingIn: loginMutation.isPending,

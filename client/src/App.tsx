@@ -8,7 +8,7 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { ThemeProvider, useTheme } from "@/components/theme-provider";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
-import { Moon, Sun, Search, Bell, Accessibility, LayoutDashboard, HeartHandshake, Briefcase, Bus, MessageSquare, Settings, PanelLeftClose, PanelLeftOpen, DollarSign, Wallet, FileText, Bot, Loader2 } from "lucide-react";
+import { Moon, Sun, Search, Bell, Accessibility, LayoutDashboard, HeartHandshake, Briefcase, Bus, MessageSquare, Settings, PanelLeftClose, PanelLeftOpen, DollarSign, Wallet, FileText, Bot, Loader2, CalendarDays } from "lucide-react";
 import { useState } from "react";
 import { useLocation } from "wouter";
 import logoImage from "@assets/Accessible_Australia_Logo_Design_1772582762574.png";
@@ -33,6 +33,7 @@ import PricingPage from "@/pages/pricing";
 import BudgetPage from "@/pages/budget";
 import InvoicesPage from "@/pages/invoices";
 import ChatPage from "@/pages/chat";
+import ShiftsPage from "@/pages/shifts";
 
 function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
@@ -119,6 +120,7 @@ function MobileSearchButton() {
 const mobileNavItems = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard, audioDesc: "View your dashboard overview" },
   { title: "Book a Carer", url: "/care", icon: HeartHandshake, audioDesc: "Find and book verified NDIS support workers" },
+  { title: "Shifts", url: "/shifts", icon: CalendarDays, audioDesc: "Manage shift schedules and track NDIS goal alignment" },
   { title: "Find a Job", url: "/jobs", icon: Briefcase, audioDesc: "Browse disability support employment opportunities" },
   { title: "Get Transport", url: "/transport", icon: Bus, audioDesc: "Arrange wheelchair accessible transport services" },
   { title: "MapAble Chat", url: "/chat", icon: Bot, audioDesc: "Chat with your accessibility-aware travel assistant" },
@@ -190,6 +192,7 @@ function Router() {
     <Switch>
       <Route path="/" component={Dashboard} />
       <Route path="/care" component={CarePage} />
+      <Route path="/shifts" component={ShiftsPage} />
       <Route path="/care/:id" component={WorkerDetailPage} />
       <Route path="/care/:id/book" component={WorkerDetailPage} />
       <Route path="/jobs" component={JobsPage} />

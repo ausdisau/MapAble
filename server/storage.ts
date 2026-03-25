@@ -13,17 +13,25 @@ import {
   type ParticipantBudget, type InsertParticipantBudget,
   type AccessContextProfile, type InsertAccessContextProfile,
   type CommunityReport, type InsertCommunityReport,
+  type WorkerAvailability, type InsertWorkerAvailability,
+  type WorkerBlockout, type InsertWorkerBlockout,
+  type Shift, type InsertShift,
+  type NdisPlanCache, type InsertNdisPlanCache,
   users, workers, bookings, jobs, transportRequests, messages,
   pricingTiers, serviceSessions, transportTrips, invoices, reviews, participantBudgets,
   accessContextProfiles, communityReports,
+  workerAvailability, workerBlockouts, shifts, ndisPlanCache,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, and, sql, gte, lte } from "drizzle-orm";
+import { eq, desc, and, sql, gte, lte, inArray } from "drizzle-orm";
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
+  getUserByAuth0Sub(auth0Sub: string): Promise<User | undefined>;
   getUserByRole(role: string): Promise<User | undefined>;
+  updateUserAuth0Sub(id: string, auth0Sub: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUserAvatar(id: string, avatar: string): Promise<User | undefined>;
   updateUserProfile(id: string, data: Partial<{ fullName: string; email: string; location: string }>): Promise<User | undefined>;
@@ -63,6 +71,24 @@ export interface IStorage {
   updateUserOrbIds(userId: string, orbCustomerId: string, orbSubscriptionId: string | null): Promise<User | undefined>;
   getInvoiceById(id: string): Promise<Invoice | undefined>;
   updateInvoicePayment(invoiceId: string, data: { stripePaymentIntentId?: string; stripePaymentStatus?: string; status?: string }): Promise<Invoice | undefined>;
+  getWorkerAvailability(workerId: string): Promise<WorkerAvailability[]>;
+  getWorkerAvailabilityById(id: string): Promise<WorkerAvailability | undefined>;
+  createWorkerAvailability(data: InsertWorkerAvailability): Promise<WorkerAvailability>;
+  deleteWorkerAvailability(id: string): Promise<void>;
+  setWorkerAvailabilityBulk(workerId: string, slots: InsertWorkerAvailability[]): Promise<WorkerAvailability[]>;
+  getWorkerBlockouts(workerId: string): Promise<WorkerBlockout[]>;
+  getWorkerBlockoutById(id: string): Promise<WorkerBlockout | undefined>;
+  createWorkerBlockout(data: InsertWorkerBlockout): Promise<WorkerBlockout>;
+  deleteWorkerBlockout(id: string): Promise<void>;
+  getWorkerByUserId(userId: string): Promise<(import("@shared/schema").Worker) | undefined>;
+  getShifts(filters: { participantId?: string; workerId?: string; dateFrom?: string; dateTo?: string }): Promise<Shift[]>;
+  getShift(id: string): Promise<Shift | undefined>;
+  createShift(data: InsertShift): Promise<Shift>;
+  updateShiftStatus(id: string, status: string, serviceSessionId?: string): Promise<Shift | undefined>;
+  deleteShift(id: string): Promise<void>;
+  getUpcomingShifts(participantId: string): Promise<Shift[]>;
+  getNdisPlanGoals(participantId: string): Promise<NdisPlanCache | undefined>;
+  getPendingInvoices(participantId: string): Promise<Invoice[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -76,8 +102,23 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user;
+  }
+
+  async getUserByAuth0Sub(auth0Sub: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.auth0Sub, auth0Sub));
+    return user;
+  }
+
   async getUserByRole(role: string): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.role, role));
+    return user;
+  }
+
+  async updateUserAuth0Sub(id: string, auth0Sub: string): Promise<User | undefined> {
+    const [user] = await db.update(users).set({ auth0Sub }).where(eq(users.id, id)).returning();
     return user;
   }
 
@@ -418,6 +459,137 @@ export class DatabaseStorage implements IStorage {
       .where(eq(invoices.id, invoiceId))
       .returning();
     return invoice;
+  }
+
+  async getWorkerAvailabilityById(id: string): Promise<WorkerAvailability | undefined> {
+    const [slot] = await db.select().from(workerAvailability)
+      .where(eq(workerAvailability.id, id));
+    return slot;
+  }
+  async getWorkerAvailability(workerId: string): Promise<WorkerAvailability[]> {
+    return db.select().from(workerAvailability)
+      .where(eq(workerAvailability.workerId, workerId));
+  }
+
+  async createWorkerAvailability(data: InsertWorkerAvailability): Promise<WorkerAvailability> {
+    const [slot] = await db.insert(workerAvailability).values(data).returning();
+    return slot;
+  }
+
+  async deleteWorkerAvailability(id: string): Promise<void> {
+    await db.delete(workerAvailability).where(eq(workerAvailability.id, id));
+  }
+
+  async setWorkerAvailabilityBulk(workerId: string, slots: InsertWorkerAvailability[]): Promise<WorkerAvailability[]> {
+    await db.delete(workerAvailability).where(eq(workerAvailability.workerId, workerId));
+    if (slots.length === 0) return [];
+    const results = await db.insert(workerAvailability)
+      .values(slots.map(s => ({ ...s, workerId })))
+      .returning();
+    return results;
+  }
+
+  async getWorkerBlockoutById(id: string): Promise<WorkerBlockout | undefined> {
+    const [blockout] = await db.select().from(workerBlockouts)
+      .where(eq(workerBlockouts.id, id));
+    return blockout;
+  }
+
+  async getWorkerBlockouts(workerId: string): Promise<WorkerBlockout[]> {
+    return db.select().from(workerBlockouts)
+      .where(eq(workerBlockouts.workerId, workerId));
+  }
+
+  async createWorkerBlockout(data: InsertWorkerBlockout): Promise<WorkerBlockout> {
+    const [blockout] = await db.insert(workerBlockouts).values(data).returning();
+    return blockout;
+  }
+
+  async deleteWorkerBlockout(id: string): Promise<void> {
+    await db.delete(workerBlockouts).where(eq(workerBlockouts.id, id));
+  }
+
+  async getWorkerByUserId(userId: string): Promise<(import("@shared/schema").Worker) | undefined> {
+    const [worker] = await db.select().from(workers).where(eq(workers.userId, userId));
+    return worker;
+  }
+
+  async getShifts(filters: { participantId?: string; workerId?: string; dateFrom?: string; dateTo?: string }): Promise<Shift[]> {
+    const conditions = [];
+    if (filters.participantId) conditions.push(eq(shifts.participantId, filters.participantId));
+    if (filters.workerId) conditions.push(eq(shifts.workerId, filters.workerId));
+    if (filters.dateFrom) conditions.push(gte(shifts.date, filters.dateFrom));
+    if (filters.dateTo) conditions.push(lte(shifts.date, filters.dateTo));
+
+    if (conditions.length === 0) {
+      return db.select().from(shifts).orderBy(desc(shifts.date));
+    }
+    return db.select().from(shifts)
+      .where(and(...conditions))
+      .orderBy(desc(shifts.date));
+  }
+
+  async getShift(id: string): Promise<Shift | undefined> {
+    const [shift] = await db.select().from(shifts).where(eq(shifts.id, id));
+    return shift;
+  }
+
+  async getUpcomingShifts(participantId: string): Promise<Shift[]> {
+    const today = new Date().toISOString().split("T")[0];
+    return db
+      .select()
+      .from(shifts)
+      .where(
+        and(
+          eq(shifts.participantId, participantId),
+          gte(shifts.date, today),
+          inArray(shifts.status, ["scheduled", "confirmed"]),
+        )
+      )
+      .orderBy(shifts.date, shifts.startTime)
+      .limit(20);
+  }
+
+  async createShift(data: InsertShift): Promise<Shift> {
+    const [shift] = await db.insert(shifts).values(data).returning();
+    return shift;
+  }
+
+  async updateShiftStatus(id: string, status: string, serviceSessionId?: string): Promise<Shift | undefined> {
+    const updateData: Partial<{ status: string; serviceSessionId: string }> = { status };
+    if (serviceSessionId) updateData.serviceSessionId = serviceSessionId;
+    const [shift] = await db.update(shifts)
+      .set(updateData)
+      .where(eq(shifts.id, id))
+      .returning();
+    return shift;
+  }
+
+  async deleteShift(id: string): Promise<void> {
+    await db.delete(shifts).where(eq(shifts.id, id));
+  }
+
+  async getNdisPlanGoals(participantId: string): Promise<NdisPlanCache | undefined> {
+    const [plan] = await db
+      .select()
+      .from(ndisPlanCache)
+      .where(eq(ndisPlanCache.participantId, participantId))
+      .orderBy(desc(ndisPlanCache.fetchedAt))
+      .limit(1);
+    return plan;
+  }
+
+  async getPendingInvoices(participantId: string): Promise<Invoice[]> {
+    return db
+      .select()
+      .from(invoices)
+      .where(
+        and(
+          eq(invoices.participantId, participantId),
+          inArray(invoices.status, ["draft", "submitted", "pending"]),
+        )
+      )
+      .orderBy(desc(invoices.generatedAt));
   }
 }
 

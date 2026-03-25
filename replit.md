@@ -17,7 +17,7 @@ MapAble 4.0 is a fullstack TypeScript superapp combining core NDIS services:
 - **AI**: OpenAI (via Replit AI Integrations)
 - **Payments**: Stripe (Payment Intents with Link + Card methods)
 - **Usage Metering**: Orb (care hours and transport km billing)
-- **Auth**: Express sessions with login/logout
+- **Auth**: Express sessions with login/logout + Auth0 SSO (Google/Microsoft via PKCE)
 - **Routing**: wouter (frontend), Express (backend API)
 
 ## Brand Identity
@@ -40,6 +40,11 @@ MapAble 4.0 is a fullstack TypeScript superapp combining core NDIS services:
 - `STRIPE_PUBLISHABLE_KEY` — Stripe publishable key (exposed to frontend)
 - `STRIPE_WEBHOOK_SECRET` — Stripe webhook signing secret
 - `ORB_API_KEY` — Orb API key for usage-based billing
+- `AUTH0_DOMAIN` — Auth0 tenant domain (default: `adid.au.auth0.com`)
+- `AUTH0_CLIENT_ID` — Auth0 application Client ID
+- `AUTH0_CLIENT_SECRET` — Auth0 application Client Secret (required for SSO)
+- `ACCESSIBE_SITE_KEY` — accessiBe widget site key for PHP pages (placeholder; replace with real key from accessiBe account)
+- `VITE_ACCESSIBE_SITE_KEY` — accessiBe widget site key for React frontend (set to same value as ACCESSIBE_SITE_KEY)
 
 ## Project Structure
 ```
@@ -56,6 +61,10 @@ server/
   seed.ts                - Database seeding
   vite.ts                - Vite dev server integration
   static.ts              - Production static file serving
+php/
+  includes/
+    accessibe_widget.php   - Reusable accessiBe accessibility widget snippet
+    layout_footer.php      - Footer, scripts, toast messages (includes accessiBe widget)
 client/src/
   App.tsx                - Root app with routing, sidebar, header
   pages/
@@ -69,7 +78,7 @@ client/src/
   lib/                   - queryClient, utils
 ```
 
-## Database Tables
+## Database Tables (23)
 - users (with stripe_customer_id, orb_customer_id, orb_subscription_id)
 - workers, bookings, jobs, transport_requests, messages
 - pricing_tiers, service_sessions, transport_trips
@@ -77,6 +86,7 @@ client/src/
 - reviews, participant_budgets
 - access_context_profiles, chat_sessions, chat_messages
 - community_reports
+- worker_availability, worker_blockouts, shifts, ndis_plan_cache
 
 ## Stripe & Orb Billing Integration
 - **Stripe Link Checkout**: When user clicks "Pay Now" on an invoice, creates a PaymentIntent with `link` + `card` methods, opens embedded Stripe checkout
@@ -85,6 +95,24 @@ client/src/
 - **Orb Webhooks**: POST `/api/webhooks/orb` handles billing_period_ended → auto-generates invoices
 - **Invoice statuses**: draft, submitted, pending, processing, paid, failed
 - **Orb customer setup**: POST `/api/billing/setup-orb` creates Orb customer + subscription for a user
+
+## Key Features
+- Dashboard with stats, featured workers, recent jobs
+- Worker directory with search, filtering (verified/transport/accessible)
+- Worker detail with booking form, shift timer, reviews, verification checklist
+- Job board with category filters (Care/Transport/Support/Employment)
+- Transport booking with wheelchair options + trip logger with tier pricing
+- AI-powered chat assistant with OpenAI
+- NDIS pricing tiers (4 care + 4 transport) with automatic tier calculation
+- **Shift Scheduler** — dedicated Shifts page with weekly/monthly calendar views, worker availability management, shift booking with NDIS goal alignment, recurring shift creation (weekly/fortnightly), shift status workflow (scheduled → confirmed → in_progress → completed), automatic service session creation on completion
+- **NDIS API Integration** — PRODA authentication module (OAuth2), myplace portal client for participant plan/goals, Price Guide data fetcher for NDIS rates, plan data caching, rate validation against NDIS price guide
+- Budget dashboard with category progress bars and tier indicators
+- Invoice generation with NDIS line items, Stripe payments, and Orb usage metering
+- Messaging system with contact sidebar
+- Settings with profile editing and accessibility toggles
+- Dark mode toggle
+- **WCAG 2.2 AA accessibility** with skip links, ARIA landmarks, live regions, and keyboard navigation
+- **accessiBe widget**: Floating accessibility overlay (bottom-left) on all pages; loads from `acsbapp.com` CDN async; branded with MapAble blue (#1B6EB5)
 
 ## Pricing Engine
 - Care tiers: Basic (0-10hrs, $70.23/hr), Standard (11-30hrs, $68/hr), High Support (31+hrs, $65/hr)

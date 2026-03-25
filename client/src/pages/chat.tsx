@@ -7,7 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Loader2, Send, Plus, Trash2, Bot, User, AlertTriangle, ArrowRight, Bus, Flag, Phone, Copy, Search, UserCog, ChevronDown, ChevronUp, MessageCircle, Shield } from "lucide-react";
+import { Loader2, Send, Plus, Trash2, Bot, User, AlertTriangle, ArrowRight, Bus, Flag, Phone, Copy, Search, UserCog, ChevronDown, ChevronUp, MessageCircle, Shield, Calendar, CreditCard, PieChart } from "lucide-react";
 import type { ChatSession, ChatMessage, AccessContextProfile } from "@shared/schema";
 import { AccessProfileWizard } from "@/components/access-profile-wizard";
 import { BarrierReportForm } from "@/components/barrier-report-form";
@@ -27,6 +27,9 @@ const QUICK_ACTION_CONFIG: Record<string, { label: string; icon: typeof Bus; col
   escalate: { label: "Get Human Help", icon: Phone, color: "bg-red-500/10 text-red-600 border-red-500/30 dark:text-red-400" },
   edit_profile: { label: "Edit Profile", icon: UserCog, color: "bg-purple-500/10 text-purple-600 border-purple-500/30 dark:text-purple-400" },
   view_pricing: { label: "View Pricing", icon: ArrowRight, color: "bg-[#E6A817]/10 text-[#E6A817] border-[#E6A817]/30" },
+  view_shifts: { label: "View Shifts", icon: Calendar, color: "bg-indigo-500/10 text-indigo-600 border-indigo-500/30 dark:text-indigo-400" },
+  pay_invoice: { label: "Pay Invoice", icon: CreditCard, color: "bg-emerald-500/10 text-emerald-600 border-emerald-500/30 dark:text-emerald-400" },
+  check_budget: { label: "Check Budget", icon: PieChart, color: "bg-[#E6A817]/10 text-[#E6A817] border-[#E6A817]/30" },
 };
 
 const CONFIDENCE_CONFIG: Record<string, { label: string; variant: "default" | "secondary" | "outline" }> = {
@@ -288,6 +291,15 @@ export default function ChatPage() {
       case "view_pricing":
         window.location.href = "/pricing";
         break;
+      case "view_shifts":
+        window.location.href = "/care";
+        break;
+      case "pay_invoice":
+        window.location.href = "/invoices";
+        break;
+      case "check_budget":
+        window.location.href = "/budget";
+        break;
     }
   };
 
@@ -308,6 +320,9 @@ export default function ChatPage() {
     { label: "Report a barrier", message: "I want to report an accessibility barrier" },
     { label: "Transport options", message: "What transport options are available for me?" },
     { label: "NDIS pricing", message: "What are the current NDIS transport pricing tiers?" },
+    { label: "View shifts", message: "What's my next shift?" },
+    { label: "Pay invoice", message: "How much do I owe?" },
+    { label: "Check budget", message: "What's my NDIS budget for transport?" },
   ];
 
   return (
