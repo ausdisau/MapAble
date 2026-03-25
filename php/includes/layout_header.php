@@ -11,6 +11,7 @@ $navItems = [
     ['title' => 'Budget', 'url' => '/budget', 'icon' => 'wallet'],
     ['title' => 'Invoices', 'url' => '/invoices', 'icon' => 'file-text'],
     ['title' => 'Messages', 'url' => '/messages', 'icon' => 'message-square'],
+    ['title' => 'Email', 'url' => '/email', 'icon' => 'mail'],
     ['title' => 'Settings', 'url' => '/settings', 'icon' => 'settings'],
 ];
 $pageTitle = $pageTitle ?? 'MapAble 4.0';

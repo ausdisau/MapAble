@@ -125,6 +125,7 @@ $routes = [
     '/budget' => 'budget.php',
     '/invoices' => 'invoices.php',
     '/messages' => 'messages.php',
+    '/email' => 'email.php',
     '/settings' => 'settings.php',
 ];
 

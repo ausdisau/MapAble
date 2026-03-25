@@ -44,7 +44,10 @@ You are an autonomous assistant that helps NDIS participants manage their care, 
 - Keep responses helpful and concise, but thorough when the user needs detail.
 
 ## Available Capabilities
-You have tools to: look up user profiles, search care workers, search transport workers, search jobs, check budgets, get pricing, view bookings/sessions/trips/invoices, report barriers, book transport, and escalate to human support.
+You have tools to: look up user profiles, search care workers, search transport workers, search jobs, check budgets, get pricing, view bookings/sessions/trips/invoices, report barriers, book transport, send emails, check email inbox, and escalate to human support.
+
+## Email
+You can send emails on behalf of the user via AgentMail (send_email tool). Use this for shift confirmations, invoice reminders, contacting support coordinators, or any email the user requests. You can also check their email inbox (get_email_messages tool).
 PROMPT;
 }
 
@@ -251,6 +254,30 @@ function getToolDefinitions() {
                 ],
             ]
         ],
+        [
+            'type' => 'function',
+            'function' => [
+                'name' => 'send_email',
+                'description' => 'Send an email notification to a recipient via AgentMail. Use for shift confirmations, invoice reminders, support messages, or any email the user requests.',
+                'parameters' => [
+                    'type' => 'object',
+                    'properties' => [
+                        'to' => ['type' => 'string', 'description' => 'Recipient email address'],
+                        'subject' => ['type' => 'string', 'description' => 'Email subject line'],
+                        'body' => ['type' => 'string', 'description' => 'Email body text content'],
+                    ],
+                    'required' => ['to', 'subject', 'body'],
+                ],
+            ]
+        ],
+        [
+            'type' => 'function',
+            'function' => [
+                'name' => 'get_email_messages',
+                'description' => 'Get recent emails from the user\'s MapAble inbox',
+                'parameters' => ['type' => 'object', 'properties' => new \stdClass(), 'required' => []],
+            ]
+        ],
     ];
 }
 
@@ -273,6 +300,8 @@ function getToolFriendlyName($name) {
         'submit_barrier_report' => 'Submitting barrier report',
         'book_transport' => 'Booking transport',
         'escalate_to_human' => 'Connecting to support',
+        'send_email' => 'Sending email',
+        'get_email_messages' => 'Checking emails',
     ];
     return $names[$name] ?? $name;
 }
@@ -423,6 +452,75 @@ function executeTool($pdo, $userId, $name, $args) {
 
         case 'escalate_to_human':
             return json_encode(['success' => true, 'message' => 'Escalated to human support coordinator. Reason: ' . ($args['reason'] ?? 'User request')]);
+
+        case 'send_email':
+            $emailBase = 'http://127.0.0.1:3001';
+            $stmt = $pdo->prepare('SELECT * FROM user_email_inboxes WHERE user_id = ? ORDER BY created_at LIMIT 1');
+            $stmt->execute([$userId]);
+            $userInbox = $stmt->fetch();
+            if (!$userInbox) {
+                return json_encode(['error' => 'No email inbox configured. Please set one up on the Email page first.']);
+            }
+            $inboxId = $userInbox['inbox_id'];
+            $ch = curl_init($emailBase . '/api/email/send');
+            curl_setopt_array($ch, [
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_POST => true,
+                CURLOPT_TIMEOUT => 10,
+                CURLOPT_CONNECTTIMEOUT => 5,
+                CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+                CURLOPT_POSTFIELDS => json_encode([
+                    'inbox_id' => $inboxId,
+                    'to' => $args['to'],
+                    'subject' => $args['subject'],
+                    'text' => $args['body'],
+                    'html' => '<div style="font-family:Arial,sans-serif;color:#333;">' . nl2br(htmlspecialchars($args['body'])) . '</div>',
+                ]),
+            ]);
+            $emailRes = curl_exec($ch);
+            $emailCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $curlErr = curl_error($ch);
+            curl_close($ch);
+            if ($curlErr) {
+                return json_encode(['error' => 'Email service unavailable: ' . $curlErr]);
+            }
+            if ($emailCode >= 200 && $emailCode < 300) {
+                return json_encode(['success' => true, 'message' => 'Email sent to ' . $args['to']]);
+            }
+            $emailErr = json_decode($emailRes ?: '{}', true);
+            return json_encode(['error' => 'Failed to send email: ' . ($emailErr['message'] ?? $emailErr['error'] ?? 'Unknown error')]);
+
+        case 'get_email_messages':
+            $emailBase = 'http://127.0.0.1:3001';
+            $stmt = $pdo->prepare('SELECT * FROM user_email_inboxes WHERE user_id = ? ORDER BY created_at LIMIT 1');
+            $stmt->execute([$userId]);
+            $userInbox = $stmt->fetch();
+            if (!$userInbox) {
+                return json_encode(['error' => 'No email inbox configured. Visit the Email page to create one.']);
+            }
+            $inboxId = $userInbox['inbox_id'];
+            $ch = curl_init($emailBase . '/api/email/messages/' . urlencode($inboxId) . '?limit=10');
+            curl_setopt_array($ch, [
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_TIMEOUT => 10,
+                CURLOPT_CONNECTTIMEOUT => 5,
+            ]);
+            $msgsRes = curl_exec($ch);
+            $curlErr = curl_error($ch);
+            curl_close($ch);
+            if ($curlErr) {
+                return json_encode(['error' => 'Email service unavailable: ' . $curlErr]);
+            }
+            $msgsData = json_decode($msgsRes ?: '{}', true);
+            $emailMessages = $msgsData['messages'] ?? $msgsData['items'] ?? [];
+            $result = array_map(fn($m) => [
+                'id' => $m['message_id'] ?? $m['id'] ?? '',
+                'from' => $m['from'] ?? '',
+                'subject' => $m['subject'] ?? '',
+                'preview' => mb_substr($m['extracted_text'] ?? $m['text'] ?? '', 0, 200),
+                'date' => $m['created_at'] ?? '',
+            ], array_slice($emailMessages, 0, 10));
+            return json_encode(['inbox' => $userInbox['email'], 'messages' => $result]);
 
         default:
             return json_encode(['error' => 'Unknown tool: ' . $name]);

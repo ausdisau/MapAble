@@ -8,10 +8,11 @@ MapAble 4.0 is a fullstack TypeScript superapp combining core NDIS services:
 - **MapAble Chat** - AI-powered accessibility-context chatbot
 - **Pricing & Billing** - NDIS-aligned tiered pricing with Stripe Link payments & Orb usage metering
 - **Budget Tracking** - Real-time NDIS plan budget monitoring
+- **Email** - AgentMail integration for sending/receiving emails (shift confirmations, invoices, support)
 
 ## Architecture
-- **Runtime**: Node.js with TypeScript (tsx)
-- **Backend**: Express.js
+- **Runtime**: PHP 8.4 with PDO/Neon PostgreSQL (primary app) + Node.js/TypeScript (AgentMail microservice, Drizzle schema)
+- **Backend**: PHP native router + Express.js (AgentMail proxy)
 - **Frontend**: React + Vite + Tailwind CSS + shadcn/ui
 - **Database**: Neon PostgreSQL (serverless) via Drizzle ORM
 - **AI**: OpenAI (via Replit AI Integrations)
@@ -27,7 +28,8 @@ MapAble 4.0 is a fullstack TypeScript superapp combining core NDIS services:
 - **Dark mode**: Deep navy #0F1A2E background
 
 ## Running the Project
-- **Workflow**: `npm run dev` (runs tsx server/index.ts)
+- **Main Workflow**: `php -S 0.0.0.0:5000 -t php/public` (PHP dev server — the primary app)
+- **AgentMail Service**: `npx tsx server/agentmail-service.ts` (runs on port 3001 internally)
 - **Dev server**: Express + Vite on port 5000
 - **DB push**: `npx drizzle-kit push`
 
