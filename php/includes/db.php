@@ -175,6 +175,31 @@ function getInvoices($pdo, $participantId) {
     return $stmt->fetchAll();
 }
 
+function getGstRate($ndisItemCode, $serviceType) {
+    $gstFreeNdisCodes = [
+        '01_011_0107_1_1',
+        '01_015_0107_1_1',
+        '01_002_0107_1_1',
+        '04_104_0125_6_1',
+        '07_001_0106_8_3',
+        '09_011_0117_6_3',
+        '15_037_0117_1_3',
+    ];
+    if (in_array($ndisItemCode, $gstFreeNdisCodes)) {
+        return 0.0;
+    }
+    $gstNdisPrefixes = ['02_'];
+    foreach ($gstNdisPrefixes as $prefix) {
+        if (str_starts_with($ndisItemCode, $prefix)) {
+            return 0.10;
+        }
+    }
+    if ($serviceType === 'transport') {
+        return 0.10;
+    }
+    return 0.0;
+}
+
 function generateInvoice($pdo, $participantId, $periodStart, $periodEnd) {
     $stmt = $pdo->prepare("SELECT ss.*, u.full_name as worker_name FROM service_sessions ss
         LEFT JOIN workers w ON ss.worker_id = w.id LEFT JOIN users u ON w.user_id = u.id
@@ -189,30 +214,63 @@ function generateInvoice($pdo, $participantId, $periodStart, $periodEnd) {
     $trips = $stmt2->fetchAll();
 
     $lineItems = [];
-    $total = 0;
+    $subtotalExGst = 0;
+    $totalGst = 0;
     foreach ($sessions as $s) {
         $sub = (float)($s['total_charge'] ?? 0);
-        $lineItems[] = ['type' => 'care', 'description' => 'Care Session - ' . ($s['worker_name'] ?? 'Worker'),
-            'date' => $s['date'], 'quantity' => (float)($s['actual_hours'] ?? 0), 'unit' => 'hours',
-            'rate' => (float)($s['hourly_rate'] ?? 0), 'subtotal' => $sub, 'ndisItemCode' => $s['ndis_item_code'] ?? '01_011_0107_1_1'];
-        $total += $sub;
+        $ndisCode = $s['ndis_item_code'] ?? '01_011_0107_1_1';
+        $gstRate = getGstRate($ndisCode, 'care');
+        $gstAmt = round($sub * $gstRate, 2);
+        $lineItems[] = [
+            'type' => 'care',
+            'description' => 'Care Session - ' . ($s['worker_name'] ?? 'Worker'),
+            'date' => $s['date'],
+            'quantity' => (float)($s['actual_hours'] ?? 0),
+            'unit' => 'hours',
+            'rate' => (float)($s['hourly_rate'] ?? 0),
+            'subtotal' => $sub,
+            'gst_rate' => $gstRate,
+            'gst_amount' => $gstAmt,
+            'total_inc_gst' => $sub + $gstAmt,
+            'gst_free' => $gstRate === 0.0,
+            'ndisItemCode' => $ndisCode,
+        ];
+        $subtotalExGst += $sub;
+        $totalGst += $gstAmt;
     }
     foreach ($trips as $t) {
         $sub = (float)($t['total_charge'] ?? 0);
-        $lineItems[] = ['type' => 'transport', 'description' => 'Transport Trip - ' . ($t['worker_name'] ?? 'Driver'),
-            'date' => $t['date'], 'quantity' => (float)($t['distance_km'] ?? 0), 'unit' => 'km',
-            'rate' => (float)($t['per_km_rate'] ?? 0), 'subtotal' => $sub, 'ndisItemCode' => $t['ndis_item_code'] ?? '02_051_0108_1_1'];
-        $total += $sub;
+        $ndisCode = $t['ndis_item_code'] ?? '02_051_0108_1_1';
+        $gstRate = getGstRate($ndisCode, 'transport');
+        $gstAmt = round($sub * $gstRate, 2);
+        $lineItems[] = [
+            'type' => 'transport',
+            'description' => 'Transport Trip - ' . ($t['worker_name'] ?? 'Driver'),
+            'date' => $t['date'],
+            'quantity' => (float)($t['distance_km'] ?? 0),
+            'unit' => 'km',
+            'rate' => (float)($t['per_km_rate'] ?? 0),
+            'subtotal' => $sub,
+            'gst_rate' => $gstRate,
+            'gst_amount' => $gstAmt,
+            'total_inc_gst' => $sub + $gstAmt,
+            'gst_free' => $gstRate === 0.0,
+            'ndisItemCode' => $ndisCode,
+        ];
+        $subtotalExGst += $sub;
+        $totalGst += $gstAmt;
     }
+
+    $totalIncGst = $subtotalExGst + $totalGst;
 
     $providerStmt = $pdo->prepare("SELECT id FROM users WHERE role = 'provider' LIMIT 1");
     $providerStmt->execute();
     $provider = $providerStmt->fetch();
 
-    $ins = $pdo->prepare('INSERT INTO invoices (participant_id, provider_id, period_start, period_end, total_amount, ndis_claimable, status, line_items)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING *');
+    $ins = $pdo->prepare('INSERT INTO invoices (participant_id, provider_id, period_start, period_end, total_amount, gst_amount, total_inc_gst, ndis_claimable, status, line_items)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING *');
     $ins->execute([$participantId, $provider['id'] ?? null, $periodStart, $periodEnd,
-        $total, $total, 'draft', json_encode($lineItems)]);
+        $subtotalExGst, $totalGst, $totalIncGst, $subtotalExGst, 'draft', json_encode($lineItems)]);
     return $ins->fetch();
 }
 

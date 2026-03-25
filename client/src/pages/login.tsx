@@ -4,8 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { AlertCircle, LogIn, Loader2, HeartHandshake, Bus, Briefcase, Bot, ShieldCheck } from "lucide-react";
+import { AlertCircle, LogIn, Loader2, HeartHandshake, Bus, Briefcase, Bot, ShieldCheck, UserPlus } from "lucide-react";
 import { SiGoogle } from "react-icons/si";
+import { Link } from "wouter";
 import logoImage from "@assets/Accessible_Australia_Logo_Design_1772582762574.png";
 
 export default function LoginPage() {
@@ -187,6 +188,17 @@ export default function LoginPage() {
               </div>
             </CardContent>
           </Card>
+
+          <div className="text-center">
+            <Link
+              href="/register"
+              className="inline-flex items-center gap-2 text-white/50 text-sm hover:text-white/70 transition-colors"
+              data-testid="link-create-account"
+            >
+              <UserPlus className="w-4 h-4" />
+              Don't have an account? <span className="text-[#2EAA6E] font-medium">Create Account</span>
+            </Link>
+          </div>
 
           <div className="flex justify-center">
             <div className="flex items-center gap-2 text-white/30 text-xs">

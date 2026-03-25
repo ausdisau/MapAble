@@ -33,6 +33,10 @@ export const users = pgTable("users", {
   stripeCustomerId: text("stripe_customer_id"),
   orbCustomerId: text("orb_customer_id"),
   orbSubscriptionId: text("orb_subscription_id"),
+  managementType: text("management_type"),
+  providerAbn: text("provider_abn"),
+  providerBusinessName: text("provider_business_name"),
+  providerRegistrationGroups: text("provider_registration_groups").array(),
 });
 
 export const workers = pgTable("workers", {
@@ -54,6 +58,9 @@ export const workers = pgTable("workers", {
   firstAidExpiry: text("first_aid_expiry"),
   wwccNumber: text("wwcc_number"),
   wwccExpiry: text("wwcc_expiry"),
+  screeningNumber: text("screening_number"),
+  screeningClearanceStatus: text("screening_clearance_status"),
+  screeningExpiry: text("screening_expiry"),
 });
 
 export const bookings = pgTable("bookings", {
@@ -158,6 +165,8 @@ export const invoices = pgTable("invoices", {
   periodStart: text("period_start").notNull(),
   periodEnd: text("period_end").notNull(),
   totalAmount: decimal("total_amount", { precision: 10, scale: 2 }).notNull(),
+  gstAmount: decimal("gst_amount", { precision: 10, scale: 2 }).default("0"),
+  totalIncGst: decimal("total_inc_gst", { precision: 10, scale: 2 }),
   ndisClaimable: decimal("ndis_claimable", { precision: 10, scale: 2 }),
   status: invoiceStatusEnum("status").notNull().default("draft"),
   lineItems: jsonb("line_items"),
@@ -202,6 +211,10 @@ export const insertUserSchema = createInsertSchema(users).pick({
   planStartDate: true,
   planEndDate: true,
   phoneNumber: true,
+  managementType: true,
+  providerAbn: true,
+  providerBusinessName: true,
+  providerRegistrationGroups: true,
 });
 
 export const insertWorkerSchema = createInsertSchema(workers).pick({
@@ -220,6 +233,9 @@ export const insertWorkerSchema = createInsertSchema(workers).pick({
   firstAidExpiry: true,
   wwccNumber: true,
   wwccExpiry: true,
+  screeningNumber: true,
+  screeningClearanceStatus: true,
+  screeningExpiry: true,
 });
 
 export const insertBookingSchema = createInsertSchema(bookings).pick({

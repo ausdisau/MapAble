@@ -48,7 +48,7 @@ outputType = "webview"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "php -S 0.0.0.0:5000 -t php/public"
+args = "npm run dev"
 waitForPort = 5000
 
 [[workflows.workflow]]

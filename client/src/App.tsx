@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import NotFound from "@/pages/not-found";
 import LoginPage from "@/pages/login";
+import RegisterPage from "@/pages/register";
 import Dashboard from "@/pages/dashboard";
 import CarePage from "@/pages/care";
 import WorkerDetailPage from "@/pages/worker-detail";
@@ -263,6 +264,7 @@ function AppLayout() {
 
 function AuthGate() {
   const { isAuthenticated, isLoading } = useAuth();
+  const [location] = useLocation();
 
   if (isLoading) {
     return (
@@ -273,6 +275,9 @@ function AuthGate() {
   }
 
   if (!isAuthenticated) {
+    if (location === "/register") {
+      return <RegisterPage />;
+    }
     return <LoginPage />;
   }
 
