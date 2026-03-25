@@ -6,6 +6,11 @@ hidden = [".config", ".git", "generated-icon.png", "node_modules", "dist"]
 channel = "stable-24_05"
 
 [[ports]]
+localPort = 3001
+externalPort = 3001
+exposeLocalhost = true
+
+[[ports]]
 localPort = 5000
 externalPort = 80
 
@@ -30,6 +35,10 @@ author = "agent"
 task = "workflow.run"
 args = "Start application"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "AgentMail Service"
+
 [[workflows.workflow]]
 name = "Start application"
 author = "agent"
@@ -39,8 +48,20 @@ outputType = "webview"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "npm run dev"
+args = "php -S 0.0.0.0:5000 -t php/public"
 waitForPort = 5000
+
+[[workflows.workflow]]
+name = "AgentMail Service"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npx tsx server/agentmail-service.ts"
+waitForPort = 3001
+
+[workflows.workflow.metadata]
+outputType = "console"
 
 [objectStorage]
 defaultBucketID = "replit-objstore-f974be9b-d8e8-48b3-99db-cb41e9ac325e"

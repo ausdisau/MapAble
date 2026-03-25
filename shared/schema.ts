@@ -466,6 +466,15 @@ export type ChatMessage = typeof chatMessages.$inferSelect;
 export type InsertCommunityReport = z.infer<typeof insertCommunityReportSchema>;
 export type CommunityReport = typeof communityReports.$inferSelect;
 
+export const userEmailInboxes = pgTable("user_email_inboxes", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull(),
+  inboxId: varchar("inbox_id").notNull().unique(),
+  email: varchar("email").notNull(),
+  displayName: varchar("display_name"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 export const shiftStatusEnum = pgEnum("shift_status", ["scheduled", "confirmed", "in_progress", "completed", "cancelled"]);
 
 export const workerAvailability = pgTable("worker_availability", {
