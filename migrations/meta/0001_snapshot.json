@@ -1,5 +1,5 @@
 {
-  "id": "5cf6ba65-b250-4faf-b7c6-227e8b737cc9",
+  "id": "d5f1d95a-c930-48e4-b535-8af1985ab13d",
   "prevId": "d2013e34-bd4c-4be4-93fa-edb6daa3cdbf",
   "version": "7",
   "dialect": "postgresql",
@@ -1498,16 +1498,14 @@
           "type": "text[]",
           "primaryKey": false,
           "notNull": false
+        },
+        "abn": {
+          "name": "abn",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
         }
       },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "users_username_unique": {
-          "name": "users_username_unique",
-          "nullsNotDistinct": false,
-          "columns": [
             "username"
           ]
         }
@@ -1729,6 +1727,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "screening_number": {
+          "name": "screening_number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
         "screening_clearance_status": {
           "name": "screening_clearance_status",
           "type": "text",
@@ -1742,15 +1746,6 @@
           "notNull": false
         }
       },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    }
-  },
   "enums": {
     "public.barrier_severity": {
       "name": "barrier_severity",

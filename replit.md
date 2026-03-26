@@ -9,6 +9,7 @@ MapAble 4.0 is a fullstack TypeScript superapp combining core NDIS services:
 - **Pricing & Billing** - NDIS-aligned tiered pricing with Stripe Link payments & Orb usage metering
 - **Budget Tracking** - Real-time NDIS plan budget monitoring
 - **Email** - AgentMail integration for sending/receiving emails (shift confirmations, invoices, support)
+- **ABN Lookup** - Australian Business Number validation and ABR registry lookup
 
 ## Architecture
 - **Runtime**: PHP 8.4 with PDO/Neon PostgreSQL (primary app) + Node.js/TypeScript (AgentMail microservice, Drizzle schema)
@@ -47,6 +48,7 @@ MapAble 4.0 is a fullstack TypeScript superapp combining core NDIS services:
 - `AUTH0_CLIENT_SECRET` — Auth0 application Client Secret (required for SSO)
 - `ACCESSIBE_SITE_KEY` — accessiBe widget site key for PHP pages (placeholder; replace with real key from accessiBe account)
 - `VITE_ACCESSIBE_SITE_KEY` — accessiBe widget site key for React frontend (set to same value as ACCESSIBE_SITE_KEY)
+- `ABR_GUID` — Australian Business Register API GUID for ABN lookups (optional; format-only validation works without it)
 
 ## Project Structure
 ```

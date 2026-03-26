@@ -24,8 +24,10 @@ import {
   Loader2,
   BookOpen,
   UserCog,
+  Building2,
 } from "lucide-react";
 import { AccessProfileWizard } from "@/components/access-profile-wizard";
+import { AbnLookup } from "@/components/abn-lookup";
 
 function EasyReadToggle() {
   const [enabled, setEnabled] = useState(() => {
@@ -423,6 +425,13 @@ export default function SettingsPage() {
               Edit
             </Button>
           </div>
+        </div>
+      </Card>
+
+      <Card className="overflow-visible">
+        <SectionHeader icon={Building2} title="ABN Verification" description="Verify your Australian Business Number" />
+        <div className="p-5">
+          <AbnLookup compact />
         </div>
       </Card>
 
