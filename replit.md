@@ -12,8 +12,8 @@ MapAble 4.0 is a fullstack TypeScript superapp combining core NDIS services:
 - **ABN Lookup** - Australian Business Number validation and ABR registry lookup
 
 ## Architecture
-- **Runtime**: PHP 8.4 with PDO/Neon PostgreSQL (primary app) + Node.js/TypeScript (AgentMail microservice, Drizzle schema)
-- **Backend**: PHP native router + Express.js (AgentMail proxy)
+- **Runtime**: Node.js/TypeScript (primary), PHP 8.4 (legacy pages)
+- **Backend**: Express.js (primary API + auth + payments)
 - **Frontend**: React + Vite + Tailwind CSS + shadcn/ui
 - **Database**: Neon PostgreSQL (serverless) via Drizzle ORM
 - **AI**: OpenAI (via Replit AI Integrations)
@@ -29,9 +29,8 @@ MapAble 4.0 is a fullstack TypeScript superapp combining core NDIS services:
 - **Dark mode**: Deep navy #0F1A2E background
 
 ## Running the Project
-- **Main Workflow**: `php -S 0.0.0.0:5000 -t php/public` (PHP dev server — the primary app)
+- **Main Workflow**: `npm run dev` — Express + Vite on port 5000 (primary app)
 - **AgentMail Service**: `npx tsx server/agentmail-service.ts` (runs on port 3001 internally)
-- **Dev server**: Express + Vite on port 5000
 - **DB push**: `npx drizzle-kit push`
 
 ## Environment Variables
@@ -102,6 +101,8 @@ client/src/
 
 ## Key Features
 - Dashboard with stats, featured workers, recent jobs
+- **Worker Dashboard** — Complete support worker experience with role-based sidebar nav, today's shifts, active shift tracking, compliance alerts, earnings stats, recent reviews. Routes: `/worker/dashboard`, `/worker/profile`, `/worker/shifts`, `/worker/bookings`. APIs: `/api/worker/me`, `/api/worker/dashboard`, `/api/worker/bookings`, `/api/worker/earnings`, `/api/worker/reviews`
+- **Role-Based Navigation** — Sidebar and mobile nav show different items for carers (worker-focused) vs participants (service-focused). Client-side route guards redirect non-carers from `/worker/*` pages. Server-side RBAC enforces worker-only transitions (confirm/start/complete shifts)
 - Worker directory with search, filtering (verified/transport/accessible)
 - Worker detail with booking form, shift timer, reviews, verification checklist
 - Job board with category filters (Care/Transport/Support/Employment)

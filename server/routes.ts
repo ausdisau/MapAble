@@ -651,6 +651,190 @@ export async function registerRoutes(
     res.status(201).json(booking);
   });
 
+  app.get("/api/worker/me", requireAuth, async (req, res) => {
+    const userId = req.session.userId!;
+    const user = await storage.getUser(userId);
+    if (!user || user.role !== "carer") {
+      return res.status(403).json({ message: "Not a worker account" });
+    }
+    const worker = await storage.getWorkerByUserId(userId);
+    if (!worker) return res.status(404).json({ message: "Worker profile not found" });
+    const fullWorker = await storage.getWorker(worker.id);
+    res.json(fullWorker);
+  });
+
+  app.patch("/api/worker/me", requireAuth, async (req, res) => {
+    const userId = req.session.userId!;
+    const user = await storage.getUser(userId);
+    if (!user || user.role !== "carer") {
+      return res.status(403).json({ message: "Not a worker account" });
+    }
+    const worker = await storage.getWorkerByUserId(userId);
+    if (!worker) return res.status(404).json({ message: "Worker profile not found" });
+
+    const { fullName, email, location, phoneNumber, bio } = req.body;
+    if (fullName || email || location) {
+      await storage.updateUserProfile(userId, { fullName, email, location });
+    }
+    if (phoneNumber !== undefined || bio !== undefined) {
+      const updateData: Record<string, string> = {};
+      if (phoneNumber !== undefined) updateData.phoneNumber = phoneNumber;
+      if (bio !== undefined) updateData.bio = bio;
+      const { eq } = await import("drizzle-orm");
+      const { users } = await import("@shared/schema");
+      const { db } = await import("./db");
+      await db.update(users).set(updateData).where(eq(users.id, userId));
+    }
+
+    const updatedWorker = await storage.getWorker(worker.id);
+    res.json(updatedWorker);
+  });
+
+  app.get("/api/worker/bookings", requireAuth, async (req, res) => {
+    const userId = req.session.userId!;
+    const user = await storage.getUser(userId);
+    if (!user || user.role !== "carer") {
+      return res.status(403).json({ message: "Not a worker account" });
+    }
+    const worker = await storage.getWorkerByUserId(userId);
+    if (!worker) return res.status(404).json({ message: "Worker profile not found" });
+
+    const allBookings = await storage.getBookings();
+    const workerBookings = allBookings.filter(b => b.workerId === worker.id);
+
+    const enriched = await Promise.all(workerBookings.map(async (b) => {
+      const participant = await storage.getUser(b.participantId);
+      return { ...b, participant: participant ? { id: participant.id, fullName: participant.fullName, email: participant.email, location: participant.location } : null };
+    }));
+
+    res.json(enriched);
+  });
+
+  app.patch("/api/worker/bookings/:id/status", requireAuth, async (req, res) => {
+    const userId = req.session.userId!;
+    const user = await storage.getUser(userId);
+    if (!user || user.role !== "carer") {
+      return res.status(403).json({ message: "Not a worker account" });
+    }
+    const worker = await storage.getWorkerByUserId(userId);
+    if (!worker) return res.status(404).json({ message: "Worker profile not found" });
+
+    const { status } = req.body;
+    const validStatuses = ["confirmed", "cancelled"];
+    if (!status || !validStatuses.includes(status)) {
+      return res.status(400).json({ message: `status must be one of: ${validStatuses.join(", ")}` });
+    }
+
+    const allBookings = await storage.getBookings();
+    const booking = allBookings.find(b => b.id === req.params.id);
+    if (!booking) return res.status(404).json({ message: "Booking not found" });
+    if (booking.workerId !== worker.id) {
+      return res.status(403).json({ message: "Not your booking" });
+    }
+
+    const { eq } = await import("drizzle-orm");
+    const { bookings } = await import("@shared/schema");
+    const { db } = await import("./db");
+    const [updated] = await db.update(bookings).set({ status }).where(eq(bookings.id, req.params.id)).returning();
+    res.json(updated);
+  });
+
+  app.get("/api/worker/earnings", requireAuth, async (req, res) => {
+    const userId = req.session.userId!;
+    const user = await storage.getUser(userId);
+    if (!user || user.role !== "carer") {
+      return res.status(403).json({ message: "Not a worker account" });
+    }
+    const worker = await storage.getWorkerByUserId(userId);
+    if (!worker) return res.status(404).json({ message: "Worker profile not found" });
+
+    const workerShifts = await storage.getShifts({ workerId: worker.id });
+    const completedShifts = workerShifts.filter(s => s.status === "completed");
+
+    let totalEarnings = 0;
+    const earningsByMonth: Record<string, number> = {};
+    for (const shift of completedShifts) {
+      const startParts = shift.startTime.split(":");
+      const endParts = shift.endTime.split(":");
+      const startMins = parseInt(startParts[0]) * 60 + parseInt(startParts[1] || "0");
+      const endMins = parseInt(endParts[0]) * 60 + parseInt(endParts[1] || "0");
+      const hours = Math.max((endMins - startMins) / 60, 0.25);
+      const rate = Number(worker.hourlyRate || 0);
+      const earned = hours * rate;
+      totalEarnings += earned;
+      const month = shift.date.substring(0, 7);
+      earningsByMonth[month] = (earningsByMonth[month] || 0) + earned;
+    }
+
+    res.json({
+      totalEarnings: totalEarnings.toFixed(2),
+      completedShifts: completedShifts.length,
+      totalShifts: workerShifts.length,
+      hourlyRate: worker.hourlyRate,
+      earningsByMonth,
+    });
+  });
+
+  app.get("/api/worker/reviews", requireAuth, async (req, res) => {
+    const userId = req.session.userId!;
+    const user = await storage.getUser(userId);
+    if (!user || user.role !== "carer") {
+      return res.status(403).json({ message: "Not a worker account" });
+    }
+    const worker = await storage.getWorkerByUserId(userId);
+    if (!worker) return res.status(404).json({ message: "Worker profile not found" });
+
+    const reviews = await storage.getReviewsForWorker(worker.id);
+    res.json(reviews);
+  });
+
+  app.get("/api/worker/dashboard", requireAuth, async (req, res) => {
+    const userId = req.session.userId!;
+    const user = await storage.getUser(userId);
+    if (!user || user.role !== "carer") {
+      return res.status(403).json({ message: "Not a worker account" });
+    }
+    const worker = await storage.getWorkerByUserId(userId);
+    if (!worker) return res.status(404).json({ message: "Worker profile not found" });
+
+    const today = new Date().toISOString().split("T")[0];
+    const allShifts = await storage.getShifts({ workerId: worker.id });
+    const todayShifts = allShifts.filter(s => s.date === today);
+    const upcomingShifts = allShifts.filter(s => s.date >= today && s.status !== "cancelled" && s.status !== "completed").slice(0, 5);
+    const completedCount = allShifts.filter(s => s.status === "completed").length;
+    const activeShift = todayShifts.find(s => s.status === "in_progress") || null;
+
+    const allBookings = await storage.getBookings();
+    const pendingBookings = allBookings.filter(b => b.workerId === worker.id && b.status === "pending");
+
+    const reviews = await storage.getReviewsForWorker(worker.id);
+
+    const insuranceExpiry = worker.insuranceExpiry;
+    const complianceAlerts: string[] = [];
+    if (insuranceExpiry) {
+      const expiryDate = new Date(insuranceExpiry);
+      const daysUntilExpiry = Math.ceil((expiryDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+      if (daysUntilExpiry < 0) complianceAlerts.push("Insurance has expired");
+      else if (daysUntilExpiry <= 30) complianceAlerts.push(`Insurance expires in ${daysUntilExpiry} days`);
+    }
+    if (!worker.ndisVerified) complianceAlerts.push("NDIS verification pending");
+
+    res.json({
+      worker,
+      user: { id: user.id, fullName: user.fullName, email: user.email, role: user.role },
+      todayShifts,
+      upcomingShifts,
+      activeShift,
+      completedCount,
+      totalShifts: allShifts.length,
+      pendingBookings: pendingBookings.length,
+      rating: worker.rating,
+      reviewCount: worker.reviewCount,
+      recentReviews: reviews.slice(0, 3),
+      complianceAlerts,
+    });
+  });
+
   app.get("/api/jobs", async (_req, res) => {
     const jobs = await storage.getJobs();
     res.json(jobs);
@@ -1342,9 +1526,17 @@ export async function registerRoutes(
     if (!shift) return res.status(404).json({ message: "Shift not found" });
 
     const userId = req.session.userId!;
+    const user = await storage.getUser(userId);
     const userWorkerId = await getWorkerIdForUser(userId);
-    if (shift.participantId !== userId && shift.workerId !== userWorkerId) {
+    const isWorker = shift.workerId === userWorkerId;
+    const isParticipant = shift.participantId === userId;
+    if (!isWorker && !isParticipant) {
       return res.status(403).json({ message: "Access denied" });
+    }
+
+    const workerOnlyTransitions = ["confirmed", "in_progress", "completed"];
+    if (workerOnlyTransitions.includes(status) && !isWorker) {
+      return res.status(403).json({ message: "Only the assigned worker can perform this transition" });
     }
 
     if (shift.status === "completed") {

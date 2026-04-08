@@ -17,6 +17,9 @@ import {
   LogOut,
   CalendarDays,
   Building2,
+  ClipboardList,
+  User as UserIcon,
+  TrendingUp,
 } from "lucide-react";
 import {
   Sidebar,
@@ -41,7 +44,9 @@ import {
 import { Badge } from "@/components/ui/badge";
 import logoImage from "@assets/Accessible_Australia_Logo_Design_1772582762574.png";
 
-const navItems = [
+type NavItem = { title: string; url: string; icon: typeof LayoutDashboard; audioDesc: string };
+
+const participantNavItems: NavItem[] = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard, audioDesc: "View your dashboard overview" },
   { title: "Book a Carer", url: "/care", icon: HeartHandshake, audioDesc: "Find and book verified NDIS support workers" },
   { title: "Shifts", url: "/shifts", icon: CalendarDays, audioDesc: "Manage shift schedules and track NDIS goal alignment" },
@@ -55,6 +60,22 @@ const navItems = [
   { title: "Messages", url: "/messages", icon: MessageSquare, audioDesc: "View your conversations and messages" },
   { title: "Settings", url: "/settings", icon: Settings, audioDesc: "Manage your account and accessibility preferences" },
 ];
+
+const workerNavItems: NavItem[] = [
+  { title: "Dashboard", url: "/worker/dashboard", icon: LayoutDashboard, audioDesc: "View your worker dashboard overview" },
+  { title: "My Shifts", url: "/worker/shifts", icon: CalendarDays, audioDesc: "View and manage your shifts and earnings" },
+  { title: "My Bookings", url: "/worker/bookings", icon: ClipboardList, audioDesc: "Accept or decline booking requests" },
+  { title: "Availability", url: "/shifts", icon: CalendarDays, audioDesc: "Set your weekly availability and blockouts" },
+  { title: "My Profile", url: "/worker/profile", icon: UserIcon, audioDesc: "Update your worker profile and details" },
+  { title: "MapAble Chat", url: "/chat", icon: Bot, audioDesc: "Chat with your accessibility-aware travel assistant" },
+  { title: "Messages", url: "/messages", icon: MessageSquare, audioDesc: "View your conversations and messages" },
+  { title: "Settings", url: "/settings", icon: Settings, audioDesc: "Manage your account and accessibility preferences" },
+];
+
+function getNavItems(role?: string): NavItem[] {
+  if (role === "carer") return workerNavItems;
+  return participantNavItems;
+}
 
 function speakDescription(text: string) {
   if (typeof window !== "undefined" && window.speechSynthesis) {
@@ -71,6 +92,7 @@ export function AppSidebar() {
   const { toggleSidebar, state } = useSidebar();
   const { user, logout } = useAuth();
   const isCollapsed = state === "collapsed";
+  const navItems = getNavItems(user?.role);
 
   return (
     <Sidebar collapsible="icon">
@@ -99,7 +121,7 @@ export function AppSidebar() {
           <DropdownMenuContent align="start" className="w-64">
             {navItems.map((item) => (
               <DropdownMenuItem
-                key={item.title}
+                key={item.title + item.url}
                 onFocus={() => speakDescription(item.audioDesc)}
                 onSelect={() => setLocation(item.url)}
                 aria-description={item.audioDesc}
@@ -124,18 +146,20 @@ export function AppSidebar() {
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+          <SidebarGroupLabel>{user?.role === "carer" ? "Worker" : "Navigation"}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {navItems.map((item) => {
-                const isActive = location === item.url || (item.url !== "/" && location.startsWith(item.url));
+                const isActive = location === item.url || (item.url !== "/" && item.url !== "/worker/dashboard" && location.startsWith(item.url));
+                const isDashboardActive = (item.url === "/" || item.url === "/worker/dashboard") && location === item.url;
+                const active = isActive || isDashboardActive;
                 return (
-                  <SidebarMenuItem key={item.title}>
+                  <SidebarMenuItem key={item.title + item.url}>
                     <SidebarMenuButton
                       asChild
-                      data-active={isActive}
+                      data-active={active}
                       tooltip={item.title}
-                      className={isActive ? "bg-sidebar-accent text-sidebar-accent-foreground" : ""}
+                      className={active ? "bg-sidebar-accent text-sidebar-accent-foreground" : ""}
                     >
                       <Link
                         href={item.url}
@@ -143,8 +167,8 @@ export function AppSidebar() {
                         aria-label={`${item.title} — ${item.audioDesc}`}
                         onFocus={() => speakDescription(item.audioDesc)}
                       >
-                        <item.icon className={`w-4 h-4 ${isActive ? "text-[#2EAA6E]" : ""}`} />
-                        <span className={isActive ? "font-semibold" : ""}>{item.title}</span>
+                        <item.icon className={`w-4 h-4 ${active ? "text-[#2EAA6E]" : ""}`} />
+                        <span className={active ? "font-semibold" : ""}>{item.title}</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>

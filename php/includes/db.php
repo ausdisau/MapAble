@@ -381,3 +381,251 @@ function pgArrayToPhp($pgArray) {
     if (empty($pgArray)) return [];
     return array_map(fn($v) => trim($v, '"'), explode(',', $pgArray));
 }
+
+function getWorkerByUserId($pdo, $userId) {
+    $stmt = $pdo->prepare('SELECT w.*, u.full_name, u.email, u.location, u.bio, u.languages, u.skills, u.phone_number, u.role, u.username, u.avatar
+        FROM workers w JOIN users u ON w.user_id = u.id WHERE w.user_id = ?');
+    $stmt->execute([$userId]);
+    return $stmt->fetch();
+}
+
+function getWorkerBookings($pdo, $workerId, $status = null) {
+    $sql = 'SELECT b.*, u.full_name as participant_name, u.email as participant_email
+        FROM bookings b JOIN users u ON b.participant_id = u.id WHERE b.worker_id = ?';
+    $params = [$workerId];
+    if ($status) {
+        $sql .= ' AND b.status = ?';
+        $params[] = $status;
+    }
+    $sql .= ' ORDER BY b.date DESC';
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
+    return $stmt->fetchAll();
+}
+
+function getWorkerShifts($pdo, $workerId, $filters = []) {
+    $sql = 'SELECT ss.*, u.full_name as participant_name
+        FROM service_sessions ss
+        JOIN users u ON ss.participant_id = u.id
+        WHERE ss.worker_id = ?';
+    $params = [$workerId];
+    if (!empty($filters['status'])) {
+        $sql .= ' AND ss.status = ?';
+        $params[] = $filters['status'];
+    }
+    if (!empty($filters['date_from'])) {
+        $sql .= ' AND ss.date >= ?';
+        $params[] = $filters['date_from'];
+    }
+    if (!empty($filters['date_to'])) {
+        $sql .= ' AND ss.date <= ?';
+        $params[] = $filters['date_to'];
+    }
+    $sql .= ' ORDER BY ss.date DESC, ss.start_time DESC';
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
+    return $stmt->fetchAll();
+}
+
+function getWorkerEarnings($pdo, $workerId, $periodStart, $periodEnd) {
+    $stmt = $pdo->prepare("SELECT
+        COALESCE(SUM(actual_hours), 0) as total_hours,
+        COALESCE(SUM(total_charge), 0) as total_earnings,
+        COUNT(*) as shift_count
+        FROM service_sessions
+        WHERE worker_id = ? AND status = 'completed' AND date >= ? AND date <= ?");
+    $stmt->execute([$workerId, $periodStart, $periodEnd]);
+    return $stmt->fetch();
+}
+
+function updateWorkerProfile($pdo, $workerId, $data) {
+    $workerFields = [];
+    $workerValues = [];
+    $allowedWorker = ['title', 'hourly_rate', 'transport_capable', 'transport_type', 'wheelchair_accessible'];
+    foreach ($allowedWorker as $col) {
+        if (isset($data[$col])) {
+            $workerFields[] = "$col = ?";
+            if (in_array($col, ['transport_capable', 'wheelchair_accessible'])) {
+                $workerValues[] = $data[$col] ? 'true' : 'false';
+            } else {
+                $workerValues[] = $data[$col];
+            }
+        }
+    }
+    if (!empty($data['specializations']) && is_array($data['specializations'])) {
+        $workerFields[] = 'specializations = ?';
+        $workerValues[] = '{' . implode(',', array_map(fn($s) => '"' . $s . '"', $data['specializations'])) . '}';
+    }
+    if (!empty($workerFields)) {
+        $workerValues[] = $workerId;
+        $pdo->prepare('UPDATE workers SET ' . implode(', ', $workerFields) . ' WHERE id = ?')->execute($workerValues);
+    }
+
+    $worker = getWorkerById($pdo, $workerId);
+    if ($worker) {
+        $userFields = [];
+        $userValues = [];
+        foreach (['bio', 'languages', 'phone_number'] as $col) {
+            if (isset($data[$col])) {
+                $userFields[] = "$col = ?";
+                $userValues[] = $data[$col];
+            }
+        }
+        if (!empty($userFields)) {
+            $userValues[] = $worker['user_id'];
+            $pdo->prepare('UPDATE users SET ' . implode(', ', $userFields) . ' WHERE id = ?')->execute($userValues);
+        }
+    }
+    return getWorkerByUserId($pdo, $worker['user_id']);
+}
+
+function getWorkerById($pdo, $workerId) {
+    $stmt = $pdo->prepare('SELECT * FROM workers WHERE id = ?');
+    $stmt->execute([$workerId]);
+    return $stmt->fetch();
+}
+
+function setWorkerAvailability($pdo, $workerId, $slots) {
+    $pdo->prepare('DELETE FROM worker_availability WHERE worker_id = ?')->execute([$workerId]);
+    $stmt = $pdo->prepare('INSERT INTO worker_availability (id, worker_id, day_of_week, start_time, end_time, is_recurring) VALUES (?, ?, ?, ?, ?, true)');
+    foreach ($slots as $slot) {
+        $id = bin2hex(random_bytes(16));
+        $stmt->execute([$id, $workerId, $slot['day_of_week'], $slot['start_time'], $slot['end_time']]);
+    }
+}
+
+function getWorkerAvailability($pdo, $workerId) {
+    $stmt = $pdo->prepare('SELECT * FROM worker_availability WHERE worker_id = ? ORDER BY day_of_week, start_time');
+    $stmt->execute([$workerId]);
+    return $stmt->fetchAll();
+}
+
+function addWorkerBlockout($pdo, $workerId, $date, $reason) {
+    $id = bin2hex(random_bytes(16));
+    $stmt = $pdo->prepare('INSERT INTO worker_blockouts (id, worker_id, date, reason) VALUES (?, ?, ?, ?)');
+    $stmt->execute([$id, $workerId, $date, $reason]);
+}
+
+function removeWorkerBlockout($pdo, $id) {
+    $pdo->prepare('DELETE FROM worker_blockouts WHERE id = ?')->execute([$id]);
+}
+
+function getWorkerBlockouts($pdo, $workerId) {
+    $stmt = $pdo->prepare('SELECT * FROM worker_blockouts WHERE worker_id = ? ORDER BY date');
+    $stmt->execute([$workerId]);
+    return $stmt->fetchAll();
+}
+
+function acceptBooking($pdo, $bookingId) {
+    $pdo->prepare("UPDATE bookings SET status = 'confirmed' WHERE id = ?")->execute([$bookingId]);
+}
+
+function declineBooking($pdo, $bookingId) {
+    $pdo->prepare("UPDATE bookings SET status = 'cancelled' WHERE id = ?")->execute([$bookingId]);
+}
+
+function getWorkerComplianceAlerts($pdo, $workerId) {
+    $stmt = $pdo->prepare('SELECT wwcc_expiry, first_aid_expiry, insurance_expiry, screening_clearance_status, screening_expiry FROM workers WHERE id = ?');
+    $stmt->execute([$workerId]);
+    $w = $stmt->fetch();
+    if (!$w) return [];
+    $alerts = [];
+    $now = time();
+    $warn30 = $now + (30 * 86400);
+    $fields = [
+        'wwcc_expiry' => 'WWCC',
+        'first_aid_expiry' => 'First Aid Certificate',
+        'insurance_expiry' => 'Insurance',
+        'screening_expiry' => 'Screening',
+    ];
+    foreach ($fields as $col => $label) {
+        if (!empty($w[$col])) {
+            $exp = strtotime($w[$col]);
+            if ($exp && $exp < $now) {
+                $alerts[] = ['field' => $col, 'label' => $label, 'expiry' => $w[$col], 'level' => 'expired'];
+            } elseif ($exp && $exp < $warn30) {
+                $alerts[] = ['field' => $col, 'label' => $label, 'expiry' => $w[$col], 'level' => 'warning'];
+            }
+        }
+    }
+    if (!empty($w['screening_clearance_status']) && $w['screening_clearance_status'] !== 'cleared') {
+        $alerts[] = ['field' => 'screening_clearance_status', 'label' => 'Screening Status', 'status' => $w['screening_clearance_status'], 'level' => 'warning'];
+    }
+    return $alerts;
+}
+
+function getWorkerTodayBookings($pdo, $workerId) {
+    $today = date('Y-m-d');
+    $stmt = $pdo->prepare("SELECT b.*, u.full_name as participant_name
+        FROM bookings b JOIN users u ON b.participant_id = u.id
+        WHERE b.worker_id = ? AND b.date = ? AND b.status IN ('confirmed', 'pending')
+        ORDER BY b.start_time");
+    $stmt->execute([$workerId, $today]);
+    return $stmt->fetchAll();
+}
+
+function getWorkerActiveShift($pdo, $workerId) {
+    $stmt = $pdo->prepare("SELECT ss.*, u.full_name as participant_name
+        FROM service_sessions ss JOIN users u ON ss.participant_id = u.id
+        WHERE ss.worker_id = ? AND ss.status = 'in_progress'
+        ORDER BY ss.start_time DESC LIMIT 1");
+    $stmt->execute([$workerId]);
+    return $stmt->fetch();
+}
+
+function endWorkerShift($pdo, $sessionId, $hours, $notes = null) {
+    $stmt = $pdo->prepare("SELECT * FROM service_sessions WHERE id = ?");
+    $stmt->execute([$sessionId]);
+    $session = $stmt->fetch();
+    if (!$session) return null;
+    $rate = (float)($session['hourly_rate'] ?? 0);
+    $total = round($hours * $rate, 2);
+    $pdo->prepare("UPDATE service_sessions SET status = 'completed', end_time = ?, actual_hours = ?, total_charge = ?, shift_notes = ? WHERE id = ?")
+        ->execute([date('H:i'), $hours, $total, $notes, $sessionId]);
+    $stmt->execute([$sessionId]);
+    return $stmt->fetch();
+}
+
+function startWorkerShift($pdo, $workerId, $participantId, $bookingId = null) {
+    $month = date('Y-m');
+    $rateInfo = calculateCareRate($pdo, $participantId, $month);
+    $data = [
+        'booking_id' => $bookingId,
+        'worker_id' => $workerId,
+        'participant_id' => $participantId,
+        'start_time' => date('H:i'),
+        'end_time' => null,
+        'actual_hours' => null,
+        'hourly_rate' => $rateInfo['rate'],
+        'tier_applied' => $rateInfo['tier'],
+        'ndis_item_code' => '01_011_0107_1_1',
+        'total_charge' => null,
+        'shift_notes' => null,
+        'status' => 'in_progress',
+        'date' => date('Y-m-d'),
+    ];
+    return createServiceSession($pdo, $data);
+}
+
+function getWorkerUpcomingBookings($pdo, $workerId, $limit = 5) {
+    $today = date('Y-m-d');
+    $stmt = $pdo->prepare("SELECT b.*, u.full_name as participant_name
+        FROM bookings b JOIN users u ON b.participant_id = u.id
+        WHERE b.worker_id = ? AND b.date >= ? AND b.status IN ('confirmed', 'pending')
+        ORDER BY b.date, b.start_time LIMIT ?");
+    $stmt->execute([$workerId, $today, $limit]);
+    return $stmt->fetchAll();
+}
+
+function getWorkerRecentReviews($pdo, $workerId, $limit = 3) {
+    $stmt = $pdo->prepare('SELECT r.*, u.full_name as reviewer_name FROM reviews r
+        JOIN users u ON r.participant_id = u.id WHERE r.worker_id = ? ORDER BY r.created_at DESC LIMIT ?');
+    $stmt->execute([$workerId, $limit]);
+    return $stmt->fetchAll();
+}
+
+function getWorkerActiveBookingsCount($pdo, $workerId) {
+    $stmt = $pdo->prepare("SELECT COUNT(*) as cnt FROM bookings WHERE worker_id = ? AND status IN ('confirmed', 'pending')");
+    $stmt->execute([$workerId]);
+    return (int)$stmt->fetch()['cnt'];
+}

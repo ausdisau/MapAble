@@ -36,6 +36,10 @@ import InvoicesPage from "@/pages/invoices";
 import ChatPage from "@/pages/chat";
 import ShiftsPage from "@/pages/shifts";
 import AbnLookupPage from "@/pages/abn-lookup";
+import WorkerDashboard from "@/pages/worker-dashboard";
+import WorkerProfile from "@/pages/worker-profile";
+import WorkerBookings from "@/pages/worker-bookings";
+import WorkerShifts from "@/pages/worker-shifts";
 
 function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
@@ -119,7 +123,9 @@ function MobileSearchButton() {
   );
 }
 
-const mobileNavItems = [
+import { ClipboardList, User as UserIconLucide } from "lucide-react";
+
+const participantMobileNavItems = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard, audioDesc: "View your dashboard overview" },
   { title: "Book a Carer", url: "/care", icon: HeartHandshake, audioDesc: "Find and book verified NDIS support workers" },
   { title: "Shifts", url: "/shifts", icon: CalendarDays, audioDesc: "Manage shift schedules and track NDIS goal alignment" },
@@ -130,6 +136,17 @@ const mobileNavItems = [
   { title: "Budget", url: "/budget", icon: Wallet, audioDesc: "View your NDIS budget usage and remaining funds" },
   { title: "Invoices", url: "/invoices", icon: FileText, audioDesc: "View and manage your NDIS invoices and claims" },
   { title: "ABN Lookup", url: "/abn-lookup", icon: Building2, audioDesc: "Search and verify Australian Business Numbers" },
+  { title: "Messages", url: "/messages", icon: MessageSquare, audioDesc: "View your conversations and messages" },
+  { title: "Settings", url: "/settings", icon: Settings, audioDesc: "Manage your account and accessibility preferences" },
+];
+
+const workerMobileNavItems = [
+  { title: "Dashboard", url: "/worker/dashboard", icon: LayoutDashboard, audioDesc: "View your worker dashboard" },
+  { title: "My Shifts", url: "/worker/shifts", icon: CalendarDays, audioDesc: "View and manage your shifts and earnings" },
+  { title: "My Bookings", url: "/worker/bookings", icon: ClipboardList, audioDesc: "Accept or decline booking requests" },
+  { title: "Availability", url: "/shifts", icon: CalendarDays, audioDesc: "Set your weekly availability and blockouts" },
+  { title: "My Profile", url: "/worker/profile", icon: UserIconLucide, audioDesc: "Update your worker profile" },
+  { title: "MapAble Chat", url: "/chat", icon: Bot, audioDesc: "Chat with your accessibility-aware travel assistant" },
   { title: "Messages", url: "/messages", icon: MessageSquare, audioDesc: "View your conversations and messages" },
   { title: "Settings", url: "/settings", icon: Settings, audioDesc: "Manage your account and accessibility preferences" },
 ];
@@ -147,7 +164,9 @@ function speakDescription(text: string) {
 function MobileMenuToggle() {
   const { toggleSidebar, state } = useSidebar();
   const [, setLocation] = useLocation();
+  const { user } = useAuth();
   const isCollapsed = state === "collapsed";
+  const mobileNavItems = user?.role === "carer" ? workerMobileNavItems : participantMobileNavItems;
 
   return (
     <div className="md:hidden flex items-center">
@@ -164,7 +183,7 @@ function MobileMenuToggle() {
         <DropdownMenuContent align="start" className="w-64">
           {mobileNavItems.map((item) => (
             <DropdownMenuItem
-              key={item.title}
+              key={item.title + item.url}
               onFocus={() => speakDescription(item.audioDesc)}
               onSelect={() => setLocation(item.url)}
               aria-description={item.audioDesc}
@@ -208,6 +227,10 @@ function Router() {
       <Route path="/abn-lookup" component={AbnLookupPage} />
       <Route path="/messages" component={MessagesPage} />
       <Route path="/settings" component={SettingsPage} />
+      <Route path="/worker/dashboard" component={WorkerDashboard} />
+      <Route path="/worker/profile" component={WorkerProfile} />
+      <Route path="/worker/bookings" component={WorkerBookings} />
+      <Route path="/worker/shifts" component={WorkerShifts} />
       <Route component={NotFound} />
     </Switch>
   );
