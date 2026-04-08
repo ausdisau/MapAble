@@ -30,6 +30,8 @@ import {
 import { useState, useEffect } from "react";
 import type { Shift } from "@shared/schema";
 
+type EnrichedShift = Shift & { participantName?: string };
+
 interface EarningsData {
   totalEarnings: string;
   completedShifts: number;
@@ -59,7 +61,7 @@ export default function WorkerShifts() {
   const [endShiftNotes, setEndShiftNotes] = useState("");
   const [showNewShift, setShowNewShift] = useState(false);
 
-  const { data: shifts, isLoading: shiftsLoading } = useQuery<Shift[]>({
+  const { data: shifts, isLoading: shiftsLoading } = useQuery<EnrichedShift[]>({
     queryKey: ["/api/shifts"],
     enabled: user?.role === "carer",
   });
@@ -233,6 +235,9 @@ export default function WorkerShifts() {
               {shift.ndisCategory && <Badge variant="outline">{shift.ndisCategory}</Badge>}
               {shift.serviceType && <Badge variant="outline" className="text-xs">{shift.serviceType}</Badge>}
             </div>
+            {shift.participantName && (
+              <p className="text-sm font-medium" data-testid={`shift-participant-${shift.id}`}>{shift.participantName}</p>
+            )}
             <div className="flex items-center gap-4 text-sm">
               <span className="flex items-center gap-1.5 font-medium">
                 <CalendarDays className="w-3.5 h-3.5 text-muted-foreground" />

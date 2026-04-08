@@ -1535,6 +1535,14 @@ export async function registerRoutes(
       dateFrom: dateFrom || undefined,
       dateTo: dateTo || undefined,
     });
+
+    if (user.role === "carer") {
+      const enriched = await Promise.all(result.map(async (shift) => {
+        const participant = shift.participantId ? await storage.getUser(shift.participantId) : null;
+        return { ...shift, participantName: participant?.fullName || "Participant" };
+      }));
+      return res.json(enriched);
+    }
     res.json(result);
   });
 
