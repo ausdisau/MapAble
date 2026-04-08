@@ -25,16 +25,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $bookingId = $_POST['booking_id'] ?? '';
 
     if ($action === 'accept' && $bookingId) {
-        acceptBooking($pdo, $bookingId);
-        setFlash('success', 'Booking accepted.');
+        if (acceptBooking($pdo, $bookingId, $worker['id'])) {
+            setFlash('success', 'Booking accepted.');
+        } else {
+            setFlash('error', 'Booking not found or not assigned to you.');
+        }
     } elseif ($action === 'decline' && $bookingId) {
-        declineBooking($pdo, $bookingId);
-        setFlash('success', 'Booking declined.');
+        if (declineBooking($pdo, $bookingId, $worker['id'])) {
+            setFlash('success', 'Booking declined.');
+        } else {
+            setFlash('error', 'Booking not found or not assigned to you.');
+        }
     } elseif ($action === 'start_shift' && $bookingId) {
         $participantId = $_POST['participant_id'] ?? '';
         if ($participantId && !$activeShift) {
             startWorkerShift($pdo, $worker['id'], $participantId, $bookingId);
-            acceptBooking($pdo, $bookingId);
+            acceptBooking($pdo, $bookingId, $worker['id']);
             setFlash('success', 'Shift started from booking.');
         }
     }

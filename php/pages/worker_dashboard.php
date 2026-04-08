@@ -24,8 +24,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $hours = (float)($_POST['hours'] ?? 0);
         $notes = $_POST['notes'] ?? '';
         if ($hours > 0) {
-            endWorkerShift($pdo, $activeShift['id'], $hours, $notes);
-            setFlash('success', 'Shift ended successfully. ' . $hours . ' hours logged.');
+            $result = endWorkerShift($pdo, $activeShift['id'], $hours, $notes, $worker['id']);
+            if ($result) {
+                setFlash('success', 'Shift ended successfully. ' . $hours . ' hours logged.');
+            } else {
+                setFlash('error', 'Could not end shift. Session not found or not yours.');
+            }
         }
     }
     redirect('/');

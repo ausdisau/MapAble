@@ -516,12 +516,16 @@ function getWorkerBlockouts($pdo, $workerId) {
     return $stmt->fetchAll();
 }
 
-function acceptBooking($pdo, $bookingId) {
-    $pdo->prepare("UPDATE bookings SET status = 'confirmed' WHERE id = ?")->execute([$bookingId]);
+function acceptBooking($pdo, $bookingId, $workerId) {
+    $stmt = $pdo->prepare("UPDATE bookings SET status = 'confirmed' WHERE id = ? AND worker_id = ?");
+    $stmt->execute([$bookingId, $workerId]);
+    return $stmt->rowCount() > 0;
 }
 
-function declineBooking($pdo, $bookingId) {
-    $pdo->prepare("UPDATE bookings SET status = 'cancelled' WHERE id = ?")->execute([$bookingId]);
+function declineBooking($pdo, $bookingId, $workerId) {
+    $stmt = $pdo->prepare("UPDATE bookings SET status = 'cancelled' WHERE id = ? AND worker_id = ?");
+    $stmt->execute([$bookingId, $workerId]);
+    return $stmt->rowCount() > 0;
 }
 
 function getWorkerComplianceAlerts($pdo, $workerId) {
@@ -573,17 +577,18 @@ function getWorkerActiveShift($pdo, $workerId) {
     return $stmt->fetch();
 }
 
-function endWorkerShift($pdo, $sessionId, $hours, $notes = null) {
-    $stmt = $pdo->prepare("SELECT * FROM service_sessions WHERE id = ?");
-    $stmt->execute([$sessionId]);
+function endWorkerShift($pdo, $sessionId, $hours, $notes, $workerId) {
+    $stmt = $pdo->prepare("SELECT * FROM service_sessions WHERE id = ? AND worker_id = ?");
+    $stmt->execute([$sessionId, $workerId]);
     $session = $stmt->fetch();
     if (!$session) return null;
     $rate = (float)($session['hourly_rate'] ?? 0);
     $total = round($hours * $rate, 2);
-    $pdo->prepare("UPDATE service_sessions SET status = 'completed', end_time = ?, actual_hours = ?, total_charge = ?, shift_notes = ? WHERE id = ?")
-        ->execute([date('H:i'), $hours, $total, $notes, $sessionId]);
-    $stmt->execute([$sessionId]);
-    return $stmt->fetch();
+    $pdo->prepare("UPDATE service_sessions SET status = 'completed', end_time = ?, actual_hours = ?, total_charge = ?, shift_notes = ? WHERE id = ? AND worker_id = ?")
+        ->execute([date('H:i'), $hours, $total, $notes, $sessionId, $workerId]);
+    $stmt2 = $pdo->prepare("SELECT * FROM service_sessions WHERE id = ?");
+    $stmt2->execute([$sessionId]);
+    return $stmt2->fetch();
 }
 
 function startWorkerShift($pdo, $workerId, $participantId, $bookingId = null) {

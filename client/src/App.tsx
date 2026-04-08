@@ -40,6 +40,7 @@ import WorkerDashboard from "@/pages/worker-dashboard";
 import WorkerProfile from "@/pages/worker-profile";
 import WorkerBookings from "@/pages/worker-bookings";
 import WorkerShifts from "@/pages/worker-shifts";
+import WorkerAvailabilityPage from "@/pages/worker-availability";
 
 function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
@@ -144,7 +145,7 @@ const workerMobileNavItems = [
   { title: "Dashboard", url: "/worker/dashboard", icon: LayoutDashboard, audioDesc: "View your worker dashboard" },
   { title: "My Shifts", url: "/worker/shifts", icon: CalendarDays, audioDesc: "View and manage your shifts and earnings" },
   { title: "My Bookings", url: "/worker/bookings", icon: ClipboardList, audioDesc: "Accept or decline booking requests" },
-  { title: "Availability", url: "/shifts", icon: CalendarDays, audioDesc: "Set your weekly availability and blockouts" },
+  { title: "Availability", url: "/worker/availability", icon: CalendarDays, audioDesc: "Set your weekly availability and blockouts" },
   { title: "My Profile", url: "/worker/profile", icon: UserIconLucide, audioDesc: "Update your worker profile" },
   { title: "MapAble Chat", url: "/chat", icon: Bot, audioDesc: "Chat with your accessibility-aware travel assistant" },
   { title: "Messages", url: "/messages", icon: MessageSquare, audioDesc: "View your conversations and messages" },
@@ -231,6 +232,7 @@ function Router() {
       <Route path="/worker/profile" component={WorkerProfile} />
       <Route path="/worker/bookings" component={WorkerBookings} />
       <Route path="/worker/shifts" component={WorkerShifts} />
+      <Route path="/worker/availability" component={WorkerAvailabilityPage} />
       <Route component={NotFound} />
     </Switch>
   );

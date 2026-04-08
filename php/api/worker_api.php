@@ -36,7 +36,8 @@ if ($uri === '/api/worker/shift/end' && $method === 'POST') {
     if (!$sessionId || $hours <= 0) {
         jsonResponse(['error' => 'session_id and hours required'], 400);
     }
-    $session = endWorkerShift($pdo, $sessionId, $hours, $notes);
+    $session = endWorkerShift($pdo, $sessionId, $hours, $notes, $worker['id']);
+    if (!$session) jsonResponse(['error' => 'Session not found or not yours'], 403);
     jsonResponse(['success' => true, 'session' => $session]);
 }
 
@@ -44,7 +45,7 @@ if ($uri === '/api/worker/booking/accept' && $method === 'POST') {
     $input = json_decode(file_get_contents('php://input'), true) ?: $_POST;
     $bookingId = $input['booking_id'] ?? '';
     if (!$bookingId) jsonResponse(['error' => 'booking_id required'], 400);
-    acceptBooking($pdo, $bookingId);
+    acceptBooking($pdo, $bookingId, $worker['id']);
     jsonResponse(['success' => true]);
 }
 
@@ -52,7 +53,7 @@ if ($uri === '/api/worker/booking/decline' && $method === 'POST') {
     $input = json_decode(file_get_contents('php://input'), true) ?: $_POST;
     $bookingId = $input['booking_id'] ?? '';
     if (!$bookingId) jsonResponse(['error' => 'booking_id required'], 400);
-    declineBooking($pdo, $bookingId);
+    declineBooking($pdo, $bookingId, $worker['id']);
     jsonResponse(['success' => true]);
 }
 
@@ -64,7 +65,7 @@ if ($uri === '/api/worker/booking/start-shift' && $method === 'POST') {
     $existing = getWorkerActiveShift($pdo, $worker['id']);
     if ($existing) jsonResponse(['error' => 'You already have an active shift'], 400);
     $session = startWorkerShift($pdo, $worker['id'], $participantId, $bookingId);
-    acceptBooking($pdo, $bookingId);
+    acceptBooking($pdo, $bookingId, $worker['id']);
     jsonResponse(['success' => true, 'session' => $session]);
 }
 
