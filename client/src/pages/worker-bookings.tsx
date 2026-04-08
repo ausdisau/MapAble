@@ -18,6 +18,7 @@ import {
   Calendar,
   AlertTriangle,
   ClipboardList,
+  Play,
 } from "lucide-react";
 import type { Booking } from "@shared/schema";
 
@@ -60,6 +61,22 @@ export default function WorkerBookings() {
     },
     onError: () => {
       toast({ title: "Error", description: "Failed to update booking status.", variant: "destructive" });
+    },
+  });
+
+  const startShiftMutation = useMutation({
+    mutationFn: async (bookingId: string) => {
+      const res = await apiRequest("POST", `/api/worker/bookings/${bookingId}/start-shift`);
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/worker/bookings"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/worker/dashboard"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/worker/shifts"] });
+      toast({ title: "Shift started", description: "A new active shift has been created from this booking." });
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to start shift from booking.", variant: "destructive" });
     },
   });
 
@@ -129,29 +146,42 @@ export default function WorkerBookings() {
           )}
         </div>
 
-        {showActions && booking.status === "pending" && (
-          <div className="flex gap-2 shrink-0">
+        <div className="flex gap-2 shrink-0">
+          {showActions && booking.status === "pending" && (
+            <>
+              <Button
+                size="sm"
+                className="bg-[#2EAA6E] hover:bg-[#259D61] gap-1"
+                onClick={() => statusMutation.mutate({ id: booking.id, status: "confirmed" })}
+                disabled={statusMutation.isPending}
+                data-testid={`button-accept-${booking.id}`}
+              >
+                <CheckCircle2 className="w-3.5 h-3.5" /> Accept
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                className="text-red-600 border-red-300 hover:bg-red-50 gap-1"
+                onClick={() => statusMutation.mutate({ id: booking.id, status: "cancelled" })}
+                disabled={statusMutation.isPending}
+                data-testid={`button-decline-${booking.id}`}
+              >
+                <XCircle className="w-3.5 h-3.5" /> Decline
+              </Button>
+            </>
+          )}
+          {booking.status === "confirmed" && (
             <Button
               size="sm"
-              className="bg-[#2EAA6E] hover:bg-[#259D61] gap-1"
-              onClick={() => statusMutation.mutate({ id: booking.id, status: "confirmed" })}
-              disabled={statusMutation.isPending}
-              data-testid={`button-accept-${booking.id}`}
+              className="bg-[#1B6EB5] hover:bg-[#155B96] gap-1"
+              onClick={() => startShiftMutation.mutate(booking.id)}
+              disabled={startShiftMutation.isPending}
+              data-testid={`button-start-shift-${booking.id}`}
             >
-              <CheckCircle2 className="w-3.5 h-3.5" /> Accept
+              <Play className="w-3.5 h-3.5" /> Start Shift
             </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              className="text-red-600 border-red-300 hover:bg-red-50 gap-1"
-              onClick={() => statusMutation.mutate({ id: booking.id, status: "cancelled" })}
-              disabled={statusMutation.isPending}
-              data-testid={`button-decline-${booking.id}`}
-            >
-              <XCircle className="w-3.5 h-3.5" /> Decline
-            </Button>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </Card>
   );

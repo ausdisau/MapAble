@@ -18,8 +18,11 @@ import {
   ArrowRight,
   ShieldCheck,
   TrendingUp,
+  Timer,
+  Briefcase,
 } from "lucide-react";
 import { Link, Redirect } from "wouter";
+import { useState, useEffect } from "react";
 import type { Shift } from "@shared/schema";
 
 interface DashboardData {
@@ -40,6 +43,9 @@ interface DashboardData {
   completedCount: number;
   totalShifts: number;
   pendingBookings: number;
+  activeBookingsCount: number;
+  monthHours: number;
+  monthEarnings: number;
   rating: string;
   reviewCount: number;
   recentReviews: { id: string; rating: number; comment: string | null; createdAt: string; participant?: { fullName: string } }[];
@@ -54,6 +60,37 @@ const STATUS_COLORS: Record<string, string> = {
   cancelled: "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300",
 };
 
+function LiveTimer({ startTime }: { startTime: string }) {
+  const [elapsed, setElapsed] = useState("");
+
+  useEffect(() => {
+    const parseStart = () => {
+      const now = new Date();
+      const [h, m] = startTime.split(":").map(Number);
+      const start = new Date(now);
+      start.setHours(h, m, 0, 0);
+      return start;
+    };
+
+    const update = () => {
+      const start = parseStart();
+      const diff = Math.max(0, Date.now() - start.getTime());
+      const hours = Math.floor(diff / 3600000);
+      const mins = Math.floor((diff % 3600000) / 60000);
+      const secs = Math.floor((diff % 60000) / 1000);
+      setElapsed(`${hours.toString().padStart(2, "0")}:${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`);
+    };
+
+    update();
+    const interval = setInterval(update, 1000);
+    return () => clearInterval(interval);
+  }, [startTime]);
+
+  return (
+    <span className="font-mono text-lg font-bold text-[#2EAA6E]" data-testid="text-live-timer">{elapsed}</span>
+  );
+}
+
 export default function WorkerDashboard() {
   usePageTitle("Worker Dashboard | MapAble");
   const { user } = useAuth();
@@ -61,6 +98,7 @@ export default function WorkerDashboard() {
   const { data, isLoading, error } = useQuery<DashboardData>({
     queryKey: ["/api/worker/dashboard"],
     enabled: user?.role === "carer",
+    refetchInterval: 30000,
   });
 
   if (user && user.role !== "carer") {
@@ -132,50 +170,50 @@ export default function WorkerDashboard() {
       )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="p-5" data-testid="stat-today-shifts">
+        <Card className="p-5" data-testid="stat-month-hours">
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-lg bg-[#1B6EB5]/10">
-              <CalendarDays className="w-5 h-5 text-[#1B6EB5]" />
+              <Clock className="w-5 h-5 text-[#1B6EB5]" />
             </div>
             <div>
-              <p className="text-2xl font-bold">{data.todayShifts.length}</p>
-              <p className="text-xs text-muted-foreground">Today's Shifts</p>
+              <p className="text-2xl font-bold">{data.monthHours}</p>
+              <p className="text-xs text-muted-foreground">Hours This Month</p>
             </div>
           </div>
         </Card>
 
-        <Card className="p-5" data-testid="stat-completed">
+        <Card className="p-5" data-testid="stat-month-earnings">
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-lg bg-[#2EAA6E]/10">
-              <CheckCircle2 className="w-5 h-5 text-[#2EAA6E]" />
+              <DollarSign className="w-5 h-5 text-[#2EAA6E]" />
             </div>
             <div>
-              <p className="text-2xl font-bold">{data.completedCount}</p>
-              <p className="text-xs text-muted-foreground">Completed Shifts</p>
+              <p className="text-2xl font-bold">${data.monthEarnings.toFixed(2)}</p>
+              <p className="text-xs text-muted-foreground">Earnings This Month</p>
+            </div>
+          </div>
+        </Card>
+
+        <Card className="p-5" data-testid="stat-active-bookings">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-lg bg-[#E6A817]/10">
+              <Briefcase className="w-5 h-5 text-[#E6A817]" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold">{data.activeBookingsCount}</p>
+              <p className="text-xs text-muted-foreground">Active Bookings</p>
             </div>
           </div>
         </Card>
 
         <Card className="p-5" data-testid="stat-pending-bookings">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-lg bg-[#E6A817]/10">
-              <ClipboardList className="w-5 h-5 text-[#E6A817]" />
+            <div className="p-2.5 rounded-lg bg-purple-500/10">
+              <ClipboardList className="w-5 h-5 text-purple-500" />
             </div>
             <div>
               <p className="text-2xl font-bold">{data.pendingBookings}</p>
               <p className="text-xs text-muted-foreground">Pending Bookings</p>
-            </div>
-          </div>
-        </Card>
-
-        <Card className="p-5" data-testid="stat-hourly-rate">
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-lg bg-purple-500/10">
-              <DollarSign className="w-5 h-5 text-purple-500" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold">${Number(data.worker.hourlyRate || 0).toFixed(2)}</p>
-              <p className="text-xs text-muted-foreground">Hourly Rate</p>
             </div>
           </div>
         </Card>
@@ -186,10 +224,16 @@ export default function WorkerDashboard() {
           <div className="flex items-center gap-3 mb-3">
             <Play className="w-5 h-5 text-[#2EAA6E]" />
             <h3 className="font-semibold text-[#2EAA6E]">Active Shift</h3>
+            <Badge className="bg-[#2EAA6E]/20 text-[#2EAA6E] border-[#2EAA6E]/30 gap-1 animate-pulse">
+              <Timer className="w-3 h-3" /> Live
+            </Badge>
           </div>
           <div className="flex flex-col sm:flex-row sm:items-center gap-4">
             <div className="flex-1">
-              <p className="font-medium">{data.activeShift.startTime} – {data.activeShift.endTime}</p>
+              <div className="flex items-center gap-4 mb-2">
+                <p className="font-medium">Started at {data.activeShift.startTime}</p>
+                <LiveTimer startTime={data.activeShift.startTime} />
+              </div>
               {data.activeShift.ndisGoal && (
                 <p className="text-sm text-muted-foreground mt-1">Goal: {data.activeShift.ndisGoal}</p>
               )}
@@ -198,23 +242,46 @@ export default function WorkerDashboard() {
               )}
             </div>
             <Link href="/worker/shifts">
-              <Button size="sm" data-testid="button-view-active-shift">View Details</Button>
+              <Button size="sm" data-testid="button-view-active-shift">Manage Shift</Button>
             </Link>
           </div>
         </Card>
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="p-5" data-testid="card-upcoming-shifts">
+        <Card className="p-5" data-testid="card-today-shifts">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold flex items-center gap-2">
-              <Clock className="w-4 h-4 text-[#1B6EB5]" /> Upcoming Shifts
+              <CalendarDays className="w-4 h-4 text-[#1B6EB5]" /> Today's Schedule ({data.todayShifts.length})
             </h3>
             <Link href="/worker/shifts">
               <Button variant="ghost" size="sm" className="text-[#1B6EB5] gap-1" data-testid="link-all-shifts">
                 View All <ArrowRight className="w-3.5 h-3.5" />
               </Button>
             </Link>
+          </div>
+          {data.todayShifts.length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-6">No shifts scheduled for today.</p>
+          ) : (
+            <div className="space-y-3">
+              {data.todayShifts.map((shift) => (
+                <div key={shift.id} className="flex items-center justify-between py-2 border-b last:border-b-0" data-testid={`shift-today-${shift.id}`}>
+                  <div>
+                    <p className="text-sm font-medium">{shift.startTime} – {shift.endTime}</p>
+                    {shift.ndisGoal && <p className="text-xs text-muted-foreground">{shift.ndisGoal}</p>}
+                  </div>
+                  <Badge className={STATUS_COLORS[shift.status] || ""}>{shift.status.replace("_", " ")}</Badge>
+                </div>
+              ))}
+            </div>
+          )}
+        </Card>
+
+        <Card className="p-5" data-testid="card-upcoming-shifts">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-semibold flex items-center gap-2">
+              <Clock className="w-4 h-4 text-[#1B6EB5]" /> Upcoming Shifts
+            </h3>
           </div>
           {data.upcomingShifts.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-6">No upcoming shifts scheduled.</p>
@@ -232,38 +299,38 @@ export default function WorkerDashboard() {
             </div>
           )}
         </Card>
-
-        <Card className="p-5" data-testid="card-recent-reviews">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold flex items-center gap-2">
-              <Star className="w-4 h-4 text-[#E6A817]" /> Recent Reviews
-            </h3>
-            <div className="flex items-center gap-1 text-sm font-medium">
-              <TrendingUp className="w-3.5 h-3.5 text-[#2EAA6E]" />
-              {Number(data.rating).toFixed(1)} avg
-            </div>
-          </div>
-          {data.recentReviews.length === 0 ? (
-            <p className="text-sm text-muted-foreground text-center py-6">No reviews yet.</p>
-          ) : (
-            <div className="space-y-3">
-              {data.recentReviews.map((review) => (
-                <div key={review.id} className="py-2 border-b last:border-b-0" data-testid={`review-${review.id}`}>
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm font-medium">{review.participant?.fullName || "Participant"}</span>
-                    <div className="flex items-center gap-0.5">
-                      {Array.from({ length: 5 }).map((_, i) => (
-                        <Star key={i} className={`w-3 h-3 ${i < review.rating ? "fill-[#E6A817] text-[#E6A817]" : "text-gray-300"}`} />
-                      ))}
-                    </div>
-                  </div>
-                  {review.comment && <p className="text-xs text-muted-foreground">{review.comment}</p>}
-                </div>
-              ))}
-            </div>
-          )}
-        </Card>
       </div>
+
+      <Card className="p-5" data-testid="card-recent-reviews">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-semibold flex items-center gap-2">
+            <Star className="w-4 h-4 text-[#E6A817]" /> Recent Reviews
+          </h3>
+          <div className="flex items-center gap-1 text-sm font-medium">
+            <TrendingUp className="w-3.5 h-3.5 text-[#2EAA6E]" />
+            {Number(data.rating).toFixed(1)} avg
+          </div>
+        </div>
+        {data.recentReviews.length === 0 ? (
+          <p className="text-sm text-muted-foreground text-center py-6">No reviews yet.</p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {data.recentReviews.map((review) => (
+              <div key={review.id} className="p-3 rounded-lg bg-muted/50" data-testid={`review-${review.id}`}>
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-sm font-medium">{review.participant?.fullName || "Participant"}</span>
+                  <div className="flex items-center gap-0.5">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <Star key={i} className={`w-3 h-3 ${i < review.rating ? "fill-[#E6A817] text-[#E6A817]" : "text-gray-300"}`} />
+                    ))}
+                  </div>
+                </div>
+                {review.comment && <p className="text-xs text-muted-foreground">{review.comment}</p>}
+              </div>
+            ))}
+          </div>
+        )}
+      </Card>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Link href="/worker/bookings">
@@ -288,7 +355,7 @@ export default function WorkerDashboard() {
             </div>
           </Card>
         </Link>
-        <Link href="/shifts">
+        <Link href="/worker/availability">
           <Card className="p-5 hover:shadow-md transition-shadow cursor-pointer group" data-testid="link-card-availability">
             <div className="flex items-center gap-3">
               <CalendarDays className="w-5 h-5 text-[#E6A817] group-hover:scale-110 transition-transform" />

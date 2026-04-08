@@ -506,8 +506,10 @@ function addWorkerBlockout($pdo, $workerId, $date, $reason) {
     $stmt->execute([$id, $workerId, $date, $reason]);
 }
 
-function removeWorkerBlockout($pdo, $id) {
-    $pdo->prepare('DELETE FROM worker_blockouts WHERE id = ?')->execute([$id]);
+function removeWorkerBlockout($pdo, $id, $workerId) {
+    $stmt = $pdo->prepare('DELETE FROM worker_blockouts WHERE id = ? AND worker_id = ?');
+    $stmt->execute([$id, $workerId]);
+    return $stmt->rowCount() > 0;
 }
 
 function getWorkerBlockouts($pdo, $workerId) {

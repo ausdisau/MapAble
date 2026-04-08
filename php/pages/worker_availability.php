@@ -46,8 +46,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($action === 'remove_blockout') {
         $blockoutId = $_POST['blockout_id'] ?? '';
         if ($blockoutId) {
-            removeWorkerBlockout($pdo, $blockoutId);
-            setFlash('success', 'Blockout date removed.');
+            if (removeWorkerBlockout($pdo, $blockoutId, $worker['id'])) {
+                setFlash('success', 'Blockout date removed.');
+            } else {
+                setFlash('error', 'Blockout not found or not yours.');
+            }
         }
         redirect('/worker/availability');
     }
