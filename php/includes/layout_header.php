@@ -1,19 +1,36 @@
 <?php
 $currentPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $user = currentUser($pdo);
-$navItems = [
-    ['title' => 'Dashboard', 'url' => '/', 'icon' => 'layout-dashboard'],
-    ['title' => 'Book a Carer', 'url' => '/care', 'icon' => 'heart-handshake'],
-    ['title' => 'Find a Job', 'url' => '/jobs', 'icon' => 'briefcase'],
-    ['title' => 'Get Transport', 'url' => '/transport', 'icon' => 'bus'],
-    ['title' => 'MapAble Chat', 'url' => '/chat', 'icon' => 'bot'],
-    ['title' => 'Pricing', 'url' => '/pricing', 'icon' => 'dollar-sign'],
-    ['title' => 'Budget', 'url' => '/budget', 'icon' => 'wallet'],
-    ['title' => 'Invoices', 'url' => '/invoices', 'icon' => 'file-text'],
-    ['title' => 'Messages', 'url' => '/messages', 'icon' => 'message-square'],
-    ['title' => 'Email', 'url' => '/email', 'icon' => 'mail'],
-    ['title' => 'Settings', 'url' => '/settings', 'icon' => 'settings'],
-];
+$userRole = $user['role'] ?? $_SESSION['user_role'] ?? 'participant';
+
+if ($userRole === 'carer') {
+    $navItems = [
+        ['title' => 'Dashboard', 'url' => '/', 'icon' => 'layout-dashboard'],
+        ['title' => 'My Shifts', 'url' => '/worker/shifts', 'icon' => 'clock'],
+        ['title' => 'My Bookings', 'url' => '/worker/bookings', 'icon' => 'calendar-check'],
+        ['title' => 'Availability', 'url' => '/worker/availability', 'icon' => 'calendar'],
+        ['title' => 'Worker Profile', 'url' => '/worker/profile', 'icon' => 'user-circle'],
+        ['title' => 'Find a Job', 'url' => '/jobs', 'icon' => 'briefcase'],
+        ['title' => 'MapAble Chat', 'url' => '/chat', 'icon' => 'bot'],
+        ['title' => 'Messages', 'url' => '/messages', 'icon' => 'message-square'],
+        ['title' => 'Email', 'url' => '/email', 'icon' => 'mail'],
+        ['title' => 'Settings', 'url' => '/settings', 'icon' => 'settings'],
+    ];
+} else {
+    $navItems = [
+        ['title' => 'Dashboard', 'url' => '/', 'icon' => 'layout-dashboard'],
+        ['title' => 'Book a Carer', 'url' => '/care', 'icon' => 'heart-handshake'],
+        ['title' => 'Find a Job', 'url' => '/jobs', 'icon' => 'briefcase'],
+        ['title' => 'Get Transport', 'url' => '/transport', 'icon' => 'bus'],
+        ['title' => 'MapAble Chat', 'url' => '/chat', 'icon' => 'bot'],
+        ['title' => 'Pricing', 'url' => '/pricing', 'icon' => 'dollar-sign'],
+        ['title' => 'Budget', 'url' => '/budget', 'icon' => 'wallet'],
+        ['title' => 'Invoices', 'url' => '/invoices', 'icon' => 'file-text'],
+        ['title' => 'Messages', 'url' => '/messages', 'icon' => 'message-square'],
+        ['title' => 'Email', 'url' => '/email', 'icon' => 'mail'],
+        ['title' => 'Settings', 'url' => '/settings', 'icon' => 'settings'],
+    ];
+}
 $pageTitle = $pageTitle ?? 'MapAble 4.0';
 ?>
 <!DOCTYPE html>

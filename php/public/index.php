@@ -115,8 +115,15 @@ if (str_starts_with($uri, '/api/chat/')) {
     exit;
 }
 
+if (str_starts_with($uri, '/api/worker/')) {
+    require __DIR__ . '/../api/worker_api.php';
+    exit;
+}
+
+$userRole = $_SESSION['user_role'] ?? 'participant';
+
 $routes = [
-    '/' => 'dashboard.php',
+    '/' => $userRole === 'carer' ? 'worker_dashboard.php' : 'dashboard.php',
     '/care' => 'care.php',
     '/jobs' => 'jobs.php',
     '/transport' => 'transport.php',
@@ -127,6 +134,11 @@ $routes = [
     '/messages' => 'messages.php',
     '/email' => 'email.php',
     '/settings' => 'settings.php',
+    '/worker/dashboard' => 'worker_dashboard.php',
+    '/worker/profile' => 'worker_profile.php',
+    '/worker/availability' => 'worker_availability.php',
+    '/worker/shifts' => 'worker_shifts.php',
+    '/worker/bookings' => 'worker_bookings.php',
 ];
 
 if (preg_match('#^/care/([a-zA-Z0-9-]+)$#', $uri, $m)) {
