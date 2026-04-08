@@ -885,7 +885,12 @@ export async function registerRoutes(
 
     const currentMonth = today.substring(0, 7);
     const monthShifts = allShifts.filter(s => s.date?.startsWith(currentMonth) && s.status === "completed");
-    const monthHours = monthShifts.reduce((sum, s) => sum + (Number(s.hours) || 0), 0);
+    const monthHours = monthShifts.reduce((sum, s) => {
+      if (s.actualHours) return sum + Number(s.actualHours);
+      const sp = s.startTime.split(":"), ep = s.endTime.split(":");
+      const mins = (parseInt(ep[0]) * 60 + parseInt(ep[1] || "0")) - (parseInt(sp[0]) * 60 + parseInt(sp[1] || "0"));
+      return sum + Math.max(mins / 60, 0.25);
+    }, 0);
     const hourlyRate = Number(worker.hourlyRate || 0);
     const monthEarnings = monthHours * hourlyRate;
 
@@ -1591,7 +1596,7 @@ export async function registerRoutes(
   });
 
   app.patch("/api/shifts/:id/status", async (req, res) => {
-    const { status } = req.body;
+    const { status, actualHours, notes: shiftNotes } = req.body;
     const validStatuses = ["scheduled", "confirmed", "in_progress", "completed", "cancelled"];
     if (!status || !validStatuses.includes(status)) {
       return res.status(400).json({ message: `status must be one of: ${validStatuses.join(", ")}` });
@@ -1635,7 +1640,7 @@ export async function registerRoutes(
       const endParts = shift.endTime.split(":");
       const startMins = parseInt(startParts[0]) * 60 + parseInt(startParts[1] || "0");
       const endMins = parseInt(endParts[0]) * 60 + parseInt(endParts[1] || "0");
-      const hours = Math.max((endMins - startMins) / 60, 0.25);
+      const hours = actualHours ? parseFloat(actualHours) : Math.max((endMins - startMins) / 60, 0.25);
 
       const shiftDateObj = new Date(shift.date + "T12:00:00");
       const dayOfWeek = shiftDateObj.getDay();
@@ -1692,7 +1697,10 @@ export async function registerRoutes(
       return res.json({ shift: updated, session });
     }
 
-    const updated = await storage.updateShiftStatus(req.params.id, status);
+    const extraData: { actualHours?: string; notes?: string } = {};
+    if (actualHours) extraData.actualHours = String(actualHours);
+    if (shiftNotes !== undefined) extraData.notes = shiftNotes;
+    const updated = await storage.updateShiftStatus(req.params.id, status, undefined, Object.keys(extraData).length ? extraData : undefined);
     res.json({ shift: updated });
   });
 
