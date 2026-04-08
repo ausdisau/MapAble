@@ -774,6 +774,12 @@ export async function registerRoutes(
       return res.status(400).json({ message: "Booking must be confirmed to start a shift" });
     }
 
+    const existingShifts = await storage.getShifts({ workerId: worker.id });
+    const activeShift = existingShifts.find(s => s.status === "in_progress");
+    if (activeShift) {
+      return res.status(400).json({ message: "You already have an active shift in progress. Complete it before starting a new one." });
+    }
+
     const today = new Date().toISOString().split("T")[0];
     const now = new Date();
     const startTime = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
