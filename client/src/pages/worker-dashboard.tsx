@@ -29,6 +29,8 @@ import { Link, Redirect } from "wouter";
 import { useState, useEffect } from "react";
 import type { Shift } from "@shared/schema";
 
+type EnrichedShift = Shift & { participantName?: string };
+
 interface DashboardData {
   worker: {
     id: string;
@@ -41,9 +43,9 @@ interface DashboardData {
     insuranceExpiry: string | null;
   };
   user: { id: string; fullName: string; email: string; role: string };
-  todayShifts: Shift[];
-  upcomingShifts: Shift[];
-  activeShift: Shift | null;
+  todayShifts: EnrichedShift[];
+  upcomingShifts: EnrichedShift[];
+  activeShift: EnrichedShift | null;
   completedCount: number;
   totalShifts: number;
   pendingBookings: { id: string; participantId: string; participantName: string; serviceType: string; date: string; startTime: string; endTime: string; status: string; notes?: string }[];
@@ -333,7 +335,7 @@ export default function WorkerDashboard() {
             <p className="text-sm text-muted-foreground text-center py-6">No shifts scheduled for today.</p>
           ) : (
             <div className="space-y-3">
-              {data.todayShifts.map((shift: any) => (
+              {data.todayShifts.map((shift) => (
                 <div key={shift.id} className="flex items-center justify-between py-2 border-b last:border-b-0" data-testid={`shift-today-${shift.id}`}>
                   <div>
                     <p className="text-sm font-medium">{shift.participantName || "Participant"}</p>
@@ -356,7 +358,7 @@ export default function WorkerDashboard() {
             <p className="text-sm text-muted-foreground text-center py-6">No upcoming shifts scheduled.</p>
           ) : (
             <div className="space-y-3">
-              {data.upcomingShifts.map((shift: any) => (
+              {data.upcomingShifts.map((shift) => (
                 <div key={shift.id} className="flex items-center justify-between py-2 border-b last:border-b-0" data-testid={`shift-upcoming-${shift.id}`}>
                   <div>
                     <p className="text-sm font-medium">{shift.participantName || "Participant"}</p>

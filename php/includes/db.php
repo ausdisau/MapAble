@@ -441,9 +441,9 @@ function getWorkerEarnings($pdo, $workerId, $periodStart, $periodEnd) {
 function updateWorkerProfile($pdo, $workerId, $data) {
     $workerFields = [];
     $workerValues = [];
-    $allowedWorker = ['title', 'hourly_rate', 'transport_capable', 'transport_type', 'wheelchair_accessible'];
+    $allowedWorker = ['title', 'hourly_rate', 'transport_capable', 'transport_type', 'wheelchair_accessible', 'insurance_expiry', 'first_aid_expiry', 'wwcc_number', 'wwcc_expiry', 'screening_number', 'screening_expiry'];
     foreach ($allowedWorker as $col) {
-        if (isset($data[$col])) {
+        if (array_key_exists($col, $data)) {
             $workerFields[] = "$col = ?";
             if (in_array($col, ['transport_capable', 'wheelchair_accessible'])) {
                 $workerValues[] = $data[$col] ? 'true' : 'false';
