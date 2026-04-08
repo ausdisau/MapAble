@@ -12,7 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { usePageTitle } from "@/hooks/use-page-title";
-import { Redirect } from "wouter";
+import { Link, Redirect } from "wouter";
 import {
   User as UserIcon,
   Mail,
@@ -31,6 +31,7 @@ import {
   Languages,
   X,
   Plus,
+  ExternalLink,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import type { Worker, User } from "@shared/schema";
@@ -277,7 +278,14 @@ export default function WorkerProfile() {
           </div>
           <div>
             <Label className="text-muted-foreground text-xs">ABN</Label>
-            <p className="font-medium mt-1.5" data-testid="text-abn">{worker.abn || "Not set"}</p>
+            <div className="flex items-center gap-2 mt-1.5">
+              <p className="font-medium" data-testid="text-abn">{worker.abn || "Not set"}</p>
+              <Link href="/abn-lookup">
+                <Button variant="ghost" size="sm" className="h-7 text-xs gap-1 text-[#1B6EB5]" data-testid="link-abn-lookup">
+                  <ExternalLink className="w-3 h-3" /> ABN Lookup
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
 

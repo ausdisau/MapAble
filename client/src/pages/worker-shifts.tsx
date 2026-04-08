@@ -69,8 +69,11 @@ export default function WorkerShifts() {
   });
 
   const statusMutation = useMutation({
-    mutationFn: async ({ id, status }: { id: string; status: string }) => {
-      const res = await apiRequest("PATCH", `/api/shifts/${id}/status`, { status });
+    mutationFn: async ({ id, status, actualHours, notes }: { id: string; status: string; actualHours?: string; notes?: string }) => {
+      const payload: Record<string, string> = { status };
+      if (actualHours) payload.actualHours = actualHours;
+      if (notes !== undefined) payload.notes = notes;
+      const res = await apiRequest("PATCH", `/api/shifts/${id}/status`, payload);
       return res.json();
     },
     onSuccess: () => {
@@ -139,7 +142,7 @@ export default function WorkerShifts() {
 
   const confirmEndShift = () => {
     if (!endShiftId || !endShiftHours) return;
-    statusMutation.mutate({ id: endShiftId, status: "completed" });
+    statusMutation.mutate({ id: endShiftId, status: "completed", actualHours: endShiftHours, notes: endShiftNotes || undefined });
   };
 
   const isLoading = shiftsLoading || earningsLoading;

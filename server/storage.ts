@@ -555,9 +555,11 @@ export class DatabaseStorage implements IStorage {
     return shift;
   }
 
-  async updateShiftStatus(id: string, status: string, serviceSessionId?: string): Promise<Shift | undefined> {
-    const updateData: Partial<{ status: string; serviceSessionId: string }> = { status };
+  async updateShiftStatus(id: string, status: string, serviceSessionId?: string, extraData?: { actualHours?: string; notes?: string }): Promise<Shift | undefined> {
+    const updateData: Record<string, any> = { status };
     if (serviceSessionId) updateData.serviceSessionId = serviceSessionId;
+    if (extraData?.actualHours) updateData.actualHours = extraData.actualHours;
+    if (extraData?.notes !== undefined) updateData.notes = extraData.notes;
     const [shift] = await db.update(shifts)
       .set(updateData)
       .where(eq(shifts.id, id))
