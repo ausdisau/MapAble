@@ -210,10 +210,18 @@ function MobileMenuToggle() {
   );
 }
 
+function RoleBasedHome() {
+  const { user } = useAuth();
+  if (user?.role === "carer") {
+    return <WorkerDashboard />;
+  }
+  return <Dashboard />;
+}
+
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={Dashboard} />
+      <Route path="/" component={RoleBasedHome} />
       <Route path="/care" component={CarePage} />
       <Route path="/shifts" component={ShiftsPage} />
       <Route path="/care/:id" component={WorkerDetailPage} />
