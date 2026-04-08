@@ -65,7 +65,7 @@ const workerNavItems: NavItem[] = [
   { title: "Dashboard", url: "/worker/dashboard", icon: LayoutDashboard, audioDesc: "View your worker dashboard overview" },
   { title: "My Shifts", url: "/worker/shifts", icon: CalendarDays, audioDesc: "View and manage your shifts and earnings" },
   { title: "My Bookings", url: "/worker/bookings", icon: ClipboardList, audioDesc: "Accept or decline booking requests" },
-  { title: "Availability", url: "/shifts", icon: CalendarDays, audioDesc: "Set your weekly availability and blockouts" },
+  { title: "Availability", url: "/worker/availability", icon: CalendarDays, audioDesc: "Set your weekly availability and blockouts" },
   { title: "My Profile", url: "/worker/profile", icon: UserIcon, audioDesc: "Update your worker profile and details" },
   { title: "MapAble Chat", url: "/chat", icon: Bot, audioDesc: "Chat with your accessibility-aware travel assistant" },
   { title: "Messages", url: "/messages", icon: MessageSquare, audioDesc: "View your conversations and messages" },

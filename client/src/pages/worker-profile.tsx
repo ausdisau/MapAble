@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
+import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -24,6 +25,12 @@ import {
   DollarSign,
   FileText,
   Calendar,
+  Car,
+  Accessibility,
+  Briefcase,
+  Languages,
+  X,
+  Plus,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import type { Worker, User } from "@shared/schema";
@@ -45,19 +52,35 @@ export default function WorkerProfile() {
   const [location, setLocation] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [bio, setBio] = useState("");
+  const [title, setTitle] = useState("");
+  const [specializations, setSpecializations] = useState<string[]>([]);
+  const [newSpec, setNewSpec] = useState("");
+  const [hourlyRate, setHourlyRate] = useState("");
+  const [transportCapable, setTransportCapable] = useState(false);
+  const [wheelchairAccessible, setWheelchairAccessible] = useState(false);
+  const [languages, setLanguages] = useState<string[]>([]);
+  const [newLanguage, setNewLanguage] = useState("");
 
   useEffect(() => {
-    if (worker?.user) {
-      setFullName(worker.user.fullName || "");
-      setEmail(worker.user.email || "");
-      setLocation(worker.user.location || "");
-      setPhoneNumber(worker.user.phoneNumber || "");
-      setBio(worker.user.bio || "");
+    if (worker) {
+      if (worker.user) {
+        setFullName(worker.user.fullName || "");
+        setEmail(worker.user.email || "");
+        setLocation(worker.user.location || "");
+        setPhoneNumber(worker.user.phoneNumber || "");
+        setBio(worker.user.bio || "");
+        setLanguages(worker.user.languages || []);
+      }
+      setTitle(worker.title || "");
+      setSpecializations(worker.specializations || []);
+      setHourlyRate(worker.hourlyRate ? String(worker.hourlyRate) : "");
+      setTransportCapable(worker.transportCapable ?? false);
+      setWheelchairAccessible(worker.wheelchairAccessible ?? false);
     }
   }, [worker]);
 
   const updateMutation = useMutation({
-    mutationFn: async (data: { fullName: string; email: string; location: string; phoneNumber: string; bio: string }) => {
+    mutationFn: async (data: Record<string, any>) => {
       const res = await apiRequest("PATCH", "/api/worker/me", data);
       return res.json();
     },
@@ -77,7 +100,43 @@ export default function WorkerProfile() {
   }
 
   const handleSave = () => {
-    updateMutation.mutate({ fullName, email, location, phoneNumber, bio });
+    updateMutation.mutate({
+      fullName,
+      email,
+      location,
+      phoneNumber,
+      bio,
+      title,
+      specializations,
+      hourlyRate: hourlyRate ? parseFloat(hourlyRate) : undefined,
+      transportCapable,
+      wheelchairAccessible,
+      languages,
+    });
+  };
+
+  const addSpecialization = () => {
+    const trimmed = newSpec.trim();
+    if (trimmed && !specializations.includes(trimmed)) {
+      setSpecializations([...specializations, trimmed]);
+      setNewSpec("");
+    }
+  };
+
+  const removeSpecialization = (spec: string) => {
+    setSpecializations(specializations.filter(s => s !== spec));
+  };
+
+  const addLanguage = () => {
+    const trimmed = newLanguage.trim();
+    if (trimmed && !languages.includes(trimmed)) {
+      setLanguages([...languages, trimmed]);
+      setNewLanguage("");
+    }
+  };
+
+  const removeLanguage = (lang: string) => {
+    setLanguages(languages.filter(l => l !== lang));
   };
 
   if (isLoading) {
@@ -179,43 +238,151 @@ export default function WorkerProfile() {
 
       <Card className="p-6" data-testid="card-worker-details">
         <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-          <ShieldCheck className="w-5 h-5 text-[#2EAA6E]" /> Worker Details
+          <Briefcase className="w-5 h-5 text-[#1B6EB5]" /> Worker Details
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <Label className="text-muted-foreground text-xs">Title / Role</Label>
-            <p className="font-medium mt-0.5" data-testid="text-worker-title">{worker.title}</p>
+            <Label htmlFor="title" className="flex items-center gap-1.5 mb-1.5">
+              <Briefcase className="w-3.5 h-3.5" /> Title / Role
+            </Label>
+            <Input
+              id="title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="e.g., Support Worker, Occupational Therapist"
+              data-testid="input-title"
+            />
           </div>
           <div>
-            <Label className="text-muted-foreground text-xs">Hourly Rate</Label>
-            <p className="font-medium mt-0.5 flex items-center gap-1" data-testid="text-hourly-rate">
-              <DollarSign className="w-3.5 h-3.5" />
-              {Number(worker.hourlyRate || 0).toFixed(2)}/hr
-            </p>
+            <Label htmlFor="hourlyRate" className="flex items-center gap-1.5 mb-1.5">
+              <DollarSign className="w-3.5 h-3.5" /> Hourly Rate (AUD)
+            </Label>
+            <Input
+              id="hourlyRate"
+              type="number"
+              min="0"
+              step="0.01"
+              value={hourlyRate}
+              onChange={(e) => setHourlyRate(e.target.value)}
+              placeholder="e.g., 55.00"
+              data-testid="input-hourly-rate"
+            />
           </div>
           <div>
             <Label className="text-muted-foreground text-xs">Rating</Label>
-            <p className="font-medium mt-0.5 flex items-center gap-1" data-testid="text-rating">
+            <p className="font-medium mt-1.5 flex items-center gap-1" data-testid="text-rating">
               <Star className="w-3.5 h-3.5 fill-[#E6A817] text-[#E6A817]" />
               {Number(worker.rating || 0).toFixed(1)} ({worker.reviewCount || 0} reviews)
             </p>
           </div>
           <div>
             <Label className="text-muted-foreground text-xs">ABN</Label>
-            <p className="font-medium mt-0.5" data-testid="text-abn">{worker.abn || "Not set"}</p>
+            <p className="font-medium mt-1.5" data-testid="text-abn">{worker.abn || "Not set"}</p>
           </div>
         </div>
 
         <Separator className="my-4" />
 
-        <h3 className="text-sm font-semibold mb-3">Specializations</h3>
-        <div className="flex flex-wrap gap-2" data-testid="list-specializations">
-          {(worker.specializations || []).map((spec, i) => (
-            <Badge key={i} variant="secondary">{spec}</Badge>
-          ))}
-          {(!worker.specializations || worker.specializations.length === 0) && (
-            <span className="text-sm text-muted-foreground">No specializations listed</span>
-          )}
+        <div className="space-y-4">
+          <div>
+            <Label className="flex items-center gap-1.5 mb-2">
+              <Briefcase className="w-3.5 h-3.5" /> Specializations
+            </Label>
+            <div className="flex flex-wrap gap-2 mb-2" data-testid="list-specializations">
+              {specializations.map((spec, i) => (
+                <Badge key={i} variant="secondary" className="gap-1 pr-1">
+                  {spec}
+                  <button onClick={() => removeSpecialization(spec)} className="ml-1 hover:text-red-500" data-testid={`button-remove-spec-${i}`}>
+                    <X className="w-3 h-3" />
+                  </button>
+                </Badge>
+              ))}
+              {specializations.length === 0 && (
+                <span className="text-sm text-muted-foreground">No specializations listed</span>
+              )}
+            </div>
+            <div className="flex gap-2">
+              <Input
+                value={newSpec}
+                onChange={(e) => setNewSpec(e.target.value)}
+                placeholder="Add specialization..."
+                className="max-w-xs"
+                onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addSpecialization())}
+                data-testid="input-new-specialization"
+              />
+              <Button variant="outline" size="sm" onClick={addSpecialization} className="gap-1" data-testid="button-add-specialization">
+                <Plus className="w-3.5 h-3.5" /> Add
+              </Button>
+            </div>
+          </div>
+
+          <div>
+            <Label className="flex items-center gap-1.5 mb-2">
+              <Languages className="w-3.5 h-3.5" /> Languages
+            </Label>
+            <div className="flex flex-wrap gap-2 mb-2" data-testid="list-languages">
+              {languages.map((lang, i) => (
+                <Badge key={i} variant="secondary" className="gap-1 pr-1">
+                  {lang}
+                  <button onClick={() => removeLanguage(lang)} className="ml-1 hover:text-red-500" data-testid={`button-remove-lang-${i}`}>
+                    <X className="w-3 h-3" />
+                  </button>
+                </Badge>
+              ))}
+              {languages.length === 0 && (
+                <span className="text-sm text-muted-foreground">No languages listed</span>
+              )}
+            </div>
+            <div className="flex gap-2">
+              <Input
+                value={newLanguage}
+                onChange={(e) => setNewLanguage(e.target.value)}
+                placeholder="Add language..."
+                className="max-w-xs"
+                onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addLanguage())}
+                data-testid="input-new-language"
+              />
+              <Button variant="outline" size="sm" onClick={addLanguage} className="gap-1" data-testid="button-add-language">
+                <Plus className="w-3.5 h-3.5" /> Add
+              </Button>
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      <Card className="p-6" data-testid="card-transport">
+        <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+          <Car className="w-5 h-5 text-[#2EAA6E]" /> Transport Settings
+        </h2>
+        <div className="space-y-4">
+          <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+            <div className="flex items-center gap-2">
+              <Car className="w-4 h-4 text-muted-foreground" />
+              <div>
+                <p className="text-sm font-medium">Transport Capable</p>
+                <p className="text-xs text-muted-foreground">Can provide transport to participants</p>
+              </div>
+            </div>
+            <Switch
+              checked={transportCapable}
+              onCheckedChange={setTransportCapable}
+              data-testid="switch-transport"
+            />
+          </div>
+          <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+            <div className="flex items-center gap-2">
+              <Accessibility className="w-4 h-4 text-muted-foreground" />
+              <div>
+                <p className="text-sm font-medium">Wheelchair Accessible Vehicle</p>
+                <p className="text-xs text-muted-foreground">Vehicle can accommodate wheelchairs</p>
+              </div>
+            </div>
+            <Switch
+              checked={wheelchairAccessible}
+              onCheckedChange={setWheelchairAccessible}
+              data-testid="switch-wheelchair"
+            />
+          </div>
         </div>
       </Card>
 
@@ -245,18 +412,6 @@ export default function WorkerProfile() {
                 <AlertTriangle className="w-3 h-3" /> Not set
               </Badge>
             )}
-          </div>
-          <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
-            <span className="text-sm">Transport Capable</span>
-            <Badge variant={worker.transportCapable ? "default" : "outline"}>
-              {worker.transportCapable ? "Yes" : "No"}
-            </Badge>
-          </div>
-          <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
-            <span className="text-sm">Wheelchair Accessible</span>
-            <Badge variant={worker.wheelchairAccessible ? "default" : "outline"}>
-              {worker.wheelchairAccessible ? "Yes" : "No"}
-            </Badge>
           </div>
         </div>
       </Card>

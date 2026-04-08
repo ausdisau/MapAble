@@ -672,18 +672,34 @@ export async function registerRoutes(
     const worker = await storage.getWorkerByUserId(userId);
     if (!worker) return res.status(404).json({ message: "Worker profile not found" });
 
-    const { fullName, email, location, phoneNumber, bio } = req.body;
+    const { fullName, email, location, phoneNumber, bio, title, specializations, hourlyRate, transportCapable, wheelchairAccessible, languages } = req.body;
     if (fullName || email || location) {
       await storage.updateUserProfile(userId, { fullName, email, location });
     }
-    if (phoneNumber !== undefined || bio !== undefined) {
-      const updateData: Record<string, string> = {};
+    if (phoneNumber !== undefined || bio !== undefined || languages !== undefined) {
+      const updateData: Record<string, any> = {};
       if (phoneNumber !== undefined) updateData.phoneNumber = phoneNumber;
       if (bio !== undefined) updateData.bio = bio;
+      if (languages !== undefined) updateData.languages = languages;
       const { eq } = await import("drizzle-orm");
       const { users } = await import("@shared/schema");
       const { db } = await import("./db");
       await db.update(users).set(updateData).where(eq(users.id, userId));
+    }
+
+    if (title !== undefined || specializations !== undefined || hourlyRate !== undefined || transportCapable !== undefined || wheelchairAccessible !== undefined) {
+      const workerUpdate: Record<string, any> = {};
+      if (title !== undefined) workerUpdate.title = title;
+      if (specializations !== undefined) workerUpdate.specializations = specializations;
+      if (hourlyRate !== undefined) workerUpdate.hourlyRate = hourlyRate;
+      if (transportCapable !== undefined) workerUpdate.transportCapable = transportCapable;
+      if (wheelchairAccessible !== undefined) workerUpdate.wheelchairAccessible = wheelchairAccessible;
+      if (Object.keys(workerUpdate).length > 0) {
+        const { eq } = await import("drizzle-orm");
+        const { workers } = await import("@shared/schema");
+        const { db } = await import("./db");
+        await db.update(workers).set(workerUpdate).where(eq(workers.id, worker.id));
+      }
     }
 
     const updatedWorker = await storage.getWorker(worker.id);
