@@ -16,6 +16,7 @@ import {
   Bot,
   LogOut,
   CalendarDays,
+  Building2,
 } from "lucide-react";
 import {
   Sidebar,
@@ -50,6 +51,7 @@ const navItems = [
   { title: "Pricing", url: "/pricing", icon: DollarSign, audioDesc: "View NDIS-aligned pricing for care and transport services" },
   { title: "Budget", url: "/budget", icon: Wallet, audioDesc: "View your NDIS budget usage and remaining funds" },
   { title: "Invoices", url: "/invoices", icon: FileText, audioDesc: "View and manage your NDIS invoices and claims" },
+  { title: "ABN Lookup", url: "/abn-lookup", icon: Building2, audioDesc: "Search and verify Australian Business Numbers" },
   { title: "Messages", url: "/messages", icon: MessageSquare, audioDesc: "View your conversations and messages" },
   { title: "Settings", url: "/settings", icon: Settings, audioDesc: "Manage your account and accessibility preferences" },
 ];

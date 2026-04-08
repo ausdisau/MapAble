@@ -99,6 +99,7 @@ export async function seedDatabase() {
       email: "services@mapable.com.au",
       role: "provider",
       location: "Sydney, NSW",
+      abn: "51 824 753 556",
     },
   ]).returning();
 

@@ -496,6 +496,119 @@ export async function registerRoutes(
 
   registerObjectStorageRoutes(app);
 
+  app.post("/api/abn/lookup", async (req, res) => {
+    const { abn } = req.body;
+    if (!abn) return res.status(400).json({ message: "ABN is required" });
+
+    const { validateAbn, formatAbn, stripAbn } = await import("@shared/abn-utils");
+    const validation = validateAbn(abn);
+    if (!validation.valid) {
+      return res.status(400).json({ message: validation.error });
+    }
+
+    const digits = stripAbn(abn);
+    const abnGuid = process.env.ABR_GUID || "";
+
+    if (!abnGuid) {
+      return res.json({
+        abn: digits,
+        abnFormatted: formatAbn(digits),
+        entityName: "ABR lookup unavailable — ABN format is valid",
+        businessNames: [],
+        tradingNames: [],
+        abnStatus: "Valid (format only)",
+        abnStatusEffectiveFrom: "",
+        entityTypeCode: "",
+        entityTypeDescription: "",
+        state: "",
+        postcode: "",
+        gstRegistered: false,
+        gstRegisteredFrom: "",
+        dgrEndorsed: false,
+        lastUpdated: new Date().toISOString(),
+        offline: true,
+      });
+    }
+
+    try {
+      const abrUrl = `https://abr.business.gov.au/abrxmlsearch/AbrXmlSearch.asmx/SearchByABNv202001?searchString=${digits}&includeHistoricalDetails=N&authenticationGuid=${abnGuid}`;
+      const abrRes = await fetch(abrUrl);
+      const xml = await abrRes.text();
+
+      const getTag = (tag: string, src: string) => {
+        const m = src.match(new RegExp(`<${tag}[^>]*>([^<]*)</${tag}>`));
+        return m ? m[1].trim() : "";
+      };
+      const identifierValue = getTag("identifierValue", xml);
+      if (!identifierValue) {
+        return res.status(404).json({ message: "ABN not found in Australian Business Register" });
+      }
+
+      const abnStatusBlock = xml.match(/<entityStatus>([\s\S]*?)<\/entityStatus>/)?.[1] || "";
+      const abnStatus = getTag("entityStatusCode", abnStatusBlock);
+      const abnStatusFrom = getTag("effectiveFrom", abnStatusBlock);
+
+      const entityTypeBlock = xml.match(/<entityType>([\s\S]*?)<\/entityType>/)?.[1] || "";
+      const entityTypeCode = getTag("entityTypeCode", entityTypeBlock);
+      const entityTypeDescription = getTag("entityDescription", entityTypeBlock);
+
+      const mainNameBlock = xml.match(/<mainName>([\s\S]*?)<\/mainName>/)?.[1] || "";
+      const legalNameBlock = xml.match(/<legalName>([\s\S]*?)<\/legalName>/)?.[1] || "";
+      let entityName = getTag("organisationName", mainNameBlock);
+      if (!entityName) {
+        const givenName = getTag("givenName", legalNameBlock);
+        const familyName = getTag("familyName", legalNameBlock);
+        entityName = [givenName, familyName].filter(Boolean).join(" ");
+      }
+
+      const businessNameBlocks = xml.match(/<businessName>([\s\S]*?)<\/businessName>/g) || [];
+      const businessNames = businessNameBlocks.map(b => getTag("organisationName", b)).filter(Boolean);
+
+      const tradingNameBlocks = xml.match(/<mainTradingName>([\s\S]*?)<\/mainTradingName>/g) || [];
+      const tradingNames = tradingNameBlocks.map(b => getTag("organisationName", b)).filter(Boolean);
+
+      const addressBlock = xml.match(/<mainBusinessPhysicalAddress>([\s\S]*?)<\/mainBusinessPhysicalAddress>/)?.[1] || "";
+      const state = getTag("stateCode", addressBlock);
+      const postcode = getTag("postcode", addressBlock);
+
+      const gstBlocks = xml.match(/<goodsAndServicesTax>([\s\S]*?)<\/goodsAndServicesTax>/g) || [];
+      let gstRegistered = false;
+      let gstRegisteredFrom = "";
+      for (const b of gstBlocks) {
+        const to = getTag("effectiveTo", b);
+        if (!to || to === "0001-01-01") {
+          gstRegistered = true;
+          gstRegisteredFrom = getTag("effectiveFrom", b);
+          break;
+        }
+      }
+
+      const dgrBlocks = xml.match(/<dgrEndorsement>([\s\S]*?)<\/dgrEndorsement>/g) || [];
+      const dgrEndorsed = dgrBlocks.length > 0;
+
+      res.json({
+        abn: digits,
+        abnFormatted: formatAbn(digits),
+        entityName,
+        businessNames,
+        tradingNames,
+        abnStatus,
+        abnStatusEffectiveFrom: abnStatusFrom,
+        entityTypeCode,
+        entityTypeDescription,
+        state,
+        postcode,
+        gstRegistered,
+        gstRegisteredFrom,
+        dgrEndorsed,
+        lastUpdated: new Date().toISOString(),
+      });
+    } catch (err) {
+      console.error("ABR lookup error:", err);
+      res.status(502).json({ message: "Failed to contact Australian Business Register" });
+    }
+  });
+
   app.get("/api/me", async (req, res) => {
     const user = await storage.getUser(req.session.userId!);
     if (!user) return res.status(404).json({ message: "No user found" });

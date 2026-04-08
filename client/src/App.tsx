@@ -8,7 +8,7 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { ThemeProvider, useTheme } from "@/components/theme-provider";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
-import { Moon, Sun, Search, Bell, Accessibility, LayoutDashboard, HeartHandshake, Briefcase, Bus, MessageSquare, Settings, PanelLeftClose, PanelLeftOpen, DollarSign, Wallet, FileText, Bot, Loader2, CalendarDays } from "lucide-react";
+import { Moon, Sun, Search, Bell, Accessibility, LayoutDashboard, HeartHandshake, Briefcase, Bus, MessageSquare, Settings, PanelLeftClose, PanelLeftOpen, DollarSign, Wallet, FileText, Bot, Loader2, CalendarDays, Building2 } from "lucide-react";
 import { useState } from "react";
 import { useLocation } from "wouter";
 import logoImage from "@assets/Accessible_Australia_Logo_Design_1772582762574.png";
@@ -35,6 +35,7 @@ import BudgetPage from "@/pages/budget";
 import InvoicesPage from "@/pages/invoices";
 import ChatPage from "@/pages/chat";
 import ShiftsPage from "@/pages/shifts";
+import AbnLookupPage from "@/pages/abn-lookup";
 
 function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
@@ -128,6 +129,7 @@ const mobileNavItems = [
   { title: "Pricing", url: "/pricing", icon: DollarSign, audioDesc: "View NDIS-aligned pricing for care and transport services" },
   { title: "Budget", url: "/budget", icon: Wallet, audioDesc: "View your NDIS budget usage and remaining funds" },
   { title: "Invoices", url: "/invoices", icon: FileText, audioDesc: "View and manage your NDIS invoices and claims" },
+  { title: "ABN Lookup", url: "/abn-lookup", icon: Building2, audioDesc: "Search and verify Australian Business Numbers" },
   { title: "Messages", url: "/messages", icon: MessageSquare, audioDesc: "View your conversations and messages" },
   { title: "Settings", url: "/settings", icon: Settings, audioDesc: "Manage your account and accessibility preferences" },
 ];
@@ -203,6 +205,7 @@ function Router() {
       <Route path="/budget" component={BudgetPage} />
       <Route path="/invoices" component={InvoicesPage} />
       <Route path="/chat" component={ChatPage} />
+      <Route path="/abn-lookup" component={AbnLookupPage} />
       <Route path="/messages" component={MessagesPage} />
       <Route path="/settings" component={SettingsPage} />
       <Route component={NotFound} />

@@ -32,8 +32,12 @@ import { Link } from "wouter";
 import { useState, useEffect } from "react";
 import { usePageTitle } from "@/hooks/use-page-title";
 import type { Worker, User, Review } from "@shared/schema";
+import { validateAbnChecksum, stripAbn } from "@shared/abn-utils";
 
 function VerificationChecklist({ worker }: { worker: Worker & { user?: User } }) {
+  const abnChecksumValid = !!worker.abn && validateAbnChecksum(stripAbn(worker.abn));
+  const abnVerified = abnChecksumValid;
+
   const items = [
     {
       label: "NDIS Worker Screening",
@@ -59,9 +63,11 @@ function VerificationChecklist({ worker }: { worker: Worker & { user?: User } })
     },
     {
       label: "ABN Registered",
-      verified: !!worker.abn,
+      verified: !!worker.abn && abnVerified,
       detail: worker.abn
-        ? `XX XXX XXX ${worker.abn.slice(-3)}`
+        ? abnChecksumValid
+          ? `Valid — ${worker.abn}`
+          : `Unverified — ${worker.abn}`
         : "Not provided",
     },
   ];

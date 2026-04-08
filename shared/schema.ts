@@ -37,6 +37,7 @@ export const users = pgTable("users", {
   providerAbn: text("provider_abn"),
   providerBusinessName: text("provider_business_name"),
   providerRegistrationGroups: text("provider_registration_groups").array(),
+  abn: text("abn"),
 });
 
 export const workers = pgTable("workers", {
@@ -215,6 +216,7 @@ export const insertUserSchema = createInsertSchema(users).pick({
   providerAbn: true,
   providerBusinessName: true,
   providerRegistrationGroups: true,
+  abn: true,
 });
 
 export const insertWorkerSchema = createInsertSchema(workers).pick({
