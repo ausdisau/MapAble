@@ -101,6 +101,7 @@ require __DIR__ . '/../includes/layout_header.php';
                     <?php if ($worker['abn_verified']): ?>
                         <i class="icon-check-circle w-3 h-3 text-map-teal inline" aria-hidden="true"></i>
                     <?php endif; ?>
+                    <a href="/abn-lookup" class="ml-2 text-map-blue hover:underline text-xs" data-testid="link-abn-lookup">ABN Lookup &rarr;</a>
                 </p>
                 <?php endif; ?>
             </div>

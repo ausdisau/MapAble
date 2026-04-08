@@ -13,8 +13,23 @@ if (!$worker) {
     jsonResponse(['error' => 'Worker profile not found'], 404);
 }
 
+$_rawInput = file_get_contents('php://input');
+$_jsonInput = json_decode($_rawInput, true);
+
+function requireApiCsrf() {
+    global $_jsonInput;
+    $token = $_POST['csrf_token'] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
+    if ($_jsonInput && isset($_jsonInput['csrf_token'])) {
+        $token = $_jsonInput['csrf_token'];
+    }
+    if (empty($token) || !hash_equals($_SESSION['csrf_token'] ?? '', $token)) {
+        jsonResponse(['error' => 'Invalid or missing CSRF token'], 403);
+    }
+}
+
 if ($uri === '/api/worker/shift/start' && $method === 'POST') {
-    $input = json_decode(file_get_contents('php://input'), true) ?: $_POST;
+    requireApiCsrf();
+    $input = $_jsonInput ?: $_POST;
     $participantId = $input['participant_id'] ?? '';
     $bookingId = $input['booking_id'] ?? null;
     if (!$participantId) {
@@ -29,7 +44,8 @@ if ($uri === '/api/worker/shift/start' && $method === 'POST') {
 }
 
 if ($uri === '/api/worker/shift/end' && $method === 'POST') {
-    $input = json_decode(file_get_contents('php://input'), true) ?: $_POST;
+    requireApiCsrf();
+    $input = $_jsonInput ?: $_POST;
     $sessionId = $input['session_id'] ?? '';
     $hours = (float)($input['hours'] ?? 0);
     $notes = $input['notes'] ?? null;
@@ -42,7 +58,8 @@ if ($uri === '/api/worker/shift/end' && $method === 'POST') {
 }
 
 if ($uri === '/api/worker/booking/accept' && $method === 'POST') {
-    $input = json_decode(file_get_contents('php://input'), true) ?: $_POST;
+    requireApiCsrf();
+    $input = $_jsonInput ?: $_POST;
     $bookingId = $input['booking_id'] ?? '';
     if (!$bookingId) jsonResponse(['error' => 'booking_id required'], 400);
     acceptBooking($pdo, $bookingId, $worker['id']);
@@ -50,7 +67,8 @@ if ($uri === '/api/worker/booking/accept' && $method === 'POST') {
 }
 
 if ($uri === '/api/worker/booking/decline' && $method === 'POST') {
-    $input = json_decode(file_get_contents('php://input'), true) ?: $_POST;
+    requireApiCsrf();
+    $input = $_jsonInput ?: $_POST;
     $bookingId = $input['booking_id'] ?? '';
     if (!$bookingId) jsonResponse(['error' => 'booking_id required'], 400);
     declineBooking($pdo, $bookingId, $worker['id']);
@@ -58,7 +76,8 @@ if ($uri === '/api/worker/booking/decline' && $method === 'POST') {
 }
 
 if ($uri === '/api/worker/booking/start-shift' && $method === 'POST') {
-    $input = json_decode(file_get_contents('php://input'), true) ?: $_POST;
+    requireApiCsrf();
+    $input = $_jsonInput ?: $_POST;
     $bookingId = $input['booking_id'] ?? '';
     $participantId = $input['participant_id'] ?? '';
     if (!$bookingId || !$participantId) jsonResponse(['error' => 'booking_id and participant_id required'], 400);
