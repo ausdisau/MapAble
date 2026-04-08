@@ -333,11 +333,11 @@ export default function WorkerDashboard() {
             <p className="text-sm text-muted-foreground text-center py-6">No shifts scheduled for today.</p>
           ) : (
             <div className="space-y-3">
-              {data.todayShifts.map((shift) => (
+              {data.todayShifts.map((shift: any) => (
                 <div key={shift.id} className="flex items-center justify-between py-2 border-b last:border-b-0" data-testid={`shift-today-${shift.id}`}>
                   <div>
-                    <p className="text-sm font-medium">{shift.startTime} – {shift.endTime}</p>
-                    {shift.ndisGoal && <p className="text-xs text-muted-foreground">{shift.ndisGoal}</p>}
+                    <p className="text-sm font-medium">{shift.participantName || "Participant"}</p>
+                    <p className="text-xs text-muted-foreground">{shift.serviceType || shift.ndisGoal || "Support"} &middot; {shift.startTime} – {shift.endTime}</p>
                   </div>
                   <Badge className={STATUS_COLORS[shift.status] || ""}>{shift.status.replace("_", " ")}</Badge>
                 </div>
@@ -356,11 +356,12 @@ export default function WorkerDashboard() {
             <p className="text-sm text-muted-foreground text-center py-6">No upcoming shifts scheduled.</p>
           ) : (
             <div className="space-y-3">
-              {data.upcomingShifts.map((shift) => (
+              {data.upcomingShifts.map((shift: any) => (
                 <div key={shift.id} className="flex items-center justify-between py-2 border-b last:border-b-0" data-testid={`shift-upcoming-${shift.id}`}>
                   <div>
-                    <p className="text-sm font-medium">{shift.date}</p>
-                    <p className="text-xs text-muted-foreground">{shift.startTime} – {shift.endTime}</p>
+                    <p className="text-sm font-medium">{shift.participantName || "Participant"}</p>
+                    <p className="text-xs text-muted-foreground">{shift.date} &middot; {shift.startTime} – {shift.endTime}</p>
+                    {shift.serviceType && <p className="text-xs text-muted-foreground">{shift.serviceType}</p>}
                   </div>
                   <Badge className={STATUS_COLORS[shift.status] || ""}>{shift.status.replace("_", " ")}</Badge>
                 </div>

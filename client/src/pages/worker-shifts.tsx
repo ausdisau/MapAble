@@ -27,8 +27,8 @@ import {
   Filter,
   StopCircle,
 } from "lucide-react";
-import { useState } from "react";
-import type { Shift } from "@shared/schema";
+import { useState, useEffect } from "react";
+import type { Shift, Booking } from "@shared/schema";
 
 interface EarningsData {
   totalEarnings: string;
@@ -57,6 +57,7 @@ export default function WorkerShifts() {
   const [endShiftId, setEndShiftId] = useState<string | null>(null);
   const [endShiftHours, setEndShiftHours] = useState("");
   const [endShiftNotes, setEndShiftNotes] = useState("");
+  const [showNewShift, setShowNewShift] = useState(false);
 
   const { data: shifts, isLoading: shiftsLoading } = useQuery<Shift[]>({
     queryKey: ["/api/shifts"],
@@ -66,6 +67,28 @@ export default function WorkerShifts() {
   const { data: earnings, isLoading: earningsLoading } = useQuery<EarningsData>({
     queryKey: ["/api/worker/earnings"],
     enabled: user?.role === "carer",
+  });
+
+  const { data: confirmedBookings } = useQuery<any[]>({
+    queryKey: ["/api/worker/bookings"],
+    enabled: user?.role === "carer" && showNewShift,
+  });
+
+  const startShiftMutation = useMutation({
+    mutationFn: async (bookingId: string) => {
+      const res = await apiRequest("POST", `/api/worker/bookings/${bookingId}/start-shift`);
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/shifts"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/worker/bookings"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/worker/dashboard"] });
+      setShowNewShift(false);
+      toast({ title: "Shift started", description: "New shift has been started from the booking." });
+    },
+    onError: (error: Error) => {
+      toast({ title: "Error", description: error.message || "Failed to start shift.", variant: "destructive" });
+    },
   });
 
   const statusMutation = useMutation({
@@ -297,9 +320,14 @@ export default function WorkerShifts() {
         <h1 className="text-2xl font-bold flex items-center gap-2" data-testid="text-shifts-heading">
           <CalendarDays className="w-6 h-6 text-[#1B6EB5]" /> My Shifts & Earnings
         </h1>
-        <Button variant="outline" className="gap-2" onClick={handleExportCSV} data-testid="button-export-csv">
-          <Download className="w-4 h-4" /> Export CSV
-        </Button>
+        <div className="flex gap-2">
+          <Button className="gap-2 bg-[#2EAA6E] hover:bg-[#258f5c]" onClick={() => setShowNewShift(true)} data-testid="button-start-new-shift">
+            <Play className="w-4 h-4" /> Start New Shift
+          </Button>
+          <Button variant="outline" className="gap-2" onClick={handleExportCSV} data-testid="button-export-csv">
+            <Download className="w-4 h-4" /> Export CSV
+          </Button>
+        </div>
       </div>
 
       {earnings && (
@@ -471,6 +499,53 @@ export default function WorkerShifts() {
               ))}
           </div>
         </Card>
+      )}
+
+      {showNewShift && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setShowNewShift(false)}>
+          <Card className="p-6 w-full max-w-md" onClick={(e) => e.stopPropagation()} data-testid="dialog-start-shift">
+            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <Play className="w-5 h-5 text-[#2EAA6E]" /> Start New Shift
+            </h3>
+            <p className="text-sm text-muted-foreground mb-4">Select a confirmed booking to start a shift:</p>
+            {(() => {
+              const confirmed = (confirmedBookings || []).filter((b: any) => b.status === "confirmed");
+              if (confirmed.length === 0) {
+                return (
+                  <div className="text-center py-6">
+                    <AlertTriangle className="w-8 h-8 mx-auto text-amber-500 mb-2" />
+                    <p className="text-sm text-muted-foreground">No confirmed bookings available. Accept a pending booking first.</p>
+                  </div>
+                );
+              }
+              return (
+                <div className="space-y-3 max-h-64 overflow-y-auto">
+                  {confirmed.map((booking: any) => (
+                    <div key={booking.id} className="flex items-center justify-between p-3 rounded-lg border" data-testid={`new-shift-booking-${booking.id}`}>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">{booking.participantName || "Participant"}</p>
+                        <p className="text-xs text-muted-foreground">{booking.serviceType} &middot; {booking.date}</p>
+                        <p className="text-xs text-muted-foreground">{booking.startTime} – {booking.endTime}</p>
+                      </div>
+                      <Button
+                        size="sm"
+                        className="ml-2 bg-[#2EAA6E] hover:bg-[#258f5c] gap-1"
+                        disabled={startShiftMutation.isPending}
+                        onClick={() => startShiftMutation.mutate(booking.id)}
+                        data-testid={`button-start-shift-from-booking-${booking.id}`}
+                      >
+                        <Play className="w-3.5 h-3.5" /> Start
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
+            <div className="flex justify-end mt-4">
+              <Button variant="outline" onClick={() => setShowNewShift(false)} data-testid="button-cancel-new-shift">Cancel</Button>
+            </div>
+          </Card>
+        </div>
       )}
     </div>
   );

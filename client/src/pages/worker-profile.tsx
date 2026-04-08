@@ -61,6 +61,13 @@ export default function WorkerProfile() {
   const [wheelchairAccessible, setWheelchairAccessible] = useState(false);
   const [languages, setLanguages] = useState<string[]>([]);
   const [newLanguage, setNewLanguage] = useState("");
+  const [transportType, setTransportType] = useState("");
+  const [insuranceExpiry, setInsuranceExpiry] = useState("");
+  const [firstAidExpiry, setFirstAidExpiry] = useState("");
+  const [wwccNumber, setWwccNumber] = useState("");
+  const [wwccExpiry, setWwccExpiry] = useState("");
+  const [screeningNumber, setScreeningNumber] = useState("");
+  const [screeningExpiry, setScreeningExpiry] = useState("");
 
   useEffect(() => {
     if (worker) {
@@ -77,6 +84,13 @@ export default function WorkerProfile() {
       setHourlyRate(worker.hourlyRate ? String(worker.hourlyRate) : "");
       setTransportCapable(worker.transportCapable ?? false);
       setWheelchairAccessible(worker.wheelchairAccessible ?? false);
+      setTransportType(worker.transportType || "");
+      setInsuranceExpiry(worker.insuranceExpiry || "");
+      setFirstAidExpiry(worker.firstAidExpiry || "");
+      setWwccNumber(worker.wwccNumber || "");
+      setWwccExpiry(worker.wwccExpiry || "");
+      setScreeningNumber(worker.screeningNumber || "");
+      setScreeningExpiry(worker.screeningExpiry || "");
     }
   }, [worker]);
 
@@ -112,7 +126,14 @@ export default function WorkerProfile() {
       hourlyRate: hourlyRate ? parseFloat(hourlyRate) : undefined,
       transportCapable,
       wheelchairAccessible,
+      transportType: transportType || null,
       languages,
+      insuranceExpiry: insuranceExpiry || null,
+      firstAidExpiry: firstAidExpiry || null,
+      wwccNumber: wwccNumber || null,
+      wwccExpiry: wwccExpiry || null,
+      screeningNumber: screeningNumber || null,
+      screeningExpiry: screeningExpiry || null,
     });
   };
 
@@ -377,6 +398,18 @@ export default function WorkerProfile() {
               data-testid="switch-transport"
             />
           </div>
+          {transportCapable && (
+            <div className="pl-10">
+              <Label className="text-xs text-muted-foreground mb-1">Vehicle Type</Label>
+              <Input
+                value={transportType}
+                onChange={(e) => setTransportType(e.target.value)}
+                placeholder="e.g., Sedan, Van, Modified vehicle"
+                className="max-w-xs"
+                data-testid="input-transport-type"
+              />
+            </div>
+          )}
           <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
             <div className="flex items-center gap-2">
               <Accessibility className="w-4 h-4 text-muted-foreground" />
@@ -398,9 +431,9 @@ export default function WorkerProfile() {
         <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
           <Calendar className="w-5 h-5 text-[#E6A817]" /> Compliance & Verification
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="space-y-4">
           <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
-            <span className="text-sm">NDIS Verified</span>
+            <span className="text-sm font-medium">NDIS Verified</span>
             {worker.ndisVerified ? (
               <Badge className="bg-[#2EAA6E]/10 text-[#2EAA6E] border-[#2EAA6E]/30 gap-1">
                 <ShieldCheck className="w-3 h-3" /> Verified
@@ -411,18 +444,65 @@ export default function WorkerProfile() {
               </Badge>
             )}
           </div>
-          <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
-            <span className="text-sm">Insurance</span>
-            {worker.insuranceExpiry ? (
-              <span className="text-sm font-medium">Expires: {worker.insuranceExpiry}</span>
-            ) : (
-              <Badge variant="outline" className="text-amber-600 border-amber-300 gap-1">
-                <AlertTriangle className="w-3 h-3" /> Not set
-              </Badge>
-            )}
+
+          <ExpiryField label="Insurance" value={insuranceExpiry} onChange={setInsuranceExpiry} testId="insurance" />
+          <ExpiryField label="First Aid Certificate" value={firstAidExpiry} onChange={setFirstAidExpiry} testId="first-aid" />
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <Label className="text-xs text-muted-foreground">WWCC Number</Label>
+              <Input
+                value={wwccNumber}
+                onChange={(e) => setWwccNumber(e.target.value)}
+                placeholder="WWCC number"
+                data-testid="input-wwcc-number"
+              />
+            </div>
+            <ExpiryField label="WWCC Expiry" value={wwccExpiry} onChange={setWwccExpiry} testId="wwcc" />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <Label className="text-xs text-muted-foreground">Screening Number</Label>
+              <Input
+                value={screeningNumber}
+                onChange={(e) => setScreeningNumber(e.target.value)}
+                placeholder="Screening clearance number"
+                data-testid="input-screening-number"
+              />
+            </div>
+            <ExpiryField label="Screening Expiry" value={screeningExpiry} onChange={setScreeningExpiry} testId="screening" />
           </div>
         </div>
       </Card>
+    </div>
+  );
+}
+
+function ExpiryField({ label, value, onChange, testId }: { label: string; value: string; onChange: (v: string) => void; testId: string }) {
+  const getExpiryStatus = () => {
+    if (!value) return { color: "text-amber-600", bg: "bg-amber-50 dark:bg-amber-950/30", text: "Not set" };
+    const days = Math.ceil((new Date(value).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+    if (days < 0) return { color: "text-red-600", bg: "bg-red-50 dark:bg-red-950/30", text: "Expired" };
+    if (days <= 30) return { color: "text-amber-600", bg: "bg-amber-50 dark:bg-amber-950/30", text: `Expires in ${days}d` };
+    return { color: "text-[#2EAA6E]", bg: "bg-green-50 dark:bg-green-950/30", text: "Valid" };
+  };
+  const status = getExpiryStatus();
+  return (
+    <div>
+      <Label className="text-xs text-muted-foreground">{label}</Label>
+      <div className="flex items-center gap-2">
+        <Input
+          type="date"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="max-w-[200px]"
+          data-testid={`input-${testId}-expiry`}
+        />
+        <Badge variant="outline" className={`${status.color} text-xs`} data-testid={`badge-${testId}-status`}>
+          {status.text}
+        </Badge>
+      </div>
     </div>
   );
 }
