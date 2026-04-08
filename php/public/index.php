@@ -122,6 +122,11 @@ if (str_starts_with($uri, '/api/worker/')) {
 
 $userRole = $_SESSION['user_role'] ?? 'participant';
 
+if (str_starts_with($uri, '/worker/') && $userRole !== 'carer') {
+    setFlash('error', 'Access denied. Worker pages are only available to carer accounts.');
+    redirect('/');
+}
+
 $routes = [
     '/' => $userRole === 'carer' ? 'worker_dashboard.php' : 'dashboard.php',
     '/care' => 'care.php',
