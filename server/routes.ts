@@ -672,7 +672,7 @@ export async function registerRoutes(
     const worker = await storage.getWorkerByUserId(userId);
     if (!worker) return res.status(404).json({ message: "Worker profile not found" });
 
-    const { fullName, email, location, phoneNumber, bio, title, specializations, hourlyRate, transportCapable, wheelchairAccessible, languages } = req.body;
+    const { fullName, email, location, phoneNumber, bio, title, specializations, hourlyRate, transportCapable, wheelchairAccessible, transportType, languages, insuranceExpiry, firstAidExpiry, wwccNumber, wwccExpiry, screeningNumber, screeningExpiry } = req.body;
     if (fullName || email || location) {
       await storage.updateUserProfile(userId, { fullName, email, location });
     }
@@ -687,13 +687,12 @@ export async function registerRoutes(
       await db.update(users).set(updateData).where(eq(users.id, userId));
     }
 
-    if (title !== undefined || specializations !== undefined || hourlyRate !== undefined || transportCapable !== undefined || wheelchairAccessible !== undefined) {
+    const workerFields = { title, specializations, hourlyRate, transportCapable, wheelchairAccessible, transportType, insuranceExpiry, firstAidExpiry, wwccNumber, wwccExpiry, screeningNumber, screeningExpiry };
+    if (Object.values(workerFields).some(v => v !== undefined)) {
       const workerUpdate: Record<string, any> = {};
-      if (title !== undefined) workerUpdate.title = title;
-      if (specializations !== undefined) workerUpdate.specializations = specializations;
-      if (hourlyRate !== undefined) workerUpdate.hourlyRate = hourlyRate;
-      if (transportCapable !== undefined) workerUpdate.transportCapable = transportCapable;
-      if (wheelchairAccessible !== undefined) workerUpdate.wheelchairAccessible = wheelchairAccessible;
+      for (const [k, v] of Object.entries(workerFields)) {
+        if (v !== undefined) workerUpdate[k] = v;
+      }
       if (Object.keys(workerUpdate).length > 0) {
         const { eq } = await import("drizzle-orm");
         const { workers } = await import("@shared/schema");
@@ -863,10 +862,18 @@ export async function registerRoutes(
 
     const today = new Date().toISOString().split("T")[0];
     const allShifts = await storage.getShifts({ workerId: worker.id });
-    const todayShifts = allShifts.filter(s => s.date === today);
-    const upcomingShifts = allShifts.filter(s => s.date >= today && s.status !== "cancelled" && s.status !== "completed").slice(0, 5);
+    const todayShiftsRaw = allShifts.filter(s => s.date === today);
+    const upcomingShiftsRaw = allShifts.filter(s => s.date >= today && s.status !== "cancelled" && s.status !== "completed").slice(0, 5);
     const completedCount = allShifts.filter(s => s.status === "completed").length;
-    const activeShift = todayShifts.find(s => s.status === "in_progress") || null;
+    const activeShiftRaw = todayShiftsRaw.find(s => s.status === "in_progress") || null;
+
+    const enrichShift = async (s: any) => {
+      const participant = await storage.getUser(s.participantId);
+      return { ...s, participantName: participant?.fullName || "Unknown" };
+    };
+    const todayShifts = await Promise.all(todayShiftsRaw.map(enrichShift));
+    const upcomingShifts = await Promise.all(upcomingShiftsRaw.map(enrichShift));
+    const activeShift = activeShiftRaw ? await enrichShift(activeShiftRaw) : null;
 
     const allBookings = await storage.getBookings();
     const pendingBookings = allBookings.filter(b => b.workerId === worker.id && b.status === "pending");
@@ -881,14 +888,18 @@ export async function registerRoutes(
 
     const reviews = await storage.getReviewsForWorker(worker.id);
 
-    const insuranceExpiry = worker.insuranceExpiry;
     const complianceAlerts: string[] = [];
-    if (insuranceExpiry) {
-      const expiryDate = new Date(insuranceExpiry);
-      const daysUntilExpiry = Math.ceil((expiryDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
-      if (daysUntilExpiry < 0) complianceAlerts.push("Insurance has expired");
-      else if (daysUntilExpiry <= 30) complianceAlerts.push(`Insurance expires in ${daysUntilExpiry} days`);
-    }
+    const checkExpiry = (label: string, dateStr: string | null) => {
+      if (!dateStr) { complianceAlerts.push(`${label} not on file`); return; }
+      const expiryDate = new Date(dateStr);
+      const daysUntil = Math.ceil((expiryDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+      if (daysUntil < 0) complianceAlerts.push(`${label} has expired`);
+      else if (daysUntil <= 30) complianceAlerts.push(`${label} expires in ${daysUntil} days`);
+    };
+    checkExpiry("Insurance", worker.insuranceExpiry);
+    checkExpiry("First Aid Certificate", worker.firstAidExpiry);
+    checkExpiry("WWCC", worker.wwccExpiry);
+    checkExpiry("Screening Clearance", worker.screeningExpiry);
     if (!worker.ndisVerified) complianceAlerts.push("NDIS verification pending");
 
     const currentMonth = today.substring(0, 7);
