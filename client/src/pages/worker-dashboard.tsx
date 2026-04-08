@@ -1,10 +1,12 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useToast } from "@/hooks/use-toast";
 import { usePageTitle } from "@/hooks/use-page-title";
 import { useAuth } from "@/hooks/use-auth";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import {
   CalendarDays,
   Clock,
@@ -20,6 +22,8 @@ import {
   TrendingUp,
   Timer,
   Briefcase,
+  Check,
+  XCircle,
 } from "lucide-react";
 import { Link, Redirect } from "wouter";
 import { useState, useEffect } from "react";
@@ -42,7 +46,7 @@ interface DashboardData {
   activeShift: Shift | null;
   completedCount: number;
   totalShifts: number;
-  pendingBookings: number;
+  pendingBookings: { id: string; participantId: string; participantName: string; serviceType: string; date: string; startTime: string; endTime: string; status: string; notes?: string }[];
   activeBookingsCount: number;
   monthHours: number;
   monthEarnings: number;
@@ -95,10 +99,27 @@ export default function WorkerDashboard() {
   usePageTitle("Worker Dashboard | MapAble");
   const { user } = useAuth();
 
+  const { toast } = useToast();
+
   const { data, isLoading, error } = useQuery<DashboardData>({
     queryKey: ["/api/worker/dashboard"],
     enabled: user?.role === "carer",
     refetchInterval: 30000,
+  });
+
+  const bookingActionMutation = useMutation({
+    mutationFn: async ({ id, status }: { id: string; status: string }) => {
+      const res = await apiRequest("PATCH", `/api/worker/bookings/${id}/status`, { status });
+      return res.json();
+    },
+    onSuccess: (_data, vars) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/worker/dashboard"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/worker/bookings"] });
+      toast({ title: vars.status === "confirmed" ? "Booking accepted" : "Booking declined" });
+    },
+    onError: (err: Error) => {
+      toast({ title: "Action failed", description: err.message, variant: "destructive" });
+    },
   });
 
   if (user && user.role !== "carer") {
@@ -212,7 +233,7 @@ export default function WorkerDashboard() {
               <ClipboardList className="w-5 h-5 text-purple-500" />
             </div>
             <div>
-              <p className="text-2xl font-bold">{data.pendingBookings}</p>
+              <p className="text-2xl font-bold">{data.pendingBookings.length}</p>
               <p className="text-xs text-muted-foreground">Pending Bookings</p>
             </div>
           </div>
@@ -244,6 +265,54 @@ export default function WorkerDashboard() {
             <Link href="/worker/shifts">
               <Button size="sm" data-testid="button-view-active-shift">Manage Shift</Button>
             </Link>
+          </div>
+        </Card>
+      )}
+
+      {data.pendingBookings.length > 0 && (
+        <Card className="border-purple-300 bg-purple-50/50 dark:bg-purple-950/20 dark:border-purple-700 p-5" data-testid="card-pending-bookings">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-semibold flex items-center gap-2">
+              <ClipboardList className="w-4 h-4 text-purple-600" /> Pending Bookings ({data.pendingBookings.length})
+            </h3>
+            <Link href="/worker/bookings">
+              <Button variant="ghost" size="sm" className="text-[#1B6EB5] gap-1" data-testid="link-all-bookings">
+                View All <ArrowRight className="w-3.5 h-3.5" />
+              </Button>
+            </Link>
+          </div>
+          <div className="space-y-3">
+            {data.pendingBookings.map((booking) => (
+              <div key={booking.id} className="flex items-center justify-between py-3 px-4 rounded-lg bg-white dark:bg-gray-900 border" data-testid={`pending-booking-${booking.id}`}>
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-sm truncate">{booking.participantName}</p>
+                  <p className="text-xs text-muted-foreground">{booking.serviceType} &middot; {booking.date}</p>
+                  <p className="text-xs text-muted-foreground">{booking.startTime} – {booking.endTime}</p>
+                </div>
+                <div className="flex items-center gap-2 ml-3">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-8 gap-1 border-[#2EAA6E] text-[#2EAA6E] hover:bg-[#2EAA6E]/10"
+                    disabled={bookingActionMutation.isPending}
+                    onClick={() => bookingActionMutation.mutate({ id: booking.id, status: "confirmed" })}
+                    data-testid={`button-accept-booking-${booking.id}`}
+                  >
+                    <Check className="w-3.5 h-3.5" /> Accept
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-8 gap-1 border-red-400 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30"
+                    disabled={bookingActionMutation.isPending}
+                    onClick={() => bookingActionMutation.mutate({ id: booking.id, status: "cancelled" })}
+                    data-testid={`button-decline-booking-${booking.id}`}
+                  >
+                    <XCircle className="w-3.5 h-3.5" /> Decline
+                  </Button>
+                </div>
+              </div>
+            ))}
           </div>
         </Card>
       )}

@@ -871,6 +871,14 @@ export async function registerRoutes(
     const allBookings = await storage.getBookings();
     const pendingBookings = allBookings.filter(b => b.workerId === worker.id && b.status === "pending");
 
+    const enrichedPendingBookings = await Promise.all(pendingBookings.map(async (b) => {
+      const participant = await storage.getUser(b.participantId);
+      return {
+        ...b,
+        participantName: participant?.fullName || "Unknown",
+      };
+    }));
+
     const reviews = await storage.getReviewsForWorker(worker.id);
 
     const insuranceExpiry = worker.insuranceExpiry;
@@ -904,7 +912,7 @@ export async function registerRoutes(
       activeShift,
       completedCount,
       totalShifts: allShifts.length,
-      pendingBookings: pendingBookings.length,
+      pendingBookings: enrichedPendingBookings,
       activeBookingsCount: activeBookings.length,
       monthHours: Math.round(monthHours * 10) / 10,
       monthEarnings: Math.round(monthEarnings * 100) / 100,
@@ -1684,7 +1692,7 @@ export async function registerRoutes(
         totalCharge,
         ndisItemCode,
         date: shift.date,
-        shiftNotes: shift.notes || undefined,
+        shiftNotes: shiftNotes || shift.notes || undefined,
       };
       sessionData.status = "completed";
       const session = await storage.createServiceSession(sessionData);
@@ -1693,7 +1701,10 @@ export async function registerRoutes(
         await storage.updateBudgetUsage(shift.participantId, "daily_living", Number(session.totalCharge));
       }
 
-      const updated = await storage.updateShiftStatus(req.params.id, "completed", session.id);
+      const completionExtra: { actualHours?: string; notes?: string } = {};
+      if (actualHours) completionExtra.actualHours = String(actualHours);
+      if (shiftNotes !== undefined) completionExtra.notes = shiftNotes;
+      const updated = await storage.updateShiftStatus(req.params.id, "completed", session.id, Object.keys(completionExtra).length ? completionExtra : undefined);
       return res.json({ shift: updated, session });
     }
 

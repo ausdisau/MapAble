@@ -21,7 +21,7 @@ import {
   CalendarOff,
   CheckCircle2,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useCallback, useRef } from "react";
 import type { WorkerAvailability, WorkerBlockout, Worker } from "@shared/schema";
 
 const DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -105,6 +105,66 @@ export default function WorkerAvailabilityPage() {
     },
   });
 
+  const [focusedDay, setFocusedDay] = useState(0);
+  const gridRef = useRef<HTMLDivElement>(null);
+
+  const removeSlot = useCallback((idx: number) => {
+    setEditSlots(prev => prev.filter((_, i) => i !== idx));
+  }, []);
+
+  const handleGridKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setFocusedDay(prev => {
+        const next = Math.min(prev + 1, 6);
+        setTimeout(() => {
+          const el = gridRef.current?.querySelector(`[data-day-index="${next}"]`) as HTMLElement;
+          el?.focus();
+        }, 0);
+        return next;
+      });
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setFocusedDay(prev => {
+        const next = Math.max(prev - 1, 0);
+        setTimeout(() => {
+          const el = gridRef.current?.querySelector(`[data-day-index="${next}"]`) as HTMLElement;
+          el?.focus();
+        }, 0);
+        return next;
+      });
+    } else if (e.key === "Home") {
+      e.preventDefault();
+      setFocusedDay(0);
+      setTimeout(() => {
+        const el = gridRef.current?.querySelector('[data-day-index="0"]') as HTMLElement;
+        el?.focus();
+      }, 0);
+    } else if (e.key === "End") {
+      e.preventDefault();
+      setFocusedDay(6);
+      setTimeout(() => {
+        const el = gridRef.current?.querySelector('[data-day-index="6"]') as HTMLElement;
+        el?.focus();
+      }, 0);
+    }
+  }, []);
+
+  const handleEditKeyDown = useCallback((e: React.KeyboardEvent, idx: number) => {
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      const next = document.querySelector(`[data-testid="edit-slot-${idx + 1}"] select`) as HTMLElement;
+      next?.focus();
+    } else if (e.key === "ArrowUp" && idx > 0) {
+      e.preventDefault();
+      const prev = document.querySelector(`[data-testid="edit-slot-${idx - 1}"] select`) as HTMLElement;
+      prev?.focus();
+    } else if (e.key === "Delete") {
+      e.preventDefault();
+      removeSlot(idx);
+    }
+  }, [removeSlot]);
+
   if (user && user.role !== "carer") {
     return <Redirect to="/" />;
   }
@@ -130,10 +190,6 @@ export default function WorkerAvailabilityPage() {
 
   const addSlot = () => {
     setEditSlots([...editSlots, { dayOfWeek: 1, startTime: "09:00", endTime: "17:00" }]);
-  };
-
-  const removeSlot = (idx: number) => {
-    setEditSlots(editSlots.filter((_, i) => i !== idx));
   };
 
   const updateSlot = (idx: number, field: string, value: string | number) => {
@@ -185,24 +241,38 @@ export default function WorkerAvailabilityPage() {
         </h2>
 
         {!editing ? (
-          <div className="space-y-2">
+          <div role="grid" aria-label="Weekly availability schedule" ref={gridRef} onKeyDown={handleGridKeyDown} className="space-y-2">
+            <div role="row" className="sr-only">
+              <span role="columnheader">Day</span>
+              <span role="columnheader">Available Times</span>
+            </div>
             {DAY_NAMES.map((day, idx) => {
               const daySlots = slotsByDay[idx] || [];
               return (
-                <div key={idx} className="flex items-center gap-4 py-2 border-b last:border-b-0" data-testid={`day-row-${idx}`}>
-                  <span className="w-24 text-sm font-medium">{day}</span>
-                  {daySlots.length > 0 ? (
-                    <div className="flex flex-wrap gap-2">
-                      {daySlots.map((slot) => (
-                        <Badge key={slot.id} variant="secondary" className="gap-1">
-                          <Clock className="w-3 h-3" />
-                          {slot.startTime} – {slot.endTime}
-                        </Badge>
-                      ))}
-                    </div>
-                  ) : (
-                    <span className="text-sm text-muted-foreground">Not available</span>
-                  )}
+                <div
+                  key={idx}
+                  role="row"
+                  tabIndex={focusedDay === idx ? 0 : -1}
+                  data-day-index={idx}
+                  aria-label={`${day}: ${daySlots.length > 0 ? daySlots.map(s => `${s.startTime} to ${s.endTime}`).join(", ") : "Not available"}`}
+                  className="flex items-center gap-4 py-2 border-b last:border-b-0 focus:outline-none focus:ring-2 focus:ring-[#1B6EB5] focus:rounded-md"
+                  data-testid={`day-row-${idx}`}
+                >
+                  <span role="gridcell" className="w-24 text-sm font-medium">{day}</span>
+                  <span role="gridcell">
+                    {daySlots.length > 0 ? (
+                      <span className="flex flex-wrap gap-2">
+                        {daySlots.map((slot) => (
+                          <Badge key={slot.id} variant="secondary" className="gap-1">
+                            <Clock className="w-3 h-3" />
+                            {slot.startTime} – {slot.endTime}
+                          </Badge>
+                        ))}
+                      </span>
+                    ) : (
+                      <span className="text-sm text-muted-foreground">Not available</span>
+                    )}
+                  </span>
                 </div>
               );
             })}
@@ -214,13 +284,14 @@ export default function WorkerAvailabilityPage() {
             )}
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-3" role="list" aria-label="Editable time slots">
             {editSlots.map((slot, idx) => (
-              <div key={idx} className="flex items-center gap-3 flex-wrap" data-testid={`edit-slot-${idx}`}>
+              <div key={idx} role="listitem" className="flex items-center gap-3 flex-wrap" data-testid={`edit-slot-${idx}`} onKeyDown={(e) => handleEditKeyDown(e, idx)}>
                 <select
                   value={slot.dayOfWeek}
                   onChange={(e) => updateSlot(idx, "dayOfWeek", parseInt(e.target.value))}
                   className="border rounded-md px-3 py-2 text-sm bg-background"
+                  aria-label={`Day for slot ${idx + 1}`}
                   data-testid={`select-day-${idx}`}
                 >
                   {DAY_NAMES.map((day, i) => (
@@ -232,17 +303,19 @@ export default function WorkerAvailabilityPage() {
                   value={slot.startTime}
                   onChange={(e) => updateSlot(idx, "startTime", e.target.value)}
                   className="w-32"
+                  aria-label={`Start time for slot ${idx + 1}`}
                   data-testid={`input-start-${idx}`}
                 />
-                <span className="text-muted-foreground">to</span>
+                <span className="text-muted-foreground" aria-hidden="true">to</span>
                 <Input
                   type="time"
                   value={slot.endTime}
                   onChange={(e) => updateSlot(idx, "endTime", e.target.value)}
                   className="w-32"
+                  aria-label={`End time for slot ${idx + 1}`}
                   data-testid={`input-end-${idx}`}
                 />
-                <Button variant="ghost" size="icon" onClick={() => removeSlot(idx)} className="text-red-500" data-testid={`button-remove-slot-${idx}`}>
+                <Button variant="ghost" size="icon" onClick={() => removeSlot(idx)} className="text-red-500" aria-label={`Remove slot ${idx + 1}`} data-testid={`button-remove-slot-${idx}`}>
                   <Trash2 className="w-4 h-4" />
                 </Button>
               </div>

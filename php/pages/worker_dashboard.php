@@ -283,9 +283,10 @@ require __DIR__ . '/../includes/layout_header.php';
 })();
 
 function workerApiAction(url, data) {
+    data.csrf_token = '<?= h(csrfToken()) ?>';
     fetch(url, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': data.csrf_token },
         body: JSON.stringify(data)
     }).then(r => r.json()).then(res => {
         if (res.success) location.reload();
