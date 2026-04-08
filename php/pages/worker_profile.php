@@ -33,6 +33,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'transport_type' => trim($_POST['transport_type'] ?? ''),
             'wheelchair_accessible' => !empty($_POST['wheelchair_accessible']),
             'specializations' => $_POST['specializations'] ?? [],
+            'insurance_expiry' => trim($_POST['insurance_expiry'] ?? '') ?: null,
+            'first_aid_expiry' => trim($_POST['first_aid_expiry'] ?? '') ?: null,
+            'wwcc_number' => trim($_POST['wwcc_number'] ?? '') ?: null,
+            'wwcc_expiry' => trim($_POST['wwcc_expiry'] ?? '') ?: null,
+            'screening_number' => trim($_POST['screening_number'] ?? '') ?: null,
+            'screening_expiry' => trim($_POST['screening_expiry'] ?? '') ?: null,
         ];
         updateWorkerProfile($pdo, $worker['id'], $data);
         setFlash('success', 'Profile updated successfully.');
@@ -226,15 +232,16 @@ require __DIR__ . '/../includes/layout_header.php';
                             <span class="badge badge-teal text-[10px]"><i class="icon-check-circle w-3 h-3" aria-hidden="true"></i> Valid</span>
                         <?php endif; ?>
                     </label>
-                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-1" data-testid="text-comp-<?= $doc['key'] ?>">
-                        <?= $val ? h($doc['type'] === 'date' ? formatDate($val) : $val) : '<span class="text-gray-400 italic">Not provided</span>' ?>
-                    </p>
+                    <input type="<?= $doc['type'] ?>" id="comp-<?= $doc['key'] ?>" name="<?= $doc['key'] ?>"
+                        value="<?= h($val) ?>" class="input w-full mt-1"
+                        <?= $doc['type'] === 'text' ? 'placeholder="Enter ' . h($doc['label']) . '"' : '' ?>
+                        data-testid="input-comp-<?= $doc['key'] ?>">
                 </div>
                 <?php endforeach; ?>
             </div>
             <p class="text-xs text-gray-500 dark:text-gray-400 mt-3">
                 <i class="icon-info w-3 h-3 inline" aria-hidden="true"></i>
-                Compliance documents are managed by your provider. Contact MapAble Services to update these details.
+                Keep your compliance documents up to date. Expired documents may affect your ability to accept new bookings.
             </p>
         </fieldset>
 

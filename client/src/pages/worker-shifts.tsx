@@ -28,7 +28,7 @@ import {
   StopCircle,
 } from "lucide-react";
 import { useState, useEffect } from "react";
-import type { Shift, Booking } from "@shared/schema";
+import type { Shift } from "@shared/schema";
 
 interface EarningsData {
   totalEarnings: string;
@@ -69,7 +69,19 @@ export default function WorkerShifts() {
     enabled: user?.role === "carer",
   });
 
-  const { data: confirmedBookings } = useQuery<any[]>({
+  interface EnrichedBooking {
+    id: string;
+    participantId: string;
+    participantName: string;
+    serviceType: string;
+    date: string;
+    startTime: string;
+    endTime: string;
+    status: string;
+    notes?: string;
+  }
+
+  const { data: confirmedBookings } = useQuery<EnrichedBooking[]>({
     queryKey: ["/api/worker/bookings"],
     enabled: user?.role === "carer" && showNewShift,
   });
@@ -509,7 +521,7 @@ export default function WorkerShifts() {
             </h3>
             <p className="text-sm text-muted-foreground mb-4">Select a confirmed booking to start a shift:</p>
             {(() => {
-              const confirmed = (confirmedBookings || []).filter((b: any) => b.status === "confirmed");
+              const confirmed = (confirmedBookings || []).filter((b) => b.status === "confirmed");
               if (confirmed.length === 0) {
                 return (
                   <div className="text-center py-6">
@@ -520,7 +532,7 @@ export default function WorkerShifts() {
               }
               return (
                 <div className="space-y-3 max-h-64 overflow-y-auto">
-                  {confirmed.map((booking: any) => (
+                  {confirmed.map((booking) => (
                     <div key={booking.id} className="flex items-center justify-between p-3 rounded-lg border" data-testid={`new-shift-booking-${booking.id}`}>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium truncate">{booking.participantName || "Participant"}</p>
