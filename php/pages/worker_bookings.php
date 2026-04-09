@@ -37,11 +37,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             setFlash('error', 'Booking not found or not assigned to you.');
         }
     } elseif ($action === 'start_shift' && $bookingId) {
-        $participantId = $_POST['participant_id'] ?? '';
-        if ($participantId && !$activeShift) {
-            startWorkerShift($pdo, $worker['id'], $participantId, $bookingId);
+        $booking = getBookingById($pdo, $bookingId);
+        if ($booking && $booking['worker_id'] === $worker['id'] && !$activeShift) {
+            startWorkerShift($pdo, $worker['id'], $booking['participant_id'], $bookingId);
             acceptBooking($pdo, $bookingId, $worker['id']);
             setFlash('success', 'Shift started from booking.');
+        } elseif (!$booking || $booking['worker_id'] !== $worker['id']) {
+            setFlash('error', 'Booking not found or not assigned to you.');
         }
     }
     redirect('/worker/bookings' . ($statusFilter ? '?status=' . $statusFilter : ''));
@@ -127,7 +129,6 @@ require __DIR__ . '/../includes/layout_header.php';
                     <form method="POST">
                         <?= csrfField() ?>
                         <input type="hidden" name="booking_id" value="<?= h($b['id']) ?>">
-                        <input type="hidden" name="participant_id" value="<?= h($b['participant_id']) ?>">
                         <button type="submit" name="action" value="start_shift" class="btn btn-blue btn-xs" data-testid="button-start-shift-<?= h($b['id']) ?>">
                             <i class="icon-play w-3 h-3" aria-hidden="true"></i> Start Shift
                         </button>
