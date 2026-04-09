@@ -458,9 +458,9 @@ function updateWorkerProfile($pdo, $workerId, $data) {
             }
         }
     }
-    if (!empty($data['specializations']) && is_array($data['specializations'])) {
+    if (array_key_exists('specializations', $data) && is_array($data['specializations'])) {
         $workerFields[] = 'specializations = ?';
-        $workerValues[] = '{' . implode(',', array_map(fn($s) => '"' . $s . '"', $data['specializations'])) . '}';
+        $workerValues[] = empty($data['specializations']) ? '{}' : '{' . implode(',', array_map(fn($s) => '"' . $s . '"', $data['specializations'])) . '}';
     }
     if (!empty($workerFields)) {
         $workerValues[] = $workerId;
