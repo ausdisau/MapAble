@@ -142,7 +142,7 @@ export default function WorkerShifts() {
   const handleExportCSV = () => {
     if (!shifts || shifts.length === 0) return;
     const filtered = applyFilters(shifts);
-    const headers = ["Date", "Start Time", "End Time", "Hours", "Status", "Service Type", "NDIS Goal", "NDIS Category", "Notes"];
+    const headers = ["Date", "Start Time", "End Time", "Hours", "Status", "NDIS Goal", "NDIS Category", "Notes"];
     const rows = filtered.map(s => {
       const startParts = s.startTime.split(":");
       const endParts = s.endTime.split(":");

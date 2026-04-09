@@ -1494,6 +1494,10 @@ export async function registerRoutes(
       return res.status(403).json({ message: "Access denied" });
     }
     const blockouts = await storage.getWorkerBlockouts(req.params.workerId);
+    if (isParticipant && !isOwnWorker) {
+      const safeBlockouts = blockouts.map(({ reason, ...rest }) => ({ ...rest, reason: null }));
+      return res.json(safeBlockouts);
+    }
     res.json(blockouts);
   });
 
