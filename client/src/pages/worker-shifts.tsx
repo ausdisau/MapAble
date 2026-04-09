@@ -151,7 +151,7 @@ export default function WorkerShifts() {
       const hours = Math.max((endMins - startMins) / 60, 0.25);
       return [
         s.date, s.startTime, s.endTime, hours.toFixed(1), s.status,
-        s.serviceType || "", s.ndisGoal || "", s.ndisCategory || "", s.notes || "",
+        s.ndisGoal || "", s.ndisCategory || "", s.notes || "",
       ];
     });
     const csv = [headers.join(","), ...rows.map(r => r.map(c => `"${c}"`).join(","))].join("\n");
@@ -233,7 +233,7 @@ export default function WorkerShifts() {
             <div className="flex items-center gap-2 flex-wrap">
               <Badge className={STATUS_COLORS[shift.status] || ""}>{shift.status.replace("_", " ")}</Badge>
               {shift.ndisCategory && <Badge variant="outline">{shift.ndisCategory}</Badge>}
-              {shift.serviceType && <Badge variant="outline" className="text-xs">{shift.serviceType}</Badge>}
+              {shift.ndisGoal && <Badge variant="outline" className="text-xs">{shift.ndisGoal}</Badge>}
             </div>
             {shift.participantName && (
               <p className="text-sm font-medium" data-testid={`shift-participant-${shift.id}`}>{shift.participantName}</p>

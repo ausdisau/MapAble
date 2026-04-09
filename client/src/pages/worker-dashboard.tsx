@@ -339,7 +339,7 @@ export default function WorkerDashboard() {
                 <div key={shift.id} className="flex items-center justify-between py-2 border-b last:border-b-0" data-testid={`shift-today-${shift.id}`}>
                   <div>
                     <p className="text-sm font-medium">{shift.participantName || "Participant"}</p>
-                    <p className="text-xs text-muted-foreground">{shift.serviceType || shift.ndisGoal || "Support"} &middot; {shift.startTime} – {shift.endTime}</p>
+                    <p className="text-xs text-muted-foreground">{shift.ndisGoal || shift.ndisCategory || "Support"} &middot; {shift.startTime} – {shift.endTime}</p>
                   </div>
                   <Badge className={STATUS_COLORS[shift.status] || ""}>{shift.status.replace("_", " ")}</Badge>
                 </div>
@@ -363,7 +363,7 @@ export default function WorkerDashboard() {
                   <div>
                     <p className="text-sm font-medium">{shift.participantName || "Participant"}</p>
                     <p className="text-xs text-muted-foreground">{shift.date} &middot; {shift.startTime} – {shift.endTime}</p>
-                    {shift.serviceType && <p className="text-xs text-muted-foreground">{shift.serviceType}</p>}
+                    {shift.ndisCategory && <p className="text-xs text-muted-foreground">{shift.ndisCategory}</p>}
                   </div>
                   <Badge className={STATUS_COLORS[shift.status] || ""}>{shift.status.replace("_", " ")}</Badge>
                 </div>

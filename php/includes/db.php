@@ -53,6 +53,12 @@ function getBookings($pdo) {
     return $pdo->query('SELECT * FROM bookings ORDER BY date DESC')->fetchAll();
 }
 
+function getBookingById($pdo, $bookingId) {
+    $stmt = $pdo->prepare('SELECT * FROM bookings WHERE id = ?');
+    $stmt->execute([$bookingId]);
+    return $stmt->fetch();
+}
+
 function createBooking($pdo, $data) {
     $stmt = $pdo->prepare('INSERT INTO bookings (participant_id, worker_id, service_type, date, start_time, end_time, notes)
         VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING *');
