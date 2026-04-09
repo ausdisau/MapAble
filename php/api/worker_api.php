@@ -30,16 +30,19 @@ function requireApiCsrf() {
 if ($uri === '/api/worker/shift/start' && $method === 'POST') {
     requireApiCsrf();
     $input = $_jsonInput ?: $_POST;
-    $participantId = $input['participant_id'] ?? '';
-    $bookingId = $input['booking_id'] ?? null;
-    if (!$participantId) {
-        jsonResponse(['error' => 'participant_id required'], 400);
+    $bookingId = $input['booking_id'] ?? '';
+    if (!$bookingId) {
+        jsonResponse(['error' => 'booking_id required'], 400);
+    }
+    $booking = getBookingById($pdo, $bookingId);
+    if (!$booking || $booking['worker_id'] !== $worker['id']) {
+        jsonResponse(['error' => 'Booking not found or not assigned to you'], 403);
     }
     $existing = getWorkerActiveShift($pdo, $worker['id']);
     if ($existing) {
         jsonResponse(['error' => 'You already have an active shift'], 400);
     }
-    $session = startWorkerShift($pdo, $worker['id'], $participantId, $bookingId);
+    $session = startWorkerShift($pdo, $worker['id'], $booking['participant_id'], $bookingId);
     jsonResponse(['success' => true, 'session' => $session]);
 }
 
@@ -79,11 +82,14 @@ if ($uri === '/api/worker/booking/start-shift' && $method === 'POST') {
     requireApiCsrf();
     $input = $_jsonInput ?: $_POST;
     $bookingId = $input['booking_id'] ?? '';
-    $participantId = $input['participant_id'] ?? '';
-    if (!$bookingId || !$participantId) jsonResponse(['error' => 'booking_id and participant_id required'], 400);
+    if (!$bookingId) jsonResponse(['error' => 'booking_id required'], 400);
+    $booking = getBookingById($pdo, $bookingId);
+    if (!$booking || $booking['worker_id'] !== $worker['id']) {
+        jsonResponse(['error' => 'Booking not found or not assigned to you'], 403);
+    }
     $existing = getWorkerActiveShift($pdo, $worker['id']);
     if ($existing) jsonResponse(['error' => 'You already have an active shift'], 400);
-    $session = startWorkerShift($pdo, $worker['id'], $participantId, $bookingId);
+    $session = startWorkerShift($pdo, $worker['id'], $booking['participant_id'], $bookingId);
     acceptBooking($pdo, $bookingId, $worker['id']);
     jsonResponse(['success' => true, 'session' => $session]);
 }
