@@ -867,7 +867,7 @@ export async function registerRoutes(
     const completedCount = allShifts.filter(s => s.status === "completed").length;
     const activeShiftRaw = todayShiftsRaw.find(s => s.status === "in_progress") || null;
 
-    const enrichShift = async (s: any) => {
+    const enrichShift = async (s: typeof allShifts[number]) => {
       const participant = await storage.getUser(s.participantId);
       return { ...s, participantName: participant?.fullName || "Unknown" };
     };
@@ -877,14 +877,14 @@ export async function registerRoutes(
 
     const allBookings = await storage.getBookings();
     const pendingBookings = allBookings.filter(b => b.workerId === worker.id && b.status === "pending");
+    const upcomingBookingsRaw = allBookings.filter(b => b.workerId === worker.id && (b.status === "confirmed" || b.status === "pending") && (b.date || "") >= today).slice(0, 5);
 
-    const enrichedPendingBookings = await Promise.all(pendingBookings.map(async (b) => {
+    const enrichBooking = async (b: typeof allBookings[number]) => {
       const participant = await storage.getUser(b.participantId);
-      return {
-        ...b,
-        participantName: participant?.fullName || "Unknown",
-      };
-    }));
+      return { ...b, participantName: participant?.fullName || "Unknown" };
+    };
+    const enrichedPendingBookings = await Promise.all(pendingBookings.map(enrichBooking));
+    const upcomingBookings = await Promise.all(upcomingBookingsRaw.map(enrichBooking));
 
     const reviews = await storage.getReviewsForWorker(worker.id);
 
@@ -924,6 +924,7 @@ export async function registerRoutes(
       completedCount,
       totalShifts: allShifts.length,
       pendingBookings: enrichedPendingBookings,
+      upcomingBookings,
       activeBookingsCount: activeBookings.length,
       monthHours: Math.round(monthHours * 10) / 10,
       monthEarnings: Math.round(monthEarnings * 100) / 100,

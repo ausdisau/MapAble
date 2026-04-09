@@ -33,6 +33,18 @@ import type { Shift } from "@shared/schema";
 
 type EnrichedShift = Shift & { participantName?: string };
 
+interface EnrichedBooking {
+  id: string;
+  participantId: string;
+  participantName: string;
+  serviceType: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  status: string;
+  notes?: string | null;
+}
+
 interface DashboardData {
   worker: {
     id: string;
@@ -50,7 +62,8 @@ interface DashboardData {
   activeShift: EnrichedShift | null;
   completedCount: number;
   totalShifts: number;
-  pendingBookings: { id: string; participantId: string; participantName: string; serviceType: string; date: string; startTime: string; endTime: string; status: string; notes?: string }[];
+  pendingBookings: EnrichedBooking[];
+  upcomingBookings: EnrichedBooking[];
   activeBookingsCount: number;
   monthHours: number;
   monthEarnings: number;
@@ -363,6 +376,32 @@ export default function WorkerDashboard() {
                     <XCircle className="w-3.5 h-3.5" /> Decline
                   </Button>
                 </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
+
+      {data.upcomingBookings && data.upcomingBookings.length > 0 && (
+        <Card className="p-5" data-testid="card-upcoming-bookings">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-semibold flex items-center gap-2">
+              <CalendarDays className="w-4 h-4 text-[#1B6EB5]" /> Upcoming Bookings
+            </h3>
+            <Link href="/worker/bookings">
+              <Button variant="ghost" size="sm" className="text-[#1B6EB5] gap-1" data-testid="link-all-upcoming-bookings">
+                View All <ArrowRight className="w-3.5 h-3.5" />
+              </Button>
+            </Link>
+          </div>
+          <div className="space-y-2">
+            {data.upcomingBookings.map((booking) => (
+              <div key={booking.id} className="flex items-center justify-between py-2 border-b last:border-b-0" data-testid={`upcoming-booking-${booking.id}`}>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium truncate">{booking.participantName}</p>
+                  <p className="text-xs text-muted-foreground">{booking.serviceType} &middot; {booking.date} &middot; {booking.startTime} – {booking.endTime}</p>
+                </div>
+                <Badge className={STATUS_COLORS[booking.status] || ""}>{booking.status}</Badge>
               </div>
             ))}
           </div>
