@@ -1,6 +1,7 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
@@ -24,6 +25,7 @@ import {
   Briefcase,
   Check,
   XCircle,
+  StopCircle,
 } from "lucide-react";
 import { Link, Redirect } from "wouter";
 import { useState, useEffect } from "react";
@@ -109,6 +111,10 @@ export default function WorkerDashboard() {
     refetchInterval: 30000,
   });
 
+  const [showEndShift, setShowEndShift] = useState(false);
+  const [endShiftHours, setEndShiftHours] = useState("");
+  const [endShiftNotes, setEndShiftNotes] = useState("");
+
   const bookingActionMutation = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: string }) => {
       const res = await apiRequest("PATCH", `/api/worker/bookings/${id}/status`, { status });
@@ -121,6 +127,24 @@ export default function WorkerDashboard() {
     },
     onError: (err: Error) => {
       toast({ title: "Action failed", description: err.message, variant: "destructive" });
+    },
+  });
+
+  const endShiftMutation = useMutation({
+    mutationFn: async ({ shiftId, actualHours, notes }: { shiftId: string; actualHours: number; notes: string }) => {
+      const res = await apiRequest("PATCH", `/api/shifts/${shiftId}/status`, { status: "completed", actualHours, notes });
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/worker/dashboard"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/shifts"] });
+      setShowEndShift(false);
+      setEndShiftHours("");
+      setEndShiftNotes("");
+      toast({ title: "Shift completed successfully" });
+    },
+    onError: (err: Error) => {
+      toast({ title: "Failed to end shift", description: err.message, variant: "destructive" });
     },
   });
 
@@ -264,10 +288,36 @@ export default function WorkerDashboard() {
                 <p className="text-sm text-muted-foreground mt-1">{data.activeShift.notes}</p>
               )}
             </div>
-            <Link href="/worker/shifts">
-              <Button size="sm" data-testid="button-view-active-shift">Manage Shift</Button>
-            </Link>
+            <div className="flex gap-2 shrink-0">
+              <Button size="sm" variant="destructive" onClick={() => setShowEndShift(true)} data-testid="button-end-shift-dashboard">
+                <StopCircle className="w-4 h-4 mr-1" /> End Shift
+              </Button>
+              <Link href="/worker/shifts">
+                <Button size="sm" variant="outline" data-testid="button-view-active-shift">Manage Shift</Button>
+              </Link>
+            </div>
           </div>
+          {showEndShift && data.activeShift && (
+            <div className="mt-4 p-4 bg-white dark:bg-gray-800 rounded-lg border space-y-3" data-testid="panel-end-shift">
+              <h4 className="text-sm font-semibold">Complete Shift</h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label htmlFor="dash-end-hours" className="text-xs text-muted-foreground">Actual Hours</label>
+                  <Input id="dash-end-hours" type="number" step="0.25" min="0.25" placeholder="e.g. 2.5" value={endShiftHours} onChange={(e) => setEndShiftHours(e.target.value)} data-testid="input-end-shift-hours-dashboard" />
+                </div>
+                <div>
+                  <label htmlFor="dash-end-notes" className="text-xs text-muted-foreground">Notes (optional)</label>
+                  <Input id="dash-end-notes" placeholder="Shift notes..." value={endShiftNotes} onChange={(e) => setEndShiftNotes(e.target.value)} data-testid="input-end-shift-notes-dashboard" />
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Button size="sm" disabled={!endShiftHours || parseFloat(endShiftHours) <= 0 || endShiftMutation.isPending} onClick={() => endShiftMutation.mutate({ shiftId: data.activeShift!.id, actualHours: parseFloat(endShiftHours), notes: endShiftNotes })} data-testid="button-confirm-end-shift-dashboard">
+                  {endShiftMutation.isPending ? "Completing..." : "Complete Shift"}
+                </Button>
+                <Button size="sm" variant="outline" onClick={() => setShowEndShift(false)} data-testid="button-cancel-end-shift-dashboard">Cancel</Button>
+              </div>
+            </div>
+          )}
         </Card>
       )}
 
