@@ -20,6 +20,7 @@ import {
   ClipboardList,
   User as UserIcon,
   TrendingUp,
+  Mail,
 } from "lucide-react";
 import {
   Sidebar,
@@ -69,6 +70,7 @@ const workerNavItems: NavItem[] = [
   { title: "My Profile", url: "/worker/profile", icon: UserIcon, audioDesc: "Update your worker profile and details" },
   { title: "MapAble Chat", url: "/chat", icon: Bot, audioDesc: "Chat with your accessibility-aware travel assistant" },
   { title: "Messages", url: "/messages", icon: MessageSquare, audioDesc: "View your conversations and messages" },
+  { title: "Email", url: "/email", icon: Mail, audioDesc: "View and manage your email inbox" },
   { title: "Settings", url: "/settings", icon: Settings, audioDesc: "Manage your account and accessibility preferences" },
 ];
 

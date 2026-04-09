@@ -29,11 +29,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
 
     if ($action === 'start_shift') {
-        $participantId = $_POST['participant_id'] ?? '';
         $bookingId = $_POST['booking_id'] ?? null;
-        if ($participantId && !$activeShift) {
-            startWorkerShift($pdo, $worker['id'], $participantId, $bookingId ?: null);
-            setFlash('success', 'Shift started successfully.');
+        if ($bookingId && !$activeShift) {
+            $booking = getBookingById($pdo, $bookingId);
+            if ($booking && $booking['worker_id'] === $worker['id']) {
+                startWorkerShift($pdo, $worker['id'], $booking['participant_id'], $bookingId);
+                setFlash('success', 'Shift started successfully.');
+            } else {
+                setFlash('error', 'Booking not found or not assigned to you.');
+            }
         }
         redirect('/worker/shifts');
     }
@@ -199,17 +203,16 @@ require __DIR__ . '/../includes/layout_header.php';
             <input type="hidden" name="action" value="start_shift">
             <div class="space-y-4">
                 <div>
-                    <label for="shift-participant" class="label">Select Participant</label>
-                    <select id="shift-participant" name="participant_id" required class="input w-full" aria-required="true" data-testid="select-shift-participant">
-                        <option value="">Choose a participant...</option>
+                    <label for="shift-booking" class="label">Select Booking</label>
+                    <select id="shift-booking" name="booking_id" required class="input w-full" aria-required="true" data-testid="select-shift-booking">
+                        <option value="">Choose a confirmed booking...</option>
                         <?php foreach ($confirmedBookings as $b): ?>
-                        <option value="<?= h($b['participant_id']) ?>" data-booking="<?= h($b['id']) ?>">
-                            <?= h($b['participant_name']) ?> — <?= formatDate($b['date']) ?>
+                        <option value="<?= h($b['id']) ?>">
+                            <?= h($b['participant_name']) ?> — <?= formatDate($b['date']) ?> (<?= h($b['start_time'] ?? '') ?>)
                         </option>
                         <?php endforeach; ?>
                     </select>
                 </div>
-                <input type="hidden" name="booking_id" id="shift-booking-id" value="">
                 <div class="flex gap-3">
                     <button type="submit" class="btn btn-teal flex-1" data-testid="button-confirm-start-shift">Start Shift</button>
                     <button type="button" onclick="document.getElementById('start-shift-modal').classList.add('hidden')" class="btn btn-outline flex-1" data-testid="button-cancel-start-shift">Cancel</button>
