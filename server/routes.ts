@@ -977,7 +977,12 @@ export async function registerRoutes(
     res.status(201).json(message);
   });
 
-  app.patch("/api/workers/:id/photo", async (req, res) => {
+  app.patch("/api/workers/:id/photo", requireAuth, async (req, res) => {
+    const userId = req.session.userId!;
+    const userWorkerId = await getWorkerIdForUser(userId);
+    if (!userWorkerId || userWorkerId !== req.params.id) {
+      return res.status(403).json({ message: "You can only update your own photo" });
+    }
     const { photo } = req.body;
     if (!photo) return res.status(400).json({ message: "photo path required" });
     const worker = await storage.updateWorkerPhoto(req.params.id, photo);
@@ -985,7 +990,11 @@ export async function registerRoutes(
     res.json(worker);
   });
 
-  app.patch("/api/users/:id/avatar", async (req, res) => {
+  app.patch("/api/users/:id/avatar", requireAuth, async (req, res) => {
+    const userId = req.session.userId!;
+    if (userId !== req.params.id) {
+      return res.status(403).json({ message: "You can only update your own avatar" });
+    }
     const { avatar } = req.body;
     if (!avatar) return res.status(400).json({ message: "avatar path required" });
     const user = await storage.updateUserAvatar(req.params.id, avatar);

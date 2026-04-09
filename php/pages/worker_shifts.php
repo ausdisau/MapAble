@@ -221,12 +221,6 @@ require __DIR__ . '/../includes/layout_header.php';
         </form>
     </div>
 </div>
-<script>
-document.getElementById('shift-participant')?.addEventListener('change', function() {
-    const opt = this.selectedOptions[0];
-    document.getElementById('shift-booking-id').value = opt?.dataset?.booking || '';
-});
-</script>
 <?php endif; ?>
 
 <?php require __DIR__ . '/../includes/layout_footer.php'; ?>
