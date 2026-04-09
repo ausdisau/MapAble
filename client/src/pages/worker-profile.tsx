@@ -32,6 +32,8 @@ import {
   X,
   Plus,
   ExternalLink,
+  Camera,
+  Upload,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import type { Worker, User } from "@shared/schema";
@@ -91,8 +93,26 @@ export default function WorkerProfile() {
       setWwccExpiry(worker.wwccExpiry || "");
       setScreeningNumber(worker.screeningNumber || "");
       setScreeningExpiry(worker.screeningExpiry || "");
+      setPhotoUrl(worker.photo || "");
     }
   }, [worker]);
+
+  const [photoUrl, setPhotoUrl] = useState("");
+
+  const photoMutation = useMutation({
+    mutationFn: async (url: string) => {
+      if (!worker) throw new Error("No worker");
+      const res = await apiRequest("PATCH", `/api/workers/${worker.id}/photo`, { photo: url });
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/worker/me"] });
+      toast({ title: "Photo updated" });
+    },
+    onError: () => {
+      toast({ title: "Failed to update photo", variant: "destructive" });
+    },
+  });
 
   const updateMutation = useMutation({
     mutationFn: async (data: Record<string, any>) => {
@@ -191,6 +211,31 @@ export default function WorkerProfile() {
           {updateMutation.isPending ? "Saving..." : "Save Changes"}
         </Button>
       </div>
+
+      <Card className="p-6" data-testid="card-profile-photo">
+        <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+          <Camera className="w-5 h-5 text-[#1B6EB5]" /> Profile Photo
+        </h2>
+        <div className="flex items-center gap-6">
+          <div className="w-24 h-24 rounded-full bg-muted flex items-center justify-center overflow-hidden border-2 border-border" data-testid="img-profile-photo">
+            {worker.photo ? (
+              <img src={worker.photo} alt="Profile" className="w-full h-full object-cover" />
+            ) : (
+              <UserIcon className="w-10 h-10 text-muted-foreground" />
+            )}
+          </div>
+          <div className="flex-1 space-y-2">
+            <Label htmlFor="photoUrl">Photo URL</Label>
+            <div className="flex gap-2">
+              <Input id="photoUrl" value={photoUrl} onChange={(e) => setPhotoUrl(e.target.value)} placeholder="https://example.com/photo.jpg" data-testid="input-photo-url" className="flex-1" />
+              <Button size="sm" disabled={!photoUrl || photoMutation.isPending} onClick={() => photoMutation.mutate(photoUrl)} data-testid="button-update-photo">
+                <Upload className="w-4 h-4 mr-1" /> {photoMutation.isPending ? "Updating..." : "Update"}
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">Enter the URL of your profile photo.</p>
+          </div>
+        </div>
+      </Card>
 
       <Card className="p-6" data-testid="card-personal-info">
         <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
