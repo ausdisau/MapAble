@@ -14,7 +14,7 @@ async function agentmailRequest(path: string, method: string, body?: unknown) {
   if (body && (method === "POST" || method === "PATCH" || method === "PUT")) {
     opts.body = JSON.stringify(body);
   }
-  const response = await connectors.proxy("agentmail", path, opts);
+  const response = await connectors.proxy("agentmail", path, opts as any);
   const text = await response.text();
   let data;
   try {
