@@ -37,6 +37,7 @@ import { sql } from "drizzle-orm";
   qbRealmId: text("qb_realm_id"),
   qbTokenExpiresAt: timestamp("qb_token_expires_at"),
   qbConnectedAt: timestamp("qb_connected_at"),
+  notifyOrderUpdates: boolean("notify_order_updates").notNull().default(true),
 });
 
 export const workers = pgTable("workers", {

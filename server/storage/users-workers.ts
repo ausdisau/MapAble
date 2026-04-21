@@ -80,6 +80,14 @@ export const usersWorkersStorage = {
     return user;
   },
 
+  async updateUserNotificationPrefs(id: string, prefs: { notifyOrderUpdates?: boolean }): Promise<User | undefined> {
+    const updateData: Record<string, unknown> = {};
+    if (prefs.notifyOrderUpdates !== undefined) updateData.notifyOrderUpdates = prefs.notifyOrderUpdates;
+    if (Object.keys(updateData).length === 0) return this.getUser(id);
+    const [user] = await db.update(users).set(updateData).where(eq(users.id, id)).returning();
+    return user;
+  },
+
   async getWorkers(): Promise<(Worker & { user?: User })[]> {
     const allWorkers = await db.select().from(workers);
     const result = await Promise.all(

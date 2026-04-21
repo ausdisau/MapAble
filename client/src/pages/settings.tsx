@@ -430,7 +430,7 @@ export default function SettingsPage() {
   const { theme, toggleTheme } = useTheme();
   const { toast } = useToast();
 
-  const { data: currentUser } = useQuery<{ id: string; fullName: string; email: string; location: string }>({
+  const { data: currentUser } = useQuery<{ id: string; fullName: string; email: string; location: string; notifyOrderUpdates?: boolean }>({
     queryKey: ["/api/me"],
   });
 
@@ -438,15 +438,35 @@ export default function SettingsPage() {
   const [email, setEmail] = useState("");
   const [location, setLocation] = useState("");
   const [profileLoaded, setProfileLoaded] = useState(false);
+  const [notifyOrderUpdates, setNotifyOrderUpdates] = useState(true);
 
   useEffect(() => {
     if (currentUser && !profileLoaded) {
       setFullName(currentUser.fullName || "");
       setEmail(currentUser.email || "");
       setLocation(currentUser.location || "");
+      setNotifyOrderUpdates(currentUser.notifyOrderUpdates ?? true);
       setProfileLoaded(true);
     }
   }, [currentUser, profileLoaded]);
+
+  const updateOrderNotifyPref = async (next: boolean) => {
+    const previous = notifyOrderUpdates;
+    setNotifyOrderUpdates(next);
+    try {
+      await apiRequest("PATCH", "/api/me/notification-prefs", { notifyOrderUpdates: next });
+      queryClient.invalidateQueries({ queryKey: ["/api/me"] });
+      toast({
+        title: next ? "Order notifications on" : "Order notifications off",
+        description: next
+          ? "We'll email you when your grocery order status changes."
+          : "You won't receive emails about grocery order status changes.",
+      });
+    } catch {
+      setNotifyOrderUpdates(previous);
+      toast({ title: "Error", description: "Could not update notification preference.", variant: "destructive" });
+    }
+  };
 
   const isSaveDisabled = !profileLoaded;
 
@@ -534,6 +554,21 @@ export default function SettingsPage() {
               <p className="text-xs text-muted-foreground">Get notified about booking status changes</p>
             </div>
             <Switch defaultChecked data-testid="switch-booking-notifications" />
+          </div>
+          <Separator />
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <p className="text-sm font-semibold">Grocery Order Updates</p>
+              <p className="text-xs text-muted-foreground">
+                Email me when my grocery order moves to confirmed, shopping, out for delivery, or delivered
+              </p>
+            </div>
+            <Switch
+              checked={notifyOrderUpdates}
+              disabled={!profileLoaded}
+              onCheckedChange={updateOrderNotifyPref}
+              data-testid="switch-grocery-order-notifications"
+            />
           </div>
           <Separator />
           <div className="flex items-center justify-between gap-4">

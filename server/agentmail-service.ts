@@ -53,7 +53,7 @@ app.post("/api/email/send", async (req, res) => {
     if (!inbox_id || !to || !subject) {
       return res.status(400).json({ error: "inbox_id, to, and subject are required" });
     }
-    const result = await agentmailRequest(`/inboxes/${inbox_id}/messages`, "POST", {
+    const result = await agentmailRequest(`/inboxes/${inbox_id}/messages/send`, "POST", {
       to,
       subject,
       text: text || "",
