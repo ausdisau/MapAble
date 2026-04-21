@@ -11,6 +11,9 @@ MapAble 4.0 is a fullstack TypeScript superapp combining core NDIS services:
 - **Email** - AgentMail integration for sending/receiving emails (shift confirmations, invoices, support)
 - **ABN Lookup** - Australian Business Number validation and ABR registry lookup
 
+## Co-Design Gate
+Participant-facing HITL AI features (Concepts B, C, E from `research/hitl-ai-disability-services-au.md`) are gated by `docs/co-design-protocol.md` — engagement charter with PWDA / AFDO / FPDN / Inclusion Australia, consent and transparency template, harms escalation path, and accessible-formats spec (Easy Read, AAC, Auslan, key community languages). No build on those concepts before the protocol's S0/S1 stages are signed off by the relevant DROs.
+
 ## Architecture
 - **Runtime**: Node.js/TypeScript
 - **Backend**: Express.js (primary API + auth + payments)
