@@ -2378,7 +2378,7 @@ export async function registerRoutes(
         status: "failed",
         errorMessage: message.slice(0, 500),
       });
-      return res.status(502).json(updated);
+      return res.status(201).json(updated);
     }
   });
 

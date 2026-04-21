@@ -425,7 +425,7 @@ export default function PlanReviewPrepPage() {
           </p>
         </div>
         {activeId && (
-          <Button variant="outline" onClick={() => { setActiveId(null); setLocation("/plan-review-prep"); }} data-testid="button-new-brief">
+          <Button variant="outline" onClick={() => setLocation("/plan-review-prep")} data-testid="button-new-brief">
             <FilePlus2 className="w-4 h-4 mr-2" />New brief
           </Button>
         )}
