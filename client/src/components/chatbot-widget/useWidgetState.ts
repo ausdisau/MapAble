@@ -25,12 +25,28 @@ function writeSession(key: string, value: unknown) {
   }
 }
 
+function hasStoredTab(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    return window.sessionStorage.getItem(TAB_KEY) !== null;
+  } catch {
+    return false;
+  }
+}
+
 export function useWidgetState(defaultTab: WidgetTabKey) {
   const [open, setOpenState] = useState<boolean>(() => readSession(OPEN_KEY, false));
   const [activeTab, setActiveTabState] = useState<WidgetTabKey>(() => readSession(TAB_KEY, defaultTab));
   const [activeSessionId, setActiveSessionIdState] = useState<string | null>(() =>
     readSession<string | null>(SESSION_KEY, null)
   );
+
+  // Adopt async-loaded config defaultTab when no user choice is stored.
+  useEffect(() => {
+    if (!hasStoredTab()) {
+      setActiveTabState(defaultTab);
+    }
+  }, [defaultTab]);
 
   useEffect(() => {
     writeSession(OPEN_KEY, open);
