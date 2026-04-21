@@ -489,6 +489,7 @@ export function registerPaymentRoutes(app: Express) {
   });
 
   app.post("/api/payouts/sync", requireAuth, async (req, res) => {
+    if (!connectEnabled()) return res.status(503).json({ message: "Stripe Connect is not enabled" });
     const user = await storage.getUser(req.session.userId!);
     if (!user?.stripeAccountId) return res.status(400).json({ message: "No connected Stripe account" });
     const acct = await getStripe().accounts.retrieve(user.stripeAccountId);
@@ -502,6 +503,7 @@ export function registerPaymentRoutes(app: Express) {
   });
 
   app.get("/api/payouts/history", requireAuth, async (req, res) => {
+    if (!connectEnabled()) return res.status(503).json({ message: "Stripe Connect is not enabled" });
     const user = await storage.getUser(req.session.userId!);
     if (!user?.stripeAccountId) {
       return res.json({ transfers: [], payouts: [] });
