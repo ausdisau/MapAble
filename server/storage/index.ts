@@ -20,6 +20,8 @@ import {
   type GroceryProduct, type InsertGroceryProduct,
   type GroceryOrder, type InsertGroceryOrder,
   type GroceryOrderItem, type InsertGroceryOrderItem,
+  type BecsMandate, type InsertBecsMandate,
+  type NdisClaim, type InsertNdisClaim,
   users, workers, bookings, jobs, transportRequests, messages,
   pricingTiers, serviceSessions, transportTrips, invoices, reviews, participantBudgets,
   accessContextProfiles, communityReports,
@@ -33,6 +35,7 @@ import { usersWorkersStorage } from "./users-workers";
   import { schedulingStorage } from "./scheduling";
   import { quickBooksStorage } from "./quickbooks";
   import { groceryStorage } from "./grocery";
+  import { paymentsStorage } from "./payments";
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
@@ -125,6 +128,25 @@ export interface IStorage {
   updateGroceryOrderPayment(id: string, data: { stripePaymentIntentId?: string; paymentStatus?: string }): Promise<GroceryOrder | undefined>;
   deleteGroceryOrder(id: string): Promise<boolean>;
   getActiveGroceryOrders(participantId: string): Promise<GroceryOrder[]>;
+
+  createBecsMandate(data: InsertBecsMandate): Promise<BecsMandate>;
+  getBecsMandates(userId: string): Promise<BecsMandate[]>;
+  getBecsMandate(id: string): Promise<BecsMandate | undefined>;
+  getBecsMandateByPaymentMethod(stripePaymentMethodId: string): Promise<BecsMandate | undefined>;
+  updateBecsMandateStatus(stripePaymentMethodId: string, status: string, mandateUrl?: string, stripeMandateId?: string): Promise<BecsMandate | undefined>;
+  deleteBecsMandate(id: string): Promise<boolean>;
+  setDefaultBecsMandate(userId: string, mandateId: string): Promise<BecsMandate | undefined>;
+  getDefaultBecsMandate(userId: string): Promise<BecsMandate | undefined>;
+  setUserAutoDebit(userId: string, enabled: boolean, graceDays?: number): Promise<User | undefined>;
+  setStripeAccount(userId: string, data: { stripeAccountId?: string | null; stripeAccountStatus?: string | null; stripeChargesEnabled?: boolean; stripePayoutsEnabled?: boolean; stripeRequirementsDue?: unknown }): Promise<User | undefined>;
+  getUserByStripeAccountId(stripeAccountId: string): Promise<User | undefined>;
+  getUserByStripeCustomerId(stripeCustomerId: string): Promise<User | undefined>;
+  createNdisClaim(data: InsertNdisClaim): Promise<NdisClaim>;
+  getNdisClaims(filters?: { participantId?: string; invoiceId?: string; limit?: number }): Promise<NdisClaim[]>;
+  wasWebhookProcessed(eventId: string): Promise<boolean>;
+  recordWebhookEvent(eventId: string, eventType: string): Promise<void>;
+  claimWebhookEvent(eventId: string, eventType: string): Promise<boolean>;
+  getInvoicesAwaitingAutoDebit(): Promise<(Invoice & { user?: User })[]>;
 }
 
 
@@ -468,6 +490,25 @@ export class DatabaseStorage implements IStorage {
   deleteGroceryOrder(...args: Parameters<IStorage["deleteGroceryOrder"]>): ReturnType<IStorage["deleteGroceryOrder"]> {
     return (groceryStorage.deleteGroceryOrder as any).apply(this, args);
   }
+
+  createBecsMandate(...a: Parameters<IStorage["createBecsMandate"]>) { return (paymentsStorage.createBecsMandate as any).apply(this, a); }
+  getBecsMandates(...a: Parameters<IStorage["getBecsMandates"]>) { return (paymentsStorage.getBecsMandates as any).apply(this, a); }
+  getBecsMandate(...a: Parameters<IStorage["getBecsMandate"]>) { return (paymentsStorage.getBecsMandate as any).apply(this, a); }
+  getBecsMandateByPaymentMethod(...a: Parameters<IStorage["getBecsMandateByPaymentMethod"]>) { return (paymentsStorage.getBecsMandateByPaymentMethod as any).apply(this, a); }
+  updateBecsMandateStatus(...a: Parameters<IStorage["updateBecsMandateStatus"]>) { return (paymentsStorage.updateBecsMandateStatus as any).apply(this, a); }
+  deleteBecsMandate(...a: Parameters<IStorage["deleteBecsMandate"]>) { return (paymentsStorage.deleteBecsMandate as any).apply(this, a); }
+  setDefaultBecsMandate(...a: Parameters<IStorage["setDefaultBecsMandate"]>) { return (paymentsStorage.setDefaultBecsMandate as any).apply(this, a); }
+  getDefaultBecsMandate(...a: Parameters<IStorage["getDefaultBecsMandate"]>) { return (paymentsStorage.getDefaultBecsMandate as any).apply(this, a); }
+  setUserAutoDebit(...a: Parameters<IStorage["setUserAutoDebit"]>) { return (paymentsStorage.setUserAutoDebit as any).apply(this, a); }
+  setStripeAccount(...a: Parameters<IStorage["setStripeAccount"]>) { return (paymentsStorage.setStripeAccount as any).apply(this, a); }
+  getUserByStripeAccountId(...a: Parameters<IStorage["getUserByStripeAccountId"]>) { return (paymentsStorage.getUserByStripeAccountId as any).apply(this, a); }
+  getUserByStripeCustomerId(...a: Parameters<IStorage["getUserByStripeCustomerId"]>) { return (paymentsStorage.getUserByStripeCustomerId as any).apply(this, a); }
+  createNdisClaim(...a: Parameters<IStorage["createNdisClaim"]>) { return (paymentsStorage.createNdisClaim as any).apply(this, a); }
+  getNdisClaims(...a: Parameters<IStorage["getNdisClaims"]>) { return (paymentsStorage.getNdisClaims as any).apply(this, a); }
+  wasWebhookProcessed(...a: Parameters<IStorage["wasWebhookProcessed"]>) { return (paymentsStorage.wasWebhookProcessed as any).apply(this, a); }
+  recordWebhookEvent(...a: Parameters<IStorage["recordWebhookEvent"]>) { return (paymentsStorage.recordWebhookEvent as any).apply(this, a); }
+  claimWebhookEvent(...a: Parameters<IStorage["claimWebhookEvent"]>) { return (paymentsStorage.claimWebhookEvent as any).apply(this, a); }
+  getInvoicesAwaitingAutoDebit(...a: Parameters<IStorage["getInvoicesAwaitingAutoDebit"]>) { return (paymentsStorage.getInvoicesAwaitingAutoDebit as any).apply(this, a); }
 }
 
 export const storage = new DatabaseStorage();

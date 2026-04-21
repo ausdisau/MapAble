@@ -38,6 +38,14 @@ import { sql } from "drizzle-orm";
   qbTokenExpiresAt: timestamp("qb_token_expires_at"),
   qbConnectedAt: timestamp("qb_connected_at"),
   notifyOrderUpdates: boolean("notify_order_updates").notNull().default(true),
+  autoDebitEnabled: boolean("auto_debit_enabled").notNull().default(false),
+  autoDebitGraceDays: integer("auto_debit_grace_days").notNull().default(2),
+  defaultBecsPaymentMethodId: text("default_becs_payment_method_id"),
+  stripeAccountId: text("stripe_account_id"),
+  stripeAccountStatus: text("stripe_account_status"),
+  stripeChargesEnabled: boolean("stripe_charges_enabled").notNull().default(false),
+  stripePayoutsEnabled: boolean("stripe_payouts_enabled").notNull().default(false),
+  stripeRequirementsDue: jsonb("stripe_requirements_due"),
 });
 
 export const workers = pgTable("workers", {

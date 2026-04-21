@@ -82,6 +82,50 @@ export const reviews = pgTable("reviews", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+export const becsMandates = pgTable("becs_mandates", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull(),
+  stripePaymentMethodId: text("stripe_payment_method_id").notNull(),
+  stripeMandateId: text("stripe_mandate_id"),
+  bsbLast4: text("bsb_last4"),
+  accountLast4: text("account_last4"),
+  bankName: text("bank_name"),
+  status: text("status").notNull().default("pending"),
+  mandateUrl: text("mandate_url"),
+  isDefault: boolean("is_default").notNull().default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const ndisClaims = pgTable("ndis_claims", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  invoiceId: varchar("invoice_id"),
+  serviceSessionId: varchar("service_session_id"),
+  participantId: varchar("participant_id").notNull(),
+  providerId: varchar("provider_id"),
+  prodaClaimId: text("proda_claim_id"),
+  claimReference: text("claim_reference").notNull(),
+  itemCode: text("item_code").notNull(),
+  quantity: decimal("quantity", { precision: 10, scale: 2 }).notNull(),
+  unitPrice: decimal("unit_price", { precision: 10, scale: 2 }).notNull(),
+  totalAmount: decimal("total_amount", { precision: 10, scale: 2 }).notNull(),
+  serviceDate: text("service_date").notNull(),
+  status: text("status").notNull().default("submitted"),
+  statusMessage: text("status_message"),
+  rejectionReason: text("rejection_reason"),
+  requestPayload: jsonb("request_payload"),
+  responsePayload: jsonb("response_payload"),
+  submittedAt: timestamp("submitted_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const stripeWebhookEvents = pgTable("stripe_webhook_events", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  eventId: text("event_id").notNull().unique(),
+  eventType: text("event_type").notNull(),
+  receivedAt: timestamp("received_at").defaultNow(),
+});
+
 export const participantBudgets = pgTable("participant_budgets", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   participantId: varchar("participant_id").notNull(),
@@ -172,4 +216,21 @@ export type InsertReview = z.infer<typeof insertReviewSchema>;
 export type Review = typeof reviews.$inferSelect;
 export type InsertParticipantBudget = z.infer<typeof insertParticipantBudgetSchema>;
 export type ParticipantBudget = typeof participantBudgets.$inferSelect;
-  
+
+export const insertBecsMandateSchema = createInsertSchema(becsMandates).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+export type InsertBecsMandate = z.infer<typeof insertBecsMandateSchema>;
+export type BecsMandate = typeof becsMandates.$inferSelect;
+
+export const insertNdisClaimSchema = createInsertSchema(ndisClaims).omit({
+  id: true,
+  submittedAt: true,
+  updatedAt: true,
+});
+export type InsertNdisClaim = z.infer<typeof insertNdisClaimSchema>;
+export type NdisClaim = typeof ndisClaims.$inferSelect;
+
+export type StripeWebhookEvent = typeof stripeWebhookEvents.$inferSelect;

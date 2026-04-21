@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { storage } from "../storage";
 import { insertWorkerAvailabilitySchema, insertWorkerBlockoutSchema, insertShiftSchema } from "@shared/schema";
-import { syncParticipantPlan, getCachedPlan, fetchPriceGuide, validateRateAgainstPriceGuide, submitNdisClaim } from "../ndis-api";
+import { syncParticipantPlan, getCachedPlan, fetchPriceGuide, validateRateAgainstPriceGuide, submitNdisClaim, ProdaNotConfiguredError, ProdaApiError, prodaConfigured } from "../ndis-api";
 import { getWorkerIdForUser } from "./shared";
 
 export function registerSchedulingNdisRoutes(app: Express) {
@@ -321,12 +321,18 @@ export function registerSchedulingNdisRoutes(app: Express) {
     const userId = req.session.userId!;
     try {
       const user = await storage.getUser(userId);
-      const ndisNumber = user?.ndisNumber || undefined;
+      const ndisNumber = user?.ndisNumber;
+      if (!ndisNumber) {
+        return res.status(400).json({ message: "User has no NDIS number on file" });
+      }
       const plan = await syncParticipantPlan(userId, ndisNumber);
       res.json(plan);
     } catch (error) {
+      if (error instanceof ProdaNotConfiguredError) {
+        return res.status(503).json({ message: "NDIS PRODA not configured", code: error.code, missingEnvVars: error.missingEnvVars });
+      }
       console.error("NDIS plan sync error:", error);
-      res.status(500).json({ message: "Failed to sync NDIS plan" });
+      res.status(error instanceof ProdaApiError ? error.status : 500).json({ message: "Failed to sync NDIS plan" });
     }
   });
 
@@ -340,10 +346,18 @@ export function registerSchedulingNdisRoutes(app: Express) {
     res.json(plan);
   });
 
-  app.get("/api/ndis/price-guide", async (_req, res) => {
-    const itemCode = _req.query.itemCode as string | undefined;
-    const items = await fetchPriceGuide(itemCode);
-    res.json(items);
+  app.get("/api/ndis/price-guide", async (req, res) => {
+    const itemCode = req.query.itemCode as string | undefined;
+    try {
+      const items = await fetchPriceGuide(itemCode);
+      res.json(items);
+    } catch (error) {
+      if (error instanceof ProdaNotConfiguredError) {
+        return res.status(503).json({ message: "NDIS PRODA not configured", code: error.code, missingEnvVars: error.missingEnvVars });
+      }
+      console.error("Price guide fetch error:", error);
+      res.status(error instanceof ProdaApiError ? error.status : 500).json({ message: "Failed to fetch price guide" });
+    }
   });
 
   app.post("/api/ndis/validate-rate", async (req, res) => {
@@ -351,9 +365,17 @@ export function registerSchedulingNdisRoutes(app: Express) {
     if (!itemCode || rate === undefined) {
       return res.status(400).json({ message: "itemCode and rate required" });
     }
-    const priceGuide = await fetchPriceGuide(itemCode);
-    const result = validateRateAgainstPriceGuide(itemCode, Number(rate), priceGuide);
-    res.json(result);
+    try {
+      const priceGuide = await fetchPriceGuide(itemCode);
+      const result = validateRateAgainstPriceGuide(itemCode, Number(rate), priceGuide);
+      res.json(result);
+    } catch (error) {
+      if (error instanceof ProdaNotConfiguredError) {
+        return res.status(503).json({ message: "NDIS PRODA not configured", code: error.code, missingEnvVars: error.missingEnvVars });
+      }
+      console.error("Validate rate error:", error);
+      res.status(error instanceof ProdaApiError ? error.status : 500).json({ message: "Failed to validate rate" });
+    }
   });
 
   app.post("/api/ndis/submit-claim", async (req, res) => {
@@ -376,18 +398,22 @@ export function registerSchedulingNdisRoutes(app: Express) {
       }
     }
 
-    const priceGuideItems = await fetchPriceGuide(itemCode);
-    if (priceGuideItems.length > 0) {
-      const validation = validateRateAgainstPriceGuide(itemCode, Number(unitPrice), priceGuideItems);
-      if (!validation.valid) {
-        return res.status(400).json({ message: validation.message });
-      }
-    }
-
     try {
+      if (prodaConfigured()) {
+        const priceGuideItems = await fetchPriceGuide(itemCode);
+        if (priceGuideItems.length > 0) {
+          const validation = validateRateAgainstPriceGuide(itemCode, Number(unitPrice), priceGuideItems);
+          if (!validation.valid) {
+            return res.status(400).json({ message: validation.message });
+          }
+        }
+      }
+
       const result = await submitNdisClaim({
         participantId: userId,
         providerId: user.ndisNumber ? `PROV-${user.ndisNumber}` : "MAPABLE-001",
+        invoiceId: req.body.invoiceId,
+        serviceSessionId,
         itemCode,
         quantity: Number(quantity),
         unitPrice: Number(unitPrice),
@@ -396,8 +422,11 @@ export function registerSchedulingNdisRoutes(app: Express) {
       });
       res.json(result);
     } catch (error) {
+      if (error instanceof ProdaNotConfiguredError) {
+        return res.status(503).json({ message: "NDIS PRODA not configured", code: error.code, missingEnvVars: error.missingEnvVars });
+      }
       console.error("Claim submission error:", error);
-      res.status(500).json({ message: "Failed to submit claim" });
+      res.status(error instanceof ProdaApiError ? error.status : 500).json({ message: "Failed to submit claim" });
     }
   });
 }

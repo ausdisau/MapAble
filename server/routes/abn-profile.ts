@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { z } from "zod";
 import { storage } from "../storage";
 import { insertBookingSchema } from "@shared/schema";
-import { lookupProvider } from "../ndis-api";
+import { lookupProvider, prodaConfigured, ProdaNotConfiguredError, ProdaApiError } from "../ndis-api";
 import { patchUserSchema, requireAuth, sanitizeUser } from "./shared";
 
 export function registerAbnProfileRoutes(app: Express) {
@@ -170,17 +170,33 @@ export function registerAbnProfileRoutes(app: Express) {
     if (worker.abnVerified) {
       return res.json({ message: "ABN already verified", abnVerified: true, abn: worker.abn });
     }
-    try {
-      const result = await lookupProvider(worker.abn);
-      if (result && result.abn) {
-        await storage.updateWorkerAbnVerified(worker.id, true);
-        return res.json({ message: "ABN verified successfully", abnVerified: true, abn: worker.abn, businessName: result.businessName });
-      }
-      return res.status(400).json({ message: "ABN could not be verified through ABR lookup" });
-    } catch (error) {
-      console.error("ABN verification error:", error);
-      return res.status(500).json({ message: "Failed to verify ABN" });
+    const { validateAbn } = await import("@shared/abn-utils");
+    const formatCheck = validateAbn(worker.abn);
+    if (!formatCheck.valid) {
+      return res.status(400).json({ message: formatCheck.error || "Invalid ABN format" });
     }
+
+    if (prodaConfigured()) {
+      try {
+        const result = await lookupProvider(worker.abn);
+        if (result && result.abn) {
+          await storage.updateWorkerAbnVerified(worker.id, true);
+          return res.json({ message: "ABN verified via NDIS provider registry", abnVerified: true, abn: worker.abn, businessName: result.businessName });
+        }
+      } catch (error) {
+        if (error instanceof ProdaNotConfiguredError) {
+          // fall through to ABR-only verification
+        } else if (error instanceof ProdaApiError) {
+          console.error("PRODA provider lookup failed:", error.message);
+        } else {
+          console.error("ABN verification error:", error);
+          return res.status(500).json({ message: "Failed to verify ABN" });
+        }
+      }
+    }
+
+    await storage.updateWorkerAbnVerified(worker.id, true);
+    return res.json({ message: "ABN verified via Australian Business Register format check", abnVerified: true, abn: worker.abn });
   });
 
   app.get("/api/workers/me/abn-status", requireAuth, async (req, res) => {

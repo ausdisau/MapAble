@@ -50,6 +50,9 @@ import GroceryOrdersPage from "@/pages/grocery-orders";
 import GroceryOrderDetailPage from "@/pages/grocery-order-detail";
 import GroceryPickListPage from "@/pages/grocery-pick-list";
 import PlanReviewPrepPage from "@/pages/plan-review-prep";
+import PaymentMethodsPage from "@/pages/payment-methods";
+import PayoutsPage from "@/pages/payouts";
+import NdisAdminPage from "@/pages/ndis-admin";
 
 function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
@@ -250,6 +253,9 @@ function Router() {
       <Route path="/pricing" component={PricingPage} />
       <Route path="/budget" component={BudgetPage} />
       <Route path="/invoices" component={InvoicesPage} />
+      <Route path="/payment-methods" component={PaymentMethodsPage} />
+      <Route path="/payouts" component={PayoutsPage} />
+      <Route path="/ndis-admin" component={NdisAdminPage} />
       <Route path="/chat" component={ChatPage} />
       <Route path="/abn-lookup" component={AbnLookupPage} />
       <Route path="/messages" component={MessagesPage} />
