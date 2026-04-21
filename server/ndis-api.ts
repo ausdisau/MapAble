@@ -10,7 +10,10 @@ interface ProdaTokenResponse {
 
 interface NdisClaimSubmission {
   participantId: string;
+  /** Internal MapAble user id of the provider (worker.userId), used for filtering and reporting. */
   providerId: string;
+  /** External NDIS provider identifier sent in the request payload (PROV-* string). */
+  ndisProviderRef: string;
   invoiceId?: string;
   serviceSessionId?: string;
   itemCode: string;
@@ -303,7 +306,7 @@ export async function submitNdisClaim(claim: NdisClaimSubmission): Promise<NdisC
   const total = claim.quantity * claim.unitPrice;
   const requestPayload = {
     participantId: claim.participantId,
-    providerId: claim.providerId,
+    providerId: claim.ndisProviderRef,
     lineItems: [
       {
         itemCode: claim.itemCode,

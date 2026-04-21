@@ -76,8 +76,14 @@ export default function PaymentMethodsPage() {
           />
         </div>
         {data?.autoDebitEnabled && (
-          <div className="text-sm text-muted-foreground" data-testid="text-grace-period">
-            Grace period: {data.autoDebitGraceDays} days after invoice issue
+          <div className="text-sm text-muted-foreground space-y-1">
+            <div data-testid="text-grace-period">
+              Grace period: {data.autoDebitGraceDays} days after invoice issue
+            </div>
+            <div data-testid="text-becs-settlement">
+              BECS direct debit settlements typically take <strong>3–4 business days</strong> to clear.
+              Invoices remain in <em>processing</em> until the bank confirms the debit.
+            </div>
           </div>
         )}
       </Card>
@@ -225,6 +231,10 @@ function BecsSetupModal({ publishableKey, onClose }: { publishableKey: string; o
                 data-testid="input-account-email"
               />
               <div id="au-bank-account-element" className="border rounded-md p-3" />
+              <p className="text-xs text-muted-foreground" data-testid="text-becs-timeline">
+                BECS direct debit payments take <strong>3–4 business days</strong> to settle. Your invoice
+                will remain in <em>processing</em> status until the bank confirms the debit.
+              </p>
               <p className="text-xs text-muted-foreground">
                 By providing your bank details and confirming, you agree to a Direct Debit Request and the
                 Direct Debit Request Service Agreement.
