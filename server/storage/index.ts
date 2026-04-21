@@ -123,6 +123,7 @@ export interface IStorage {
   getGroceryOrder(id: string): Promise<(GroceryOrder & { items: (GroceryOrderItem & { product?: GroceryProduct })[] }) | undefined>;
   updateGroceryOrderStatus(id: string, status: string): Promise<GroceryOrder | undefined>;
   updateGroceryOrderPayment(id: string, data: { stripePaymentIntentId?: string; paymentStatus?: string }): Promise<GroceryOrder | undefined>;
+  deleteGroceryOrder(id: string): Promise<boolean>;
   getActiveGroceryOrders(participantId: string): Promise<GroceryOrder[]>;
 }
 
@@ -462,6 +463,10 @@ export class DatabaseStorage implements IStorage {
 
   getActiveGroceryOrders(...args: Parameters<IStorage["getActiveGroceryOrders"]>): ReturnType<IStorage["getActiveGroceryOrders"]> {
     return (groceryStorage.getActiveGroceryOrders as any).apply(this, args);
+  }
+
+  deleteGroceryOrder(...args: Parameters<IStorage["deleteGroceryOrder"]>): ReturnType<IStorage["deleteGroceryOrder"]> {
+    return (groceryStorage.deleteGroceryOrder as any).apply(this, args);
   }
 }
 

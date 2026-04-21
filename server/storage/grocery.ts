@@ -159,6 +159,12 @@ export const groceryStorage = {
     return order;
   },
 
+  async deleteGroceryOrder(id: string): Promise<boolean> {
+    await db.delete(groceryOrderItems).where(eq(groceryOrderItems.orderId, id));
+    const deleted = await db.delete(groceryOrders).where(eq(groceryOrders.id, id)).returning();
+    return deleted.length > 0;
+  },
+
   async getActiveGroceryOrders(participantId: string): Promise<GroceryOrder[]> {
     return db
       .select()

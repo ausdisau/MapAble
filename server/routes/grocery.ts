@@ -134,6 +134,23 @@ export function registerGroceryRoutes(app: Express) {
     res.json(order);
   });
 
+  // Hard delete an order (and its items). Restricted to the owner participant or admin.
+  // Used by automated tests for deterministic cleanup.
+  app.delete("/api/grocery/orders/:id", requireAuth, async (req, res) => {
+    const existing = await storage.getGroceryOrder(req.params.id);
+    if (!existing) return res.status(404).json({ message: "Order not found" });
+    const requester = await storage.getUser(req.session.userId!);
+    if (!requester) return res.status(401).json({ message: "Not authenticated" });
+    const isOwner = existing.participantId === req.session.userId;
+    const isAdmin = requester.role === "admin";
+    if (!isOwner && !isAdmin) {
+      return res.status(403).json({ message: "Not authorized to delete this order" });
+    }
+    const ok = await storage.deleteGroceryOrder(req.params.id);
+    if (!ok) return res.status(404).json({ message: "Order not found" });
+    res.json({ ok: true });
+  });
+
   app.patch("/api/grocery/orders/:id/status", requireAuth, async (req, res) => {
     const { status } = req.body;
     const allowed = ["placed", "confirmed", "shopping", "out_for_delivery", "delivered", "cancelled"];
