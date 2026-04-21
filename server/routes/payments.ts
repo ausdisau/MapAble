@@ -386,6 +386,44 @@ export function registerPaymentRoutes(app: Express) {
     res.json(updated);
   });
 
+  app.get("/api/payouts/history", requireAuth, async (req, res) => {
+    const user = await storage.getUser(req.session.userId!);
+    if (!user?.stripeAccountId) {
+      return res.json({ transfers: [], payouts: [] });
+    }
+    try {
+      const limit = Math.min(Number(req.query.limit) || 25, 100);
+      const [transfers, payouts] = await Promise.all([
+        getStripe().transfers.list({ destination: user.stripeAccountId, limit }),
+        getStripe().payouts.list({ limit }, { stripeAccount: user.stripeAccountId }),
+      ]);
+      res.json({
+        transfers: transfers.data.map((t) => ({
+          id: t.id,
+          amount: t.amount,
+          currency: t.currency,
+          created: t.created,
+          description: t.description,
+          sourceTransaction: typeof t.source_transaction === "string" ? t.source_transaction : t.source_transaction?.id ?? null,
+        })),
+        payouts: payouts.data.map((p) => ({
+          id: p.id,
+          amount: p.amount,
+          currency: p.currency,
+          status: p.status,
+          arrivalDate: p.arrival_date,
+          created: p.created,
+          method: p.method,
+          failureMessage: p.failure_message ?? null,
+        })),
+      });
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Failed to fetch payout history";
+      console.error("[payouts/history]", msg);
+      res.status(500).json({ message: msg });
+    }
+  });
+
   // ============================================================
   // NDIS admin endpoints
   // ============================================================

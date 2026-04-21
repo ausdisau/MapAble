@@ -82,7 +82,13 @@ export class ProdaApiError extends Error {
   }
 }
 
-const REQUIRED_ENV = ["NDIS_PRODA_CLIENT_ID", "NDIS_PRODA_CLIENT_SECRET"] as const;
+const REQUIRED_ENV = [
+  "NDIS_PRODA_BASE_URL",
+  "NDIS_PRODA_CLIENT_ID",
+  "NDIS_PRODA_CLIENT_SECRET",
+  "NDIS_PRODA_DEVICE_NAME",
+  "NDIS_PRODA_ORG_ID",
+] as const;
 
 export function prodaConfigured(): boolean {
   return REQUIRED_ENV.every((k) => !!process.env[k]);

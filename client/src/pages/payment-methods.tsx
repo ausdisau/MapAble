@@ -9,7 +9,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import type { BecsMandate } from "@shared/schema";
 import { getStripe } from "@/lib/stripe-loader";
-import type { Stripe, StripeElements } from "@stripe/stripe-js";
+import type { Stripe, StripeElements, StripeAuBankAccountElement } from "@stripe/stripe-js";
 
 interface PaymentMethodsResponse {
   becsMandates: BecsMandate[];
@@ -50,7 +50,7 @@ export default function PaymentMethodsPage() {
   const setAutoDebit = useMutation({
     mutationFn: (enabled: boolean) => apiRequest("PUT", "/api/billing/auto-debit", { enabled }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["/api/payment-methods"] }),
-    onError: (e: any) => toast({ title: "Could not update auto-debit", description: e?.message, variant: "destructive" }),
+    onError: (e: Error) => toast({ title: "Could not update auto-debit", description: e.message, variant: "destructive" }),
   });
 
   if (isLoading) return <div className="p-8 flex justify-center"><Loader2 className="w-6 h-6 animate-spin" /></div>;
@@ -175,7 +175,7 @@ function BecsSetupModal({ publishableKey, onClose }: { publishableKey: string; o
     }
     setSubmitting(true);
     setError(null);
-    const auEl = elements.getElement("auBankAccount");
+    const auEl: StripeAuBankAccountElement | null = elements.getElement("auBankAccount");
     if (!auEl) {
       setError("Bank account form not ready");
       setSubmitting(false);
@@ -183,7 +183,7 @@ function BecsSetupModal({ publishableKey, onClose }: { publishableKey: string; o
     }
     const result = await stripe.confirmAuBecsDebitSetup(clientSecret, {
       payment_method: {
-        au_becs_debit: auEl as any,
+        au_becs_debit: auEl,
         billing_details: { name: accountHolder, email },
       },
     });

@@ -57,7 +57,7 @@ async function resolveInboxId(): Promise<string | null> {
   }
 }
 
-async function sendEmailViaAgentMail(to: string, subject: string, text: string): Promise<boolean> {
+export async function sendEmailViaAgentMail(to: string, subject: string, text: string): Promise<boolean> {
   const inboxId = await resolveInboxId();
   if (!inboxId) return false;
   try {

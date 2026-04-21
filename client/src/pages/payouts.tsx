@@ -16,9 +16,20 @@ interface PayoutAccount {
   platformFeeBps: number;
 }
 
+interface TransferRow { id: string; amount: number; currency: string; created: number; description: string | null; sourceTransaction: string | null }
+interface PayoutRow { id: string; amount: number; currency: string; status: string; arrivalDate: number; created: number; method: string; failureMessage: string | null }
+interface PayoutHistory { transfers: TransferRow[]; payouts: PayoutRow[] }
+
+function fmtMoney(amt: number, ccy: string) { return `${(amt / 100).toFixed(2)} ${ccy.toUpperCase()}`; }
+function fmtDate(s: number) { return new Date(s * 1000).toLocaleDateString(); }
+
 export default function PayoutsPage() {
   const { toast } = useToast();
   const { data, isLoading } = useQuery<PayoutAccount>({ queryKey: ["/api/payouts/account"] });
+  const { data: history, isLoading: historyLoading } = useQuery<PayoutHistory>({
+    queryKey: ["/api/payouts/history"],
+    enabled: !!data?.stripeAccountId,
+  });
 
   const onboard = useMutation({
     mutationFn: async () => {
@@ -26,7 +37,7 @@ export default function PayoutsPage() {
       return r.json();
     },
     onSuccess: (d: { url: string }) => { window.location.href = d.url; },
-    onError: (e: any) => toast({ title: "Could not start onboarding", description: e?.message, variant: "destructive" }),
+    onError: (e: Error) => toast({ title: "Could not start onboarding", description: e.message, variant: "destructive" }),
   });
 
   const sync = useMutation({
@@ -104,6 +115,56 @@ export default function PayoutsPage() {
               )}
             </div>
           </Card>
+
+          {data.stripeAccountId && (
+            <Card className="p-6 space-y-4">
+              <h2 className="font-semibold">Payout history</h2>
+              {historyLoading ? (
+                <div className="flex justify-center py-4"><Loader2 className="w-5 h-5 animate-spin" /></div>
+              ) : (
+                <>
+                  <div>
+                    <div className="text-sm font-medium mb-2">Payouts to your bank</div>
+                    {history?.payouts.length === 0 ? (
+                      <p className="text-sm text-muted-foreground" data-testid="text-no-payouts">No payouts yet.</p>
+                    ) : (
+                      <div className="space-y-2">
+                        {history?.payouts.map((p) => (
+                          <div key={p.id} className="flex items-center justify-between p-3 border rounded-md text-sm" data-testid={`row-payout-${p.id}`}>
+                            <div>
+                              <div className="font-medium" data-testid={`text-payout-amount-${p.id}`}>{fmtMoney(p.amount, p.currency)}</div>
+                              <div className="text-xs text-muted-foreground">
+                                Arrives {fmtDate(p.arrivalDate)} · {p.method}
+                                {p.failureMessage ? ` · ${p.failureMessage}` : ""}
+                              </div>
+                            </div>
+                            <Badge variant={p.status === "paid" ? "default" : p.status === "failed" ? "destructive" : "secondary"} data-testid={`badge-payout-status-${p.id}`}>{p.status}</Badge>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium mb-2">Transfers from MapAble</div>
+                    {history?.transfers.length === 0 ? (
+                      <p className="text-sm text-muted-foreground" data-testid="text-no-transfers">No transfers yet.</p>
+                    ) : (
+                      <div className="space-y-2">
+                        {history?.transfers.map((t) => (
+                          <div key={t.id} className="flex items-center justify-between p-3 border rounded-md text-sm" data-testid={`row-transfer-${t.id}`}>
+                            <div>
+                              <div className="font-medium" data-testid={`text-transfer-amount-${t.id}`}>{fmtMoney(t.amount, t.currency)}</div>
+                              <div className="text-xs text-muted-foreground">{fmtDate(t.created)} · {t.description || t.id}</div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
+            </Card>
+          )}
         </>
       )}
     </div>
