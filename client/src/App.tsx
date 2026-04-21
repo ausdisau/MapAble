@@ -53,6 +53,7 @@ import PlanReviewPrepPage from "@/pages/plan-review-prep";
 import PaymentMethodsPage from "@/pages/payment-methods";
 import PayoutsPage from "@/pages/payouts";
 import NdisAdminPage from "@/pages/ndis-admin";
+import AdminChatGuardrailsPage from "@/pages/admin-chat-guardrails";
 
 function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
@@ -265,6 +266,7 @@ function Router() {
       <Route path="/worker/bookings" component={WorkerBookings} />
       <Route path="/worker/shifts" component={WorkerShifts} />
       <Route path="/worker/availability" component={WorkerAvailabilityPage} />
+      <Route path="/admin/chat-guardrails" component={AdminChatGuardrailsPage} />
       <Route component={NotFound} />
     </Switch>
   );

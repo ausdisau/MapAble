@@ -1,10 +1,13 @@
 import OpenAI from "openai";
 import { planReviewBriefSectionSchema, type PlanReviewBriefContent } from "@shared/schema";
+import { applyOutputGuardrails, buildPolicySystemPrompt, classifyUserTurn, logGuardrailAudit, prepBriefHardBlockCategories, refusalFor } from "./chat-guardrails";
 
 export const PREP_BRIEF_PROMPT_VERSION = "prep-brief-v1-2026-04";
 export const PREP_BRIEF_MODEL = process.env.PREP_BRIEF_MODEL || "gpt-4o-mini";
 
-const SYSTEM_PROMPT = `You are MapAble Prep-Brief, a Wizard-of-Oz prototype assistant for an Australian NDIS Support Coordinator or LAC Navigator preparing for a participant plan-review meeting.
+const SYSTEM_PROMPT = `${buildPolicySystemPrompt()}
+
+You are MapAble Prep-Brief, a Wizard-of-Oz prototype assistant for an Australian NDIS Support Coordinator or LAC Navigator preparing for a participant plan-review meeting.
 
 YOUR JOB: Read the redacted prior NDIS plan plus optional progress notes and provider correspondence the coordinator has pasted in. Produce a tight 1-page review-prep brief.
 
@@ -77,6 +80,8 @@ export async function generatePrepBrief(input: {
   planText: string;
   notesText?: string | null;
   correspondenceText?: string | null;
+  auditSessionId?: string;
+  auditUserId?: string;
 }): Promise<PrepBriefGenerationResult> {
   if (!prepBriefEnabled()) {
     throw new Error("Prep-brief generator is disabled or missing AI credentials");
@@ -87,19 +92,54 @@ export async function generatePrepBrief(input: {
     baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
   });
 
+  const userPrompt = buildUserPrompt(input);
+  const inputVerdict = classifyUserTurn(userPrompt, true);
+  const hardBlockCategories = prepBriefHardBlockCategories(inputVerdict.categories);
+  if (hardBlockCategories.length > 0) {
+    const refusal = `${refusalFor(hardBlockCategories)}\n\nA MapAble team member can review the source material before generating a prep brief.`;
+    await logGuardrailAudit({
+      sessionId: input.auditSessionId || `prep-brief:${input.participantPseudonym}`,
+      userId: input.auditUserId || "prep-brief",
+      input: userPrompt,
+      output: refusal,
+      toolCalls: [],
+      classifierVerdicts: inputVerdict.categories,
+      guardrailActions: [...inputVerdict.actions, "prep_brief_input_refusal"],
+      policyRefs: inputVerdict.policyRefs,
+      flaggedForReview: true,
+    });
+    throw new Error("Prep-brief input blocked by MapAble guardrails");
+  }
+
   const completion = await openai.chat.completions.create({
     model: PREP_BRIEF_MODEL,
     response_format: { type: "json_object" },
     temperature: 0.2,
     messages: [
       { role: "system", content: SYSTEM_PROMPT },
-      { role: "user", content: buildUserPrompt(input) },
+      { role: "user", content: userPrompt },
     ],
   });
 
   const raw = completion.choices[0]?.message?.content;
   if (!raw) {
     throw new Error("Model returned no content");
+  }
+
+  const outputGuardrail = applyOutputGuardrails(raw);
+  await logGuardrailAudit({
+    sessionId: input.auditSessionId || `prep-brief:${input.participantPseudonym}`,
+    userId: input.auditUserId || "prep-brief",
+    input: userPrompt,
+    output: outputGuardrail.flagged ? outputGuardrail.content : raw,
+    toolCalls: [],
+    classifierVerdicts: inputVerdict.categories,
+    guardrailActions: [...inputVerdict.actions, ...outputGuardrail.actions],
+    policyRefs: [...inputVerdict.policyRefs, ...outputGuardrail.policyRefs],
+    flaggedForReview: outputGuardrail.flagged || inputVerdict.actions.includes("human_pathway"),
+  });
+  if (outputGuardrail.flagged) {
+    throw new Error("Model returned content blocked by MapAble guardrails");
   }
 
   let parsed: unknown;

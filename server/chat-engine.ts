@@ -16,13 +16,28 @@ import {
   type ChatMessage,
   type CommunityReport,
 } from "@shared/schema";
+import {
+  applyOutputGuardrails,
+  buildPolicySystemPrompt,
+  classifyUserTurn,
+  ensureGuardrailTables,
+  logComplaintDraft,
+  logGuardrailAudit,
+  logIncidentDraft,
+  flagSafeguardingConcern,
+  recordConsent,
+  runRequiredSafeguardingActions,
+  safeguardingTemplate,
+} from "./chat-guardrails";
 
 const openai = new OpenAI({
   apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY,
   baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
 });
 
-const SYSTEM_PROMPT = `You are MapAble Chat, an accessibility-context travel and support assistant for the MapAble 4.0 platform — an Australian NDIS superapp. You help people with disability plan accessible journeys, understand transport options, report accessibility barriers, navigate NDIS support services, manage shifts and billing.
+const SYSTEM_PROMPT = `${buildPolicySystemPrompt()}
+
+You also help people with disability plan accessible journeys, understand transport options, report accessibility barriers, navigate NDIS support services, manage shifts and billing.
 
 Your core principles:
 - SAFETY FIRST: Never suggest stairs if the user's profile says stairs_allowed=false. Never suggest routes that exceed their max transfer distance.
@@ -44,6 +59,10 @@ You have access to tools to:
 - Check pending invoices and billing
 - View NDIS budget summary across categories
 - Look up NDIS plan goals
+- Log incident drafts for safeguarding review
+- Log complaint drafts for human follow-up
+- Record consent decisions
+- Flag safeguarding concerns for human review
 
 Billing & Shifts guidance:
 - When discussing shifts, always confirm the date, time, and worker before booking. Ask the user to confirm before creating a shift.
@@ -265,11 +284,80 @@ const tools: OpenAI.Chat.Completions.ChatCompletionTool[] = [
       parameters: { type: "object", properties: {}, required: [] },
     },
   },
+  {
+    type: "function",
+    function: {
+      name: "log_incident_draft",
+      description: "Create a safeguarding incident draft aligned with MapAble incident register fields and mark the chat for human review.",
+      parameters: {
+        type: "object",
+        properties: {
+          incidentType: { type: "string", description: "Incident category or reportable incident indicator" },
+          immediateActions: { type: "string", description: "Safety-first actions already suggested or taken" },
+          reportable: { type: "boolean", description: "Whether it may be reportable to the NDIS Commission" },
+          investigationSummary: { type: "string", description: "Brief factual summary from the chat" },
+          correctiveActions: { type: "string", description: "Suggested immediate corrective actions for human review" },
+        },
+        required: ["incidentType", "immediateActions"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "log_complaint_draft",
+      description: "Create a complaint draft aligned with MapAble complaints register fields and mark the chat for human review.",
+      parameters: {
+        type: "object",
+        properties: {
+          issue: { type: "string", description: "Plain-language complaint issue" },
+          raisedBy: { type: "string", description: "Who raised the complaint" },
+          outcome: { type: "string", description: "Any requested or early outcome" },
+          improvementsLogged: { type: "string", description: "Potential improvement action for review" },
+        },
+        required: ["issue"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "record_consent",
+      description: "Record a user's consent decision or refusal for information sharing or support action.",
+      parameters: {
+        type: "object",
+        properties: {
+          subject: { type: "string", description: "Person or topic the consent applies to" },
+          scope: { type: "string", description: "Specific information or action covered" },
+          granted: { type: "boolean", description: "Whether consent was granted" },
+          evidence: { type: "string", description: "Plain-language evidence for the consent decision" },
+        },
+        required: ["subject", "scope", "granted"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "flag_safeguarding_concern",
+      description: "Flag a safeguarding concern for human review when abuse, neglect, exploitation, immediate danger, self-harm, privacy breach, or discrimination is disclosed.",
+      parameters: {
+        type: "object",
+        properties: {
+          concernType: { type: "string", description: "Safeguarding concern category" },
+          summary: { type: "string", description: "Brief factual summary from the chat" },
+          severity: { type: "string", enum: ["low", "medium", "high", "critical"], description: "Severity for human triage" },
+        },
+        required: ["concernType", "summary"],
+      },
+    },
+  },
 ];
 
 async function executeToolCall(
   toolName: string,
   args: Record<string, any>,
+  sessionId: string,
   userId: string,
   clientContext?: ClientContext
 ): Promise<string> {
@@ -687,6 +775,46 @@ async function executeToolCall(
       });
     }
 
+    case "log_incident_draft": {
+      const draft = await logIncidentDraft(sessionId, userId, args);
+      return JSON.stringify({
+        success: true,
+        draftId: draft.id,
+        message: "Incident draft logged for human safeguarding review.",
+        quickAction: "escalate",
+      });
+    }
+
+    case "log_complaint_draft": {
+      const draft = await logComplaintDraft(sessionId, userId, args);
+      return JSON.stringify({
+        success: true,
+        draftId: draft.id,
+        message: "Complaint draft logged for human review. MapAble should acknowledge complaints within 2 business days.",
+        quickAction: "escalate",
+      });
+    }
+
+    case "record_consent": {
+      const record = await recordConsent(sessionId, userId, args);
+      return JSON.stringify({
+        success: true,
+        consentRecordId: record.id,
+        granted: record.granted,
+        message: "Consent decision recorded for human review.",
+      });
+    }
+
+    case "flag_safeguarding_concern": {
+      const flag = await flagSafeguardingConcern(sessionId, userId, args);
+      return JSON.stringify({
+        success: true,
+        flagId: flag.id,
+        message: "Safeguarding concern flagged for human review.",
+        quickAction: "escalate",
+      });
+    }
+
     default:
       return JSON.stringify({ error: `Unknown tool: ${toolName}` });
   }
@@ -755,11 +883,69 @@ export async function processChat(
   userMessage: string,
   clientContext?: ClientContext
 ): Promise<ChatResponse> {
+  await ensureGuardrailTables();
+
   const existingMessages = await db
     .select()
     .from(chatMessages)
     .where(eq(chatMessages.sessionId, sessionId))
     .orderBy(chatMessages.createdAt);
+
+  const [currentUser] = await db.select().from(users).where(eq(users.id, userId));
+  const isStaffOrAdmin = currentUser?.role === "admin" || currentUser?.role === "provider" || currentUser?.role === "carer";
+  const inputVerdict = classifyUserTurn(userMessage, isStaffOrAdmin);
+  const guardrailToolCalls: string[] = [];
+  const guardrailActions = [...inputVerdict.actions];
+  const policyRefs = [...inputVerdict.policyRefs];
+
+  await db.insert(chatMessages).values({
+    sessionId,
+    role: "user",
+    content: userMessage,
+  });
+
+  const immediateTemplate = inputVerdict.responseTemplate || safeguardingTemplate(inputVerdict);
+  if (immediateTemplate) {
+    const requiredTools = await runRequiredSafeguardingActions(sessionId, userId, userMessage, inputVerdict);
+    guardrailToolCalls.push(...requiredTools);
+
+    await db.insert(chatMessages).values({
+      sessionId,
+      role: "assistant",
+      content: immediateTemplate,
+      toolCalls: guardrailToolCalls.length > 0 ? guardrailToolCalls : null,
+      quickActions: ["escalate"],
+      confidence: "high",
+    });
+
+    if (existingMessages.length === 0) {
+      const titleSnippet = userMessage.slice(0, 50) + (userMessage.length > 50 ? "..." : "");
+      await db
+        .update(chatSessions)
+        .set({ title: titleSnippet })
+        .where(eq(chatSessions.id, sessionId));
+    }
+
+    await logGuardrailAudit({
+      sessionId,
+      userId,
+      input: userMessage,
+      output: immediateTemplate,
+      toolCalls: guardrailToolCalls,
+      classifierVerdicts: inputVerdict.categories,
+      guardrailActions,
+      policyRefs,
+      flaggedForReview: guardrailToolCalls.length > 0 || inputVerdict.blocked,
+    });
+
+    return {
+      content: immediateTemplate,
+      quickActions: ["escalate"],
+      confidence: "high",
+      warnings: inputVerdict.blocked ? ["This message was handled by MapAble's safety and privacy guardrails."] : [],
+      toolsUsed: guardrailToolCalls,
+    };
+  }
 
   const chatHistory: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
     { role: "system", content: SYSTEM_PROMPT },
@@ -767,14 +953,8 @@ export async function processChat(
       role: m.role as "user" | "assistant",
       content: m.content,
     })),
-    { role: "user", content: userMessage },
+    { role: "user", content: inputVerdict.transformedInput },
   ];
-
-  await db.insert(chatMessages).values({
-    sessionId,
-    role: "user",
-    content: userMessage,
-  });
 
   let [profile] = await db
     .select()
@@ -805,12 +985,18 @@ export async function processChat(
 
       for (const toolCall of choice.message.tool_calls) {
         if (toolCall.type !== "function") continue;
-        const args = JSON.parse(toolCall.function.arguments || "{}");
+        let args: Record<string, any> = {};
+        try {
+          args = JSON.parse(toolCall.function.arguments || "{}");
+        } catch {
+          args = {};
+        }
         toolsUsed.push(toolCall.function.name);
 
         const toolResult = await executeToolCall(
           toolCall.function.name,
           args,
+          sessionId,
           userId,
           clientContext
         );
@@ -830,12 +1016,17 @@ export async function processChat(
     break;
   }
 
-  const { content: processedContent, warnings } = applyRulesEngine(
+  const { content: rulesContent, warnings } = applyRulesEngine(
     assistantContent,
     profile || null,
     toolsUsed,
     toolOutputs
   );
+
+  const outputGuardrail = applyOutputGuardrails(rulesContent);
+  const processedContent = outputGuardrail.content;
+  guardrailActions.push(...outputGuardrail.actions);
+  policyRefs.push(...outputGuardrail.policyRefs);
 
   const quickActions = extractQuickActions(processedContent, toolsUsed);
   const confidence = determineConfidence(toolsUsed);
@@ -856,6 +1047,18 @@ export async function processChat(
       .set({ title: titleSnippet })
       .where(eq(chatSessions.id, sessionId));
   }
+
+  await logGuardrailAudit({
+    sessionId,
+    userId,
+    input: userMessage,
+    output: processedContent,
+    toolCalls: [...toolsUsed, ...guardrailToolCalls],
+    classifierVerdicts: inputVerdict.categories,
+    guardrailActions,
+    policyRefs,
+    flaggedForReview: outputGuardrail.flagged || guardrailActions.includes("human_pathway") || guardrailToolCalls.length > 0,
+  });
 
   return {
     content: processedContent,

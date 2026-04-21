@@ -1,30 +1,31 @@
 import type { Express } from "express";
 import { storage } from "../storage";
 import { processChat, createChatSession, getUserSessions, getSessionMessages, deleteChatSession } from "../chat-engine";
+import { getGuardrailAuditLogs } from "../chat-guardrails";
 import { requireAuth } from "./shared";
 
 export function registerChatCommunityRoutes(app: Express) {
-  app.get("/api/access-profile", async (req, res) => {
+  app.get("/api/access-profile", requireAuth, async (req, res) => {
     const profile = await storage.getAccessProfile(req.session.userId!);
     res.json(profile || null);
   });
 
-  app.put("/api/access-profile", async (req, res) => {
+  app.put("/api/access-profile", requireAuth, async (req, res) => {
     const profile = await storage.upsertAccessProfile(req.session.userId!, req.body);
     res.json(profile);
   });
 
-  app.post("/api/chat/sessions", async (req, res) => {
+  app.post("/api/chat/sessions", requireAuth, async (req, res) => {
     const session = await createChatSession(req.session.userId!);
     res.status(201).json(session);
   });
 
-  app.get("/api/chat/sessions", async (req, res) => {
+  app.get("/api/chat/sessions", requireAuth, async (req, res) => {
     const sessions = await getUserSessions(req.session.userId!);
     res.json(sessions);
   });
 
-  app.get("/api/chat/sessions/:id/messages", async (req, res) => {
+  app.get("/api/chat/sessions/:id/messages", requireAuth, async (req, res) => {
     const sessions = await getUserSessions(req.session.userId!);
     const owns = sessions.some((s) => s.id === req.params.id);
     if (!owns) return res.status(403).json({ message: "Access denied" });
@@ -32,7 +33,7 @@ export function registerChatCommunityRoutes(app: Express) {
     res.json(msgs);
   });
 
-  app.delete("/api/chat/sessions/:id", async (req, res) => {
+  app.delete("/api/chat/sessions/:id", requireAuth, async (req, res) => {
     const sessions = await getUserSessions(req.session.userId!);
     const owns = sessions.some((s) => s.id === req.params.id);
     if (!owns) return res.status(403).json({ message: "Access denied" });
@@ -52,6 +53,22 @@ export function registerChatCommunityRoutes(app: Express) {
     } catch (error) {
       console.error("Chat error:", error);
       res.status(500).json({ message: "Failed to process chat message" });
+    }
+  });
+
+  app.get("/api/admin/chat/guardrails/audit", requireAuth, async (req, res) => {
+    try {
+      const user = await storage.getUser(req.session.userId!);
+      if (!user || user.role !== "admin") {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      const limit = Math.min(Number(req.query.limit || 100), 250);
+      const includeRaw = req.query.raw === "true";
+      const logs = await getGuardrailAuditLogs(limit, includeRaw);
+      res.json(logs);
+    } catch (error) {
+      console.error("Guardrail audit error:", error);
+      res.status(500).json({ message: "Failed to fetch guardrail audit logs" });
     }
   });
 

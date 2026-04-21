@@ -11,6 +11,9 @@ MapAble 4.0 is a fullstack TypeScript superapp combining core NDIS services:
 - **Email** - AgentMail integration for sending/receiving emails (shift confirmations, invoices, support)
 - **ABN Lookup** - Australian Business Number validation and ABR registry lookup
 
+## Co-Design Gate
+Participant-facing HITL AI features (Concepts B, C, E from `research/hitl-ai-disability-services-au.md`) are gated by `docs/co-design-protocol.md` — engagement charter with PWDA / AFDO / FPDN / Inclusion Australia, consent and transparency template, harms escalation path, and accessible-formats spec (Easy Read, AAC, Auslan, key community languages). No build on those concepts before the protocol's S0/S1 stages are signed off by the relevant DROs.
+
 ## Architecture
 - **Runtime**: Node.js/TypeScript
 - **Backend**: Express.js (primary API + auth + payments)
@@ -32,6 +35,7 @@ MapAble 4.0 is a fullstack TypeScript superapp combining core NDIS services:
 - **Main Workflow**: `npm run dev` — Express + Vite on port 5000 (primary app)
 - **AgentMail Service**: `npx tsx server/agentmail-service.ts` (runs on port 3001 internally)
 - **DB push**: `npx drizzle-kit push`
+- **Chat guardrail rollout**: apply migration `migrations/0007_chat_guardrails_safeguarding.sql` before enabling chat/prep-brief traffic in a new environment; guardrail writes fail fast if these tables are missing.
 
 ## Environment Variables
 - `NEON_DATABASE_URL` / `DATABASE_URL` — Neon PostgreSQL connection string
@@ -133,6 +137,7 @@ client/src/
 - Job board with category filters (Care/Transport/Support/Employment)
 - Transport booking with wheelchair options + trip logger with tier pricing
 - AI-powered chat assistant with OpenAI
+- **Chat Guardrails & Safeguarding** — MapAble Chat routes all LLM turns through policy-pack guardrails using the Quality & Safeguarding Manual v3 and NDIS Policies v2.1. Input checks detect prompt injection, out-of-scope advice, third-party PII, consent/pricing circumvention and safeguarding risks; output checks refuse unsafe advice/PII; incident, complaint, consent and safeguarding draft tools write review records; audit logs are available to admins at `/admin/chat-guardrails`.
 - NDIS pricing tiers (4 care + 4 transport) with automatic tier calculation
 - **Shift Scheduler** — dedicated Shifts page with weekly/monthly calendar views, worker availability management, shift booking with NDIS goal alignment, recurring shift creation (weekly/fortnightly), shift status workflow (scheduled → confirmed → in_progress → completed), automatic service session creation on completion
 - **NDIS API Integration** — PRODA authentication module (OAuth2), myplace portal client for participant plan/goals, Price Guide data fetcher for NDIS rates, plan data caching, rate validation against NDIS price guide
