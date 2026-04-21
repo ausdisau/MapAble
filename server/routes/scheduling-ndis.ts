@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { storage } from "../storage";
 import { insertWorkerAvailabilitySchema, insertWorkerBlockoutSchema, insertShiftSchema } from "@shared/schema";
 import { syncParticipantPlan, getCachedPlan, fetchPriceGuide, validateRateAgainstPriceGuide, submitNdisClaim, ProdaNotConfiguredError, ProdaApiError, prodaConfigured } from "../ndis-api";
-import { getWorkerIdForUser } from "./shared";
+import { getWorkerIdForUser, requireAuth } from "./shared";
 
 export function registerSchedulingNdisRoutes(app: Express) {
   app.get("/api/worker-availability/:workerId", async (req, res) => {
@@ -317,7 +317,7 @@ export function registerSchedulingNdisRoutes(app: Express) {
     res.status(204).send();
   });
 
-  app.post("/api/ndis/sync-plan", async (req, res) => {
+  app.post("/api/ndis/sync-plan", requireAuth, async (req, res) => {
     const userId = req.session.userId!;
     try {
       const user = await storage.getUser(userId);
@@ -336,7 +336,7 @@ export function registerSchedulingNdisRoutes(app: Express) {
     }
   });
 
-  app.get("/api/ndis/plan/:participantId", async (req, res) => {
+  app.get("/api/ndis/plan/:participantId", requireAuth, async (req, res) => {
     const userId = req.session.userId!;
     if (req.params.participantId !== userId) {
       return res.status(403).json({ message: "You can only view your own NDIS plan" });
@@ -346,7 +346,7 @@ export function registerSchedulingNdisRoutes(app: Express) {
     res.json(plan);
   });
 
-  app.get("/api/ndis/price-guide", async (req, res) => {
+  app.get("/api/ndis/price-guide", requireAuth, async (req, res) => {
     const itemCode = req.query.itemCode as string | undefined;
     try {
       const items = await fetchPriceGuide(itemCode);
@@ -360,7 +360,7 @@ export function registerSchedulingNdisRoutes(app: Express) {
     }
   });
 
-  app.post("/api/ndis/validate-rate", async (req, res) => {
+  app.post("/api/ndis/validate-rate", requireAuth, async (req, res) => {
     const { itemCode, rate } = req.body;
     if (!itemCode || rate === undefined) {
       return res.status(400).json({ message: "itemCode and rate required" });
@@ -378,7 +378,7 @@ export function registerSchedulingNdisRoutes(app: Express) {
     }
   });
 
-  app.post("/api/ndis/submit-claim", async (req, res) => {
+  app.post("/api/ndis/submit-claim", requireAuth, async (req, res) => {
     const userId = req.session.userId!;
     const user = await storage.getUser(userId);
     if (!user || user.role !== "participant") {

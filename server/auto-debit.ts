@@ -1,5 +1,40 @@
 import { storage } from "./storage";
 import { getStripe, stripeEnabled, becsEnabled, calculatePlatformFee, connectEnabled } from "./stripe";
+import { sendEmailViaAgentMail } from "./notifications";
+
+async function notifyAutoDebit(
+  email: string | null,
+  fullName: string | null,
+  invoiceId: string,
+  outcome: "attempt" | "success" | "failure",
+  amountCents: number,
+  reason?: string,
+): Promise<void> {
+  if (!email) return;
+  const dollars = (amountCents / 100).toFixed(2);
+  const subject =
+    outcome === "success" ? `Auto-debit successful — invoice ${invoiceId}`
+    : outcome === "failure" ? `Auto-debit failed — invoice ${invoiceId}`
+    : `Auto-debit attempt scheduled — invoice ${invoiceId}`;
+  const lines = [
+    `Hi ${fullName || "there"},`,
+    "",
+    outcome === "success"
+      ? `We successfully debited $${dollars} from your default bank account for invoice ${invoiceId}.`
+      : outcome === "failure"
+      ? `We could not debit $${dollars} from your default bank account for invoice ${invoiceId}.${reason ? ` Reason: ${reason}.` : ""} We'll retry on the next cycle.`
+      : `We are about to debit $${dollars} from your default bank account for invoice ${invoiceId}.`,
+    "",
+    "You can manage auto-debit and bank accounts in MapAble → Settings → Payment methods.",
+    "",
+    "— MapAble",
+  ];
+  try {
+    await sendEmailViaAgentMail(email, subject, lines.join("\n"));
+  } catch (e) {
+    console.error("[auto-debit] notification failed:", e instanceof Error ? e.message : e);
+  }
+}
 
 export async function runAutoDebitTick(): Promise<{ attempted: number; succeeded: number; failed: number; skipped: number }> {
   const result = { attempted: 0, succeeded: 0, failed: 0, skipped: 0 };
@@ -50,6 +85,7 @@ export async function runAutoDebitTick(): Promise<{ attempted: number; succeeded
     }
 
     result.attempted++;
+    void notifyAutoDebit(user.email, user.fullName, inv.id, "attempt", amountCents);
     try {
       const pi = await getStripe().paymentIntents.create({
         amount: amountCents,
@@ -74,6 +110,9 @@ export async function runAutoDebitTick(): Promise<{ attempted: number; succeeded
       });
       result.succeeded++;
       console.log(`[auto-debit] invoice=${inv.id} pi=${pi.id} status=${pi.status}`);
+      if (pi.status === "succeeded" || pi.status === "processing") {
+        void notifyAutoDebit(user.email, user.fullName, inv.id, "success", amountCents);
+      }
     } catch (e) {
       result.failed++;
       const msg = e instanceof Error ? e.message : String(e);
@@ -81,6 +120,7 @@ export async function runAutoDebitTick(): Promise<{ attempted: number; succeeded
       await storage.updateInvoicePayment(inv.id, {
         stripePaymentStatus: "failed",
       });
+      void notifyAutoDebit(user.email, user.fullName, inv.id, "failure", amountCents, msg);
     }
   }
 
