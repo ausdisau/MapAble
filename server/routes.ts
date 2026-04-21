@@ -643,6 +643,40 @@ export async function registerRoutes(
     res.json(worker);
   });
 
+  app.post("/api/workers/verify-abn", requireAuth, async (req, res) => {
+    const userId = req.session.userId!;
+    const worker = await storage.getWorkerByUserId(userId);
+    if (!worker) {
+      return res.status(404).json({ message: "Worker profile not found" });
+    }
+    if (!worker.abn) {
+      return res.status(400).json({ message: "No ABN set on worker profile. Please add your ABN first." });
+    }
+    if (worker.abnVerified) {
+      return res.json({ message: "ABN already verified", abnVerified: true, abn: worker.abn });
+    }
+    try {
+      const result = await lookupProvider(worker.abn);
+      if (result && result.abn) {
+        await storage.updateWorkerAbnVerified(worker.id, true);
+        return res.json({ message: "ABN verified successfully", abnVerified: true, abn: worker.abn, businessName: result.businessName });
+      }
+      return res.status(400).json({ message: "ABN could not be verified through ABR lookup" });
+    } catch (error) {
+      console.error("ABN verification error:", error);
+      return res.status(500).json({ message: "Failed to verify ABN" });
+    }
+  });
+
+  app.get("/api/workers/me/abn-status", requireAuth, async (req, res) => {
+    const userId = req.session.userId!;
+    const worker = await storage.getWorkerByUserId(userId);
+    if (!worker) {
+      return res.json({ hasWorkerProfile: false, abn: null, abnVerified: false });
+    }
+    res.json({ hasWorkerProfile: true, abn: worker.abn, abnVerified: worker.abnVerified ?? false });
+  });
+
   app.get("/api/bookings", async (_req, res) => {
     const bookings = await storage.getBookings();
     res.json(bookings);
@@ -1177,6 +1211,12 @@ export async function registerRoutes(
       return res.status(400).json({ message: "participantId, periodStart, and periodEnd required" });
     }
     const invoice = await storage.generateInvoice(participantId, periodStart, periodEnd);
+    const items = (invoice.lineItems as any[]) || [];
+    const unverifiedCount = items.filter((item: any) => item.abnVerified === false).length;
+    const response: any = { ...invoice };
+    if (unverifiedCount > 0) {
+      response.abnWarning = `${unverifiedCount} line item(s) have workers/providers with unverified ABNs. Payment will be blocked until all ABNs are verified.`;
+    }
 
     if (qbEnabled()) {
       const user = await storage.getUser(participantId);
@@ -1187,7 +1227,7 @@ export async function registerRoutes(
       }
     }
 
-    res.status(201).json(invoice);
+    res.status(201).json(response);
   });
 
   app.get("/api/invoices", async (req, res) => {
@@ -1326,6 +1366,16 @@ export async function registerRoutes(
       return res.status(403).json({ message: "Not authorized to pay this invoice" });
     }
     if (invoice.status === "paid") return res.status(400).json({ message: "Invoice already paid" });
+
+    const lineItems = (invoice.lineItems as any[]) || [];
+    const unverifiedItems = lineItems.filter((item: any) => item.abnVerified === false);
+    if (unverifiedItems.length > 0) {
+      return res.status(400).json({
+        message: "This invoice contains line items from workers/providers with unverified ABNs. All ABNs must be verified before payment can be processed.",
+        unverifiedCount: unverifiedItems.length,
+        requiresAbnVerification: true,
+      });
+    }
 
     if (invoice.status === "pending" || invoice.status === "processing") {
       if (invoice.stripePaymentIntentId) {
