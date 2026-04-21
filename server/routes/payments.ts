@@ -345,9 +345,9 @@ export function registerPaymentRoutes(app: Express) {
         return res.status(400).json({ message: "ABN must be verified before payout onboarding" });
       }
     } else {
-      // provider role: must have ABN on file (verification pathway lives in admin profile)
-      if (!user.abn) {
-        return res.status(400).json({ message: "Provider ABN must be on file before payout onboarding" });
+      // provider role: ABN must be verified before onboarding
+      if (!user.abn || !user.abnVerified) {
+        return res.status(400).json({ message: "Provider ABN must be verified before payout onboarding" });
       }
     }
 
@@ -467,8 +467,12 @@ export function registerPaymentRoutes(app: Express) {
     const user = await storage.getUser(req.session.userId!);
     if (!user) return res.status(404).json({ message: "User not found" });
     const limit = Math.min(Number(req.query.limit) || 20, 100);
-    if (user.role === "admin" || user.role === "provider") {
+    if (user.role === "admin") {
       const claims = await getRecentClaims(limit);
+      return res.json(claims);
+    }
+    if (user.role === "provider") {
+      const claims = await storage.getNdisClaims({ providerId: user.id, limit });
       return res.json(claims);
     }
     const claims = await storage.getNdisClaims({ participantId: user.id, limit });

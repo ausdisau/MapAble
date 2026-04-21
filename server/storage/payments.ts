@@ -89,10 +89,11 @@ export const paymentsStorage = {
     return c;
   },
 
-  async getNdisClaims(filters?: { participantId?: string; invoiceId?: string; limit?: number }): Promise<NdisClaim[]> {
+  async getNdisClaims(filters?: { participantId?: string; invoiceId?: string; providerId?: string; limit?: number }): Promise<NdisClaim[]> {
     const conditions = [];
     if (filters?.participantId) conditions.push(eq(ndisClaims.participantId, filters.participantId));
     if (filters?.invoiceId) conditions.push(eq(ndisClaims.invoiceId, filters.invoiceId));
+    if (filters?.providerId) conditions.push(eq(ndisClaims.providerId, filters.providerId));
     let query = db.select().from(ndisClaims).$dynamic();
     if (conditions.length) query = query.where(and(...conditions));
     return query.orderBy(desc(ndisClaims.submittedAt)).limit(filters?.limit ?? 100);
