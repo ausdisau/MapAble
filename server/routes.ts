@@ -15,7 +15,10 @@ import {
   insertWorkerAvailabilitySchema,
   insertWorkerBlockoutSchema,
   insertShiftSchema,
+  insertPlanReviewBriefSchema,
+  planReviewBriefFeedbackSchema,
 } from "@shared/schema";
+import { generatePrepBrief, prepBriefEnabled, userMayUsePrepBrief } from "./plan-review-brief";
 import { z } from "zod";
 import { syncParticipantPlan, getCachedPlan, fetchPriceGuide, validateRateAgainstPriceGuide, submitNdisClaim, lookupParticipant, lookupProvider, lookupWorkerScreening } from "./ndis-api";
 
@@ -2292,6 +2295,107 @@ export async function registerRoutes(
     });
 
     res.json({ clientSecret: paymentIntent.client_secret, paymentIntentId: paymentIntent.id });
+  });
+
+  async function requirePrepBriefRole(req: Request, res: Response): Promise<{ userId: string; role: string } | null> {
+    const userId = req.session.userId!;
+    const user = await storage.getUser(userId);
+    if (!user) {
+      res.status(401).json({ message: "User not found" });
+      return null;
+    }
+    if (!userMayUsePrepBrief(user.role)) {
+      res.status(403).json({
+        message: "Plan-review prep is restricted to coordinator-equivalent roles in this prototype.",
+      });
+      return null;
+    }
+    return { userId, role: user.role };
+  }
+
+  app.get("/api/plan-review-briefs/config", requireAuth, async (req, res) => {
+    const userId = req.session.userId!;
+    const user = await storage.getUser(userId);
+    res.json({
+      enabled: prepBriefEnabled(),
+      allowed: user ? userMayUsePrepBrief(user.role) : false,
+    });
+  });
+
+  app.get("/api/plan-review-briefs", requireAuth, async (req, res) => {
+    const ctx = await requirePrepBriefRole(req, res);
+    if (!ctx) return;
+    const rows = await storage.listPlanReviewBriefsForCoordinator(ctx.userId);
+    res.json(rows);
+  });
+
+  app.get("/api/plan-review-briefs/:id", requireAuth, async (req, res) => {
+    const ctx = await requirePrepBriefRole(req, res);
+    if (!ctx) return;
+    const row = await storage.getPlanReviewBrief(req.params.id);
+    if (!row || row.coordinatorId !== ctx.userId) {
+      return res.status(404).json({ message: "Brief not found" });
+    }
+    res.json(row);
+  });
+
+  app.post("/api/plan-review-briefs", requireAuth, async (req, res) => {
+    if (!prepBriefEnabled()) {
+      return res.status(503).json({ message: "Prep-brief generator is not available in this environment" });
+    }
+    const ctx = await requirePrepBriefRole(req, res);
+    if (!ctx) return;
+    const userId = ctx.userId;
+    const parsed = insertPlanReviewBriefSchema.safeParse({
+      ...req.body,
+      coordinatorId: userId,
+    });
+    if (!parsed.success) {
+      return res.status(400).json({ message: "Invalid input", errors: parsed.error.flatten() });
+    }
+
+    const created = await storage.createPlanReviewBrief(parsed.data);
+
+    try {
+      const result = await generatePrepBrief({
+        participantPseudonym: parsed.data.participantPseudonym,
+        meetingDate: parsed.data.meetingDate ?? null,
+        planText: parsed.data.planText,
+        notesText: parsed.data.notesText ?? null,
+        correspondenceText: parsed.data.correspondenceText ?? null,
+      });
+      const updated = await storage.updatePlanReviewBriefResult(created.id, {
+        brief: result.brief,
+        status: "generated",
+        modelName: result.modelName,
+        promptVersion: result.promptVersion,
+      });
+      return res.status(201).json(updated);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Brief generation failed";
+      console.error("[plan-review-brief] generation failed:", message);
+      const updated = await storage.updatePlanReviewBriefResult(created.id, {
+        status: "failed",
+        errorMessage: message.slice(0, 500),
+      });
+      return res.status(502).json(updated);
+    }
+  });
+
+  app.post("/api/plan-review-briefs/:id/feedback", requireAuth, async (req, res) => {
+    const userId = req.session.userId!;
+    const parsed = planReviewBriefFeedbackSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({ message: "Invalid feedback", errors: parsed.error.flatten() });
+    }
+    const row = await storage.recordPlanReviewBriefFeedback(req.params.id, userId, {
+      outcome: parsed.data.outcome,
+      notes: parsed.data.notes ?? null,
+    });
+    if (!row) {
+      return res.status(404).json({ message: "Brief not found" });
+    }
+    res.json(row);
   });
 
   return httpServer;

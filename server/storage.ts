@@ -25,6 +25,8 @@ import {
   accessContextProfiles, communityReports,
   workerAvailability, workerBlockouts, shifts, ndisPlanCache,
   groceryProducts, groceryOrders, groceryOrderItems,
+  planReviewBriefs,
+  type PlanReviewBrief, type InsertPlanReviewBrief, type PlanReviewBriefContent,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, sql, gte, lte, inArray, isNotNull } from "drizzle-orm";
@@ -115,6 +117,19 @@ export interface IStorage {
   updateGroceryOrderStatus(id: string, status: string): Promise<GroceryOrder | undefined>;
   updateGroceryOrderPayment(id: string, data: { stripePaymentIntentId?: string; paymentStatus?: string }): Promise<GroceryOrder | undefined>;
   getActiveGroceryOrders(participantId: string): Promise<GroceryOrder[]>;
+
+  createPlanReviewBrief(data: InsertPlanReviewBrief): Promise<PlanReviewBrief>;
+  updatePlanReviewBriefResult(
+    id: string,
+    data: { brief?: PlanReviewBriefContent; status: "generated" | "failed"; modelName?: string; promptVersion?: string; errorMessage?: string }
+  ): Promise<PlanReviewBrief | undefined>;
+  getPlanReviewBrief(id: string): Promise<PlanReviewBrief | undefined>;
+  listPlanReviewBriefsForCoordinator(coordinatorId: string): Promise<PlanReviewBrief[]>;
+  recordPlanReviewBriefFeedback(
+    id: string,
+    coordinatorId: string,
+    data: { outcome: PlanReviewBrief["feedbackOutcome"]; notes?: string | null }
+  ): Promise<PlanReviewBrief | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -789,6 +804,62 @@ export class DatabaseStorage implements IStorage {
         )
       )
       .orderBy(desc(groceryOrders.createdAt));
+  }
+
+  async createPlanReviewBrief(data: InsertPlanReviewBrief): Promise<PlanReviewBrief> {
+    const [row] = await db.insert(planReviewBriefs).values({
+      coordinatorId: data.coordinatorId,
+      participantPseudonym: data.participantPseudonym,
+      meetingDate: data.meetingDate ?? null,
+      planText: data.planText,
+      notesText: data.notesText ?? null,
+      correspondenceText: data.correspondenceText ?? null,
+    }).returning();
+    return row;
+  }
+
+  async updatePlanReviewBriefResult(
+    id: string,
+    data: { brief?: PlanReviewBriefContent; status: "generated" | "failed"; modelName?: string; promptVersion?: string; errorMessage?: string }
+  ): Promise<PlanReviewBrief | undefined> {
+    const [row] = await db.update(planReviewBriefs)
+      .set({
+        brief: data.brief ?? null,
+        status: data.status,
+        modelName: data.modelName ?? null,
+        promptVersion: data.promptVersion ?? null,
+        errorMessage: data.errorMessage ?? null,
+      })
+      .where(eq(planReviewBriefs.id, id))
+      .returning();
+    return row;
+  }
+
+  async getPlanReviewBrief(id: string): Promise<PlanReviewBrief | undefined> {
+    const [row] = await db.select().from(planReviewBriefs).where(eq(planReviewBriefs.id, id));
+    return row;
+  }
+
+  async listPlanReviewBriefsForCoordinator(coordinatorId: string): Promise<PlanReviewBrief[]> {
+    return db.select().from(planReviewBriefs)
+      .where(eq(planReviewBriefs.coordinatorId, coordinatorId))
+      .orderBy(desc(planReviewBriefs.createdAt));
+  }
+
+  async recordPlanReviewBriefFeedback(
+    id: string,
+    coordinatorId: string,
+    data: { outcome: PlanReviewBrief["feedbackOutcome"]; notes?: string | null }
+  ): Promise<PlanReviewBrief | undefined> {
+    const [row] = await db.update(planReviewBriefs)
+      .set({
+        feedbackOutcome: data.outcome,
+        feedbackNotes: data.notes ?? null,
+        feedbackAt: new Date(),
+      })
+      .where(and(eq(planReviewBriefs.id, id), eq(planReviewBriefs.coordinatorId, coordinatorId)))
+      .returning();
+    return row;
   }
 }
 

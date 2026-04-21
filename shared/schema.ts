@@ -630,6 +630,82 @@ export const groceryOrderItems = pgTable("grocery_order_items", {
   unitPrice: decimal("unit_price", { precision: 10, scale: 2 }).notNull(),
 });
 
+export const planReviewBriefStatusEnum = pgEnum("plan_review_brief_status", [
+  "draft",
+  "generated",
+  "failed",
+]);
+
+export const planReviewBriefFeedbackEnum = pgEnum("plan_review_brief_feedback", [
+  "used_unchanged",
+  "edited_minor",
+  "edited_major",
+  "changed_decision",
+  "discarded",
+]);
+
+export const planReviewBriefs = pgTable("plan_review_briefs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  coordinatorId: varchar("coordinator_id").notNull(),
+  participantPseudonym: text("participant_pseudonym").notNull(),
+  meetingDate: text("meeting_date"),
+  planText: text("plan_text").notNull(),
+  notesText: text("notes_text"),
+  correspondenceText: text("correspondence_text"),
+  status: planReviewBriefStatusEnum("status").notNull().default("draft"),
+  brief: jsonb("brief"),
+  modelName: text("model_name"),
+  promptVersion: text("prompt_version"),
+  errorMessage: text("error_message"),
+  feedbackOutcome: planReviewBriefFeedbackEnum("feedback_outcome"),
+  feedbackNotes: text("feedback_notes"),
+  feedbackAt: timestamp("feedback_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const planReviewBriefSectionSchema = z.object({
+  participantGoalsVerbatim: z.array(z.object({
+    quote: z.string().min(1).max(600),
+    sourceHint: z.string().max(200).optional(),
+  })).max(6),
+  planUtilisationSummary: z.string().max(1200),
+  budgetConcerns: z.array(z.object({
+    item: z.string().min(1).max(200),
+    lineItemHint: z.string().min(1).max(200),
+    concern: z.string().min(1).max(400),
+  })).max(5),
+  suggestedQuestions: z.array(z.string().min(1).max(280)).max(6),
+  whatAiDidNotSee: z.array(z.string().min(1).max(280)).max(6),
+});
+export type PlanReviewBriefContent = z.infer<typeof planReviewBriefSectionSchema>;
+
+export const insertPlanReviewBriefSchema = createInsertSchema(planReviewBriefs).omit({
+  id: true,
+  status: true,
+  brief: true,
+  modelName: true,
+  promptVersion: true,
+  errorMessage: true,
+  feedbackOutcome: true,
+  feedbackNotes: true,
+  feedbackAt: true,
+  createdAt: true,
+}).extend({
+  participantPseudonym: z.string().min(1).max(120),
+  planText: z.string().min(20).max(60000),
+  notesText: z.string().max(60000).optional().nullable(),
+  correspondenceText: z.string().max(60000).optional().nullable(),
+  meetingDate: z.string().max(40).optional().nullable(),
+});
+export type InsertPlanReviewBrief = z.infer<typeof insertPlanReviewBriefSchema>;
+export type PlanReviewBrief = typeof planReviewBriefs.$inferSelect;
+
+export const planReviewBriefFeedbackSchema = z.object({
+  outcome: z.enum(["used_unchanged", "edited_minor", "edited_major", "changed_decision", "discarded"]),
+  notes: z.string().max(4000).optional().nullable(),
+});
+export type PlanReviewBriefFeedback = z.infer<typeof planReviewBriefFeedbackSchema>;
+
 export const insertGroceryProductSchema = createInsertSchema(groceryProducts).omit({ id: true });
 export const insertGroceryOrderSchema = createInsertSchema(groceryOrders).omit({
   id: true,
