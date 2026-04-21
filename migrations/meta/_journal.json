@@ -29,6 +29,13 @@
       "when": 1774418907796,
       "tag": "0004_fast_the_professor",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1777000000000,
+      "tag": "0008_payout_events",
+      "breakpoints": true
     }
   ]
 }

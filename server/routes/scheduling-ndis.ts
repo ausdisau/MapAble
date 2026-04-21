@@ -260,12 +260,20 @@ export function registerSchedulingNdisRoutes(app: Express) {
 
       const rateInfo = await storage.calculateCareRate(shift.participantId, shift.date);
 
-      const priceGuideItems = await fetchPriceGuide(ndisItemCode);
       let effectiveRate = rateInfo.rate;
-      if (priceGuideItems.length > 0) {
-        const validation = validateRateAgainstPriceGuide(ndisItemCode, rateInfo.rate, priceGuideItems);
-        if (!validation.valid && validation.maxRate) {
-          effectiveRate = validation.maxRate;
+      if (prodaConfigured()) {
+        try {
+          const priceGuideItems = await fetchPriceGuide(ndisItemCode);
+          if (priceGuideItems.length > 0) {
+            const validation = validateRateAgainstPriceGuide(ndisItemCode, rateInfo.rate, priceGuideItems);
+            if (!validation.valid && validation.maxRate) {
+              effectiveRate = validation.maxRate;
+            }
+          }
+        } catch (e) {
+          if (!(e instanceof ProdaNotConfiguredError)) {
+            console.warn(`[shift-complete] price-guide validation skipped: ${e instanceof Error ? e.message : e}`);
+          }
         }
       }
 

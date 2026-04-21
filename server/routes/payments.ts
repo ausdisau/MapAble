@@ -187,6 +187,27 @@ export function registerPaymentRoutes(app: Express) {
             stripePaymentStatus: "failed",
             status: "failed",
           });
+          const inv = await storage.getInvoiceById(invoiceId);
+          if (inv) {
+            const payer = await storage.getUser(inv.participantId);
+            if (payer?.email) {
+              const dollars = (Number(inv.totalAmount) || 0).toFixed(2);
+              const reason = pi.last_payment_error?.message || "Bank declined the direct debit";
+              try {
+                const { sendEmailViaAgentMail, sendSmsViaTwilio } = await import("../notifications");
+                await sendEmailViaAgentMail(
+                  payer.email,
+                  `Payment failed — invoice ${inv.id}`,
+                  `Hi ${payer.fullName || "there"},\n\nWe could not collect your payment of $${dollars} for invoice ${inv.id}.\nReason: ${reason}\n\nPlease update your payment method or contact support.\n\n— MapAble`,
+                );
+                if (payer.phoneNumber) {
+                  await sendSmsViaTwilio(payer.phoneNumber, `MapAble: payment of $${dollars} for invoice ${inv.id} failed. ${reason}`);
+                }
+              } catch (e) {
+                console.error("[webhook] payment_failed notify error:", e instanceof Error ? e.message : e);
+              }
+            }
+          }
         }
         if (groceryOrderId) {
           await storage.updateGroceryOrderPayment(groceryOrderId, { paymentStatus: "failed" });
