@@ -1,4 +1,4 @@
-import { Bus, Flag, Search, Phone, UserCog, ArrowRight, Calendar, CreditCard, PieChart } from "lucide-react";
+import { Bus, Flag, Search, Phone, UserCog, ArrowRight, Calendar, CreditCard, PieChart, ShoppingCart, ListOrdered } from "lucide-react";
 import type { ComponentType, SVGProps } from "react";
 
 export interface QuickActionDef {
@@ -17,6 +17,8 @@ export const QUICK_ACTION_CONFIG: Record<string, QuickActionDef> = {
   view_shifts: { label: "View Shifts", icon: Calendar, color: "bg-indigo-500/10 text-indigo-600 border-indigo-500/30 dark:text-indigo-400" },
   pay_invoice: { label: "Pay Invoice", icon: CreditCard, color: "bg-emerald-500/10 text-emerald-600 border-emerald-500/30 dark:text-emerald-400" },
   check_budget: { label: "Check Budget", icon: PieChart, color: "bg-[#E6A817]/10 text-[#E6A817] border-[#E6A817]/30" },
+  view_groceries: { label: "Order Groceries", icon: ShoppingCart, color: "bg-[#2EAA6E]/10 text-[#2EAA6E] border-[#2EAA6E]/30" },
+  view_grocery_orders: { label: "My Grocery Orders", icon: ListOrdered, color: "bg-[#2EAA6E]/10 text-[#2EAA6E] border-[#2EAA6E]/30" },
 };
 
 export interface QuickActionContext {
@@ -56,6 +58,12 @@ export function handleQuickAction(action: string, ctx: QuickActionContext): void
       break;
     case "check_budget":
       ctx.navigate("/budget");
+      break;
+    case "view_groceries":
+      ctx.navigate("/groceries");
+      break;
+    case "view_grocery_orders":
+      ctx.navigate("/groceries/orders");
       break;
   }
 }

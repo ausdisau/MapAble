@@ -6,9 +6,10 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { SidebarProvider, useSidebar } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { ThemeProvider, useTheme } from "@/components/theme-provider";
+import { GroceryCartProvider } from "@/lib/grocery-cart";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
-import { Moon, Sun, Search, Bell, Accessibility, LayoutDashboard, HeartHandshake, Briefcase, Bus, MessageSquare, Settings, PanelLeftClose, PanelLeftOpen, DollarSign, Wallet, FileText, Bot, Loader2, CalendarDays, Building2, ClipboardList, User as UserIconLucide, Mail } from "lucide-react";
+import { Moon, Sun, Search, Bell, Accessibility, LayoutDashboard, HeartHandshake, Briefcase, Bus, MessageSquare, Settings, PanelLeftClose, PanelLeftOpen, DollarSign, Wallet, FileText, Bot, Loader2, CalendarDays, Building2, ClipboardList, User as UserIconLucide, Mail, ShoppingCart } from "lucide-react";
 import { useState, lazy, Suspense } from "react";
 
 const ChatbotWidget = lazy(() => import("@/components/chatbot-widget"));
@@ -43,6 +44,10 @@ import WorkerProfile from "@/pages/worker-profile";
 import WorkerBookings from "@/pages/worker-bookings";
 import WorkerShifts from "@/pages/worker-shifts";
 import WorkerAvailabilityPage from "@/pages/worker-availability";
+import GroceriesPage from "@/pages/groceries";
+import GroceryCheckoutPage from "@/pages/grocery-checkout";
+import GroceryOrdersPage from "@/pages/grocery-orders";
+import GroceryOrderDetailPage from "@/pages/grocery-order-detail";
 
 function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
@@ -131,6 +136,7 @@ function MobileSearchButton() {
 const participantMobileNavItems = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard, audioDesc: "View your dashboard overview" },
   { title: "Book a Carer", url: "/care", icon: HeartHandshake, audioDesc: "Find and book verified NDIS support workers" },
+  { title: "Groceries", url: "/groceries", icon: ShoppingCart, audioDesc: "Order groceries for delivery or book a support worker to shop for you" },
   { title: "Shifts", url: "/shifts", icon: CalendarDays, audioDesc: "Manage shift schedules and track NDIS goal alignment" },
   { title: "Find a Job", url: "/jobs", icon: Briefcase, audioDesc: "Browse disability support employment opportunities" },
   { title: "Get Transport", url: "/transport", icon: Bus, audioDesc: "Arrange wheelchair accessible transport services" },
@@ -229,6 +235,10 @@ function Router() {
       <Route path="/shifts" component={ShiftsPage} />
       <Route path="/care/:id" component={WorkerDetailPage} />
       <Route path="/care/:id/book" component={WorkerDetailPage} />
+      <Route path="/groceries" component={GroceriesPage} />
+      <Route path="/groceries/checkout" component={GroceryCheckoutPage} />
+      <Route path="/groceries/orders" component={GroceryOrdersPage} />
+      <Route path="/groceries/orders/:id" component={GroceryOrderDetailPage} />
       <Route path="/jobs" component={JobsPage} />
       <Route path="/jobs/:id" component={JobDetailPage} />
       <Route path="/transport" component={TransportPage} />
@@ -331,8 +341,10 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <ThemeProvider>
-          <AuthGate />
-          <Toaster />
+          <GroceryCartProvider>
+            <AuthGate />
+            <Toaster />
+          </GroceryCartProvider>
         </ThemeProvider>
       </TooltipProvider>
     </QueryClientProvider>

@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { users, workers, jobs, messages, pricingTiers, participantBudgets, serviceSessions, transportTrips, reviews } from "@shared/schema";
+import { users, workers, jobs, messages, pricingTiers, participantBudgets, serviceSessions, transportTrips, reviews, groceryProducts } from "@shared/schema";
 import { sql, eq, isNull } from "drizzle-orm";
 
 export async function seedDatabase() {
@@ -10,6 +10,7 @@ export async function seedDatabase() {
       await seedPricingAndBudgets();
     }
     await backfillVerificationData();
+    await seedGroceryProducts();
     return;
   }
 
@@ -274,8 +275,48 @@ export async function seedDatabase() {
   ]);
 
   await seedPricingAndBudgets();
+  await seedGroceryProducts();
 
   console.log("Database seeded successfully");
+}
+
+async function seedGroceryProducts() {
+  const existing = await db.select().from(groceryProducts);
+  if (existing.length > 0) return;
+
+  await db.insert(groceryProducts).values([
+    { name: "Bananas", category: "fresh_produce", price: "3.50", unit: "per kg", description: "Fresh Cavendish bananas", inStock: true },
+    { name: "Apples (Pink Lady)", category: "fresh_produce", price: "5.90", unit: "per kg", description: "Crisp Pink Lady apples", inStock: true },
+    { name: "Carrots", category: "fresh_produce", price: "2.50", unit: "per kg", description: "Fresh whole carrots", inStock: true },
+    { name: "Baby Spinach", category: "fresh_produce", price: "4.00", unit: "120g pack", description: "Triple washed baby spinach", inStock: true },
+    { name: "White Bread Loaf", category: "bakery", price: "3.20", unit: "700g loaf", description: "Sliced white sandwich bread", inStock: true },
+    { name: "Wholegrain Bread", category: "bakery", price: "4.50", unit: "750g loaf", description: "Sliced wholegrain bread", inStock: true },
+    { name: "Full Cream Milk", category: "dairy", price: "3.80", unit: "2L bottle", description: "Fresh full cream milk", inStock: true },
+    { name: "Greek Yoghurt", category: "dairy", price: "6.50", unit: "1kg tub", description: "Natural Greek yoghurt", inStock: true },
+    { name: "Block Tasty Cheese", category: "dairy", price: "8.00", unit: "500g block", description: "Aussie tasty cheddar", inStock: true },
+    { name: "Free Range Eggs", category: "dairy", price: "7.20", unit: "dozen", description: "Free range large eggs", inStock: true },
+    { name: "Chicken Breast", category: "meat_seafood", price: "13.00", unit: "per kg", description: "Fresh skinless chicken breast", inStock: true },
+    { name: "Beef Mince", category: "meat_seafood", price: "12.00", unit: "500g pack", description: "Premium lean beef mince", inStock: true },
+    { name: "Atlantic Salmon Fillet", category: "meat_seafood", price: "18.00", unit: "per 200g", description: "Fresh skin-on salmon fillet", inStock: true },
+    { name: "Spaghetti Pasta", category: "pantry", price: "2.20", unit: "500g pack", description: "Durum wheat spaghetti", inStock: true },
+    { name: "Pasta Sauce", category: "pantry", price: "3.40", unit: "500g jar", description: "Tomato and basil pasta sauce", inStock: true },
+    { name: "Long Grain Rice", category: "pantry", price: "5.00", unit: "1kg pack", description: "Long grain white rice", inStock: true },
+    { name: "Tinned Tuna", category: "pantry", price: "2.80", unit: "185g tin", description: "Tuna in spring water", inStock: true },
+    { name: "Frozen Mixed Vegetables", category: "frozen", price: "4.50", unit: "1kg bag", description: "Peas, carrots, corn, beans", inStock: true },
+    { name: "Frozen Berries", category: "frozen", price: "9.00", unit: "500g bag", description: "Mixed berry medley", inStock: true },
+    { name: "Vanilla Ice Cream", category: "frozen", price: "7.50", unit: "2L tub", description: "Classic vanilla ice cream", inStock: true },
+    { name: "Orange Juice", category: "beverages", price: "4.80", unit: "2L bottle", description: "100% pure orange juice", inStock: true },
+    { name: "Sparkling Water", category: "beverages", price: "2.50", unit: "1.25L bottle", description: "Sparkling mineral water", inStock: true },
+    { name: "Tea Bags (English Breakfast)", category: "beverages", price: "5.00", unit: "100 pack", description: "Black tea bags", inStock: true },
+    { name: "Toilet Paper", category: "household", price: "12.00", unit: "12 rolls", description: "3-ply soft toilet tissue", inStock: true },
+    { name: "Laundry Detergent", category: "household", price: "16.00", unit: "2L bottle", description: "Front and top loader detergent", inStock: true },
+    { name: "Dishwashing Liquid", category: "household", price: "4.50", unit: "1L bottle", description: "Lemon scented dish soap", inStock: true },
+    { name: "Hand Soap", category: "personal_care", price: "5.50", unit: "500ml pump", description: "Gentle moisturising hand wash", inStock: true },
+    { name: "Toothpaste", category: "personal_care", price: "5.00", unit: "110g tube", description: "Cavity protection toothpaste", inStock: true },
+    { name: "Shampoo", category: "personal_care", price: "9.00", unit: "400ml bottle", description: "Daily care shampoo", inStock: true },
+  ]);
+
+  console.log("Grocery products seeded");
 }
 
 async function seedPricingAndBudgets() {
