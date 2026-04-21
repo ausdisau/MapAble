@@ -52,6 +52,11 @@ MapAble 4.0 is a fullstack TypeScript superapp combining core NDIS services:
 - `QB_REDIRECT_URI` — QuickBooks OAuth callback URI (e.g. `https://<domain>/api/quickbooks/callback`)
 - `QB_ENVIRONMENT` — QuickBooks environment: `sandbox` (default) or `production`
 - `QB_WEBHOOK_VERIFIER_TOKEN` — QuickBooks webhook verifier token (optional; for webhook HMAC validation)
+- `GROCERY_SUPPLIER_PROVIDER` — grocery catalogue supplier adapter: `openfoodfacts` (default), `woolworths`, `coles`, `iga`, `csv`, or `composite`
+- `GROCERY_SUPPLIER_CHAIN` — comma-separated fallback order for composite grocery sync, default `woolworths,coles,openfoodfacts`
+- `WOOLWORTHS_API_KEY` — optional official Woolworths API portal key; public storefront fallback is used when absent
+- `GROCERY_SUPPLIER_CSV_PATH` — local path or URL for a fooddatascrape-style grocery CSV when provider is `csv`
+- `GROCERY_SUPPLIER_SEARCH_TERMS` — optional comma-separated terms used by public supermarket search adapters
 
 ## Project Structure
 ```
@@ -128,6 +133,7 @@ client/src/
 - Messaging system with contact sidebar
 - Settings with profile editing and accessibility toggles
 - Dark mode toggle
+- **Grocery supplier adapters**: backend catalogue sync supports Open Food Facts, Woolworths, Coles, IGA, configurable CSV import, and composite first-available fallback chains. Admin supplier routes expose sync/status at `/api/grocery/supplier/sync` and `/api/grocery/supplier/status`.
 - **WCAG 2.2 AA accessibility** with skip links, ARIA landmarks, live regions, and keyboard navigation
 - **accessiBe widget**: Floating accessibility overlay (bottom-left) on all pages; loads from `acsbapp.com` CDN async; branded with MapAble blue (#1B6EB5)
 
