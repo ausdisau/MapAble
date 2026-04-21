@@ -1,6 +1,6 @@
 # Co-Design Protocol — HITL AI for Disability Services
 
-**Status:** Required precursor gate. No participant-facing Human-in-the-Loop (HITL) AI feature in MapAble's Concepts **B** (Participant Preference Articulator), **C** (NDIS-aware Transport Orchestrator) or **E** (I-CAN Translator and HITL Appeal Layer) — see `research/hitl-ai-disability-services-au.md` — may move from spec into build until the steps in this document have been completed and recorded.
+**Status:** Required precursor gate. No participant-facing Human-in-the-Loop (HITL) AI feature in MapAble's Concepts **B** (Participant Preference Articulator), **C** (NDIS-aware Transport Orchestrator) or **E** (I-CAN Translator and HITL Appeal Layer) — see `research/hitl-ai-disability-services-au.md` — may move from spec into build until **stages S0 and S1 of §1.3 have been signed off by the relevant DRO partners and recorded in the engagement record (§1.4)**. Subsequent stages (S2–S6) gate further progression: build → S2 sign-off; coordinator pilot → S3 sign-off; participant pilot → S4 joint go; general release → S5 published statement.
 
 **Owner:** Head of Product (accountable) + Co-Design Lead (responsible).
 **Review cadence:** Every 6 months, or whenever any partner organisation issues new guidance, whichever is sooner.
@@ -218,7 +218,29 @@ All participant-facing surfaces continue to meet **WCAG 2.2 AA** as a baseline; 
 
 ---
 
-## 5. Sign-off and version history
+## 5. Enforceable build gate (PR checklist)
+
+Any pull request that adds, enables, or expands a participant-facing surface for Concepts B, C or E **must** paste the checklist below into the PR description and tick every applicable item. PRs without this checklist — or with unticked items — must not be merged.
+
+```markdown
+### Co-Design Gate (docs/co-design-protocol.md)
+Concept: [ ] B  [ ] C  [ ] E    Stage entered by this PR: [ S0 / S1 / S2 / S3 / S4 / S5 ]
+
+- [ ] S0 brief acknowledged by: PWDA / AFDO / FPDN / Inclusion Australia (tick all that apply; FPDN required if First Nations cohort; Inclusion Australia required for E)
+- [ ] S1 risks register signed off by the partners ticked above (link to engagement record row: #_____)
+- [ ] S2 prompt / output / refusal / escalation copy signed off (link: #_____) — required if this PR ships any participant-facing copy
+- [ ] S3 coordinator-pilot go received (link: #_____) — required before any participant flag is enabled
+- [ ] S4 joint participant-pilot go received (link: #_____) — required for participant rollout
+- [ ] S5 DRO published statement on file (link: #_____) — required for general release
+- [ ] Consent items C1–C6 (§2.2) wired into this surface or N/A (explain): _____
+- [ ] Accessible-formats (§4) honoured for the cohorts in scope; participant_format_preferences read before delivery
+- [ ] "Something went wrong" reporting channel (§3.2) is reachable from every new screen this PR adds
+- [ ] Audit record (§2.4) captures model, version, prompt hash, output, edits, consent state, accountable human
+```
+
+Until the engagement-record table (§1.4) and a feature-flag gate that reads from it exist (proposed as a follow-up task), this checklist is enforced by code review. Once the table exists, the feature-flag gate enforces it automatically and this checklist becomes the human cross-check.
+
+## 6. Sign-off and version history
 
 | Version | Date | Change | Approver |
 |---|---|---|---|
