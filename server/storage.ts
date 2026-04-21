@@ -108,6 +108,10 @@ export interface IStorage {
   getGroceryProducts(filters?: { category?: string; search?: string }): Promise<GroceryProduct[]>;
   getGroceryProduct(id: string): Promise<GroceryProduct | undefined>;
   createGroceryProduct(data: InsertGroceryProduct): Promise<GroceryProduct>;
+  upsertSupplierGroceryProduct(data: InsertGroceryProduct): Promise<GroceryProduct>;
+  deleteGroceryProductsBySource(source: string): Promise<number>;
+  getGroceryCatalogStatus(): Promise<{ total: number; bySource: Record<string, number>; lastSyncedAt: Date | null }>;
+  getGroceryOrdersForWorker(workerId: string): Promise<(GroceryOrder & { items: (GroceryOrderItem & { product?: GroceryProduct })[] })[]>;
   createGroceryOrder(
     order: InsertGroceryOrder,
     items: { productId: string; quantity: number; unitPrice: string }[]
@@ -735,6 +739,73 @@ export class DatabaseStorage implements IStorage {
   async createGroceryProduct(data: InsertGroceryProduct): Promise<GroceryProduct> {
     const [p] = await db.insert(groceryProducts).values(data).returning();
     return p;
+  }
+
+  async upsertSupplierGroceryProduct(data: InsertGroceryProduct): Promise<GroceryProduct> {
+    const [p] = await db
+      .insert(groceryProducts)
+      .values(data)
+      .onConflictDoUpdate({
+        target: [groceryProducts.supplierSource, groceryProducts.supplierProductId],
+        set: {
+          name: data.name,
+          brand: data.brand ?? null,
+          category: data.category,
+          price: data.price,
+          unit: data.unit,
+          description: data.description ?? null,
+          image: data.image ?? null,
+          inStock: data.inStock ?? true,
+          supplierUrl: data.supplierUrl ?? null,
+          priceSource: data.priceSource ?? "estimated",
+          lastSyncedAt: data.lastSyncedAt ?? new Date(),
+        },
+      })
+      .returning();
+    return p;
+  }
+
+  async deleteGroceryProductsBySource(source: string): Promise<number> {
+    const rows = await db.delete(groceryProducts).where(eq(groceryProducts.supplierSource, source)).returning({ id: groceryProducts.id });
+    return rows.length;
+  }
+
+  async getGroceryCatalogStatus(): Promise<{ total: number; bySource: Record<string, number>; lastSyncedAt: Date | null }> {
+    const rows = await db
+      .select({ source: groceryProducts.supplierSource, count: sql<number>`count(*)::int`, lastSyncedAt: sql<Date | null>`max(${groceryProducts.lastSyncedAt})` })
+      .from(groceryProducts)
+      .groupBy(groceryProducts.supplierSource);
+    const bySource: Record<string, number> = {};
+    let total = 0;
+    let lastSyncedAt: Date | null = null;
+    for (const r of rows) {
+      bySource[r.source] = Number(r.count);
+      total += Number(r.count);
+      if (r.lastSyncedAt && (!lastSyncedAt || r.lastSyncedAt > lastSyncedAt)) lastSyncedAt = r.lastSyncedAt;
+    }
+    return { total, bySource, lastSyncedAt };
+  }
+
+  async getGroceryOrdersForWorker(workerId: string): Promise<(GroceryOrder & { items: (GroceryOrderItem & { product?: GroceryProduct })[] })[]> {
+    const orders = await db
+      .select()
+      .from(groceryOrders)
+      .where(
+        and(
+          eq(groceryOrders.workerId, workerId),
+          inArray(groceryOrders.status, ["placed", "confirmed", "shopping", "out_for_delivery"]),
+        ),
+      )
+      .orderBy(desc(groceryOrders.createdAt));
+    const result: (GroceryOrder & { items: (GroceryOrderItem & { product?: GroceryProduct })[] })[] = [];
+    for (const o of orders) {
+      const items = await db.select().from(groceryOrderItems).where(eq(groceryOrderItems.orderId, o.id));
+      const itemsWithProducts = await Promise.all(
+        items.map(async (it) => ({ ...it, product: await this.getGroceryProduct(it.productId) })),
+      );
+      result.push({ ...o, items: itemsWithProducts });
+    }
+    return result;
   }
 
   async createGroceryOrder(

@@ -48,6 +48,7 @@ import GroceriesPage from "@/pages/groceries";
 import GroceryCheckoutPage from "@/pages/grocery-checkout";
 import GroceryOrdersPage from "@/pages/grocery-orders";
 import GroceryOrderDetailPage from "@/pages/grocery-order-detail";
+import GroceryPickListPage from "@/pages/grocery-pick-list";
 import PlanReviewPrepPage from "@/pages/plan-review-prep";
 
 function ThemeToggle() {
@@ -240,6 +241,7 @@ function Router() {
       <Route path="/groceries/checkout" component={GroceryCheckoutPage} />
       <Route path="/groceries/orders" component={GroceryOrdersPage} />
       <Route path="/groceries/orders/:id" component={GroceryOrderDetailPage} />
+      <Route path="/groceries/pick-list" component={GroceryPickListPage} />
       <Route path="/plan-review-prep" component={PlanReviewPrepPage} />
       <Route path="/plan-review-prep/:id" component={PlanReviewPrepPage} />
       <Route path="/jobs" component={JobsPage} />

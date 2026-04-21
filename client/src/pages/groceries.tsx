@@ -13,7 +13,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, ShoppingCart, Plus, Minus, ClipboardList } from "lucide-react";
+import { Search, ShoppingCart, Plus, Minus, ClipboardList, Info } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { usePageTitle } from "@/hooks/use-page-title";
 import { useGroceryCart } from "@/lib/grocery-cart";
 import { useToast } from "@/hooks/use-toast";
@@ -42,6 +43,17 @@ export default function GroceriesPage() {
   const params = new URLSearchParams();
   if (category !== "all") params.set("category", category);
   if (search.trim()) params.set("search", search.trim());
+
+  const { data: supplierStatus } = useQuery<{
+    enabled: boolean;
+    provider: string;
+    productCount: number;
+    bySource: Record<string, number>;
+    lastSyncedAt: string | null;
+    priceDisclosure: string;
+  }>({
+    queryKey: ["/api/grocery/supplier/status"],
+  });
 
   const { data: products, isLoading } = useQuery<GroceryProduct[]>({
     queryKey: ["/api/grocery/products", category, search],
@@ -83,6 +95,17 @@ export default function GroceriesPage() {
           </Link>
         </div>
       </header>
+
+      {supplierStatus && (supplierStatus.bySource.openfoodfacts ?? 0) > 0 && (
+        <Alert className="border-[#1B6EB5]/30 bg-[#1B6EB5]/5" data-testid="alert-supplier-disclosure">
+          <Info className="w-4 h-4 text-[#1B6EB5]" />
+          <AlertDescription className="text-xs">
+            Catalogue powered by <span className="font-semibold">Open Food Facts</span> ({supplierStatus.bySource.openfoodfacts} live AU products).
+            Prices shown are <span className="font-semibold">estimated AUD bands by category</span> — not real retail pricing. A paid supplier feed
+            (e.g. Coles/Woolworths/wholesaler) is required for live retail prices.
+          </AlertDescription>
+        </Alert>
+      )}
 
       <Card className="p-4 grid grid-cols-1 md:grid-cols-3 gap-3">
         <div className="md:col-span-2 relative">
@@ -143,6 +166,11 @@ export default function GroceriesPage() {
                     <h3 className="font-bold text-sm leading-tight" data-testid={`text-product-name-${p.id}`}>
                       {p.name}
                     </h3>
+                    {p.brand && (
+                      <p className="text-[11px] uppercase tracking-wide text-[#1B6EB5] font-semibold" data-testid={`text-brand-${p.id}`}>
+                        {p.brand}
+                      </p>
+                    )}
                     <p className="text-xs text-muted-foreground">{p.unit}</p>
                   </div>
                   <Badge variant="outline" className="shrink-0 text-[10px]" data-testid={`badge-category-${p.id}`}>
