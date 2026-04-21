@@ -1006,6 +1006,34 @@ export async function registerRoutes(
     res.json(user);
   });
 
+  app.get("/api/widget-config", (_req, res) => {
+    res.json({
+      enabled: true,
+      tabs: ["chat", "actions", "history"],
+      defaultTab: "chat",
+      featureFlags: {
+        voiceEnabled: true,
+        nlpEnabled: true,
+        matchingEnabled: false,
+        contractsEnabled: false,
+        attestationsEnabled: false,
+      },
+      endpoints: {
+        nlp: "/api/widget/nlp",
+        voice: "/api/widget/voice",
+        matching: "/api/widget/matching",
+        contracts: "/api/widget/contracts",
+        attestations: "/api/widget/attestations",
+        chat: "/api/chat/send",
+        sessions: "/api/chat/sessions",
+        widgetConfig: "/api/widget-config",
+      },
+      launcherLabel: "Open MapAble assistant",
+      panelTitle: "MapAble Assistant",
+      panelSubtitle: "Chat, actions, and history",
+    });
+  });
+
   app.get("/api/pricing/care", async (_req, res) => {
     const tiers = await storage.getPricingTiers("care");
     res.json(tiers);
