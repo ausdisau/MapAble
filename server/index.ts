@@ -130,6 +130,21 @@ app.use((req, res, next) => {
     })();
   }
 
+  // Auto-debit scheduler — runs every AUTO_DEBIT_INTERVAL_MIN minutes (default 15).
+  // Disable by setting AUTO_DEBIT_DISABLED=1.
+  if (process.env.AUTO_DEBIT_DISABLED !== "1") {
+    const intervalMin = Math.max(1, Number(process.env.AUTO_DEBIT_INTERVAL_MIN || "15"));
+    const tick = async () => {
+      try {
+        const { runAutoDebitTick } = await import("./auto-debit");
+        await runAutoDebitTick();
+      } catch (e) {
+        console.error("[auto-debit] tick failed:", e);
+      }
+    };
+    setTimeout(() => { void tick(); setInterval(() => { void tick(); }, intervalMin * 60_000); }, 30_000);
+  }
+
   app.use((err: any, _req: Request, res: Response, next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
