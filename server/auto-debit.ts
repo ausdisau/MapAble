@@ -117,7 +117,10 @@ export async function runAutoDebitTick(): Promise<{ attempted: number; succeeded
       });
       result.succeeded++;
       console.log(`[auto-debit] invoice=${inv.id} pi=${pi.id} status=${pi.status}`);
-      if (pi.status === "succeeded" || pi.status === "processing") {
+      // Only fire the success notification when Stripe confirms terminal success.
+      // BECS often returns `processing` initially; that finalises via the
+      // `payment_intent.succeeded` webhook, where the success notification is sent.
+      if (pi.status === "succeeded") {
         void notifyAutoDebit(user.email, user.phoneNumber, user.fullName, inv.id, "success", amountCents);
       }
     } catch (e) {

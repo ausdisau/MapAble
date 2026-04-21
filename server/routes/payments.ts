@@ -132,6 +132,25 @@ export function registerPaymentRoutes(app: Express) {
             status: "paid",
           });
           const inv = await storage.getInvoiceById(invoiceId);
+          if (inv) {
+            const payer = await storage.getUser(inv.participantId);
+            if (payer?.email) {
+              const dollars = (Number(inv.totalAmount) || 0).toFixed(2);
+              try {
+                const { sendEmailViaAgentMail, sendSmsViaTwilio } = await import("../notifications");
+                await sendEmailViaAgentMail(
+                  payer.email,
+                  `Payment received — invoice ${inv.id}`,
+                  `Hi ${payer.fullName || "there"},\n\nWe've received your payment of $${dollars} for invoice ${inv.id}. Thank you!\n\n— MapAble`,
+                );
+                if (payer.phoneNumber) {
+                  await sendSmsViaTwilio(payer.phoneNumber, `MapAble: payment of $${dollars} for invoice ${inv.id} received.`);
+                }
+              } catch (e) {
+                console.error("[webhook] payment success notify failed:", e instanceof Error ? e.message : e);
+              }
+            }
+          }
           if (inv?.qbInvoiceId && qbEnabled()) {
             pushInvoiceToQb(inv.participantId, invoiceId).catch((e) =>
               console.error("QB re-sync after Stripe payment failed:", e)

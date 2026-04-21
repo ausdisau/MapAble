@@ -319,32 +319,44 @@ export async function submitNdisClaim(claim: NdisClaimSubmission): Promise<NdisC
   };
 
   let response: NdisClaimResponse;
-  let responsePayload: unknown = null;
-  let status: "submitted" | "accepted" | "rejected" = "submitted";
-  let rejectionReason: string | null = null;
-
   try {
     response = await ndisPost<NdisClaimResponse>(`/providers/claims`, requestPayload);
-    responsePayload = response;
-    status = response.status;
-    rejectionReason = response.rejectionReason ?? null;
   } catch (err) {
     if (err instanceof ProdaNotConfiguredError) throw err;
     if (err instanceof ProdaApiError) {
-      response = {
-        claimId: `LOCAL-${Date.now()}`,
-        status: "rejected",
-        message: err.message,
-        submittedAt: new Date().toISOString(),
-        rejectionReason: err.body || err.message,
-      };
-      responsePayload = { error: err.message, body: err.body };
-      status = "rejected";
-      rejectionReason = err.body || err.message;
-    } else {
-      throw err;
+      // Record the failed attempt for audit, then rethrow so the caller surfaces a real error.
+      try {
+        await db.insert(ndisClaims).values({
+          invoiceId: claim.invoiceId,
+          serviceSessionId: claim.serviceSessionId,
+          participantId: claim.participantId,
+          providerId: claim.providerId,
+          prodaClaimId: null,
+          claimReference: claim.claimReference,
+          itemCode: claim.itemCode,
+          quantity: claim.quantity.toFixed(2),
+          unitPrice: claim.unitPrice.toFixed(2),
+          totalAmount: total.toFixed(2),
+          serviceDate: claim.serviceDate,
+          status: "rejected",
+          statusMessage: err.message,
+          rejectionReason: err.body || err.message,
+          requestPayload,
+          responsePayload: { error: err.message, body: err.body, status: err.status },
+        });
+      } catch (insertErr) {
+        console.error("[ndis-claim] failed to record rejected attempt:", insertErr);
+      }
+      console.warn(
+        `[ndis-claim] PRODA error: status=${err.status} ref=${claim.claimReference} ` +
+        `participant=${claim.participantId} provider=${claim.providerId}`,
+      );
     }
+    throw err;
   }
+
+  const status = response.status;
+  const rejectionReason = response.rejectionReason ?? null;
 
   const [record] = await db
     .insert(ndisClaims)
@@ -364,7 +376,7 @@ export async function submitNdisClaim(claim: NdisClaimSubmission): Promise<NdisC
       statusMessage: response.message,
       rejectionReason,
       requestPayload,
-      responsePayload,
+      responsePayload: response,
     })
     .returning();
 
