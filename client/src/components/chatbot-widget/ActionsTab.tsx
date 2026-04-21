@@ -28,6 +28,7 @@ const ACTIONS: ActionDef[] = [
     title: "Create a job post",
     description: "Post a disability support role for workers to apply.",
     icon: Briefcase,
+    requiresFlag: "matchingEnabled",
   },
   {
     key: "ask_ndis_funding",

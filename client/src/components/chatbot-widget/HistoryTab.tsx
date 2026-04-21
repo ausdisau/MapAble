@@ -86,6 +86,7 @@ export function HistoryTab({
                 >
                   <div className="text-sm truncate">{d.title}</div>
                   <div className="text-[11px] text-muted-foreground line-clamp-1">{d.body}</div>
+                  <div className="text-[11px] text-muted-foreground">{formatTime(d.updatedAt)}</div>
                 </button>
               </li>
             ))}
