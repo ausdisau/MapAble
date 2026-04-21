@@ -147,6 +147,8 @@ export interface IStorage {
   recordWebhookEvent(eventId: string, eventType: string): Promise<void>;
   claimWebhookEvent(eventId: string, eventType: string): Promise<boolean>;
   getInvoicesAwaitingAutoDebit(): Promise<(Invoice & { user?: User })[]>;
+  recordPayoutEvent(data: { stripeId: string; kind: string; status: string; userId?: string | null; amountCents?: number | null; currency?: string | null; failureMessage?: string | null; payload?: Record<string, unknown> | null }): Promise<unknown>;
+  listPayoutEvents(userId: string, limit?: number): Promise<unknown[]>;
 }
 
 
@@ -509,6 +511,8 @@ export class DatabaseStorage implements IStorage {
   recordWebhookEvent(...a: Parameters<IStorage["recordWebhookEvent"]>) { return (paymentsStorage.recordWebhookEvent as any).apply(this, a); }
   claimWebhookEvent(...a: Parameters<IStorage["claimWebhookEvent"]>) { return (paymentsStorage.claimWebhookEvent as any).apply(this, a); }
   getInvoicesAwaitingAutoDebit(...a: Parameters<IStorage["getInvoicesAwaitingAutoDebit"]>) { return (paymentsStorage.getInvoicesAwaitingAutoDebit as any).apply(this, a); }
+  recordPayoutEvent(...a: Parameters<IStorage["recordPayoutEvent"]>) { return (paymentsStorage.recordPayoutEvent as any).apply(this, a); }
+  listPayoutEvents(...a: Parameters<IStorage["listPayoutEvents"]>) { return (paymentsStorage.listPayoutEvents as any).apply(this, a); }
 }
 
 export const storage = new DatabaseStorage();

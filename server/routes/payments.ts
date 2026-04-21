@@ -249,11 +249,54 @@ export function registerPaymentRoutes(app: Express) {
         }
         break;
       }
-      case "transfer.created":
+      case "transfer.created": {
+        const t = event.data.object as import("stripe").Stripe.Transfer;
+        const destAcct = typeof t.destination === "string" ? t.destination : t.destination?.id;
+        const recipient = destAcct ? await storage.getUserByStripeAccountId(destAcct) : null;
+        await storage.recordPayoutEvent({
+          stripeId: t.id,
+          kind: "transfer",
+          status: "created",
+          userId: recipient?.id ?? null,
+          amountCents: typeof t.amount === "number" ? t.amount : null,
+          currency: t.currency ?? null,
+          failureMessage: null,
+          payload: t as unknown as Record<string, unknown>,
+        });
+        console.log(`[connect] transfer.created ${t.id} -> ${destAcct ?? "?"} amount=${t.amount}`);
+        break;
+      }
       case "payout.paid":
       case "payout.failed": {
-        const obj = event.data.object as { id: string };
-        console.log(`Stripe Connect event ${event.type}:`, obj.id);
+        const p = event.data.object as import("stripe").Stripe.Payout;
+        const acctId = (event.account as string | undefined) ?? null;
+        const recipient = acctId ? await storage.getUserByStripeAccountId(acctId) : null;
+        const failureMessage = event.type === "payout.failed"
+          ? (p.failure_message || p.failure_code || "Payout failed")
+          : null;
+        await storage.recordPayoutEvent({
+          stripeId: p.id,
+          kind: "payout",
+          status: event.type === "payout.paid" ? "paid" : "failed",
+          userId: recipient?.id ?? null,
+          amountCents: typeof p.amount === "number" ? p.amount : null,
+          currency: p.currency ?? null,
+          failureMessage,
+          payload: p as unknown as Record<string, unknown>,
+        });
+        if (event.type === "payout.failed" && recipient?.email) {
+          try {
+            const { sendEmailViaAgentMail } = await import("../notifications");
+            await sendEmailViaAgentMail(
+              recipient.email,
+              `Payout failed — action may be required`,
+              `Hi ${recipient.fullName || "there"},\n\nA payout of ${(p.amount / 100).toFixed(2)} ${String(p.currency).toUpperCase()} failed: ${failureMessage}.\nPlease review your payout settings in MapAble.\n\n— MapAble`,
+            );
+          } catch (e) {
+            console.error("[connect] payout.failed notify error:", e instanceof Error ? e.message : e);
+          }
+        }
+        console.log(`[connect] ${event.type} ${p.id} acct=${acctId ?? "?"} amount=${p.amount}${failureMessage ? ` reason=${failureMessage}` : ""}`);
         break;
       }
     }
