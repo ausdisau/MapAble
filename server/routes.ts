@@ -19,6 +19,7 @@ import {
   planReviewBriefFeedbackSchema,
 } from "@shared/schema";
 import { generatePrepBrief, prepBriefEnabled, userMayUsePrepBrief } from "./plan-review-brief";
+import { buildAdapter, getSupplierLimit, getSupplierProvider, isSupplierEnabled, toInsertProduct } from "./grocery-supplier";
 import { z } from "zod";
 import { syncParticipantPlan, getCachedPlan, fetchPriceGuide, validateRateAgainstPriceGuide, submitNdisClaim, lookupParticipant, lookupProvider, lookupWorkerScreening } from "./ndis-api";
 
@@ -2295,6 +2296,81 @@ export async function registerRoutes(
     });
 
     res.json({ clientSecret: paymentIntent.client_secret, paymentIntentId: paymentIntent.id });
+  });
+
+  app.get("/api/grocery/supplier/status", async (_req, res) => {
+    try {
+      const status = await storage.getGroceryCatalogStatus();
+      res.json({
+        enabled: isSupplierEnabled(),
+        provider: getSupplierProvider(),
+        productCount: status.total,
+        bySource: status.bySource,
+        lastSyncedAt: status.lastSyncedAt,
+        priceDisclosure:
+          "Prices for supplier-sourced products are estimated AUD bands by category. Real retail pricing requires a paid supplier feed (e.g., Coles/Woolworths/wholesaler).",
+      });
+    } catch (e) {
+      console.error("[grocery-supplier] status failed:", e);
+      res.status(500).json({ message: "Failed to load supplier status" });
+    }
+  });
+
+  app.post("/api/grocery/supplier/sync", requireAuth, async (req, res) => {
+    const userId = req.session.userId!;
+    const user = await storage.getUser(userId);
+    if (!user || user.role !== "admin") {
+      return res.status(403).json({ message: "Admin role required to sync supplier catalogue" });
+    }
+    if (!isSupplierEnabled()) {
+      return res.status(503).json({ message: "Grocery supplier integration is disabled" });
+    }
+
+    const bodySchema = z.object({
+      replaceSeed: z.boolean().optional(),
+      limit: z.number().int().min(1).max(100).optional(),
+    });
+    const parsed = bodySchema.safeParse(req.body ?? {});
+    if (!parsed.success) {
+      return res.status(400).json({ message: "Validation error", errors: parsed.error.errors });
+    }
+    const replaceSeed = parsed.data.replaceSeed ?? (process.env.GROCERY_SUPPLIER_REPLACE_SEED !== "0");
+    const limit = parsed.data.limit ?? getSupplierLimit();
+
+    try {
+      const adapter = buildAdapter();
+      const supplierProducts = await adapter.fetchProducts({ limit });
+      let upserted = 0;
+      for (const sp of supplierProducts) {
+        await storage.upsertSupplierGroceryProduct(toInsertProduct(sp, adapter.name));
+        upserted++;
+      }
+      let removedSeed = 0;
+      if (replaceSeed && upserted > 0) {
+        removedSeed = await storage.deleteGroceryProductsBySource("seed");
+      }
+      const status = await storage.getGroceryCatalogStatus();
+      res.json({ provider: adapter.name, fetched: supplierProducts.length, upserted, removedSeed, status });
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "Supplier sync failed";
+      console.error("[grocery-supplier] sync failed:", message);
+      res.status(502).json({ message });
+    }
+  });
+
+  app.get("/api/grocery/worker/pick-list", requireAuth, async (req, res) => {
+    const userId = req.session.userId!;
+    const user = await storage.getUser(userId);
+    if (!user || (user.role !== "carer" && user.role !== "admin")) {
+      return res.status(403).json({ message: "Worker role required" });
+    }
+    try {
+      const orders = await storage.getGroceryOrdersForWorker(userId);
+      res.json(orders);
+    } catch (e) {
+      console.error("[grocery-supplier] pick-list failed:", e);
+      res.status(500).json({ message: "Failed to load pick list" });
+    }
   });
 
   async function requirePrepBriefRole(req: Request, res: Response): Promise<{ userId: string; role: string } | null> {

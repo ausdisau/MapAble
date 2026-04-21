@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, integer, boolean, timestamp, decimal, pgEnum, jsonb, json, serial, uuid } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, integer, boolean, timestamp, decimal, pgEnum, jsonb, json, serial, uuid, unique } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -595,16 +595,28 @@ export const groceryCategoryEnum = pgEnum("grocery_category", [
   "personal_care",
 ]);
 
-export const groceryProducts = pgTable("grocery_products", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  name: text("name").notNull(),
-  category: groceryCategoryEnum("category").notNull(),
-  price: decimal("price", { precision: 10, scale: 2 }).notNull(),
-  unit: text("unit").notNull(),
-  description: text("description"),
-  image: text("image"),
-  inStock: boolean("in_stock").default(true),
-});
+export const groceryProducts = pgTable(
+  "grocery_products",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    name: text("name").notNull(),
+    brand: text("brand"),
+    category: groceryCategoryEnum("category").notNull(),
+    price: decimal("price", { precision: 10, scale: 2 }).notNull(),
+    unit: text("unit").notNull(),
+    description: text("description"),
+    image: text("image"),
+    inStock: boolean("in_stock").default(true),
+    supplierSource: text("supplier_source").notNull().default("seed"),
+    supplierProductId: text("supplier_product_id"),
+    supplierUrl: text("supplier_url"),
+    priceSource: text("price_source").notNull().default("manual"),
+    lastSyncedAt: timestamp("last_synced_at"),
+  },
+  (t) => ({
+    supplierUnique: unique("grocery_products_supplier_unique").on(t.supplierSource, t.supplierProductId),
+  }),
+);
 
 export const groceryOrders = pgTable("grocery_orders", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
