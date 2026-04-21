@@ -128,6 +128,10 @@ export const paymentsStorage = {
     return inserted.length > 0;
   },
 
+  async releaseWebhookEvent(eventId: string): Promise<void> {
+    await db.delete(stripeWebhookEvents).where(eq(stripeWebhookEvents.eventId, eventId));
+  },
+
   async getInvoicesAwaitingAutoDebit(): Promise<(Invoice & { user?: User })[]> {
     const rows = await db.select().from(invoices).where(eq(invoices.status, "draft"));
     const out: (Invoice & { user?: User })[] = [];
