@@ -81,6 +81,8 @@ export interface IStorage {
   createWorkerBlockout(data: InsertWorkerBlockout): Promise<WorkerBlockout>;
   deleteWorkerBlockout(id: string): Promise<void>;
   getWorkerByUserId(userId: string): Promise<(import("@shared/schema").Worker) | undefined>;
+  updateWorkerAbnVerified(workerId: string, abnVerified: boolean): Promise<Worker | undefined>;
+  getWorkersByIds(ids: string[]): Promise<Worker[]>;
   getShifts(filters: { participantId?: string; workerId?: string; dateFrom?: string; dateTo?: string }): Promise<Shift[]>;
   getShift(id: string): Promise<Shift | undefined>;
   createShift(data: InsertShift): Promise<Shift>;
@@ -304,12 +306,23 @@ export class DatabaseStorage implements IStorage {
         lte(transportTrips.date, periodEnd)
       ));
 
+    const workerIds = Array.from(new Set([
+      ...sessions.map(s => s.workerId),
+      ...trips.map(t => t.workerId),
+    ]));
+    const workerList = await this.getWorkersByIds(workerIds);
+    const workerMap = new Map(workerList.map(w => [w.id, w]));
+
     const lineItems: any[] = [];
     let totalAmount = 0;
+    let hasUnverifiedAbn = false;
 
     for (const s of sessions) {
       const charge = Number(s.totalCharge || 0);
       totalAmount += charge;
+      const worker = workerMap.get(s.workerId);
+      const abnVerified = worker?.abnVerified ?? false;
+      if (!abnVerified) hasUnverifiedAbn = true;
       lineItems.push({
         type: "care",
         ndisItemCode: s.ndisItemCode || "01_011_0107_1_1",
@@ -318,12 +331,18 @@ export class DatabaseStorage implements IStorage {
         unitRate: Number(s.hourlyRate || 0),
         subtotal: charge,
         date: s.date,
+        workerId: s.workerId,
+        workerAbn: worker?.abn || null,
+        abnVerified,
       });
     }
 
     for (const t of trips) {
       const charge = Number(t.totalCharge || 0);
       totalAmount += charge;
+      const worker = workerMap.get(t.workerId);
+      const abnVerified = worker?.abnVerified ?? false;
+      if (!abnVerified) hasUnverifiedAbn = true;
       lineItems.push({
         type: "transport",
         ndisItemCode: t.ndisItemCode || "02_051_0108_1_1",
@@ -332,6 +351,9 @@ export class DatabaseStorage implements IStorage {
         unitRate: Number(t.perKmRate || 0),
         subtotal: charge,
         date: t.date,
+        workerId: t.workerId,
+        workerAbn: worker?.abn || null,
+        abnVerified,
       });
     }
 
@@ -519,6 +541,16 @@ export class DatabaseStorage implements IStorage {
   async getWorkerByUserId(userId: string): Promise<(import("@shared/schema").Worker) | undefined> {
     const [worker] = await db.select().from(workers).where(eq(workers.userId, userId));
     return worker;
+  }
+
+  async updateWorkerAbnVerified(workerId: string, abnVerified: boolean): Promise<Worker | undefined> {
+    const [worker] = await db.update(workers).set({ abnVerified }).where(eq(workers.id, workerId)).returning();
+    return worker;
+  }
+
+  async getWorkersByIds(ids: string[]): Promise<Worker[]> {
+    if (ids.length === 0) return [];
+    return db.select().from(workers).where(inArray(workers.id, ids));
   }
 
   async getShifts(filters: { participantId?: string; workerId?: string; dateFrom?: string; dateTo?: string }): Promise<Shift[]> {

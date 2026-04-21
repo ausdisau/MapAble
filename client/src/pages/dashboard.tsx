@@ -19,11 +19,118 @@ import {
   Accessibility,
   CheckCircle2,
   AlertCircle,
+  AlertTriangle,
+  Loader2,
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useState } from "react";
 import { usePageTitle } from "@/hooks/use-page-title";
+import { useToast } from "@/hooks/use-toast";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { Worker, User, Job } from "@shared/schema";
+
+interface AbnStatus {
+  hasWorkerProfile: boolean;
+  abn: string | null;
+  abnVerified: boolean;
+}
+
+function AbnVerificationPrompt({ user }: { user: User }) {
+  const { toast } = useToast();
+  const isWorkerOrProvider = user.role === "carer" || user.role === "provider";
+
+  const { data: abnStatus } = useQuery<AbnStatus>({
+    queryKey: ["/api/workers/me/abn-status"],
+    enabled: isWorkerOrProvider && user.role === "carer",
+  });
+
+  const providerAbn = (user as any).providerAbn as string | null | undefined;
+  const isProviderUnverified = user.role === "provider" && !!providerAbn && !user.isVerified;
+
+  const verifyMutation = useMutation({
+    mutationFn: async () => {
+      const res = await apiRequest("POST", "/api/workers/verify-abn", {});
+      return res.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "ABN verified",
+        description: data.businessName ? `Verified against ${data.businessName}` : "Your ABN has been verified.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/workers/me/abn-status"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/me"] });
+    },
+    onError: async (error: any) => {
+      toast({
+        title: "Verification failed",
+        description: error?.message || "Could not verify ABN. Please check it and try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  if (!isWorkerOrProvider) return null;
+
+  const showWorkerPrompt = user.role === "carer" && abnStatus?.hasWorkerProfile && !abnStatus.abnVerified;
+  const showProviderPrompt = isProviderUnverified;
+
+  if (!showWorkerPrompt && !showProviderPrompt) return null;
+
+  const noAbn = user.role === "carer" && abnStatus?.hasWorkerProfile && !abnStatus.abn;
+
+  return (
+    <Card
+      className="p-5 border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-950/30"
+      data-testid="card-abn-verification-prompt"
+    >
+      <div className="flex items-start gap-3">
+        <div className="w-10 h-10 rounded-md bg-amber-200/60 dark:bg-amber-900/60 flex items-center justify-center flex-shrink-0">
+          <AlertTriangle className="w-5 h-5 text-amber-700 dark:text-amber-300" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <h3 className="font-bold text-sm text-amber-900 dark:text-amber-100" data-testid="text-abn-prompt-title">
+            ABN verification required
+          </h3>
+          <p className="text-xs text-amber-800 dark:text-amber-200 mt-1">
+            {noAbn
+              ? "Your worker profile does not have an ABN on file. Add an ABN to your profile, then verify it through the Australian Business Register so your completed work can appear on invoices."
+              : "Your ABN has not been verified through the Australian Business Register. Until verified, your completed shifts/sessions will be flagged on invoices and payments to participants will be blocked."}
+          </p>
+          {(abnStatus?.abn || providerAbn) && (
+            <p className="text-xs text-amber-700 dark:text-amber-300 mt-2 font-mono" data-testid="text-abn-prompt-abn">
+              ABN on file: {abnStatus?.abn || providerAbn}
+            </p>
+          )}
+          <div className="mt-3 flex flex-wrap gap-2">
+            {user.role === "carer" && abnStatus?.abn && (
+              <Button
+                size="sm"
+                onClick={() => verifyMutation.mutate()}
+                disabled={verifyMutation.isPending}
+                className="gap-1.5"
+                data-testid="button-verify-abn"
+              >
+                {verifyMutation.isPending ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                )}
+                {verifyMutation.isPending ? "Verifying..." : "Verify ABN now"}
+              </Button>
+            )}
+            <Link href="/profile">
+              <Button size="sm" variant="outline" className="gap-1.5" data-testid="button-manage-abn">
+                {noAbn ? "Add ABN" : "Manage profile"}
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    </Card>
+  );
+}
 
 function HeroSection() {
   const [heroQuery, setHeroQuery] = useState("");
@@ -293,9 +400,11 @@ export default function Dashboard() {
   usePageTitle("Dashboard");
   const { data: workers } = useQuery<Worker[]>({ queryKey: ["/api/workers"] });
   const { data: jobs } = useQuery<Job[]>({ queryKey: ["/api/jobs"] });
+  const { data: me } = useQuery<User>({ queryKey: ["/api/me"] });
 
   return (
     <div className="space-y-6 p-4 md:p-6 max-w-7xl mx-auto">
+      {me && <AbnVerificationPrompt user={me} />}
       <HeroSection />
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

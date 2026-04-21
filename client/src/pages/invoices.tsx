@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { FileText, ChevronDown, ChevronUp, Calendar, DollarSign, ShieldCheck, AlertCircle, CreditCard, Clock, Car, Zap, Loader2, X, RefreshCw, CheckCircle2, XCircle, CloudOff, Cloud } from "lucide-react";
+import { FileText, ChevronDown, ChevronUp, Calendar, DollarSign, ShieldCheck, AlertCircle, CreditCard, Clock, Car, Zap, Loader2, X, RefreshCw, CheckCircle2, XCircle, CloudOff, Cloud, AlertTriangle } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 import { usePageTitle } from "@/hooks/use-page-title";
 import type { Invoice, User } from "@shared/schema";
@@ -39,6 +39,9 @@ interface LineItem {
   unitRate: number;
   subtotal: number;
   date: string;
+  workerId?: string;
+  workerAbn?: string | null;
+  abnVerified?: boolean;
 }
 
 function StripePaymentModal({
@@ -80,7 +83,13 @@ function StripePaymentModal({
         setStripeInstance(stripe);
 
         const res = await apiRequest("POST", "/api/payments/create-intent", { invoiceId: invoice.id });
-        const { clientSecret: cs } = await res.json();
+        const data = await res.json();
+        if (data.requiresAbnVerification) {
+          setError(data.message);
+          setLoading(false);
+          return;
+        }
+        const cs = data.clientSecret;
         if (cancelled) return;
         setClientSecret(cs);
 
@@ -266,7 +275,9 @@ function InvoiceRow({ invoice, onPaySuccess, qbConnected }: { invoice: InvoiceWi
   const [expanded, setExpanded] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
   const items = (invoice.lineItems as LineItem[]) || [];
-  const canPay = ["draft", "submitted", "failed", "pending"].includes(invoice.status);
+  const hasUnverifiedAbn = items.some(item => item.abnVerified === false);
+  const unverifiedCount = items.filter(item => item.abnVerified === false).length;
+  const canPay = ["draft", "submitted", "failed", "pending"].includes(invoice.status) && !hasUnverifiedAbn;
 
   return (
     <>
@@ -306,6 +317,12 @@ function InvoiceRow({ invoice, onPaySuccess, qbConnected }: { invoice: InvoiceWi
             <Badge className={statusColors[invoice.status] || ""} data-testid={`badge-invoice-status-${invoice.id}`}>
               {invoice.status}
             </Badge>
+            {hasUnverifiedAbn && (
+              <Badge className="bg-amber-100 dark:bg-amber-950/50 text-amber-800 dark:text-amber-300 gap-1" data-testid={`badge-abn-warning-${invoice.id}`}>
+                <AlertTriangle className="w-3 h-3" />
+                ABN Unverified
+              </Badge>
+            )}
             {canPay && (
               <Button
                 size="sm"
@@ -317,9 +334,32 @@ function InvoiceRow({ invoice, onPaySuccess, qbConnected }: { invoice: InvoiceWi
                 Pay Now
               </Button>
             )}
+            {!canPay && hasUnverifiedAbn && ["draft", "submitted", "failed", "pending"].includes(invoice.status) && (
+              <Button
+                size="sm"
+                variant="outline"
+                disabled
+                className="gap-1.5 opacity-60"
+                data-testid={`button-pay-blocked-${invoice.id}`}
+              >
+                <CreditCard className="w-3.5 h-3.5" />
+                Payment Blocked
+              </Button>
+            )}
             {expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
           </div>
         </button>
+
+        {expanded && hasUnverifiedAbn && (
+          <div className="border-t bg-amber-50 dark:bg-amber-950/30 px-5 py-3 flex items-start gap-2.5" data-testid={`banner-abn-warning-${invoice.id}`}>
+            <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+            <div className="text-xs text-amber-800 dark:text-amber-200">
+              <span className="font-bold">ABN verification required.</span>{" "}
+              {unverifiedCount} of {items.length} line item{items.length !== 1 ? "s" : ""} {unverifiedCount === 1 ? "has" : "have"} a worker/provider with an unverified ABN.
+              Payment is blocked until each worker/provider completes ABR ABN verification.
+            </div>
+          </div>
+        )}
 
         {expanded && items.length > 0 && (
           <div className="border-t">
@@ -329,6 +369,7 @@ function InvoiceRow({ invoice, onPaySuccess, qbConnected }: { invoice: InvoiceWi
                   <th className="text-left py-2 px-5 text-xs font-bold">Date</th>
                   <th className="text-left py-2 px-5 text-xs font-bold">NDIS Code</th>
                   <th className="text-left py-2 px-5 text-xs font-bold">Description</th>
+                  <th className="text-left py-2 px-5 text-xs font-bold">ABN Status</th>
                   <th className="text-right py-2 px-5 text-xs font-bold">Qty</th>
                   <th className="text-right py-2 px-5 text-xs font-bold">Rate</th>
                   <th className="text-right py-2 px-5 text-xs font-bold">Subtotal</th>
@@ -340,6 +381,22 @@ function InvoiceRow({ invoice, onPaySuccess, qbConnected }: { invoice: InvoiceWi
                     <td className="py-2 px-5 text-muted-foreground">{item.date}</td>
                     <td className="py-2 px-5 font-mono text-xs">{item.ndisItemCode}</td>
                     <td className="py-2 px-5">{item.description}</td>
+                    <td className="py-2 px-5">
+                      {item.abnVerified ? (
+                        <Badge className="bg-green-100 dark:bg-green-950/50 text-green-800 dark:text-green-300 gap-1 text-[10px]" data-testid={`badge-abn-verified-${i}`}>
+                          <ShieldCheck className="w-3 h-3" />
+                          Verified
+                        </Badge>
+                      ) : (
+                        <Badge className="bg-amber-100 dark:bg-amber-950/50 text-amber-800 dark:text-amber-300 gap-1 text-[10px]" data-testid={`badge-abn-unverified-${i}`}>
+                          <AlertTriangle className="w-3 h-3" />
+                          Unverified
+                        </Badge>
+                      )}
+                      {item.workerAbn && (
+                        <div className="text-[10px] text-muted-foreground font-mono mt-1">{item.workerAbn}</div>
+                      )}
+                    </td>
                     <td className="py-2 px-5 text-right">{item.quantity.toFixed(item.type === "transport" ? 1 : 2)}</td>
                     <td className="py-2 px-5 text-right">${item.unitRate.toFixed(2)}</td>
                     <td className="py-2 px-5 text-right font-bold">${item.subtotal.toFixed(2)}</td>
