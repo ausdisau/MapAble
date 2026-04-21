@@ -398,6 +398,13 @@ export function registerSchedulingNdisRoutes(app: Express) {
       }
     }
 
+    if (req.body.invoiceId) {
+      const ownInvoice = await storage.getInvoiceById(req.body.invoiceId);
+      if (!ownInvoice || ownInvoice.participantId !== userId) {
+        return res.status(403).json({ message: "You can only submit claims for your own invoices" });
+      }
+    }
+
     try {
       if (prodaConfigured()) {
         const priceGuideItems = await fetchPriceGuide(itemCode);

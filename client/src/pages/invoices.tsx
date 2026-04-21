@@ -121,7 +121,7 @@ function StripePaymentModal({
     setSubmitting(true);
     setError(null);
 
-    const { error: submitError } = await stripeInstance.confirmPayment({
+    const { error: submitError, paymentIntent } = await stripeInstance.confirmPayment({
       elements,
       confirmParams: {
         return_url: window.location.href,
@@ -132,10 +132,28 @@ function StripePaymentModal({
     if (submitError) {
       setError(submitError.message || "Payment failed");
       setSubmitting(false);
-    } else {
+      return;
+    }
+
+    const status = paymentIntent?.status;
+    if (status === "succeeded") {
       toast({ title: "Payment successful", description: "Your invoice has been paid." });
       onSuccess();
       onClose();
+    } else if (status === "processing") {
+      toast({
+        title: "Payment processing",
+        description:
+          "BECS direct debit takes 3–4 business days to settle. Your invoice will update to paid once the bank confirms the debit.",
+      });
+      onSuccess();
+      onClose();
+    } else if (status === "requires_action" || status === "requires_confirmation") {
+      setError("Additional confirmation is required. Please follow the prompts and try again.");
+      setSubmitting(false);
+    } else {
+      setError(`Payment is in an unexpected state (${status ?? "unknown"}). Please try again or contact support.`);
+      setSubmitting(false);
     }
   };
 

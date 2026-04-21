@@ -1,7 +1,8 @@
 import {
-  becsMandates, ndisClaims, stripeWebhookEvents, users, invoices,
+  becsMandates, ndisClaims, stripeWebhookEvents, payoutEvents, users, invoices,
   type BecsMandate, type InsertBecsMandate,
   type NdisClaim, type InsertNdisClaim,
+  type PayoutEvent,
   type Invoice, type User,
 } from "@shared/schema";
 import { db } from "../db";
@@ -137,5 +138,37 @@ export const paymentsStorage = {
       }
     }
     return out;
+  },
+
+  async recordPayoutEvent(data: {
+    stripeId: string;
+    kind: string;
+    status: string;
+    userId?: string | null;
+    amountCents?: number | null;
+    currency?: string | null;
+    failureMessage?: string | null;
+    payload?: Record<string, unknown> | null;
+  }): Promise<PayoutEvent | undefined> {
+    try {
+      const [row] = await db.insert(payoutEvents).values({
+        stripeId: data.stripeId,
+        kind: data.kind,
+        status: data.status,
+        userId: data.userId ?? null,
+        amountCents: data.amountCents ?? null,
+        currency: data.currency ?? null,
+        failureMessage: data.failureMessage ?? null,
+        payload: data.payload ?? null,
+      }).onConflictDoNothing({ target: payoutEvents.stripeId }).returning();
+      return row;
+    } catch (e) {
+      console.error("[storage] recordPayoutEvent failed:", e instanceof Error ? e.message : e);
+      return undefined;
+    }
+  },
+
+  async listPayoutEvents(userId: string, limit = 50): Promise<PayoutEvent[]> {
+    return db.select().from(payoutEvents).where(eq(payoutEvents.userId, userId)).orderBy(desc(payoutEvents.createdAt)).limit(limit);
   },
 };

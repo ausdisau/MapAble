@@ -126,6 +126,20 @@ export const stripeWebhookEvents = pgTable("stripe_webhook_events", {
   receivedAt: timestamp("received_at").defaultNow(),
 });
 
+export const payoutEvents = pgTable("payout_events", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  stripeId: text("stripe_id").notNull().unique(),
+  kind: text("kind").notNull(),
+  status: text("status").notNull(),
+  userId: varchar("user_id"),
+  amountCents: integer("amount_cents"),
+  currency: text("currency"),
+  failureMessage: text("failure_message"),
+  payload: jsonb("payload"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+export type PayoutEvent = typeof payoutEvents.$inferSelect;
+
 export const participantBudgets = pgTable("participant_budgets", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   participantId: varchar("participant_id").notNull(),
