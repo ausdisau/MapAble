@@ -1,38 +1,45 @@
 import { storage } from "./storage";
 import { getStripe, stripeEnabled, becsEnabled, calculatePlatformFee, connectEnabled } from "./stripe";
-import { sendEmailViaAgentMail } from "./notifications";
+import { sendEmailViaAgentMail, sendSmsViaTwilio } from "./notifications";
 
 async function notifyAutoDebit(
   email: string | null,
+  phoneNumber: string | null,
   fullName: string | null,
   invoiceId: string,
   outcome: "attempt" | "success" | "failure",
   amountCents: number,
   reason?: string,
 ): Promise<void> {
-  if (!email) return;
   const dollars = (amountCents / 100).toFixed(2);
   const subject =
     outcome === "success" ? `Auto-debit successful — invoice ${invoiceId}`
     : outcome === "failure" ? `Auto-debit failed — invoice ${invoiceId}`
     : `Auto-debit attempt scheduled — invoice ${invoiceId}`;
-  const lines = [
-    `Hi ${fullName || "there"},`,
-    "",
+  const body =
     outcome === "success"
-      ? `We successfully debited $${dollars} from your default bank account for invoice ${invoiceId}.`
+      ? `We successfully debited $${dollars} from your default bank account for invoice ${invoiceId}. BECS settlements typically take 3–4 business days.`
       : outcome === "failure"
       ? `We could not debit $${dollars} from your default bank account for invoice ${invoiceId}.${reason ? ` Reason: ${reason}.` : ""} We'll retry on the next cycle.`
-      : `We are about to debit $${dollars} from your default bank account for invoice ${invoiceId}.`,
+      : `We are about to debit $${dollars} from your default bank account for invoice ${invoiceId}.`;
+  const emailLines = [
+    `Hi ${fullName || "there"},`,
+    "",
+    body,
     "",
     "You can manage auto-debit and bank accounts in MapAble → Settings → Payment methods.",
     "",
     "— MapAble",
   ];
   try {
-    await sendEmailViaAgentMail(email, subject, lines.join("\n"));
+    if (email) await sendEmailViaAgentMail(email, subject, emailLines.join("\n"));
   } catch (e) {
-    console.error("[auto-debit] notification failed:", e instanceof Error ? e.message : e);
+    console.error("[auto-debit] email notify failed:", e instanceof Error ? e.message : e);
+  }
+  try {
+    if (phoneNumber) await sendSmsViaTwilio(phoneNumber, `MapAble: ${body}`);
+  } catch (e) {
+    console.error("[auto-debit] sms notify failed:", e instanceof Error ? e.message : e);
   }
 }
 
@@ -85,7 +92,7 @@ export async function runAutoDebitTick(): Promise<{ attempted: number; succeeded
     }
 
     result.attempted++;
-    void notifyAutoDebit(user.email, user.fullName, inv.id, "attempt", amountCents);
+    void notifyAutoDebit(user.email, user.phoneNumber, user.fullName, inv.id, "attempt", amountCents);
     try {
       const pi = await getStripe().paymentIntents.create({
         amount: amountCents,
@@ -111,7 +118,7 @@ export async function runAutoDebitTick(): Promise<{ attempted: number; succeeded
       result.succeeded++;
       console.log(`[auto-debit] invoice=${inv.id} pi=${pi.id} status=${pi.status}`);
       if (pi.status === "succeeded" || pi.status === "processing") {
-        void notifyAutoDebit(user.email, user.fullName, inv.id, "success", amountCents);
+        void notifyAutoDebit(user.email, user.phoneNumber, user.fullName, inv.id, "success", amountCents);
       }
     } catch (e) {
       result.failed++;
@@ -120,7 +127,7 @@ export async function runAutoDebitTick(): Promise<{ attempted: number; succeeded
       await storage.updateInvoicePayment(inv.id, {
         stripePaymentStatus: "failed",
       });
-      void notifyAutoDebit(user.email, user.fullName, inv.id, "failure", amountCents, msg);
+      void notifyAutoDebit(user.email, user.phoneNumber, user.fullName, inv.id, "failure", amountCents, msg);
     }
   }
 

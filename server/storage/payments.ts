@@ -70,7 +70,13 @@ export const paymentsStorage = {
     stripePayoutsEnabled?: boolean;
     stripeRequirementsDue?: unknown;
   }): Promise<User | undefined> {
-    const [u] = await db.update(users).set(data as any).where(eq(users.id, userId)).returning();
+    const update: Partial<typeof users.$inferInsert> = {};
+    if (data.stripeAccountId !== undefined) update.stripeAccountId = data.stripeAccountId;
+    if (data.stripeAccountStatus !== undefined) update.stripeAccountStatus = data.stripeAccountStatus;
+    if (data.stripeChargesEnabled !== undefined) update.stripeChargesEnabled = data.stripeChargesEnabled;
+    if (data.stripePayoutsEnabled !== undefined) update.stripePayoutsEnabled = data.stripePayoutsEnabled;
+    if (data.stripeRequirementsDue !== undefined) update.stripeRequirementsDue = data.stripeRequirementsDue as typeof users.$inferInsert["stripeRequirementsDue"];
+    const [u] = await db.update(users).set(update).where(eq(users.id, userId)).returning();
     return u;
   },
 

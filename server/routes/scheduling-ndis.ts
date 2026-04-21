@@ -409,9 +409,24 @@ export function registerSchedulingNdisRoutes(app: Express) {
         }
       }
 
+      let providerUserId: string | null = null;
+      if (serviceSessionId) {
+        const sessions = await storage.getServiceSessions(userId);
+        const session = sessions.find(s => s.id === serviceSessionId);
+        if (session?.workerId) {
+          const worker = await storage.getWorker(session.workerId);
+          providerUserId = worker?.userId ?? null;
+        }
+      }
+      if (!providerUserId && req.body.invoiceId) {
+        const inv = await storage.getInvoiceById(req.body.invoiceId);
+        providerUserId = inv?.providerId ?? null;
+      }
+
       const result = await submitNdisClaim({
         participantId: userId,
-        providerId: user.ndisNumber ? `PROV-${user.ndisNumber}` : "MAPABLE-001",
+        providerId: providerUserId || userId,
+        ndisProviderRef: user.ndisNumber ? `PROV-${user.ndisNumber}` : "MAPABLE-001",
         invoiceId: req.body.invoiceId,
         serviceSessionId,
         itemCode,
