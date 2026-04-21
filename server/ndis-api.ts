@@ -83,12 +83,15 @@ export class ProdaApiError extends Error {
 }
 
 const REQUIRED_ENV = [
-  "NDIS_PRODA_BASE_URL",
   "NDIS_PRODA_CLIENT_ID",
   "NDIS_PRODA_CLIENT_SECRET",
   "NDIS_PRODA_DEVICE_NAME",
   "NDIS_PRODA_ORG_ID",
 ] as const;
+
+function ndisApiBaseUrl(): string {
+  return process.env.NDIS_PRODA_BASE_URL || process.env.NDIS_API_BASE_URL || "https://api.ndis.gov.au";
+}
 
 export function prodaConfigured(): boolean {
   return REQUIRED_ENV.every((k) => !!process.env[k]);
@@ -113,7 +116,7 @@ export function getProdaIntegrationStatus() {
     missingEnvVars: missingProdaEnv(),
     requiredEnvVars: [...REQUIRED_ENV],
     optionalEnvVars: ["NDIS_API_BASE_URL", "NDIS_PRODA_TOKEN_URL"],
-    apiBaseUrl: process.env.NDIS_API_BASE_URL || "https://api.ndis.gov.au",
+    apiBaseUrl: ndisApiBaseUrl(),
     tokenUrl: process.env.NDIS_PRODA_TOKEN_URL || "https://proda.humanservices.gov.au/piaweb/api/oauth/token",
     tokenCached: !!cachedToken && cachedToken.expiresAt > Date.now(),
     tokenExpiresAt: cachedToken ? new Date(cachedToken.expiresAt).toISOString() : null,
@@ -170,7 +173,7 @@ export async function getProdaToken(): Promise<string> {
 async function ndisGet<T>(path: string): Promise<T> {
   ensureConfigured();
   const token = await getProdaToken();
-  const baseUrl = process.env.NDIS_API_BASE_URL || "https://api.ndis.gov.au";
+  const baseUrl = ndisApiBaseUrl();
   const res = await fetchWithRetry(`${baseUrl}${path}`, {
     headers: { Authorization: `Bearer ${token}`, Accept: "application/json" },
   });
@@ -188,7 +191,7 @@ async function ndisGet<T>(path: string): Promise<T> {
 async function ndisPost<T>(path: string, payload: unknown): Promise<T> {
   ensureConfigured();
   const token = await getProdaToken();
-  const baseUrl = process.env.NDIS_API_BASE_URL || "https://api.ndis.gov.au";
+  const baseUrl = ndisApiBaseUrl();
   const res = await fetchWithRetry(`${baseUrl}${path}`, {
     method: "POST",
     headers: {
@@ -361,6 +364,13 @@ export async function submitNdisClaim(claim: NdisClaimSubmission): Promise<NdisC
       responsePayload,
     })
     .returning();
+
+  console.log(
+    `[ndis-claim] audit: claim=${record.id} proda=${response.claimId} status=${status} ` +
+    `invoice=${claim.invoiceId ?? "-"} session=${claim.serviceSessionId ?? "-"} ` +
+    `participant=${claim.participantId} provider=${claim.providerId} ref=${claim.claimReference}` +
+    (rejectionReason ? ` reason=${rejectionReason}` : ""),
+  );
 
   return { ...response, record };
 }
