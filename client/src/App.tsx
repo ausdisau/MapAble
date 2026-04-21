@@ -9,7 +9,9 @@ import { ThemeProvider, useTheme } from "@/components/theme-provider";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Moon, Sun, Search, Bell, Accessibility, LayoutDashboard, HeartHandshake, Briefcase, Bus, MessageSquare, Settings, PanelLeftClose, PanelLeftOpen, DollarSign, Wallet, FileText, Bot, Loader2, CalendarDays, Building2, ClipboardList, User as UserIconLucide, Mail } from "lucide-react";
-import { useState } from "react";
+import { useState, lazy, Suspense } from "react";
+
+const ChatbotWidget = lazy(() => import("@/components/chatbot-widget"));
 import { useLocation } from "wouter";
 import logoImage from "@assets/Accessible_Australia_Logo_Design_1772582762574.png";
 import {
@@ -295,6 +297,9 @@ function AppLayout() {
           </main>
         </div>
       </div>
+      <Suspense fallback={null}>
+        <ChatbotWidget />
+      </Suspense>
     </SidebarProvider>
   );
 }
