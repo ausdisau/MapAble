@@ -410,23 +410,40 @@ export function registerSchedulingNdisRoutes(app: Express) {
       }
 
       let providerUserId: string | null = null;
+      let providerNdisRef: string | null = null;
       if (serviceSessionId) {
         const sessions = await storage.getServiceSessions(userId);
         const session = sessions.find(s => s.id === serviceSessionId);
         if (session?.workerId) {
           const worker = await storage.getWorker(session.workerId);
           providerUserId = worker?.userId ?? null;
+          if (worker?.user?.ndisNumber) {
+            providerNdisRef = `PROV-${worker.user.ndisNumber}`;
+          } else if (worker?.abn) {
+            providerNdisRef = `ABN-${worker.abn}`;
+          }
         }
       }
       if (!providerUserId && req.body.invoiceId) {
         const inv = await storage.getInvoiceById(req.body.invoiceId);
         providerUserId = inv?.providerId ?? null;
+        if (providerUserId) {
+          const provUser = await storage.getUser(providerUserId);
+          if (provUser?.ndisNumber) providerNdisRef = `PROV-${provUser.ndisNumber}`;
+          else if (provUser?.abn) providerNdisRef = `ABN-${provUser.abn}`;
+        }
+      }
+
+      if (!providerNdisRef) {
+        return res.status(400).json({
+          message: "Cannot submit claim: provider NDIS registration or ABN is not available for this session/invoice",
+        });
       }
 
       const result = await submitNdisClaim({
         participantId: userId,
         providerId: providerUserId || userId,
-        ndisProviderRef: user.ndisNumber ? `PROV-${user.ndisNumber}` : "MAPABLE-001",
+        ndisProviderRef: providerNdisRef,
         invoiceId: req.body.invoiceId,
         serviceSessionId,
         itemCode,
