@@ -339,9 +339,16 @@ export function registerPaymentRoutes(app: Express) {
     if (user.role !== "carer" && user.role !== "provider") {
       return res.status(403).json({ message: "Only workers/providers can onboard for payouts" });
     }
-    const worker = await storage.getWorkerByUserId(user.id);
-    if (!worker?.abnVerified) {
-      return res.status(400).json({ message: "ABN must be verified before payout onboarding" });
+    if (user.role === "carer") {
+      const worker = await storage.getWorkerByUserId(user.id);
+      if (!worker?.abnVerified) {
+        return res.status(400).json({ message: "ABN must be verified before payout onboarding" });
+      }
+    } else {
+      // provider role: must have ABN on file (verification pathway lives in admin profile)
+      if (!user.abn) {
+        return res.status(400).json({ message: "Provider ABN must be on file before payout onboarding" });
+      }
     }
 
     let accountId = user.stripeAccountId;

@@ -122,6 +122,7 @@ export const billingStorage = {
     ]));
     const workerList = await this.getWorkersByIds(workerIds);
     const workerMap = new Map(workerList.map(w => [w.id, w]));
+    const workerCharge = new Map<string, number>();
 
     const lineItems: any[] = [];
     let totalAmount = 0;
@@ -130,6 +131,7 @@ export const billingStorage = {
     for (const s of sessions) {
       const charge = Number(s.totalCharge || 0);
       totalAmount += charge;
+      workerCharge.set(s.workerId, (workerCharge.get(s.workerId) || 0) + charge);
       const worker = workerMap.get(s.workerId);
       const abnVerified = worker?.abnVerified ?? false;
       if (!abnVerified) hasUnverifiedAbn = true;
@@ -150,6 +152,7 @@ export const billingStorage = {
     for (const t of trips) {
       const charge = Number(t.totalCharge || 0);
       totalAmount += charge;
+      workerCharge.set(t.workerId, (workerCharge.get(t.workerId) || 0) + charge);
       const worker = workerMap.get(t.workerId);
       const abnVerified = worker?.abnVerified ?? false;
       if (!abnVerified) hasUnverifiedAbn = true;
@@ -167,8 +170,16 @@ export const billingStorage = {
       });
     }
 
+    let providerId: string | null = null;
+    if (workerCharge.size > 0) {
+      const topWorkerId = [...workerCharge.entries()].sort((a, b) => b[1] - a[1])[0][0];
+      const topWorker = workerMap.get(topWorkerId);
+      if (topWorker?.userId) providerId = topWorker.userId;
+    }
+
     const [invoice] = await db.insert(invoices).values({
       participantId,
+      providerId,
       periodStart,
       periodEnd,
       totalAmount: totalAmount.toFixed(2),
