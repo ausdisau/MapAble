@@ -1,0 +1,228 @@
+Build a production-ready tabbed chatbot widget for the existing MapAble website at https://mapable.com.au.
+
+Important context:
+- This is for MapAble, an accessibility-first disability platform.
+- The widget will be embedded as a layer on top of the existing site shell, not a separate app.
+- The widget must feel modern, accessible, calm, and easy to use.
+- It must be ready for future integration with:
+  - NLP runtime
+  - voice intake
+  - matching engine
+  - compliance layer
+  - smart contracts
+  - attestations
+- Preserve current site architecture and styling patterns if they exist.
+- Do not invent a new design system unless the repo has none.
+- Prefer maintainability, modularity, and accessibility over cleverness.
+
+Primary goal:
+Embed the existing chatbot as a tabbed widget with:
+1. Chat
+2. Actions
+3. History
+
+Platform and code assumptions:
+- Use TypeScript
+- Use React functional components
+- Assume a Next.js or React app unless the repo clearly shows another structure
+- If the repo is Next.js App Router, integrate accordingly
+- Keep the code production-safe and repo-friendly
+
+Widget behavior requirements:
+- Floating launcher button visible site-wide
+- Desktop: open as a right-side panel
+- Mobile: open as a bottom sheet
+- Save open/closed state in sessionStorage
+- Save selected tab in sessionStorage
+- Lazy load the widget so it does not block page rendering
+- Ensure safe z-index layering
+- Ensure route changes do not break the widget
+- Allow feature-flag-based disablement
+
+Accessibility requirements:
+- Keyboard navigable
+- Proper tab roles and aria attributes
+- Visible focus states
+- Large touch targets
+- Semantic buttons and landmarks
+- No keyboard traps
+- Good scrolling behavior on iOS Safari and Android Chrome
+- Plain language labels
+- Accessible empty, loading, and error states
+
+Tabs:
+1. Chat tab
+- Mount the existing chatbot component inside this tab
+- Preserve existing chatbot API calls and business logic
+- Do not rewrite chatbot internals unless required for embedding
+- Expose a clean prop interface for future widget context
+- Ensure the chat works in constrained panel dimensions
+- Make the message area scroll correctly
+- Add loading and error boundaries if needed
+- Add voice input UI:
+  - microphone button
+  - recording start/stop state
+  - clear recording feedback
+  - transcript review/edit before submit
+  - do not auto-submit transcript without confirmation
+  - permission failure fallback
+
+2. Actions tab
+- Build a structured actions surface with accessible action cards or buttons
+- Include:
+  - Create support request
+  - Book accessible transport
+  - Create job post
+  - Ask about NDIS funding
+  - Contact support
+- Each action should have:
+  - clear title
+  - short description
+  - callback such as onActionSelect(actionKey)
+- Keep it touch-friendly and responsive
+- Prepare for future integration with:
+  - /api/nlp/run
+  - /api/voice/intake
+  - /api/match/run
+  - /api/contracts/run
+  - /api/attestations/create
+
+3. History tab
+- Render:
+  - Recent conversations
+  - Saved drafts
+  - Pending actions
+- Accept all data through props
+- Add empty states
+- Add callback props:
+  - onOpenConversation(id)
+  - onOpenDraft(id)
+  - onOpenPendingAction(id)
+- Make it scrollable within the panel
+- Show timestamps where appropriate
+
+Config-driven requirements:
+Add support for loading widget configuration from a backend endpoint such as /api/widget-config.
+
+Expected config shape:
+{
+  "tabs": ["chat", "actions", "history"],
+  "defaultTab": "chat",
+  "featureFlags": {
+    "voiceEnabled": true,
+    "matchingEnabled": false,
+    "contractsEnabled": false
+  },
+  "apis": {
+    "nlp": "/api/nlp/run",
+    "voice": "/api/voice/intake",
+    "match": "/api/match/run",
+    "contracts": "/api/contracts/run",
+    "attestations": "/api/attestations/create"
+  }
+}
+
+Requirements:
+- Render only enabled tabs
+- Support a default tab from config
+- Isolate config logic into a reusable hook or service
+- Add safe fallback config if loading fails
+- Do not hardcode environment-specific endpoints into components
+
+Service layer requirements:
+Create typed frontend service wrappers for:
+- NLP runtime
+- voice intake
+- matching
+- contracts
+- attestations
+
+Suggested service functions:
+- runNlp()
+- sendVoiceTranscript()
+- runMatching()
+- runContracts()
+- createAttestation()
+
+Requirements:
+- strongly typed interfaces
+- fetch-based implementation
+- robust error handling
+- no business logic in UI components
+- support endpoint injection from widget config
+
+Integration requirements:
+- Integrate the widget into the main site layout
+- Mount near the root layout or top-level app shell
+- Keep it easy to disable via feature flag
+- Preserve existing layout behavior
+- Do not break navigation
+
+Code organization:
+Create or adapt the following structure if appropriate for the repo:
+
+src/components/chatbot-widget/ChatbotWidget.tsx
+src/components/chatbot-widget/ChatbotLauncher.tsx
+src/components/chatbot-widget/ChatbotPanel.tsx
+src/components/chatbot-widget/WidgetTabs.tsx
+src/components/chatbot-widget/ChatTab.tsx
+src/components/chatbot-widget/ActionsTab.tsx
+src/components/chatbot-widget/HistoryTab.tsx
+src/components/chatbot-widget/useWidgetState.ts
+src/components/chatbot-widget/types.ts
+
+src/lib/widget-services/types.ts
+src/lib/widget-services/nlp.ts
+src/lib/widget-services/voice.ts
+src/lib/widget-services/matching.ts
+src/lib/widget-services/contracts.ts
+src/lib/widget-services/attestations.ts
+
+If the repo uses a different structure, adapt intelligently while keeping the widget modular.
+
+Backend/config support:
+If needed, create or scaffold:
+- /api/widget-config
+but keep it simple and production-friendly.
+
+Polish requirements:
+- smooth but restrained transitions
+- clean spacing and typography
+- professional empty/loading/error states
+- readable mobile layout
+- visually consistent with a modern accessibility-first platform
+- avoid clutter
+
+Documentation:
+Create:
+docs/chatbot-widget-integration.md
+
+Include:
+- purpose
+- component structure
+- tab behavior
+- config loading
+- API service wrappers
+- accessibility considerations
+- site integration instructions
+- future extension points:
+  - NLP runtime
+  - voice
+  - matching
+  - compliance
+  - smart contracts
+  - attestations
+- local development notes
+
+Critical guardrails:
+- Reuse existing chatbot logic instead of replacing it
+- Reuse existing design system/components if present
+- Keep the implementation production-ready
+- Do not leave toy placeholders where a realistic implementation is expected
+- Make reasonable assumptions only where the repo does not already provide patterns
+- At the end, summarize:
+  1. files created/changed
+  2. assumptions made
+  3. any manual follow-up needed
+
+Now inspect the repo, determine the best integration points, and implement the widget end to end.
