@@ -804,6 +804,7 @@ export async function processChat(
       chatHistory.push(choice.message);
 
       for (const toolCall of choice.message.tool_calls) {
+        if (toolCall.type !== "function") continue;
         const args = JSON.parse(toolCall.function.arguments || "{}");
         toolsUsed.push(toolCall.function.name);
 
@@ -902,7 +903,7 @@ function extractQuickActions(content: string, toolsUsed: string[]): string[] {
     actions.push("view_grocery_orders");
   }
 
-  return [...new Set(actions)];
+  return Array.from(new Set(actions));
 }
 
 function determineConfidence(toolsUsed: string[]): string {

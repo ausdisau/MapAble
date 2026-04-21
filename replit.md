@@ -12,7 +12,7 @@ MapAble 4.0 is a fullstack TypeScript superapp combining core NDIS services:
 - **ABN Lookup** - Australian Business Number validation and ABR registry lookup
 
 ## Architecture
-- **Runtime**: Node.js/TypeScript (primary), PHP 8.4 (legacy pages)
+- **Runtime**: Node.js/TypeScript
 - **Backend**: Express.js (primary API + auth + payments)
 - **Frontend**: React + Vite + Tailwind CSS + shadcn/ui
 - **Database**: Neon PostgreSQL (serverless) via Drizzle ORM
@@ -45,8 +45,7 @@ MapAble 4.0 is a fullstack TypeScript superapp combining core NDIS services:
 - `AUTH0_DOMAIN` — Auth0 tenant domain (default: `adid.au.auth0.com`)
 - `AUTH0_CLIENT_ID` — Auth0 application Client ID
 - `AUTH0_CLIENT_SECRET` — Auth0 application Client Secret (required for SSO)
-- `ACCESSIBE_SITE_KEY` — accessiBe widget site key for PHP pages (placeholder; replace with real key from accessiBe account)
-- `VITE_ACCESSIBE_SITE_KEY` — accessiBe widget site key for React frontend (set to same value as ACCESSIBE_SITE_KEY)
+- `VITE_ACCESSIBE_SITE_KEY` — accessiBe widget site key for React frontend
 - `ABR_GUID` — Australian Business Register API GUID for ABN lookups (optional; format-only validation works without it)
 - `QB_CLIENT_ID` — QuickBooks Online OAuth 2.0 Client ID
 - `QB_CLIENT_SECRET` — QuickBooks Online OAuth 2.0 Client Secret
@@ -57,11 +56,12 @@ MapAble 4.0 is a fullstack TypeScript superapp combining core NDIS services:
 ## Project Structure
 ```
 shared/
-  schema.ts              - Drizzle ORM schema (all tables + insert schemas + types)
+  schema.ts              - Barrel export for modular schema files
+  schema/                - Domain schema modules (users, marketplace, billing, chat, scheduling, grocery)
 server/
   index.ts               - Express app setup, session, middleware
-  routes.ts              - All API routes (auth, CRUD, payments, webhooks)
-  storage.ts             - IStorage interface + DatabaseStorage implementation
+  routes/                - Domain API route modules registered from routes/index.ts
+  storage/               - IStorage facade plus per-domain storage modules
   db.ts                  - Neon/Drizzle database connection
   stripe.ts              - Stripe client initialization
   orb.ts                 - Orb REST API client (customers, subscriptions, usage events)
@@ -70,10 +70,6 @@ server/
   seed.ts                - Database seeding
   vite.ts                - Vite dev server integration
   static.ts              - Production static file serving
-php/
-  includes/
-    accessibe_widget.php   - Reusable accessiBe accessibility widget snippet
-    layout_footer.php      - Footer, scripts, toast messages (includes accessiBe widget)
 client/src/
   App.tsx                - Root app with routing, sidebar, header
   pages/
