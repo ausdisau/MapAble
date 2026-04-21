@@ -131,6 +131,43 @@ export function getSupplierLimit(): number {
   return Math.min(Math.floor(raw), 100);
 }
 
+export interface SyncOptions {
+  limit?: number;
+  replaceSeed?: boolean;
+}
+
+export interface SyncResult {
+  provider: string;
+  fetched: number;
+  upserted: number;
+  removedSeed: number;
+}
+
+/**
+ * Run a full supplier→DB sync. Used by the admin /supplier/sync route and the
+ * optional startup auto-sync. Throws on upstream/transport failure so callers
+ * can surface 502s; never swallows storage errors.
+ */
+export async function syncGroceryCatalog(opts: SyncOptions = {}): Promise<SyncResult> {
+  // Lazy-import storage to avoid a circular import in startup paths.
+  const { storage } = await import("./storage");
+  const adapter = buildAdapter();
+  const limit = opts.limit ?? getSupplierLimit();
+  const replaceSeed = opts.replaceSeed ?? (process.env.GROCERY_SUPPLIER_REPLACE_SEED !== "0");
+
+  const supplierProducts = await adapter.fetchProducts({ limit });
+  let upserted = 0;
+  for (const sp of supplierProducts) {
+    await storage.upsertSupplierGroceryProduct(toInsertProduct(sp, adapter.name));
+    upserted++;
+  }
+  let removedSeed = 0;
+  if (replaceSeed && upserted > 0) {
+    removedSeed = await storage.deleteGroceryProductsBySource("seed");
+  }
+  return { provider: adapter.name, fetched: supplierProducts.length, upserted, removedSeed };
+}
+
 export function toInsertProduct(p: SupplierProductInput, source: string): InsertGroceryProduct {
   return {
     name: p.name,
