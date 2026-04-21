@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { storage } from "../storage";
 import { getStripe, stripeEnabled, becsEnabled, connectEnabled, getStripeCapabilities, calculatePlatformFee, getPlatformFeeBps } from "../stripe";
-import { getProdaIntegrationStatus, getRecentClaims } from "../ndis-api";
+import { getProdaIntegrationStatus, getRecentClaims, fetchPriceGuide, prodaConfigured, missingProdaEnv } from "../ndis-api";
 import { orbEnabled, getCustomerUsage, verifyAndUnwrapWebhook } from "../orb";
 import { qbEnabled, pushInvoiceToQb } from "../quickbooks";
 import { requireAuth, provisionOrbBilling } from "./shared";
@@ -63,16 +63,29 @@ export function registerPaymentRoutes(app: Express) {
     const paymentMethodTypes: string[] = ["link", "card"];
     if (includeBecs) paymentMethodTypes.push("au_becs_debit");
 
+    let connectTransferData: { destination: string } | undefined;
+    let applicationFeeAmount: number | undefined;
+    if (connectEnabled() && invoice.providerId) {
+      const provider = await storage.getUser(invoice.providerId);
+      if (provider?.stripeAccountId && provider.stripeChargesEnabled) {
+        connectTransferData = { destination: provider.stripeAccountId };
+        applicationFeeAmount = calculatePlatformFee(amountCents);
+      }
+    }
+
     const paymentIntent = await getStripe().paymentIntents.create({
       amount: amountCents,
       currency: "aud",
       customer: stripeCustomerId,
       payment_method_types: paymentMethodTypes,
+      ...(connectTransferData ? { transfer_data: connectTransferData } : {}),
+      ...(applicationFeeAmount ? { application_fee_amount: applicationFeeAmount } : {}),
       metadata: {
         invoiceId: invoice.id,
         participantId: invoice.participantId,
         periodStart: invoice.periodStart,
         periodEnd: invoice.periodEnd,
+        ...(applicationFeeAmount ? { platformFeeCents: String(applicationFeeAmount) } : {}),
       },
     });
 
@@ -162,29 +175,30 @@ export function registerPaymentRoutes(app: Express) {
         break;
       }
       case "setup_intent.succeeded": {
-        const si: any = event.data.object;
-        const pmId = si.payment_method as string | undefined;
+        const si = event.data.object as import("stripe").Stripe.SetupIntent;
+        const pmId = typeof si.payment_method === "string" ? si.payment_method : si.payment_method?.id;
         if (pmId) {
           try {
             const pm = await getStripe().paymentMethods.retrieve(pmId);
             if (pm.type === "au_becs_debit" && pm.au_becs_debit) {
-              const userId = (si.metadata?.userId as string) || (pm.metadata?.userId as string);
+              const userId = (si.metadata?.userId as string | undefined) || (pm.metadata?.userId as string | undefined);
               if (userId) {
+                const mandateId = typeof si.mandate === "string" ? si.mandate : si.mandate?.id ?? null;
                 const existing = await storage.getBecsMandateByPaymentMethod(pmId);
                 if (!existing) {
                   await storage.createBecsMandate({
                     userId,
                     stripePaymentMethodId: pmId,
-                    stripeMandateId: (si.mandate as string) || null,
+                    stripeMandateId: mandateId,
                     bsbLast4: pm.au_becs_debit.bsb_number?.slice(-4) || null,
                     accountLast4: pm.au_becs_debit.last4 || null,
                     bankName: null,
-                    status: "active",
+                    status: "pending",
                     mandateUrl: null,
                     isDefault: false,
-                  } as any);
+                  });
                 } else {
-                  await storage.updateBecsMandateStatus(pmId, "active", undefined, (si.mandate as string) || undefined);
+                  await storage.updateBecsMandateStatus(pmId, existing.status === "active" ? "active" : "pending", undefined, mandateId ?? undefined);
                 }
               }
             }
@@ -195,8 +209,8 @@ export function registerPaymentRoutes(app: Express) {
         break;
       }
       case "mandate.updated": {
-        const mandate: any = event.data.object;
-        const pmId = mandate.payment_method as string | undefined;
+        const mandate = event.data.object as import("stripe").Stripe.Mandate;
+        const pmId = typeof mandate.payment_method === "string" ? mandate.payment_method : mandate.payment_method?.id;
         const status = mandate.status === "active" ? "active" : mandate.status === "inactive" ? "revoked" : "pending";
         if (pmId) {
           await storage.updateBecsMandateStatus(pmId, status);
@@ -204,7 +218,7 @@ export function registerPaymentRoutes(app: Express) {
         break;
       }
       case "account.updated": {
-        const acct: any = event.data.object;
+        const acct = event.data.object as import("stripe").Stripe.Account;
         const user = await storage.getUserByStripeAccountId(acct.id);
         if (user) {
           await storage.setStripeAccount(user.id, {
@@ -219,7 +233,8 @@ export function registerPaymentRoutes(app: Express) {
       case "transfer.created":
       case "payout.paid":
       case "payout.failed": {
-        console.log(`Stripe Connect event ${event.type}:`, (event.data.object as any).id);
+        const obj = event.data.object as { id: string };
+        console.log(`Stripe Connect event ${event.type}:`, obj.id);
         break;
       }
     }
@@ -380,6 +395,27 @@ export function registerPaymentRoutes(app: Express) {
       return res.status(403).json({ message: "Admin or provider access required" });
     }
     res.json(getProdaIntegrationStatus());
+  });
+
+  app.post("/api/ndis/price-guide/sync", requireAuth, async (req, res) => {
+    const user = await storage.getUser(req.session.userId!);
+    if (!user || (user.role !== "admin" && user.role !== "provider")) {
+      return res.status(403).json({ message: "Admin or provider access required" });
+    }
+    if (!prodaConfigured()) {
+      return res.status(503).json({
+        message: "PRODA is not configured",
+        missingEnvVars: missingProdaEnv(),
+      });
+    }
+    try {
+      const items = await fetchPriceGuide();
+      res.json({ ok: true, itemsCount: items.length, syncedAt: new Date().toISOString() });
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Unknown error";
+      console.error("Price guide sync failed:", msg);
+      res.status(502).json({ message: "Price guide sync failed", error: msg });
+    }
   });
 
   app.get("/api/ndis/claims", requireAuth, async (req, res) => {

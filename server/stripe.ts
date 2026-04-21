@@ -17,15 +17,19 @@ export function getStripe(): Stripe {
   return stripe;
 }
 
+function flagOn(v: string | undefined): boolean {
+  return v === "1" || v === "true" || v === "yes" || v === "on";
+}
+
 export function becsEnabled(): boolean {
   if (!stripeEnabled()) return false;
-  if (process.env.STRIPE_BECS_DISABLED === "true") return false;
+  if (flagOn(process.env.STRIPE_BECS_DISABLED)) return false;
   return true;
 }
 
 export function connectEnabled(): boolean {
   if (!stripeEnabled()) return false;
-  return process.env.STRIPE_CONNECT_ENABLED === "true";
+  return flagOn(process.env.STRIPE_CONNECT_ENABLED);
 }
 
 export function getPlatformFeeBps(): number {

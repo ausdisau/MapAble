@@ -183,20 +183,23 @@ export function registerAbnProfileRoutes(app: Express) {
           await storage.updateWorkerAbnVerified(worker.id, true);
           return res.json({ message: "ABN verified via NDIS provider registry", abnVerified: true, abn: worker.abn, businessName: result.businessName });
         }
+        return res.status(404).json({ message: "ABN not found in NDIS provider registry", abnVerified: false });
       } catch (error) {
-        if (error instanceof ProdaNotConfiguredError) {
-          // fall through to ABR-only verification
-        } else if (error instanceof ProdaApiError) {
+        if (error instanceof ProdaApiError) {
           console.error("PRODA provider lookup failed:", error.message);
-        } else {
-          console.error("ABN verification error:", error);
-          return res.status(500).json({ message: "Failed to verify ABN" });
+          return res.status(502).json({ message: "PRODA verification temporarily unavailable. Please retry shortly.", abnVerified: false });
         }
+        console.error("ABN verification error:", error);
+        return res.status(500).json({ message: "Failed to verify ABN", abnVerified: false });
       }
     }
 
-    await storage.updateWorkerAbnVerified(worker.id, true);
-    return res.json({ message: "ABN verified via Australian Business Register format check", abnVerified: true, abn: worker.abn });
+    return res.status(503).json({
+      message: "NDIS provider verification (PRODA) is not configured. ABN format check passed but full verification cannot be completed until PRODA credentials are available.",
+      abnVerified: false,
+      formatValid: true,
+      requiresProda: true,
+    });
   });
 
   app.get("/api/workers/me/abn-status", requireAuth, async (req, res) => {
