@@ -240,15 +240,13 @@ export function ChatTab({
         {pendingMessages.map((m, i) => (
           <MessageBubble
             key={`pending-${i}`}
-            message={
-              {
-                id: `pending-${i}`,
-                role: m.role,
-                content: m.content,
-                quickActions: [],
-                confidence: "general",
-              } as unknown as ChatMessage
-            }
+            message={{
+              id: `pending-${i}`,
+              role: m.role,
+              content: m.content,
+              quickActions: [],
+              confidence: "general",
+            }}
             onQuickAction={onQuickAction}
             compact
           />

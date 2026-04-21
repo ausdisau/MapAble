@@ -1,10 +1,17 @@
 import { Bot, User, Shield } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import type { ChatMessage } from "@shared/schema";
 import { QUICK_ACTION_CONFIG, CONFIDENCE_CONFIG } from "./quick-actions";
 
+export interface DisplayMessage {
+  id: string;
+  role: string;
+  content: string;
+  quickActions?: string[] | null;
+  confidence?: string | null;
+}
+
 interface MessageBubbleProps {
-  message: ChatMessage;
+  message: DisplayMessage;
   onQuickAction: (action: string) => void;
   compact?: boolean;
 }
