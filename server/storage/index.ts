@@ -142,7 +142,7 @@ export interface IStorage {
   getUserByStripeAccountId(stripeAccountId: string): Promise<User | undefined>;
   getUserByStripeCustomerId(stripeCustomerId: string): Promise<User | undefined>;
   createNdisClaim(data: InsertNdisClaim): Promise<NdisClaim>;
-  getNdisClaims(filters?: { participantId?: string; invoiceId?: string; limit?: number }): Promise<NdisClaim[]>;
+  getNdisClaims(filters?: { participantId?: string; invoiceId?: string; providerId?: string; limit?: number }): Promise<NdisClaim[]>;
   wasWebhookProcessed(eventId: string): Promise<boolean>;
   recordWebhookEvent(eventId: string, eventType: string): Promise<void>;
   claimWebhookEvent(eventId: string, eventType: string): Promise<boolean>;
