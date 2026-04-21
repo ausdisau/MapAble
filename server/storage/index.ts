@@ -44,6 +44,7 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
   updateUserAvatar(id: string, avatar: string): Promise<User | undefined>;
   updateUserProfile(id: string, data: Partial<{ fullName: string; email: string; location: string }>): Promise<User | undefined>;
+  updateUserNotificationPrefs(id: string, prefs: { notifyOrderUpdates?: boolean }): Promise<User | undefined>;
   getWorkers(): Promise<(Worker & { user?: User })[]>;
   getWorker(id: string): Promise<(Worker & { user?: User }) | undefined>;
   createWorker(worker: InsertWorker): Promise<Worker>;
@@ -161,6 +162,10 @@ export class DatabaseStorage implements IStorage {
 
   updateUserProfile(...args: Parameters<IStorage["updateUserProfile"]>): ReturnType<IStorage["updateUserProfile"]> {
     return (usersWorkersStorage.updateUserProfile as any).apply(this, args);
+  }
+
+  updateUserNotificationPrefs(...args: Parameters<IStorage["updateUserNotificationPrefs"]>): ReturnType<IStorage["updateUserNotificationPrefs"]> {
+    return (usersWorkersStorage.updateUserNotificationPrefs as any).apply(this, args);
   }
 
   getWorkers(...args: Parameters<IStorage["getWorkers"]>): ReturnType<IStorage["getWorkers"]> {

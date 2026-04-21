@@ -1,4 +1,5 @@
 import type { Express } from "express";
+import { z } from "zod";
 import { storage } from "../storage";
 import { insertBookingSchema } from "@shared/schema";
 import { lookupProvider } from "../ndis-api";
@@ -132,6 +133,17 @@ export function registerAbnProfileRoutes(app: Express) {
     const { fullName, email, location } = parsed.data;
     const updated = await storage.updateUserProfile(user.id, { fullName, email, location });
     if (!updated) return res.status(500).json({ message: "Update failed" });
+    res.json(sanitizeUser(updated));
+  });
+
+  app.patch("/api/me/notification-prefs", async (req, res) => {
+    const userId = req.session.userId;
+    if (!userId) return res.status(401).json({ message: "Not authenticated" });
+    const schema = z.object({ notifyOrderUpdates: z.boolean().optional() });
+    const parsed = schema.safeParse(req.body);
+    if (!parsed.success) return res.status(400).json({ message: "Invalid data", errors: parsed.error.flatten() });
+    const updated = await storage.updateUserNotificationPrefs(userId, parsed.data);
+    if (!updated) return res.status(404).json({ message: "User not found" });
     res.json(sanitizeUser(updated));
   });
 

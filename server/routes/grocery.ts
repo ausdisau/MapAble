@@ -133,6 +133,26 @@ export function registerGroceryRoutes(app: Express) {
     }
 
     const order = await storage.updateGroceryOrderStatus(req.params.id, status);
+
+    // Fire-and-forget participant notification on real status transitions.
+    // Skip if the new status equals the old one (no-op update). Notification
+    // failures must never block the status update from succeeding.
+    if (order && existing.status !== status) {
+      (async () => {
+        try {
+          const participant = await storage.getUser(order.participantId);
+          if (!participant) return;
+          const { notifyGroceryOrderStatus } = await import("../notifications");
+          const result = await notifyGroceryOrderStatus(participant, order);
+          if (result.attempted && !result.emailed) {
+            console.warn(`[notifications] order ${order.id} status=${status} not delivered: ${result.reason}`);
+          }
+        } catch (e) {
+          console.warn("[notifications] dispatch threw:", e instanceof Error ? e.message : e);
+        }
+      })();
+    }
+
     res.json(order);
   });
 
