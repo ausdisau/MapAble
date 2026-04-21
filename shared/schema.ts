@@ -38,6 +38,11 @@ export const users = pgTable("users", {
   providerBusinessName: text("provider_business_name"),
   providerRegistrationGroups: text("provider_registration_groups").array(),
   abn: text("abn"),
+  qbAccessToken: text("qb_access_token"),
+  qbRefreshToken: text("qb_refresh_token"),
+  qbRealmId: text("qb_realm_id"),
+  qbTokenExpiresAt: timestamp("qb_token_expires_at"),
+  qbConnectedAt: timestamp("qb_connected_at"),
 });
 
 export const workers = pgTable("workers", {
@@ -174,6 +179,10 @@ export const invoices = pgTable("invoices", {
   generatedAt: timestamp("generated_at").defaultNow(),
   stripePaymentIntentId: text("stripe_payment_intent_id"),
   stripePaymentStatus: text("stripe_payment_status"),
+  qbInvoiceId: text("qb_invoice_id"),
+  qbSyncStatus: text("qb_sync_status"),
+  qbSyncError: text("qb_sync_error"),
+  qbLastSyncedAt: timestamp("qb_last_synced_at"),
 });
 
 export const reviews = pgTable("reviews", {

@@ -48,6 +48,11 @@ MapAble 4.0 is a fullstack TypeScript superapp combining core NDIS services:
 - `ACCESSIBE_SITE_KEY` — accessiBe widget site key for PHP pages (placeholder; replace with real key from accessiBe account)
 - `VITE_ACCESSIBE_SITE_KEY` — accessiBe widget site key for React frontend (set to same value as ACCESSIBE_SITE_KEY)
 - `ABR_GUID` — Australian Business Register API GUID for ABN lookups (optional; format-only validation works without it)
+- `QB_CLIENT_ID` — QuickBooks Online OAuth 2.0 Client ID
+- `QB_CLIENT_SECRET` — QuickBooks Online OAuth 2.0 Client Secret
+- `QB_REDIRECT_URI` — QuickBooks OAuth callback URI (e.g. `https://<domain>/api/quickbooks/callback`)
+- `QB_ENVIRONMENT` — QuickBooks environment: `sandbox` (default) or `production`
+- `QB_WEBHOOK_VERIFIER_TOKEN` — QuickBooks webhook verifier token (optional; for webhook HMAC validation)
 
 ## Project Structure
 ```
@@ -60,6 +65,7 @@ server/
   db.ts                  - Neon/Drizzle database connection
   stripe.ts              - Stripe client initialization
   orb.ts                 - Orb REST API client (customers, subscriptions, usage events)
+  quickbooks.ts          - QuickBooks Online OAuth 2.0, invoice push/pull, payment sync
   chat-engine.ts         - AI chatbot with OpenAI
   seed.ts                - Database seeding
   vite.ts                - Vite dev server integration
@@ -85,7 +91,7 @@ client/src/
 - users (with stripe_customer_id, orb_customer_id, orb_subscription_id)
 - workers, bookings, jobs, transport_requests, messages
 - pricing_tiers, service_sessions, transport_trips
-- invoices (with stripe_payment_intent_id, stripe_payment_status)
+- invoices (with stripe_payment_intent_id, stripe_payment_status, qb_invoice_id, qb_sync_status, qb_sync_error, qb_last_synced_at)
 - reviews, participant_budgets
 - access_context_profiles, chat_sessions, chat_messages
 - community_reports
@@ -98,6 +104,16 @@ client/src/
 - **Orb Webhooks**: POST `/api/webhooks/orb` handles billing_period_ended → auto-generates invoices
 - **Invoice statuses**: draft, submitted, pending, processing, paid, failed
 - **Orb customer setup**: POST `/api/billing/setup-orb` creates Orb customer + subscription for a user
+
+## QuickBooks Online Integration
+- **OAuth 2.0 Connect/Disconnect**: Settings page allows connecting/disconnecting QB account
+- **Invoice Push Sync**: MapAble invoices auto-sync to QB on generation and Stripe payment; manual sync via Settings
+- **Payment Pull Sync**: QB payments auto-detected via webhook handler (POST `/api/quickbooks/webhook`) and background polling (5-min interval)
+- **Sync Status UI**: Per-invoice QB sync badges (synced/error/not synced) on Invoices page with click-to-sync and retry
+- **QB Webhook**: HMAC-verified webhook endpoint for real-time payment event detection
+- **Invoice Update Sync**: QB re-sync triggers on invoice generation, Stripe payment, and invoice status updates (PATCH `/api/invoices/:id/status`)
+- **ItemRef handling**: Auto-finds or creates "NDIS Support Services" item in QB for valid line items
+- **GST/Tax**: Proper TaxCodeRef (TAX/NON) and GlobalTaxCalculation for Australian GST
 
 ## Key Features
 - Dashboard with stats, featured workers, recent jobs

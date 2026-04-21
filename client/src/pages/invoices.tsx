@@ -7,10 +7,11 @@ import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { FileText, ChevronDown, ChevronUp, Calendar, DollarSign, ShieldCheck, AlertCircle, CreditCard, Clock, Car, Zap, Loader2, X } from "lucide-react";
+import { FileText, ChevronDown, ChevronUp, Calendar, DollarSign, ShieldCheck, AlertCircle, CreditCard, Clock, Car, Zap, Loader2, X, RefreshCw, CheckCircle2, XCircle, CloudOff, Cloud } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 import { usePageTitle } from "@/hooks/use-page-title";
 import type { Invoice, User } from "@shared/schema";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { loadStripe, type Stripe as StripeType, type StripeElements } from "@stripe/stripe-js";
 
 let stripePromise: Promise<StripeType | null> | null = null;
@@ -174,7 +175,94 @@ function StripePaymentModal({
   );
 }
 
-function InvoiceRow({ invoice, onPaySuccess }: { invoice: Invoice; onPaySuccess: () => void }) {
+type InvoiceWithQb = Invoice;
+
+function QbSyncBadge({ invoice, onSyncSuccess }: { invoice: InvoiceWithQb; onSyncSuccess: () => void }) {
+  const { toast } = useToast();
+  const [syncing, setSyncing] = useState(false);
+  const qbSync = invoice.qbSyncStatus || null;
+  const qbError = invoice.qbSyncError || null;
+  const qbLastSynced = invoice.qbLastSyncedAt || null;
+
+  const handleSync = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSyncing(true);
+    try {
+      await apiRequest("POST", "/api/quickbooks/sync-invoice", { invoiceId: invoice.id });
+      toast({ title: "Synced", description: "Invoice synced to QuickBooks." });
+      onSyncSuccess();
+    } catch (err) {
+      toast({ title: "Sync failed", description: err instanceof Error ? err.message : "Failed to sync", variant: "destructive" });
+    } finally {
+      setSyncing(false);
+    }
+  };
+
+  if (!qbSync) {
+    return (
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button
+            onClick={handleSync}
+            disabled={syncing}
+            className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors"
+            data-testid={`button-qb-sync-${invoice.id}`}
+          >
+            {syncing ? <Loader2 className="w-3 h-3 animate-spin" /> : <CloudOff className="w-3 h-3" />}
+            Not synced
+          </button>
+        </TooltipTrigger>
+        <TooltipContent>Click to sync to QuickBooks</TooltipContent>
+      </Tooltip>
+    );
+  }
+
+  if (qbSync === "syncing") {
+    return (
+      <span className="inline-flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400" data-testid={`badge-qb-syncing-${invoice.id}`}>
+        <Loader2 className="w-3 h-3 animate-spin" /> Syncing...
+      </span>
+    );
+  }
+
+  if (qbSync === "synced") {
+    return (
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <span className="inline-flex items-center gap-1 text-xs text-green-600 dark:text-green-400" data-testid={`badge-qb-synced-${invoice.id}`}>
+            <CheckCircle2 className="w-3 h-3" /> QB Synced
+          </span>
+        </TooltipTrigger>
+        <TooltipContent>
+          {qbLastSynced ? `Last synced: ${new Date(qbLastSynced).toLocaleString()}` : "Synced to QuickBooks"}
+        </TooltipContent>
+      </Tooltip>
+    );
+  }
+
+  if (qbSync === "error") {
+    return (
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button
+            onClick={handleSync}
+            disabled={syncing}
+            className="inline-flex items-center gap-1 text-xs text-red-600 dark:text-red-400 hover:text-red-700 transition-colors"
+            data-testid={`button-qb-retry-${invoice.id}`}
+          >
+            {syncing ? <Loader2 className="w-3 h-3 animate-spin" /> : <XCircle className="w-3 h-3" />}
+            Sync Error
+          </button>
+        </TooltipTrigger>
+        <TooltipContent>{qbError || "Sync failed. Click to retry."}</TooltipContent>
+      </Tooltip>
+    );
+  }
+
+  return null;
+}
+
+function InvoiceRow({ invoice, onPaySuccess, qbConnected }: { invoice: InvoiceWithQb; onPaySuccess: () => void; qbConnected: boolean }) {
   const [expanded, setExpanded] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
   const items = (invoice.lineItems as LineItem[]) || [];
@@ -197,8 +285,9 @@ function InvoiceRow({ invoice, onPaySuccess }: { invoice: Invoice; onPaySuccess:
               <div className="font-bold text-sm">
                 {invoice.periodStart} to {invoice.periodEnd}
               </div>
-              <div className="text-xs text-muted-foreground mt-0.5">
-                {items.length} line item{items.length !== 1 ? "s" : ""}
+              <div className="text-xs text-muted-foreground mt-0.5 flex items-center gap-2">
+                <span>{items.length} line item{items.length !== 1 ? "s" : ""}</span>
+                {qbConnected && <QbSyncBadge invoice={invoice} onSyncSuccess={onPaySuccess} />}
               </div>
             </div>
           </div>
@@ -372,6 +461,10 @@ export default function InvoicesPage() {
   usePageTitle("Invoices");
   const { toast } = useToast();
   const { data: me } = useQuery<User>({ queryKey: ["/api/me"] });
+  const { data: qbStatus } = useQuery<{ connected: boolean; enabled: boolean }>({
+    queryKey: ["/api/quickbooks/status"],
+  });
+  const qbConnected = qbStatus?.connected || false;
   const now = new Date();
   const firstOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
   const lastOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
@@ -379,7 +472,7 @@ export default function InvoicesPage() {
   const [periodStart, setPeriodStart] = useState(formatDate(firstOfMonth));
   const [periodEnd, setPeriodEnd] = useState(formatDate(lastOfMonth));
 
-  const { data: invoiceList, isLoading, isError, refetch } = useQuery<Invoice[]>({
+  const { data: invoiceList, isLoading, isError, refetch } = useQuery<InvoiceWithQb[]>({
     queryKey: ["/api/invoices", me?.id],
     queryFn: async () => {
       const res = await fetch(`/api/invoices?participantId=${me?.id}`);
@@ -486,7 +579,7 @@ export default function InvoicesPage() {
       <div className="space-y-3">
         {invoiceList && invoiceList.length > 0 ? (
           invoiceList.map((inv) => (
-            <InvoiceRow key={inv.id} invoice={inv} onPaySuccess={handlePaySuccess} />
+            <InvoiceRow key={inv.id} invoice={inv} onPaySuccess={handlePaySuccess} qbConnected={qbConnected} />
           ))
         ) : (
           <Card className="p-8 text-center text-sm text-muted-foreground">

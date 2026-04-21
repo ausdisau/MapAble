@@ -22,6 +22,7 @@ declare module "express-session" {
     auth0Login?: boolean;
     auth0State?: string;
     auth0CodeVerifier?: string;
+    qbOAuthState?: string;
   }
 }
 

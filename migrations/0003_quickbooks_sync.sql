@@ -1,0 +1,9 @@
+ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "qb_access_token" text;
+ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "qb_refresh_token" text;
+ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "qb_realm_id" text;
+ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "qb_token_expires_at" timestamp;
+ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "qb_connected_at" timestamp;
+ALTER TABLE "invoices" ADD COLUMN IF NOT EXISTS "qb_invoice_id" text;
+ALTER TABLE "invoices" ADD COLUMN IF NOT EXISTS "qb_sync_status" text;
+ALTER TABLE "invoices" ADD COLUMN IF NOT EXISTS "qb_sync_error" text;
+ALTER TABLE "invoices" ADD COLUMN IF NOT EXISTS "qb_last_synced_at" timestamp;

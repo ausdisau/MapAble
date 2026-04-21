@@ -32,6 +32,7 @@ import {
 } from "./chat-engine";
 import { getStripe, stripeEnabled } from "./stripe";
 import { orbEnabled, createOrbCustomer, createOrbSubscription, ingestCareHoursEvent, ingestTransportKmEvent, getCustomerUsage, verifyAndUnwrapWebhook } from "./orb";
+import { qbEnabled, getQbAuthUrl, exchangeQbCode, pushInvoiceToQb, pullPaymentsFromQb, syncAllInvoices, handleQbWebhook, startPaymentPolling } from "./quickbooks";
 
 const patchUserSchema = z.object({
   fullName: z.string().min(1).max(200).optional(),
@@ -44,6 +45,11 @@ function requireAuth(req: Request, res: Response, next: NextFunction) {
     return res.status(401).json({ message: "Not authenticated" });
   }
   next();
+}
+
+function sanitizeUser(user: Record<string, any>) {
+  const { password, qbAccessToken, qbRefreshToken, qbTokenExpiresAt, ...safe } = user;
+  return safe;
 }
 
 export async function registerRoutes(
@@ -90,8 +96,7 @@ export async function registerRoutes(
     }
     req.session.userId = user.id;
 
-    const { password: _, ...safeUser } = user;
-    res.json(safeUser);
+    res.json(sanitizeUser(user));
   });
 
   app.post("/api/auth/logout", (req, res) => {
@@ -113,8 +118,7 @@ export async function registerRoutes(
       req.session.destroy(() => {});
       return res.status(401).json({ message: "User not found" });
     }
-    const { password, ...safeUser } = user;
-    res.json({ ...safeUser, auth0Login: !!req.session.auth0Login });
+    res.json({ ...sanitizeUser(user), auth0Login: !!req.session.auth0Login });
   });
 
   const auth0Domain = process.env.AUTH0_DOMAIN || "";
@@ -463,8 +467,7 @@ export async function registerRoutes(
       }
 
       req.session.userId = user.id;
-      const { password: _, ...safeUser } = user;
-      res.status(201).json(safeUser);
+      res.status(201).json(sanitizeUser(user));
     } catch (error) {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Validation error", errors: error.errors });
@@ -487,7 +490,10 @@ export async function registerRoutes(
       req.path.startsWith("/ndis/lookup/") ||
       req.path === "/webhooks/stripe" ||
       req.path === "/webhooks/orb" ||
-      req.path === "/stripe/config"
+      req.path === "/stripe/config" ||
+      req.path === "/quickbooks/config" ||
+      req.path === "/quickbooks/callback" ||
+      req.path === "/quickbooks/webhook"
     ) {
       return next();
     }
@@ -612,8 +618,7 @@ export async function registerRoutes(
   app.get("/api/me", async (req, res) => {
     const user = await storage.getUser(req.session.userId!);
     if (!user) return res.status(404).json({ message: "No user found" });
-    const { password, ...safeUser } = user;
-    res.json(safeUser);
+    res.json(sanitizeUser(user));
   });
 
   app.patch("/api/me", async (req, res) => {
@@ -624,8 +629,7 @@ export async function registerRoutes(
     const { fullName, email, location } = parsed.data;
     const updated = await storage.updateUserProfile(user.id, { fullName, email, location });
     if (!updated) return res.status(500).json({ message: "Update failed" });
-    const { password, ...safeUser } = updated;
-    res.json(safeUser);
+    res.json(sanitizeUser(updated));
   });
 
   app.get("/api/workers", async (_req, res) => {
@@ -1145,6 +1149,16 @@ export async function registerRoutes(
       return res.status(400).json({ message: "participantId, periodStart, and periodEnd required" });
     }
     const invoice = await storage.generateInvoice(participantId, periodStart, periodEnd);
+
+    if (qbEnabled()) {
+      const user = await storage.getUser(participantId);
+      if (user?.qbAccessToken && user?.qbRealmId) {
+        pushInvoiceToQb(participantId, invoice.id).catch((err) => {
+          console.error("Auto QB sync failed for new invoice:", err);
+        });
+      }
+    }
+
     res.status(201).json(invoice);
   });
 
@@ -1153,6 +1167,23 @@ export async function registerRoutes(
     if (!participantId) return res.status(400).json({ message: "participantId required" });
     const invoiceList = await storage.getInvoices(participantId);
     res.json(invoiceList);
+  });
+
+  app.patch("/api/invoices/:id/status", requireAuth, async (req, res) => {
+    const { status } = req.body;
+    if (!status) return res.status(400).json({ message: "status required" });
+    const invoice = await storage.getInvoiceById(req.params.id);
+    if (!invoice) return res.status(404).json({ message: "Invoice not found" });
+    if (invoice.participantId !== req.session.userId) {
+      return res.status(403).json({ message: "Not authorized" });
+    }
+    const updated = await storage.updateInvoicePayment(req.params.id, { status });
+    if (updated && updated.qbInvoiceId && qbEnabled()) {
+      pushInvoiceToQb(invoice.participantId, invoice.id).catch((err) =>
+        console.error("QB re-sync after invoice status update failed:", err)
+      );
+    }
+    res.json(updated);
   });
 
   app.get("/api/budget", async (req, res) => {
@@ -1342,6 +1373,12 @@ export async function registerRoutes(
             stripePaymentStatus: "succeeded",
             status: "paid",
           });
+          const inv = await storage.getInvoiceById(invoiceId);
+          if (inv?.qbInvoiceId && qbEnabled()) {
+            pushInvoiceToQb(inv.participantId, invoiceId).catch((e) =>
+              console.error("QB re-sync after Stripe payment failed:", e)
+            );
+          }
         }
         break;
       }
@@ -1843,6 +1880,139 @@ export async function registerRoutes(
       res.status(500).json({ message: "Failed to submit claim" });
     }
   });
+
+  app.get("/api/quickbooks/config", (_req, res) => {
+    res.json({ enabled: qbEnabled() });
+  });
+
+  app.get("/api/quickbooks/status", requireAuth, async (req, res) => {
+    const user = await storage.getUser(req.session.userId!);
+    if (!user) return res.status(404).json({ message: "User not found" });
+    res.json({
+      connected: !!(user.qbAccessToken && user.qbRealmId),
+      realmId: user.qbRealmId || null,
+      connectedAt: user.qbConnectedAt || null,
+      enabled: qbEnabled(),
+    });
+  });
+
+  app.get("/api/quickbooks/connect", requireAuth, (req, res) => {
+    if (!qbEnabled()) {
+      return res.status(503).json({ message: "QuickBooks integration is not configured" });
+    }
+    const state = `${req.session.userId}:${crypto.randomBytes(16).toString("hex")}`;
+    req.session.qbOAuthState = state;
+    const authUrl = getQbAuthUrl(state);
+    res.json({ authUrl });
+  });
+
+  app.get("/api/quickbooks/callback", async (req, res) => {
+    const { code, state, realmId } = req.query as { code: string; state: string; realmId: string };
+
+    if (!code || !state || !realmId) {
+      return res.redirect("/settings?qb_error=missing_params");
+    }
+
+    if (!req.session.userId || !req.session.qbOAuthState || req.session.qbOAuthState !== state) {
+      return res.redirect("/settings?qb_error=invalid_state");
+    }
+
+    const userId = req.session.userId;
+    req.session.qbOAuthState = undefined;
+
+    try {
+      const tokens = await exchangeQbCode(code);
+      const expiresAt = new Date(Date.now() + tokens.expires_in * 1000);
+
+      await storage.updateUserQbTokens(userId, {
+        qbAccessToken: tokens.access_token,
+        qbRefreshToken: tokens.refresh_token,
+        qbRealmId: realmId,
+        qbTokenExpiresAt: expiresAt,
+        qbConnectedAt: new Date(),
+      });
+
+      res.redirect("/settings?qb_success=true");
+    } catch (error) {
+      console.error("QuickBooks OAuth callback error:", error);
+      res.redirect("/settings?qb_error=token_exchange_failed");
+    }
+  });
+
+  app.post("/api/quickbooks/disconnect", requireAuth, async (req, res) => {
+    await storage.clearUserQbTokens(req.session.userId!);
+    res.json({ success: true });
+  });
+
+  app.post("/api/quickbooks/sync-invoice", requireAuth, async (req, res) => {
+    const { invoiceId } = req.body;
+    if (!invoiceId) return res.status(400).json({ message: "invoiceId required" });
+
+    const invoice = await storage.getInvoiceById(invoiceId);
+    if (!invoice) return res.status(404).json({ message: "Invoice not found" });
+    if (invoice.participantId !== req.session.userId) {
+      return res.status(403).json({ message: "Not authorized to sync this invoice" });
+    }
+
+    try {
+      const synced = await pushInvoiceToQb(req.session.userId!, invoiceId);
+      res.json({ success: true, invoice: synced });
+    } catch (error) {
+      res.status(500).json({
+        message: error instanceof Error ? error.message : "Failed to sync invoice to QuickBooks",
+      });
+    }
+  });
+
+  app.post("/api/quickbooks/pull-payments", requireAuth, async (req, res) => {
+    try {
+      const result = await pullPaymentsFromQb(req.session.userId!);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({
+        message: error instanceof Error ? error.message : "Failed to pull payments from QuickBooks",
+      });
+    }
+  });
+
+  app.post("/api/quickbooks/sync-all", requireAuth, async (req, res) => {
+    try {
+      const result = await syncAllInvoices(req.session.userId!);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({
+        message: error instanceof Error ? error.message : "Failed to sync with QuickBooks",
+      });
+    }
+  });
+
+  app.post("/api/quickbooks/webhook", async (req, res) => {
+    try {
+      const verifierToken = process.env.QB_WEBHOOK_VERIFIER_TOKEN;
+      if (req.headers["intuit-signature"] && verifierToken) {
+        const crypto = await import("crypto");
+        const rawPayload = (req as { rawBody?: Buffer }).rawBody || Buffer.from(JSON.stringify(req.body));
+        const hash = crypto.createHmac("sha256", verifierToken).update(rawPayload).digest("base64");
+        if (hash !== req.headers["intuit-signature"]) {
+          return res.status(401).json({ message: "Invalid webhook signature" });
+        }
+      }
+
+      if (req.body?.challenge) {
+        return res.status(200).send(req.body.challenge);
+      }
+
+      await handleQbWebhook(req.body);
+      res.status(200).json({ received: true });
+    } catch (error) {
+      console.error("QB webhook error:", error);
+      res.status(200).json({ received: true });
+    }
+  });
+
+  if (qbEnabled()) {
+    startPaymentPolling();
+  }
 
   return httpServer;
 }

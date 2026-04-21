@@ -23,7 +23,7 @@ import {
   workerAvailability, workerBlockouts, shifts, ndisPlanCache,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, and, sql, gte, lte, inArray } from "drizzle-orm";
+import { eq, desc, and, sql, gte, lte, inArray, isNotNull } from "drizzle-orm";
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
@@ -89,6 +89,13 @@ export interface IStorage {
   getUpcomingShifts(participantId: string): Promise<Shift[]>;
   getNdisPlanGoals(participantId: string): Promise<NdisPlanCache | undefined>;
   getPendingInvoices(participantId: string): Promise<Invoice[]>;
+  updateUserQbTokens(userId: string, data: { qbAccessToken: string; qbRefreshToken: string; qbRealmId: string; qbTokenExpiresAt: Date; qbConnectedAt?: Date }): Promise<User | undefined>;
+  clearUserQbTokens(userId: string): Promise<User | undefined>;
+  updateInvoiceQbSync(invoiceId: string, data: { qbInvoiceId?: string; qbSyncStatus?: string; qbSyncError?: string | null; qbLastSyncedAt?: Date }): Promise<Invoice | undefined>;
+  getInvoicesByQbSyncStatus(status: string): Promise<Invoice[]>;
+  getAllInvoicesForSync(participantId: string): Promise<Invoice[]>;
+  getUsersByQbRealmId(realmId: string): Promise<User[]>;
+  getQbConnectedUsers(): Promise<User[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -592,6 +599,55 @@ export class DatabaseStorage implements IStorage {
         )
       )
       .orderBy(desc(invoices.generatedAt));
+  }
+
+  async updateUserQbTokens(userId: string, data: { qbAccessToken: string; qbRefreshToken: string; qbRealmId: string; qbTokenExpiresAt: Date; qbConnectedAt?: Date }): Promise<User | undefined> {
+    const setData: Record<string, any> = {
+      qbAccessToken: data.qbAccessToken,
+      qbRefreshToken: data.qbRefreshToken,
+      qbRealmId: data.qbRealmId,
+      qbTokenExpiresAt: data.qbTokenExpiresAt,
+    };
+    if (data.qbConnectedAt) setData.qbConnectedAt = data.qbConnectedAt;
+    const [user] = await db.update(users).set(setData).where(eq(users.id, userId)).returning();
+    return user;
+  }
+
+  async clearUserQbTokens(userId: string): Promise<User | undefined> {
+    const [user] = await db.update(users).set({
+      qbAccessToken: null,
+      qbRefreshToken: null,
+      qbRealmId: null,
+      qbTokenExpiresAt: null,
+      qbConnectedAt: null,
+    }).where(eq(users.id, userId)).returning();
+    return user;
+  }
+
+  async updateInvoiceQbSync(invoiceId: string, data: { qbInvoiceId?: string; qbSyncStatus?: string; qbSyncError?: string | null; qbLastSyncedAt?: Date }): Promise<Invoice | undefined> {
+    const setData: Record<string, any> = {};
+    if (data.qbInvoiceId !== undefined) setData.qbInvoiceId = data.qbInvoiceId;
+    if (data.qbSyncStatus !== undefined) setData.qbSyncStatus = data.qbSyncStatus;
+    if (data.qbSyncError !== undefined) setData.qbSyncError = data.qbSyncError;
+    if (data.qbLastSyncedAt !== undefined) setData.qbLastSyncedAt = data.qbLastSyncedAt;
+    const [invoice] = await db.update(invoices).set(setData).where(eq(invoices.id, invoiceId)).returning();
+    return invoice;
+  }
+
+  async getInvoicesByQbSyncStatus(status: string): Promise<Invoice[]> {
+    return db.select().from(invoices).where(eq(invoices.qbSyncStatus, status)).orderBy(desc(invoices.generatedAt));
+  }
+
+  async getAllInvoicesForSync(participantId: string): Promise<Invoice[]> {
+    return db.select().from(invoices).where(eq(invoices.participantId, participantId)).orderBy(desc(invoices.generatedAt));
+  }
+
+  async getUsersByQbRealmId(realmId: string): Promise<User[]> {
+    return db.select().from(users).where(eq(users.qbRealmId, realmId));
+  }
+
+  async getQbConnectedUsers(): Promise<User[]> {
+    return db.select().from(users).where(isNotNull(users.qbRealmId));
   }
 }
 
