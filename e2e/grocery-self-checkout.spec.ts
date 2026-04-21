@@ -18,13 +18,10 @@ test.describe("Grocery self-checkout (Stripe modal)", () => {
     await page.getByTestId("input-delivery-address").fill(uniqueAddress());
     await page.getByTestId("input-delivery-time").fill("Tomorrow morning");
 
-    // Capture the order id and the pay endpoint response so we can assert clientSecret + cleanup.
-    // Safety guard: refuse to run against a live Stripe key. /api/grocery/orders/:id/pay
-    // creates real Stripe PaymentIntents server-side, so we only allow test mode here.
+    // Detect Stripe mode. We will only fill the test card if the key is a test publishable key.
     const cfg = await page.context().request.get("/api/stripe/config");
-    const cfgBody = await cfg.json();
-    const pk: string = cfgBody.publishableKey || "";
-    test.skip(!pk.startsWith("pk_test"), `Stripe key is not test mode (prefix=${pk.slice(0, 7)}); skipping to avoid live PaymentIntent creation`);
+    const pk: string = (await cfg.json()).publishableKey || "";
+    const stripeTestMode = pk.startsWith("pk_test");
 
     const orderResp = page.waitForResponse((r) =>
       r.url().endsWith("/api/grocery/orders") && r.request().method() === "POST" && r.status() < 300
@@ -36,15 +33,39 @@ test.describe("Grocery self-checkout (Stripe modal)", () => {
     const order = await (await orderResp).json();
     const pay = await (await payResp).json();
     expect(order.id, "order has id").toBeTruthy();
-    expect(pay.clientSecret, "pay returns clientSecret").toMatch(/^pi_/);
+    expect(pay.clientSecret, "pay returns a Stripe clientSecret").toMatch(/^pi_/);
 
     await expect(page.getByTestId("modal-grocery-payment")).toBeVisible();
     await expect(page.getByTestId("button-confirm-grocery-payment")).toBeVisible({ timeout: 20_000 });
 
-    // Close modal without paying — we don't want to charge a real Stripe key in CI.
-    await page.getByTestId("button-close-grocery-payment").click();
+    if (stripeTestMode) {
+      // Fill Stripe test card 4242 4242 4242 4242 inside the Payment Element iframe(s),
+      // then confirm. Server logs payment_status via the /confirm route.
+      const paymentFrame = page.frameLocator('iframe[name^="__privateStripeFrame"]').first();
+      await paymentFrame.locator('input[name="number"]').fill("4242424242424242");
+      await paymentFrame.locator('input[name="expiry"]').fill("12 / 34");
+      await paymentFrame.locator('input[name="cvc"]').fill("123");
+      // Postal code is required for some country defaults.
+      const postal = paymentFrame.locator('input[name="postalCode"]');
+      if (await postal.count()) await postal.fill("2000");
 
-    // Best-effort cleanup; placed-but-unpaid order is acceptable to leave but try to delete.
+      const confirmResp = page.waitForResponse((r) =>
+        /\/api\/grocery\/orders\/[^/]+\/confirm$/.test(r.url()) && r.request().method() === "POST"
+      );
+      await page.getByTestId("button-confirm-grocery-payment").click();
+      const confirmRaw = await confirmResp;
+      expect(confirmRaw.ok(), `confirm-payment ok (status=${confirmRaw.status()})`).toBeTruthy();
+
+      // Order should now reflect a paid/processing payment status server-side.
+      const refreshed = await api.get(`/api/grocery/orders/${order.id}`);
+      const body = await refreshed.json();
+      expect(["succeeded", "processing", "paid"], `payment status (got=${body.paymentStatus})`).toContain(body.paymentStatus);
+    } else {
+      // Non-test Stripe key (or no key): close the modal without confirming so we never
+      // capture a real-mode payment from automated tests.
+      await page.getByTestId("button-close-grocery-payment").click();
+    }
+
     await deleteOrder(api, order.id);
   });
 });

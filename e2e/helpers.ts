@@ -48,12 +48,16 @@ export async function pickWorkerId(api: APIRequestContext): Promise<string> {
 }
 
 export async function deleteOrder(api: APIRequestContext, orderId: string) {
-  // Best-effort cleanup (route may not exist; ignore failures).
-  try { await api.delete(`/api/grocery/orders/${orderId}`); } catch {}
+  // Strict cleanup: fail the test if the order cannot be removed (prevents accumulating state).
+  const res = await api.delete(`/api/grocery/orders/${orderId}`);
+  expect(res.ok(), `cleanup: delete order ${orderId} (status=${res.status()})`).toBeTruthy();
 }
 
 export async function deleteShift(api: APIRequestContext, shiftId: string) {
-  try { await api.delete(`/api/shifts/${shiftId}`); } catch {}
+  const res = await api.delete(`/api/shifts/${shiftId}`);
+  // 404 acceptable (already gone), but any other failure should surface.
+  if (res.status() === 404) return;
+  expect(res.ok(), `cleanup: delete shift ${shiftId} (status=${res.status()})`).toBeTruthy();
 }
 
 export function uniqueAddress(): string {
