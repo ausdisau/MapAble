@@ -111,13 +111,18 @@ app.use((req, res, next) => {
   if (process.env.GROCERY_SUPPLIER_AUTOSYNC === "1" && process.env.GROCERY_SUPPLIER_DISABLED !== "1") {
     (async () => {
       try {
-        const { syncGroceryCatalog } = await import("./grocery-supplier");
+        const { syncGroceryCatalog, getSupplierProvider } = await import("./grocery-supplier");
         const { storage } = await import("./storage");
         const status = await storage.getGroceryCatalogStatus();
-        // Only auto-sync if nothing real has been pulled yet; never overwrite a recent admin sync.
-        if (status.supplierCount === 0) {
+        // bySource has one entry per supplier_source (e.g. "seed", "openfoodfacts").
+        // Only auto-sync when nothing from a non-seed provider has been pulled yet.
+        const provider = getSupplierProvider();
+        const supplierCount = status.bySource[provider] ?? 0;
+        if (supplierCount === 0) {
           const result = await syncGroceryCatalog();
-          console.log(`[grocery-supplier] autosync: upserted=${result.upserted} replacedSeed=${result.replacedSeed}`);
+          console.log(`[grocery-supplier] autosync: provider=${result.provider} fetched=${result.fetched} upserted=${result.upserted} removedSeed=${result.removedSeed}`);
+        } else {
+          console.log(`[grocery-supplier] autosync skipped: ${supplierCount} ${provider} products already present`);
         }
       } catch (e) {
         console.error("[grocery-supplier] autosync failed:", e);

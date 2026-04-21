@@ -19,7 +19,7 @@ import {
   planReviewBriefFeedbackSchema,
 } from "@shared/schema";
 import { generatePrepBrief, prepBriefEnabled, userMayUsePrepBrief } from "./plan-review-brief";
-import { buildAdapter, getSupplierLimit, getSupplierProvider, isSupplierEnabled, toInsertProduct } from "./grocery-supplier";
+import { getSupplierLimit, getSupplierProvider, isSupplierEnabled, syncGroceryCatalog } from "./grocery-supplier";
 import { z } from "zod";
 import { syncParticipantPlan, getCachedPlan, fetchPriceGuide, validateRateAgainstPriceGuide, submitNdisClaim, lookupParticipant, lookupProvider, lookupWorkerScreening } from "./ndis-api";
 
@@ -2338,19 +2338,9 @@ export async function registerRoutes(
     const limit = parsed.data.limit ?? getSupplierLimit();
 
     try {
-      const adapter = buildAdapter();
-      const supplierProducts = await adapter.fetchProducts({ limit });
-      let upserted = 0;
-      for (const sp of supplierProducts) {
-        await storage.upsertSupplierGroceryProduct(toInsertProduct(sp, adapter.name));
-        upserted++;
-      }
-      let removedSeed = 0;
-      if (replaceSeed && upserted > 0) {
-        removedSeed = await storage.deleteGroceryProductsBySource("seed");
-      }
+      const result = await syncGroceryCatalog({ limit, replaceSeed });
       const status = await storage.getGroceryCatalogStatus();
-      res.json({ provider: adapter.name, fetched: supplierProducts.length, upserted, removedSeed, status });
+      res.json({ ...result, status });
     } catch (e) {
       const message = e instanceof Error ? e.message : "Supplier sync failed";
       console.error("[grocery-supplier] sync failed:", message);
