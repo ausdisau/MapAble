@@ -5,3 +5,4 @@ export * from "./schema/billing";
 export * from "./schema/chat";
 export * from "./schema/scheduling";
 export * from "./schema/grocery";
+export * from "./schema/geo";
