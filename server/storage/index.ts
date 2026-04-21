@@ -146,6 +146,7 @@ export interface IStorage {
   wasWebhookProcessed(eventId: string): Promise<boolean>;
   recordWebhookEvent(eventId: string, eventType: string): Promise<void>;
   claimWebhookEvent(eventId: string, eventType: string): Promise<boolean>;
+  releaseWebhookEvent(eventId: string): Promise<void>;
   getInvoicesAwaitingAutoDebit(): Promise<(Invoice & { user?: User })[]>;
   recordPayoutEvent(data: { stripeId: string; kind: string; status: string; userId?: string | null; amountCents?: number | null; currency?: string | null; failureMessage?: string | null; payload?: Record<string, unknown> | null }): Promise<unknown>;
   listPayoutEvents(userId: string, limit?: number): Promise<unknown[]>;
@@ -510,6 +511,7 @@ export class DatabaseStorage implements IStorage {
   wasWebhookProcessed(...a: Parameters<IStorage["wasWebhookProcessed"]>) { return (paymentsStorage.wasWebhookProcessed as any).apply(this, a); }
   recordWebhookEvent(...a: Parameters<IStorage["recordWebhookEvent"]>) { return (paymentsStorage.recordWebhookEvent as any).apply(this, a); }
   claimWebhookEvent(...a: Parameters<IStorage["claimWebhookEvent"]>) { return (paymentsStorage.claimWebhookEvent as any).apply(this, a); }
+  releaseWebhookEvent(...a: Parameters<IStorage["releaseWebhookEvent"]>) { return (paymentsStorage.releaseWebhookEvent as any).apply(this, a); }
   getInvoicesAwaitingAutoDebit(...a: Parameters<IStorage["getInvoicesAwaitingAutoDebit"]>) { return (paymentsStorage.getInvoicesAwaitingAutoDebit as any).apply(this, a); }
   recordPayoutEvent(...a: Parameters<IStorage["recordPayoutEvent"]>) { return (paymentsStorage.recordPayoutEvent as any).apply(this, a); }
   listPayoutEvents(...a: Parameters<IStorage["listPayoutEvents"]>) { return (paymentsStorage.listPayoutEvents as any).apply(this, a); }
