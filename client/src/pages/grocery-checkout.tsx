@@ -22,6 +22,7 @@ import { usePageTitle } from "@/hooks/use-page-title";
 import { loadStripe, type Stripe as StripeType, type StripeElements } from "@stripe/stripe-js";
 import type { Worker, User, GroceryOrder } from "@shared/schema";
 import { Link } from "wouter";
+import { useAuth } from "@/hooks/use-auth";
 
 let stripePromise: Promise<StripeType | null> | null = null;
 function getStripe(publishableKey: string) {
@@ -151,6 +152,7 @@ export default function GroceryCheckoutPage() {
   const cart = useGroceryCart();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
+  const { user } = useAuth();
 
   const [mode, setMode] = useState<"delivery" | "worker">("delivery");
   const [deliveryAddress, setDeliveryAddress] = useState("");
@@ -201,7 +203,9 @@ export default function GroceryCheckoutPage() {
       if (!shiftDate) throw new Error("Please choose a date");
       if (!shoppingList.trim()) throw new Error("Please write a shopping list");
 
+      if (!user?.id) throw new Error("You must be signed in");
       const shiftRes = await apiRequest("POST", "/api/shifts", {
+        participantId: user.id,
         workerId,
         date: shiftDate,
         startTime: shiftStart,

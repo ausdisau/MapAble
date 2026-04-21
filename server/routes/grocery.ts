@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { z } from "zod";
 import { storage } from "../storage";
 import { getStripe, stripeEnabled } from "../stripe";
+import { getSupplierLimit, getSupplierProvider, syncGroceryCatalog } from "../grocery-supplier";
 import { getWorkerIdForUser, requireAuth } from "./shared";
 
 export function registerGroceryRoutes(app: Express) {
@@ -21,6 +22,39 @@ export function registerGroceryRoutes(app: Express) {
     const product = await storage.getGroceryProduct(req.params.id);
     if (!product) return res.status(404).json({ message: "Product not found" });
     res.json(product);
+  });
+
+  app.get("/api/grocery/supplier/status", requireAuth, async (req, res) => {
+    try {
+      const requester = await storage.getUser(req.session.userId!);
+      if (!requester || requester.role !== "admin") {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+      const status = await storage.getGroceryCatalogStatus();
+      res.json({ ...status, provider: getSupplierProvider(), limit: getSupplierLimit() });
+    } catch (e) {
+      console.error("Grocery supplier status failed:", e);
+      res.status(500).json({ message: "Failed to load supplier status" });
+    }
+  });
+
+  app.post("/api/grocery/supplier/sync", requireAuth, async (req, res) => {
+    try {
+      const requester = await storage.getUser(req.session.userId!);
+      if (!requester || requester.role !== "admin") {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+      const limit = req.body?.limit === undefined ? undefined : z.number().int().min(1).max(100).parse(req.body.limit);
+      const replaceSeed = req.body?.replaceSeed === undefined ? undefined : z.boolean().parse(req.body.replaceSeed);
+      const result = await syncGroceryCatalog({ limit, replaceSeed });
+      res.json(result);
+    } catch (e) {
+      if (e instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: e.errors });
+      }
+      console.error("Grocery supplier sync failed:", e);
+      res.status(502).json({ message: e instanceof Error ? e.message : "Supplier sync failed" });
+    }
   });
 
   const createGroceryOrderSchema = z.object({
