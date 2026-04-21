@@ -12,6 +12,7 @@ import type { ChatSession, ChatMessage, AccessContextProfile } from "@shared/sch
 import { AccessProfileWizard } from "@/components/access-profile-wizard";
 import { BarrierReportForm } from "@/components/barrier-report-form";
 import { QUICK_ACTION_CONFIG, CONFIDENCE_CONFIG } from "@/components/chat-shared/quick-actions";
+import type { CartItem } from "@/lib/grocery-cart";
 
 interface ChatResponse {
   content: string;
@@ -213,7 +214,19 @@ export default function ChatPage() {
 
   const sendMutation = useMutation({
     mutationFn: async ({ sessionId, message }: { sessionId: string; message: string }) => {
-      const res = await apiRequest("POST", "/api/chat/send", { sessionId, message });
+      let groceryCart: CartItem[] | undefined;
+      try {
+        const raw = localStorage.getItem("mapable-grocery-cart-v1");
+        if (raw) {
+          const parsed = JSON.parse(raw) as unknown;
+          if (Array.isArray(parsed)) groceryCart = parsed as CartItem[];
+        }
+      } catch {}
+      const res = await apiRequest("POST", "/api/chat/send", {
+        sessionId,
+        message,
+        clientContext: groceryCart ? { groceryCart } : undefined,
+      });
       return res.json() as Promise<ChatResponse>;
     },
     onSuccess: () => {

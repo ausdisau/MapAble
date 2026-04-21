@@ -21,6 +21,7 @@ import {
   AlertCircle,
   AlertTriangle,
   Loader2,
+  ShoppingCart,
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useState } from "react";
@@ -28,7 +29,78 @@ import { usePageTitle } from "@/hooks/use-page-title";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import type { Worker, User, Job } from "@shared/schema";
+import type { Worker, User, Job, GroceryOrder } from "@shared/schema";
+
+const GROCERY_STATUS_LABELS: Record<string, string> = {
+  placed: "Placed",
+  confirmed: "Confirmed",
+  shopping: "Shopping",
+  out_for_delivery: "Out for delivery",
+  delivered: "Delivered",
+  cancelled: "Cancelled",
+};
+
+function ActiveGroceryOrders() {
+  const { data: orders, isLoading } = useQuery<GroceryOrder[]>({
+    queryKey: ["/api/grocery/orders"],
+  });
+
+  if (isLoading) return null;
+  const active = (orders || []).filter(
+    (o) => !["delivered", "cancelled"].includes(o.status),
+  );
+  if (active.length === 0) return null;
+
+  return (
+    <Card className="p-5" data-testid="card-active-grocery-orders">
+      <div className="flex items-center justify-between gap-2 mb-4">
+        <div className="flex items-center gap-2">
+          <ShoppingCart className="w-5 h-5 text-[#2EAA6E]" />
+          <h2 className="text-lg font-black tracking-tight">
+            Active grocery orders
+          </h2>
+        </div>
+        <Link href="/groceries/orders">
+          <Button variant="secondary" size="sm" className="gap-1" data-testid="button-view-all-grocery-orders">
+            View all <ArrowRight className="w-3 h-3" />
+          </Button>
+        </Link>
+      </div>
+      <ul className="space-y-2">
+        {active.slice(0, 3).map((o) => (
+          <li key={o.id}>
+            <Link href={`/groceries/orders/${o.id}`}>
+              <div
+                className="flex items-center justify-between gap-3 p-3 rounded-md border hover-elevate cursor-pointer"
+                data-testid={`dashboard-grocery-order-${o.id}`}
+              >
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-semibold text-sm">
+                      Order #{o.id.slice(0, 8)}
+                    </span>
+                    <Badge variant="secondary" className="text-xs">
+                      {GROCERY_STATUS_LABELS[o.status] || o.status}
+                    </Badge>
+                    {o.workerId && (
+                      <Badge variant="outline" className="text-xs">Worker assisted</Badge>
+                    )}
+                  </div>
+                  <p className="text-xs text-muted-foreground line-clamp-1 mt-1">
+                    {o.deliveryAddress}
+                  </p>
+                </div>
+                <span className="font-black text-[#2EAA6E] text-sm">
+                  ${Number(o.totalAmount).toFixed(2)}
+                </span>
+              </div>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </Card>
+  );
+}
 
 interface AbnStatus {
   hasWorkerProfile: boolean;
@@ -239,10 +311,18 @@ function QuickActions() {
       iconBg: "bg-[#E6A817]/15 dark:bg-[#E6A817]/20",
       iconColor: "text-[#C48F14] dark:text-[#E6A817]",
     },
+    {
+      title: "Order Groceries",
+      description: "Delivered to your door, or book a worker to shop",
+      icon: ShoppingCart,
+      href: "/groceries",
+      iconBg: "bg-[#E6A817]/15 dark:bg-[#E6A817]/20",
+      iconColor: "text-[#C48F14] dark:text-[#E6A817]",
+    },
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       {actions.map((action) => (
         <Link key={action.title} href={action.href}>
           <Card className="p-5 cursor-pointer hover-elevate h-full">
@@ -415,6 +495,7 @@ export default function Dashboard() {
       </div>
 
       <QuickActions />
+      <ActiveGroceryOrders />
       <FeaturedWorkers />
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">

@@ -1,0 +1,1879 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://www.opengis.net/kml/2.2 http://schemas.opengis.net/kml/2.2.0/ogckml22.xsd http://www.google.com/kml/ext/2.2 http://code.google.com/apis/kml/schema/kml22gx.xsd">
+<Document id="all-abilities-playgrounds.lyr">
+  <name>all-abilities-playgrounds.lyr</name>
+  <Snippet></Snippet>
+  <Folder id="FeatureLayer0">
+    <name>all-abilities-playgrounds.lyr</name>
+    <Snippet></Snippet>
+    <Placemark id="ID_00001">
+      <name>Anzac Park All Abilities Playground</name>
+      <Snippet></Snippet>
+      <description><![CDATA[<html xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:msxsl="urn:schemas-microsoft-com:xslt">
+<head>
+<META http-equiv="Content-Type" content="text/html">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+</head>
+<body style="margin:0px 0px 0px 0px;overflow:auto;background:#FFFFFF;">
+<table style="font-family:Arial,Verdana,Times;font-size:12px;text-align:left;width:100%;border-collapse:collapse;padding:3px 3px 3px 3px">
+<tr style="text-align:center;font-weight:bold;background:#9CBCE2">
+<td>Anzac Park All Abilities Playground</td>
+</tr>
+<tr>
+<td>
+<table style="font-family:Arial,Verdana,Times;font-size:12px;text-align:left;width:100%;border-spacing:0px; padding:3px 3px 3px 3px">
+<tr>
+<td>FID</td>
+<td>0</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Name</td>
+<td>Anzac Park All Abilities Playground</td>
+</tr>
+<tr>
+<td>Address1</td>
+<td>Macmillan Street</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Address2</td>
+<td></td>
+</tr>
+<tr>
+<td>Suburb</td>
+<td>Ayr</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Postcode</td>
+<td>4807</td>
+</tr>
+<tr>
+<td>Playground</td>
+<td>Interactive music elements, climbing net, bird's nest swing, garden see-saw, play structure with slide, sensory plants, wheelchair-accessible Sway Fun rocker</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Facilities</td>
+<td>Picnic shelter with a barbecue, automated unisex toilet, drinking fountain, bench and platform seating, bike stands and soft-fall rubberised surfacing throughout</td>
+</tr>
+<tr>
+<td>Weblink</td>
+<td></td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image1</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/ayr-flags</td>
+</tr>
+<tr>
+<td>Image1Desc</td>
+<td>Established gardens, including large trees, provide shade and opportunities for children to enjoy and explore nature</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image2</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/ayr-equipment</td>
+</tr>
+<tr>
+<td>Image2Desc</td>
+<td>A variety of play equipment ensures children of all abilities have a fun and inclusive play experience</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image3</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/ayr-drive</td>
+</tr>
+<tr>
+<td>Image3Desc</td>
+<td>Driving can be so much fun!</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image4</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/ayr-facepaint</td>
+</tr>
+<tr>
+<td>Image4Desc</td>
+<td>Face painting was one of the attractions and part of the fun on the opening day</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Contact</td>
+<td>Burdekin Shire Council on (07) 4783 9800</td>
+</tr>
+<tr>
+<td>Latitude</td>
+<td>-19.580053</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Longitude</td>
+<td>147.40314</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</body>
+</html>
+]]></description>
+      <styleUrl>#IconStyle01</styleUrl>
+      <Point>
+        <altitudeMode>clampToGround</altitudeMode>
+        <coordinates> 147.40314,-19.58005299940358,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark id="ID_00002">
+      <name>Blackwater All Abilities Playground</name>
+      <Snippet></Snippet>
+      <description><![CDATA[<html xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:msxsl="urn:schemas-microsoft-com:xslt">
+<head>
+<META http-equiv="Content-Type" content="text/html">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+</head>
+<body style="margin:0px 0px 0px 0px;overflow:auto;background:#FFFFFF;">
+<table style="font-family:Arial,Verdana,Times;font-size:12px;text-align:left;width:100%;border-collapse:collapse;padding:3px 3px 3px 3px">
+<tr style="text-align:center;font-weight:bold;background:#9CBCE2">
+<td>Blackwater All Abilities Playground</td>
+</tr>
+<tr>
+<td>
+<table style="font-family:Arial,Verdana,Times;font-size:12px;text-align:left;width:100%;border-spacing:0px; padding:3px 3px 3px 3px">
+<tr>
+<td>FID</td>
+<td>1</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Name</td>
+<td>Blackwater All Abilities Playground</td>
+</tr>
+<tr>
+<td>Address1</td>
+<td>Blain Street</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Address2</td>
+<td></td>
+</tr>
+<tr>
+<td>Suburb</td>
+<td>Blackwater</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Postcode</td>
+<td>4717</td>
+</tr>
+<tr>
+<td>Playground</td>
+<td>Wheelchair-accessible Liberty Swing, flat-base swing and swing with a high-back seat and harness, sand and water play area featuring a dry creek bed, sand table and water spray, double flying fox, wheelchair-accessible carousel, natural logs and beams fo</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Facilities</td>
+<td>Large picnic shelter with accessible barbecues and picnic tables, toilet and change facility, perimeter fencing, shade trees, and car and bus parking</td>
+</tr>
+<tr>
+<td>Weblink</td>
+<td></td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image1</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/blackwater-view</td>
+</tr>
+<tr>
+<td>Image1Desc</td>
+<td>A range of different textures including sand makes for a fun play experience</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image2</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/blackwater-swings</td>
+</tr>
+<tr>
+<td>Image2Desc</td>
+<td>A range of swings available for children of all abilities and ages</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image3</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/blackwater-carousel</td>
+</tr>
+<tr>
+<td>Image3Desc</td>
+<td>Blue sky and sunny weather makes for great opening day celebrations</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image4</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/blackwater-libertyswing</td>
+</tr>
+<tr>
+<td>Image4Desc</td>
+<td>Using the Liberty Swing at opening day celebrations</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Contact</td>
+<td>Central Highlands Regional Council on 1300 242 686</td>
+</tr>
+<tr>
+<td>Latitude</td>
+<td>-23.575555</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Longitude</td>
+<td>148.88859</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</body>
+</html>
+]]></description>
+      <styleUrl>#IconStyle01</styleUrl>
+      <Point>
+        <altitudeMode>clampToGround</altitudeMode>
+        <coordinates> 148.88859,-23.57555499930768,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark id="ID_00003">
+      <name>Kurrawa All Abilities Playground</name>
+      <Snippet></Snippet>
+      <description><![CDATA[<html xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:msxsl="urn:schemas-microsoft-com:xslt">
+<head>
+<META http-equiv="Content-Type" content="text/html">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+</head>
+<body style="margin:0px 0px 0px 0px;overflow:auto;background:#FFFFFF;">
+<table style="font-family:Arial,Verdana,Times;font-size:12px;text-align:left;width:100%;border-collapse:collapse;padding:3px 3px 3px 3px">
+<tr style="text-align:center;font-weight:bold;background:#9CBCE2">
+<td>Kurrawa All Abilities Playground</td>
+</tr>
+<tr>
+<td>
+<table style="font-family:Arial,Verdana,Times;font-size:12px;text-align:left;width:100%;border-spacing:0px; padding:3px 3px 3px 3px">
+<tr>
+<td>FID</td>
+<td>2</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Name</td>
+<td>Kurrawa All Abilities Playground</td>
+</tr>
+<tr>
+<td>Address1</td>
+<td>Kurrawa Pratten Park</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Address2</td>
+<td>Old Burleigh Road</td>
+</tr>
+<tr>
+<td>Suburb</td>
+<td>Broadbeach</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Postcode</td>
+<td>4218</td>
+</tr>
+<tr>
+<td>Playground</td>
+<td>Sway Fun, bucket spinner, carousel swing with harnesses and a rocker (Undersea zone), accessible sandcastle with turret, sand tables at various heights and a slide, sound tubes and stepping blocks (Sandcastle zone), hill slides, basket swing, flying fox,</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Facilities</td>
+<td>Accessible car parking bays, bus drop-off zone, rubber and artificial turf surfacing, perimeter fencing and informal seating, amenities block featuring a change room with a hoist and adjustable table. Access to the change room is restricted. Contact coun</td>
+</tr>
+<tr>
+<td>Weblink</td>
+<td><a target="_blank" href="http://gcparks.com.au/parks.aspx?page=353">http://gcparks.com.au/parks.aspx?page=353</a></td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image1</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/kurrawa-maze</td>
+</tr>
+<tr>
+<td>Image1Desc</td>
+<td>A wheelchair-accessible maze, featuring sea-inspired images etched into panels</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image2</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/kurrawa-sway-fun-empty</td>
+</tr>
+<tr>
+<td>Image2Desc</td>
+<td>Resembling a boat, a Sway Fun has a rocking-gliding action and caters for all with bench seating and space for two wheelchairs at the same time</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image3</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/kurrawa-carousel-harness</td>
+</tr>
+<tr>
+<td>Image3Desc</td>
+<td>A carousel with harnesses</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image4</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/kurrawa-carousel-swing</td>
+</tr>
+<tr>
+<td>Image4Desc</td>
+<td>Having fun on the carousel swing</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Contact</td>
+<td>Gold Coast City Council on (07) 5581 6984</td>
+</tr>
+<tr>
+<td>Latitude</td>
+<td>-28.030208</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Longitude</td>
+<td>153.43496</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</body>
+</html>
+]]></description>
+      <styleUrl>#IconStyle01</styleUrl>
+      <Point>
+        <altitudeMode>clampToGround</altitudeMode>
+        <coordinates> 153.43496,-28.03020799921673,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark id="ID_00004">
+      <name>Capalaba Regional Park All Abilities Playground</name>
+      <Snippet></Snippet>
+      <description><![CDATA[<html xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:msxsl="urn:schemas-microsoft-com:xslt">
+<head>
+<META http-equiv="Content-Type" content="text/html">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+</head>
+<body style="margin:0px 0px 0px 0px;overflow:auto;background:#FFFFFF;">
+<table style="font-family:Arial,Verdana,Times;font-size:12px;text-align:left;width:100%;border-collapse:collapse;padding:3px 3px 3px 3px">
+<tr style="text-align:center;font-weight:bold;background:#9CBCE2">
+<td>Capalaba Regional Park All Abilities Playground</td>
+</tr>
+<tr>
+<td>
+<table style="font-family:Arial,Verdana,Times;font-size:12px;text-align:left;width:100%;border-spacing:0px; padding:3px 3px 3px 3px">
+<tr>
+<td>FID</td>
+<td>3</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Name</td>
+<td>Capalaba Regional Park All Abilities Playground</td>
+</tr>
+<tr>
+<td>Address1</td>
+<td>Capalaba Regional Park</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Address2</td>
+<td>Pittwin Road North</td>
+</tr>
+<tr>
+<td>Suburb</td>
+<td>Capalaba</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Postcode</td>
+<td>4157</td>
+</tr>
+<tr>
+<td>Playground</td>
+<td>Forts with ramp bridges, sand play area, swings, flying fox, rockers, climbing net, wheelchair-accessible Liberty Swing, chat boards, musical forest, natural plants, mounds and hilly areas, fitness equipment</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Facilities</td>
+<td>Electric barbeques, wheelchair accessible toilets, shelters, bench seating, shade trees, dog off-leash area, wide access bicycle and walking paths, car park</td>
+</tr>
+<tr>
+<td>Weblink</td>
+<td><a target="_blank" href="http://www.redland.qld.gov.au/RecreationFacilities/Parks/Pages/ParksDisabledFacilities.aspx">http://www.redland.qld.gov.au/RecreationFacilities/Parks/Pages/ParksDisabledFacilities.aspx</a></td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image1</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/capalaba-entrance</td>
+</tr>
+<tr>
+<td>Image1Desc</td>
+<td>The colourful entrance to the Capalaba Regional All Abilities Playground</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image2</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/capalaba-liberty-swing</td>
+</tr>
+<tr>
+<td>Image2Desc</td>
+<td>The playground invites children with disability to try out the Liberty Swing</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image3</td>
+<td>disability/assets/images/children-young-people/all-abilities-playgrounds/capalaba-bikes</td>
+</tr>
+<tr>
+<td>Image3Desc</td>
+<td>A family heads to the Capalaba Regional All Abilities Playground on their bikes</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image4</td>
+<td>disability/assets/images/children-young-people/all-abilities-playgrounds/capalaba-cycling-track</td>
+</tr>
+<tr>
+<td>Image4Desc</td>
+<td>Families can do various activities at the Capalaba Regional All Abilities Playground</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Contact</td>
+<td>Redland City Council on (07) 3829 8999</td>
+</tr>
+<tr>
+<td>Latitude</td>
+<td>-27.522199</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Longitude</td>
+<td>153.18691</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</body>
+</html>
+]]></description>
+      <styleUrl>#IconStyle01</styleUrl>
+      <Point>
+        <altitudeMode>clampToGround</altitudeMode>
+        <coordinates> 153.18691,-27.5221989992262,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark id="ID_00005">
+      <name>Sugarworld All Abilities Playground</name>
+      <Snippet></Snippet>
+      <description><![CDATA[<html xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:msxsl="urn:schemas-microsoft-com:xslt">
+<head>
+<META http-equiv="Content-Type" content="text/html">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+</head>
+<body style="margin:0px 0px 0px 0px;overflow:auto;background:#FFFFFF;">
+<table style="font-family:Arial,Verdana,Times;font-size:12px;text-align:left;width:100%;border-collapse:collapse;padding:3px 3px 3px 3px">
+<tr style="text-align:center;font-weight:bold;background:#9CBCE2">
+<td>Sugarworld All Abilities Playground</td>
+</tr>
+<tr>
+<td>
+<table style="font-family:Arial,Verdana,Times;font-size:12px;text-align:left;width:100%;border-spacing:0px; padding:3px 3px 3px 3px">
+<tr>
+<td>FID</td>
+<td>4</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Name</td>
+<td>Sugarworld All Abilities Playground</td>
+</tr>
+<tr>
+<td>Address1</td>
+<td>Sugarworld Gardens</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Address2</td>
+<td>Hambledon Drive</td>
+</tr>
+<tr>
+<td>Suburb</td>
+<td>Edmonton</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Postcode</td>
+<td>4869</td>
+</tr>
+<tr>
+<td>Playground</td>
+<td>Custom designed train with carriages, sensory space with a musical hub, sand and water play area, cubby house, raised herb garden and daisy table, bamboo arbour, rope climbing course, flying fox, bird's nest swing, swing with a high back seat and harness</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Facilities</td>
+<td>Picnic shelter with tables and a barbecue, toilet amenities, bench and platform seating throughout, drinking fountain and bicycle racks</td>
+</tr>
+<tr>
+<td>Weblink</td>
+<td><a target="_blank" href="http://www.cairns.qld.gov.au/facilities-and-recreation/parks/sugarworld">http://www.cairns.qld.gov.au/facilities-and-recreation/parks/sugarworld</a></td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image1</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/sugarworld-seesaw-empty</td>
+</tr>
+<tr>
+<td>Image1Desc</td>
+<td>See-sawing fun for everyone</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image2</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/sugarworld-swings</td>
+</tr>
+<tr>
+<td>Image2Desc</td>
+<td>A variety of swings are on offer for children of all abilities</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image3</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/sugarworld-climbing-net</td>
+</tr>
+<tr>
+<td>Image3Desc</td>
+<td>Adventure climbing nets take active play to new heights</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image4</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/sugarworld-mum-son</td>
+</tr>
+<tr>
+<td>Image4Desc</td>
+<td>Mother and Son enjoy the water feature at Sugarworld Playground</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Contact</td>
+<td>Cairns Regional Council on (07) 4044 3044</td>
+</tr>
+<tr>
+<td>Latitude</td>
+<td>-17.021643</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Longitude</td>
+<td>145.72584</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</body>
+</html>
+]]></description>
+      <styleUrl>#IconStyle01</styleUrl>
+      <Point>
+        <altitudeMode>clampToGround</altitudeMode>
+        <coordinates> 145.72584,-17.02164299947123,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark id="ID_00006">
+      <name>Gympie Region All Abilities Playground</name>
+      <Snippet></Snippet>
+      <description><![CDATA[<html xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:msxsl="urn:schemas-microsoft-com:xslt">
+<head>
+<META http-equiv="Content-Type" content="text/html">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+</head>
+<body style="margin:0px 0px 0px 0px;overflow:auto;background:#FFFFFF;">
+<table style="font-family:Arial,Verdana,Times;font-size:12px;text-align:left;width:100%;border-collapse:collapse;padding:3px 3px 3px 3px">
+<tr style="text-align:center;font-weight:bold;background:#9CBCE2">
+<td>Gympie Region All Abilities Playground</td>
+</tr>
+<tr>
+<td>
+<table style="font-family:Arial,Verdana,Times;font-size:12px;text-align:left;width:100%;border-spacing:0px; padding:3px 3px 3px 3px">
+<tr>
+<td>FID</td>
+<td>5</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Name</td>
+<td>Gympie Region All Abilities Playground</td>
+</tr>
+<tr>
+<td>Address1</td>
+<td>Lake Alford Park</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Address2</td>
+<td>Bruce Highway</td>
+</tr>
+<tr>
+<td>Suburb</td>
+<td>Gympie</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Postcode</td>
+<td>4570</td>
+</tr>
+<tr>
+<td>Playground</td>
+<td>Sand and water play zone, performance and role play zone, swinging and sliding play zone, chill-out zone, open play area for ball play, kick-about area, 2 flying foxes, 2 adventure climbing nets</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Facilities</td>
+<td>Informal seating, accessible toilet block, shade sails, perimeter fencing, disabled car parking bays, rubberised soft-fall surfacing</td>
+</tr>
+<tr>
+<td>Weblink</td>
+<td></td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image1</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/gympie-slides</td>
+</tr>
+<tr>
+<td>Image1Desc</td>
+<td>Hills slides at the all abilities playground encourage active play</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image2</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/gympie-chat-board</td>
+</tr>
+<tr>
+<td>Image2Desc</td>
+<td>Children can use chat boards to communicate during play</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image3</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/gympie-mobility-swing-empty</td>
+</tr>
+<tr>
+<td>Image3Desc</td>
+<td>Children with limited mobility can swing through the air thanks to supportive seating</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image4</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/gympie-view</td>
+</tr>
+<tr>
+<td>Image4Desc</td>
+<td>Climbing nets offering a birdÆs eye view of the playground</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Contact</td>
+<td>Gympie Regional Council on 1300 307 800</td>
+</tr>
+<tr>
+<td>Latitude</td>
+<td>-26.215833</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Longitude</td>
+<td>152.68499</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</body>
+</html>
+]]></description>
+      <styleUrl>#IconStyle01</styleUrl>
+      <Point>
+        <altitudeMode>clampToGround</altitudeMode>
+        <coordinates> 152.68499,-26.2158329992516,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark id="ID_00007">
+      <name>Pioneer Park All Abilities Playground</name>
+      <Snippet></Snippet>
+      <description><![CDATA[<html xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:msxsl="urn:schemas-microsoft-com:xslt">
+<head>
+<META http-equiv="Content-Type" content="text/html">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+</head>
+<body style="margin:0px 0px 0px 0px;overflow:auto;background:#FFFFFF;">
+<table style="font-family:Arial,Verdana,Times;font-size:12px;text-align:left;width:100%;border-collapse:collapse;padding:3px 3px 3px 3px">
+<tr style="text-align:center;font-weight:bold;background:#9CBCE2">
+<td>Pioneer Park All Abilities Playground</td>
+</tr>
+<tr>
+<td>
+<table style="font-family:Arial,Verdana,Times;font-size:12px;text-align:left;width:100%;border-spacing:0px; padding:3px 3px 3px 3px">
+<tr>
+<td>FID</td>
+<td>6</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Name</td>
+<td>Pioneer Park All Abilities Playground</td>
+</tr>
+<tr>
+<td>Address1</td>
+<td>Caloundra Street</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Address2</td>
+<td></td>
+</tr>
+<tr>
+<td>Suburb</td>
+<td>Landsborough</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Postcode</td>
+<td>4550</td>
+</tr>
+<tr>
+<td>Playground</td>
+<td>A pioneer cottage complete with play kitchen, veranda, ramp access and adjustable speakerphone, sand and water play tables, artificial garden with spinning flowers and a mail box, vibrating rock, hammock, arm-powered swing and hard-based swing, flying fo</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Facilities</td>
+<td>An accessible picnic shelter with tables and seating, an equal access toilet block featuring two unisex toilets, drinking fountain with equal access and push lever operation, large shade sail, as well as equal access pathways, rubberised soft-fall and ra</td>
+</tr>
+<tr>
+<td>Weblink</td>
+<td><a target="_blank" href="http://www.community.sunshinecoast.qld.gov.au/directory/all-abilities-playground-landsborough">http://www.community.sunshinecoast.qld.gov.au/directory/all-abilities-playground-landsborough</a></td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image1</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/pioneer-park-cog-panel</td>
+</tr>
+<tr>
+<td>Image1Desc</td>
+<td>Setting the cogs in motion</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image2</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/pioneer-park-equipment</td>
+</tr>
+<tr>
+<td>Image2Desc</td>
+<td>Playing on the carousel</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image3</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/pioneer-park-entrance</td>
+</tr>
+<tr>
+<td>Image3Desc</td>
+<td>The entrance to Pioneer Park</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image4</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/pioneer-park-wheelchair-ramp</td>
+</tr>
+<tr>
+<td>Image4Desc</td>
+<td>Accessible ramp for wheelchair users</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Contact</td>
+<td>Sunshine Coast  Council on (07) 5475 7272</td>
+</tr>
+<tr>
+<td>Latitude</td>
+<td>-26.807107</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Longitude</td>
+<td>152.975283</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</body>
+</html>
+]]></description>
+      <styleUrl>#IconStyle01</styleUrl>
+      <Point>
+        <altitudeMode>clampToGround</altitudeMode>
+        <coordinates> 152.975283,-26.8071069992399,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark id="ID_00008">
+      <name>Logan Gardens All Abilities Playground</name>
+      <Snippet></Snippet>
+      <description><![CDATA[<html xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:msxsl="urn:schemas-microsoft-com:xslt">
+<head>
+<META http-equiv="Content-Type" content="text/html">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+</head>
+<body style="margin:0px 0px 0px 0px;overflow:auto;background:#FFFFFF;">
+<table style="font-family:Arial,Verdana,Times;font-size:12px;text-align:left;width:100%;border-collapse:collapse;padding:3px 3px 3px 3px">
+<tr style="text-align:center;font-weight:bold;background:#9CBCE2">
+<td>Logan Gardens All Abilities Playground</td>
+</tr>
+<tr>
+<td>
+<table style="font-family:Arial,Verdana,Times;font-size:12px;text-align:left;width:100%;border-spacing:0px; padding:3px 3px 3px 3px">
+<tr>
+<td>FID</td>
+<td>7</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Name</td>
+<td>Logan Gardens All Abilities Playground</td>
+</tr>
+<tr>
+<td>Address1</td>
+<td>Logan Gardens</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Address2</td>
+<td>Civic Parade</td>
+</tr>
+<tr>
+<td>Suburb</td>
+<td>Logan Central</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Postcode</td>
+<td>4114</td>
+</tr>
+<tr>
+<td>Playground</td>
+<td>Stage area, giant musical instrumentsùincluding drums, gongs cymbals and a horn, sand pit and table, sensory garden, existing fort with new elevated play systemùincluding a lookout, double slide, play panels and climbing structures, adventure play system</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Facilities</td>
+<td>Informal seating throughout, rubberised soft-fall and concrete surfacing for greater accessibility, and existing toilet, barbecue and picnic facilities</td>
+</tr>
+<tr>
+<td>Weblink</td>
+<td><a target="_blank" href="http://www.visitlogan.com.au/things-to-do/parks/product?id=9174133">http://www.visitlogan.com.au/things-to-do/parks/product?id=9174133</a></td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image1</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/logan-equipment</td>
+</tr>
+<tr>
+<td>Image1Desc</td>
+<td>An adventure play system and climbing mound created a hub for social and active play</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image2</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/logan-double-slide</td>
+</tr>
+<tr>
+<td>Image2Desc</td>
+<td>A double slide added another dimension to the existing fort</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image3</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/logan-blocks</td>
+</tr>
+<tr>
+<td>Image3Desc</td>
+<td>Socialising and supervising children was made a little easier with informal seating, such as these block seats featuring artificial turf, throughout the playground</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image4</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/logan-liberty-swing</td>
+</tr>
+<tr>
+<td>Image4Desc</td>
+<td>Having fun on the Liberty Swing</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Contact</td>
+<td>Logan City Council on 1300 156 426</td>
+</tr>
+<tr>
+<td>Latitude</td>
+<td>-27.646894</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Longitude</td>
+<td>153.10504</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</body>
+</html>
+]]></description>
+      <styleUrl>#IconStyle01</styleUrl>
+      <Point>
+        <altitudeMode>clampToGround</altitudeMode>
+        <coordinates> 153.10504,-27.64689399922384,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark id="ID_00009">
+      <name>Iluka Park All Abilities Playground</name>
+      <Snippet></Snippet>
+      <description><![CDATA[<html xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:msxsl="urn:schemas-microsoft-com:xslt">
+<head>
+<META http-equiv="Content-Type" content="text/html">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+</head>
+<body style="margin:0px 0px 0px 0px;overflow:auto;background:#FFFFFF;">
+<table style="font-family:Arial,Verdana,Times;font-size:12px;text-align:left;width:100%;border-collapse:collapse;padding:3px 3px 3px 3px">
+<tr style="text-align:center;font-weight:bold;background:#9CBCE2">
+<td>Iluka Park All Abilities Playground</td>
+</tr>
+<tr>
+<td>
+<table style="font-family:Arial,Verdana,Times;font-size:12px;text-align:left;width:100%;border-spacing:0px; padding:3px 3px 3px 3px">
+<tr>
+<td>FID</td>
+<td>8</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Name</td>
+<td>Iluka Park All Abilities Playground</td>
+</tr>
+<tr>
+<td>Address1</td>
+<td>Binnington Esplanade</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Address2</td>
+<td></td>
+</tr>
+<tr>
+<td>Suburb</td>
+<td>East Mackay</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Postcode</td>
+<td>4740</td>
+</tr>
+<tr>
+<td>Playground</td>
+<td>Fort surrounded by a maze of paths, sensory plantings, interactive panelsùincluding chimes, tom toms and other musical elements, sand play station, junior and senior play areas, kick-about area, climbing structure, double swing, Gyro spinner, hand water</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Facilities</td>
+<td>Accessible picnic shelter and drinking facilities, toilet facilities, soft-fall surfacing, perimeter fencing, shade sails and bike racks</td>
+</tr>
+<tr>
+<td>Weblink</td>
+<td></td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image1</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/iluka-park-equipment</td>
+</tr>
+<tr>
+<td>Image1Desc</td>
+<td>A play jungle offers a range of challenging play experiences</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image2</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/iluka-park-view</td>
+</tr>
+<tr>
+<td>Image2Desc</td>
+<td>Extensive pathways connect all play areas, including a train play station, an elevated red fort and grassed open play areas</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image3</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/iluka-park-hammock-swing</td>
+</tr>
+<tr>
+<td>Image3Desc</td>
+<td>A giant hammock swing and sand play area is well-suited to a beachside environment</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image4</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/iluka-park-mosaic</td>
+</tr>
+<tr>
+<td>Image4Desc</td>
+<td>A mosaic featuring children of all abilities playing side-by-side, created by local students with a disability, with support by the Queensland Government and MackayÆs Bunnings Warehouse</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Contact</td>
+<td>Mackay Regional Council on 1300 622 529</td>
+</tr>
+<tr>
+<td>Latitude</td>
+<td>-21.150206</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Longitude</td>
+<td>149.20417</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</body>
+</html>
+]]></description>
+      <styleUrl>#IconStyle01</styleUrl>
+      <Point>
+        <altitudeMode>clampToGround</altitudeMode>
+        <coordinates> 149.20417,-21.1502059993644,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark id="ID_00010">
+      <name>Mossman All Abilities Playground</name>
+      <Snippet></Snippet>
+      <description><![CDATA[<html xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:msxsl="urn:schemas-microsoft-com:xslt">
+<head>
+<META http-equiv="Content-Type" content="text/html">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+</head>
+<body style="margin:0px 0px 0px 0px;overflow:auto;background:#FFFFFF;">
+<table style="font-family:Arial,Verdana,Times;font-size:12px;text-align:left;width:100%;border-collapse:collapse;padding:3px 3px 3px 3px">
+<tr style="text-align:center;font-weight:bold;background:#9CBCE2">
+<td>Mossman All Abilities Playground</td>
+</tr>
+<tr>
+<td>
+<table style="font-family:Arial,Verdana,Times;font-size:12px;text-align:left;width:100%;border-spacing:0px; padding:3px 3px 3px 3px">
+<tr>
+<td>FID</td>
+<td>9</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Name</td>
+<td>Mossman All Abilities Playground</td>
+</tr>
+<tr>
+<td>Address1</td>
+<td>BUBU KinKari (George Davis Park)</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Address2</td>
+<td>Foxton Avenue</td>
+</tr>
+<tr>
+<td>Suburb</td>
+<td>Mossman</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Postcode</td>
+<td>4873</td>
+</tr>
+<tr>
+<td>Playground</td>
+<td>Wheelchair-accessible carousel, double flying fox, sand and water play areaùincluding sand tables, a mini studio, accessible diggers and a waterfall, bird's nest swing, double swing set with supportive seating, bamboo maze with musical implements and sen</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Facilities</td>
+<td>Accessible toilet amenities, a picnic shelter with 2 tables and a barbecue, 2 additional picnic tables, seating, bike racks, accessible drinking fountain and perimeter fencing</td>
+</tr>
+<tr>
+<td>Weblink</td>
+<td></td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image1</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/mossman-swings</td>
+</tr>
+<tr>
+<td>Image1Desc</td>
+<td>A variety of swings are on offer for children of all abilities</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image2</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/mossman-flying-fox</td>
+</tr>
+<tr>
+<td>Image2Desc</td>
+<td>Children with limited mobility can swing through the air thanks to supportive seating</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image3</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/mossman-carousel</td>
+</tr>
+<tr>
+<td>Image3Desc</td>
+<td>The wheelchair accessible carousel at Mossman playground features two bench seats and allows space for two wheelchairs at any one time</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image4</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/mossman-chat-boards</td>
+</tr>
+<tr>
+<td>Image4Desc</td>
+<td>Children can use chat boards to communicate during play</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Contact</td>
+<td>Cairns Regional Council on (07) 4044 3044</td>
+</tr>
+<tr>
+<td>Latitude</td>
+<td>-16.457749</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Longitude</td>
+<td>145.37268</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</body>
+</html>
+]]></description>
+      <styleUrl>#IconStyle01</styleUrl>
+      <Point>
+        <altitudeMode>clampToGround</altitudeMode>
+        <coordinates> 145.37268,-16.45774899948673,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark id="ID_00011">
+      <name>Mount Isa Family Fun Park</name>
+      <Snippet></Snippet>
+      <description><![CDATA[<html xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:msxsl="urn:schemas-microsoft-com:xslt">
+<head>
+<META http-equiv="Content-Type" content="text/html">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+</head>
+<body style="margin:0px 0px 0px 0px;overflow:auto;background:#FFFFFF;">
+<table style="font-family:Arial,Verdana,Times;font-size:12px;text-align:left;width:100%;border-collapse:collapse;padding:3px 3px 3px 3px">
+<tr style="text-align:center;font-weight:bold;background:#9CBCE2">
+<td>Mount Isa Family Fun Park</td>
+</tr>
+<tr>
+<td>
+<table style="font-family:Arial,Verdana,Times;font-size:12px;text-align:left;width:100%;border-spacing:0px; padding:3px 3px 3px 3px">
+<tr>
+<td>FID</td>
+<td>10</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Name</td>
+<td>Mount Isa Family Fun Park</td>
+</tr>
+<tr>
+<td>Address1</td>
+<td>Church Street</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Address2</td>
+<td></td>
+</tr>
+<tr>
+<td>Suburb</td>
+<td>Mt Isa</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Postcode</td>
+<td>4825</td>
+</tr>
+<tr>
+<td>Playground</td>
+<td>Interactive water play area, sensory garden, pool-fences junior play area (0-6 years), senior play area (6-15 years), Liberty Swing, double flying fox, bicycle course, open play areas</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Facilities</td>
+<td>Accessible toiletsùincluding fold-down toddler change facility, outdoor showers, drinking fountains, perimeter fencing, accessible car parking, picnic shelters and barbecue facilities, gazebo, open-air stage and amphitheatre</td>
+</tr>
+<tr>
+<td>Weblink</td>
+<td><a target="_blank" href="http://www.mountisa.qld.gov.au/family-fun-park">http://www.mountisa.qld.gov.au/family-fun-park</a></td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image1</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/mtisa-junior-play-area</td>
+</tr>
+<tr>
+<td>Image1Desc</td>
+<td>Brothers sailed the high seas in the junior play area</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image2</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/mtisa-water-play</td>
+</tr>
+<tr>
+<td>Image2Desc</td>
+<td>Let the water games begin!</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image3</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/mtisa-pedal</td>
+</tr>
+<tr>
+<td>Image3Desc</td>
+<td>Putting the pedal to the metal in the junior play area</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image4</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/mtisa-birds-nest-swing</td>
+</tr>
+<tr>
+<td>Image4Desc</td>
+<td>Playing and having fun on the birds nest swing</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Contact</td>
+<td>Mount Isa City Council on (07) 4747 3200</td>
+</tr>
+<tr>
+<td>Latitude</td>
+<td>-20.72897</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Longitude</td>
+<td>139.48632</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</body>
+</html>
+]]></description>
+      <styleUrl>#IconStyle01</styleUrl>
+      <Point>
+        <altitudeMode>clampToGround</altitudeMode>
+        <coordinates> 139.48632,-20.72896999937473,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark id="ID_00012">
+      <name>Mandingnou Apudthama Apang û New Mapoon</name>
+      <Snippet></Snippet>
+      <description><![CDATA[<html xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:msxsl="urn:schemas-microsoft-com:xslt">
+<head>
+<META http-equiv="Content-Type" content="text/html">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+</head>
+<body style="margin:0px 0px 0px 0px;overflow:auto;background:#FFFFFF;">
+<table style="font-family:Arial,Verdana,Times;font-size:12px;text-align:left;width:100%;border-collapse:collapse;padding:3px 3px 3px 3px">
+<tr style="text-align:center;font-weight:bold;background:#9CBCE2">
+<td>Mandingnou Apudthama Apang û New Mapoon</td>
+</tr>
+<tr>
+<td>
+<table style="font-family:Arial,Verdana,Times;font-size:12px;text-align:left;width:100%;border-spacing:0px; padding:3px 3px 3px 3px">
+<tr>
+<td>FID</td>
+<td>11</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Name</td>
+<td>Mandingnou Apudthama Apang û New Mapoon</td>
+</tr>
+<tr>
+<td>Address1</td>
+<td>Langie-Draha Street</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Address2</td>
+<td></td>
+</tr>
+<tr>
+<td>Suburb</td>
+<td>New Mapoon</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Postcode</td>
+<td>4876</td>
+</tr>
+<tr>
+<td>Playground</td>
+<td>Adventure climbing structure, slides, see-saw, bird's nest swing and swings with supportive seating</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Facilities</td>
+<td>Welcome wall, toilet amenities, BBQ, gazebo with bench seating and concrete paths</td>
+</tr>
+<tr>
+<td>Weblink</td>
+<td></td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image1</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/new-mapoon-slide</td>
+</tr>
+<tr>
+<td>Image1Desc</td>
+<td>Kids can have fun on the playground's colourful equipment</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image2</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/new-mapoon-equipment</td>
+</tr>
+<tr>
+<td>Image2Desc</td>
+<td>Climbing equipment encourages adventurous play</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image3</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/new-mapoon-facilities</td>
+</tr>
+<tr>
+<td>Image3Desc</td>
+<td>Parents and friends can sit away from the sun at the playground</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image4</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/new-mapoon-view</td>
+</tr>
+<tr>
+<td>Image4Desc</td>
+<td>The view of the New Mapoon All Abilities Playground on a sunny day</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Contact</td>
+<td>Northern Peninsula Area Regional Council on (07) 4048 6600</td>
+</tr>
+<tr>
+<td>Latitude</td>
+<td>-10.867593</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Longitude</td>
+<td>142.38537</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</body>
+</html>
+]]></description>
+      <styleUrl>#IconStyle01</styleUrl>
+      <Point>
+        <altitudeMode>clampToGround</altitudeMode>
+        <coordinates> 142.38537,-10.86759299965016,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark id="ID_00013">
+      <name>Normanton All Abilities Playground</name>
+      <Snippet></Snippet>
+      <description><![CDATA[<html xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:msxsl="urn:schemas-microsoft-com:xslt">
+<head>
+<META http-equiv="Content-Type" content="text/html">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+</head>
+<body style="margin:0px 0px 0px 0px;overflow:auto;background:#FFFFFF;">
+<table style="font-family:Arial,Verdana,Times;font-size:12px;text-align:left;width:100%;border-collapse:collapse;padding:3px 3px 3px 3px">
+<tr style="text-align:center;font-weight:bold;background:#9CBCE2">
+<td>Normanton All Abilities Playground</td>
+</tr>
+<tr>
+<td>
+<table style="font-family:Arial,Verdana,Times;font-size:12px;text-align:left;width:100%;border-spacing:0px; padding:3px 3px 3px 3px">
+<tr>
+<td>FID</td>
+<td>12</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Name</td>
+<td>Normanton All Abilities Playground</td>
+</tr>
+<tr>
+<td>Address1</td>
+<td>Normanton Sports Reserve</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Address2</td>
+<td>Philip Street</td>
+</tr>
+<tr>
+<td>Suburb</td>
+<td>Normanton</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Postcode</td>
+<td>4890</td>
+</tr>
+<tr>
+<td>Playground</td>
+<td>Junior play zone, senior play zone, swings, sand and water play zones, bird's nest swing, adventure play system, spinning carousel, play cottage, octopus see-saw, interactive musical panels</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Facilities</td>
+<td>Toilet amenities located at the nearby sports hall and swimming pool complex, bench seating, accessible drinking fountain, rubberised soft-fall and concrete surfacing</td>
+</tr>
+<tr>
+<td>Weblink</td>
+<td></td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image1</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/normanton-view</td>
+</tr>
+<tr>
+<td>Image1Desc</td>
+<td>Colourful, interactive play options, such as a play cottage and sand play area, were on offer as soon as you enter the playground</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image2</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/normanton-equipment</td>
+</tr>
+<tr>
+<td>Image2Desc</td>
+<td>Large sails offered shade from the sun above, while û on the ground û wide pathways and an angled, push-button drinking fountain provided better access for people who use wheelchairs</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image3</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/normanton-music-panels</td>
+</tr>
+<tr>
+<td>Image3Desc</td>
+<td>Interactive musical panels took sensory play to a new level</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image4</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/normanton-basket-swing</td>
+</tr>
+<tr>
+<td>Image4Desc</td>
+<td>A basket swing provided opportunities to play and socialise at the same time</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Contact</td>
+<td>Carpentaria Shire Council on (07) 4745 2200</td>
+</tr>
+<tr>
+<td>Latitude</td>
+<td>-17.674838</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Longitude</td>
+<td>141.07138</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</body>
+</html>
+]]></description>
+      <styleUrl>#IconStyle01</styleUrl>
+      <Point>
+        <altitudeMode>clampToGround</altitudeMode>
+        <coordinates> 141.07138,-17.67483799945354,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark id="ID_00014">
+      <name>Seafront All Abilities Playground</name>
+      <Snippet></Snippet>
+      <description><![CDATA[<html xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:msxsl="urn:schemas-microsoft-com:xslt">
+<head>
+<META http-equiv="Content-Type" content="text/html">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+</head>
+<body style="margin:0px 0px 0px 0px;overflow:auto;background:#FFFFFF;">
+<table style="font-family:Arial,Verdana,Times;font-size:12px;text-align:left;width:100%;border-collapse:collapse;padding:3px 3px 3px 3px">
+<tr style="text-align:center;font-weight:bold;background:#9CBCE2">
+<td>Seafront All Abilities Playground</td>
+</tr>
+<tr>
+<td>
+<table style="font-family:Arial,Verdana,Times;font-size:12px;text-align:left;width:100%;border-spacing:0px; padding:3px 3px 3px 3px">
+<tr>
+<td>FID</td>
+<td>13</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Name</td>
+<td>Seafront All Abilities Playground</td>
+</tr>
+<tr>
+<td>Address1</td>
+<td>Seafront Oval</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Address2</td>
+<td>Charlton Esplanade</td>
+</tr>
+<tr>
+<td>Suburb</td>
+<td>Pialba</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Postcode</td>
+<td>4655</td>
+</tr>
+<tr>
+<td>Playground</td>
+<td>Wheelchair-accessible carousel, range of swingsùincluding a basket swing and swings with supportive seating, look-out, kick-about area, custom-designed shipwreck, elevated sand table, interactive musical turtle with sounds, hand pump, totems marking the</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Facilities</td>
+<td>Accessible amenities block located next to the playground, sheltered barbecue and picnic areas, accessible drinking fountain, disabled car parking, rubberised soft-fall and concrete surfacing</td>
+</tr>
+<tr>
+<td>Weblink</td>
+<td></td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image1</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/pialba-swings</td>
+</tr>
+<tr>
+<td>Image1Desc</td>
+<td>The playground features swings to suit different abilities, including a high back seat with harness and a toddler seat</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image2</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/pialba-chat-board</td>
+</tr>
+<tr>
+<td>Image2Desc</td>
+<td>Hervey Bay School teacher and student used one of the playgroundÆs chat boards to practice communicating with pictures</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image3</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/pialba-swinger</td>
+</tr>
+<tr>
+<td>Image3Desc</td>
+<td>There were smiles all round as everyone got into the swing of opening celebrations</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image4</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/pialba-sand-table</td>
+</tr>
+<tr>
+<td>Image4Desc</td>
+<td>Kawunga State School students played at the custom-built sand tables</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Contact</td>
+<td>Fraser Coast Regional Council on 1300 794 929</td>
+</tr>
+<tr>
+<td>Latitude</td>
+<td>-25.280164</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Longitude</td>
+<td>152.84312</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</body>
+</html>
+]]></description>
+      <styleUrl>#IconStyle01</styleUrl>
+      <Point>
+        <altitudeMode>clampToGround</altitudeMode>
+        <coordinates> 152.84312,-25.28016399927077,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark id="ID_00015">
+      <name>Texas All Abilities Playground</name>
+      <Snippet></Snippet>
+      <description><![CDATA[<html xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:msxsl="urn:schemas-microsoft-com:xslt">
+<head>
+<META http-equiv="Content-Type" content="text/html">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+</head>
+<body style="margin:0px 0px 0px 0px;overflow:auto;background:#FFFFFF;">
+<table style="font-family:Arial,Verdana,Times;font-size:12px;text-align:left;width:100%;border-collapse:collapse;padding:3px 3px 3px 3px">
+<tr style="text-align:center;font-weight:bold;background:#9CBCE2">
+<td>Texas All Abilities Playground</td>
+</tr>
+<tr>
+<td>
+<table style="font-family:Arial,Verdana,Times;font-size:12px;text-align:left;width:100%;border-spacing:0px; padding:3px 3px 3px 3px">
+<tr>
+<td>FID</td>
+<td>14</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Name</td>
+<td>Texas All Abilities Playground</td>
+</tr>
+<tr>
+<td>Address1</td>
+<td>Broadway East</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Address2</td>
+<td></td>
+</tr>
+<tr>
+<td>Suburb</td>
+<td>Texas</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Postcode</td>
+<td>4385</td>
+</tr>
+<tr>
+<td>Playground</td>
+<td>Silver Spur' sand and water play area, general store faþade, sensory plantings, flying fox with harness, toddler and hand-powered swings, open play areas, climbing net</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Facilities</td>
+<td>Accessible toilet facilities, sheltered picnic and barbecue area, continuous surfacing and wide pathways, informal seating and perimeter fencing</td>
+</tr>
+<tr>
+<td>Weblink</td>
+<td></td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image1</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/texas-climbing-net</td>
+</tr>
+<tr>
+<td>Image1Desc</td>
+<td>A horizontal climbing net is a great place to play and hang out</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image2</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/texas-equipment</td>
+</tr>
+<tr>
+<td>Image2Desc</td>
+<td>The Silver Spur play area offers many different play opportunities for children of all ages and abilities</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image3</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/texas-swings</td>
+</tr>
+<tr>
+<td>Image3Desc</td>
+<td>Two swings with harnesses - one with a high back toddler seat and another with an adult-sized seat - were specially-designed to suit different users</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image4</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/texas-swing</td>
+</tr>
+<tr>
+<td>Image4Desc</td>
+<td>A flying fox with harness gives more children the opportunity to fly through the air</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Contact</td>
+<td>Goondiwindi Regional Council on (07) 4653 2600</td>
+</tr>
+<tr>
+<td>Latitude</td>
+<td>-28.852507</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Longitude</td>
+<td>151.16549</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</body>
+</html>
+]]></description>
+      <styleUrl>#IconStyle01</styleUrl>
+      <Point>
+        <altitudeMode>clampToGround</altitudeMode>
+        <coordinates> 151.16549,-28.85250699920196,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark id="ID_00016">
+      <name>Riverway All Abilities Playground</name>
+      <Snippet></Snippet>
+      <description><![CDATA[<html xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:msxsl="urn:schemas-microsoft-com:xslt">
+<head>
+<META http-equiv="Content-Type" content="text/html">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+</head>
+<body style="margin:0px 0px 0px 0px;overflow:auto;background:#FFFFFF;">
+<table style="font-family:Arial,Verdana,Times;font-size:12px;text-align:left;width:100%;border-collapse:collapse;padding:3px 3px 3px 3px">
+<tr style="text-align:center;font-weight:bold;background:#9CBCE2">
+<td>Riverway All Abilities Playground</td>
+</tr>
+<tr>
+<td>
+<table style="font-family:Arial,Verdana,Times;font-size:12px;text-align:left;width:100%;border-spacing:0px; padding:3px 3px 3px 3px">
+<tr>
+<td>FID</td>
+<td>15</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Name</td>
+<td>Riverway All Abilities Playground</td>
+</tr>
+<tr>
+<td>Address1</td>
+<td>Pioneer Park</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Address2</td>
+<td>Village Boulevard</td>
+</tr>
+<tr>
+<td>Suburb</td>
+<td>Thuringowa</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Postcode</td>
+<td>4817</td>
+</tr>
+<tr>
+<td>Playground</td>
+<td>Sound garden featuring musical alphabet poles and instruments, harnessed swings, banging bangalow palms, sensory herb garden, misting poles, turtle sand pods, obstacle course, turtle hopscotch and snail-scotch, chalk boards, tree house with binoculars an</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Facilities</td>
+<td>Neighbouring Riverway Lagoons complex has accessible toilet and change facilities, informal seating, chill-out space, perimeter fencing, soft-fall surfacing and drinking fountains</td>
+</tr>
+<tr>
+<td>Weblink</td>
+<td></td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image1</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/thuringowa-sensory-sound-play-area</td>
+</tr>
+<tr>
+<td>Image1Desc</td>
+<td>A view of the sensory and sound play area</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image2</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/thuringowa-view</td>
+</tr>
+<tr>
+<td>Image2Desc</td>
+<td>With alphabet poles, banging bangalow palms and sensory plantings throughout, the sound and sensory play area is a feast for the senses</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image3</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/thuringowa-lilypad-swing</td>
+</tr>
+<tr>
+<td>Image3Desc</td>
+<td>The lily pad swing features an adult-sized seat with a harness for enhanced accessibility and safety</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image4</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/thuringowa-bridge</td>
+</tr>
+<tr>
+<td>Image4Desc</td>
+<td>Road testing the Riverway bridge</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Contact</td>
+<td>Townsville City Council on (07) 4727 9050</td>
+</tr>
+<tr>
+<td>Latitude</td>
+<td>-19.319472</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Longitude</td>
+<td>146.7299</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</body>
+</html>
+]]></description>
+      <styleUrl>#IconStyle01</styleUrl>
+      <Point>
+        <altitudeMode>clampToGround</altitudeMode>
+        <coordinates> 146.7299,-19.31947199941027,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark id="ID_00017">
+      <name>Yeppoon All Abilities Playground</name>
+      <Snippet></Snippet>
+      <description><![CDATA[<html xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:msxsl="urn:schemas-microsoft-com:xslt">
+<head>
+<META http-equiv="Content-Type" content="text/html">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+</head>
+<body style="margin:0px 0px 0px 0px;overflow:auto;background:#FFFFFF;">
+<table style="font-family:Arial,Verdana,Times;font-size:12px;text-align:left;width:100%;border-collapse:collapse;padding:3px 3px 3px 3px">
+<tr style="text-align:center;font-weight:bold;background:#9CBCE2">
+<td>Yeppoon All Abilities Playground</td>
+</tr>
+<tr>
+<td>
+<table style="font-family:Arial,Verdana,Times;font-size:12px;text-align:left;width:100%;border-spacing:0px; padding:3px 3px 3px 3px">
+<tr>
+<td>FID</td>
+<td>16</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Name</td>
+<td>Yeppoon All Abilities Playground</td>
+</tr>
+<tr>
+<td>Address1</td>
+<td>Appleton Park</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Address2</td>
+<td>Anzac Parade</td>
+</tr>
+<tr>
+<td>Suburb</td>
+<td>Yeppoon</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Postcode</td>
+<td>4703</td>
+</tr>
+<tr>
+<td>Playground</td>
+<td>Seaside-themed large interactive play areaùincluding a tinnie, fishing rod, beach huts and a springboard, music centreùincluding musical elements such as chimes, drums and xylophone, sand and water play areaùincluding junior sand play table featuring a s</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Facilities</td>
+<td>Unisex toilet amenities block, bench and platform seating, shade sails, perimeter fencing and disabled car parking bays</td>
+</tr>
+<tr>
+<td>Weblink</td>
+<td></td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image1</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/yeppoon-view</td>
+</tr>
+<tr>
+<td>Image1Desc</td>
+<td>The Yeppoon playground is a hub for social and active play</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image2</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/yeppoon-equipment</td>
+</tr>
+<tr>
+<td>Image2Desc</td>
+<td>Yeppoon has seaside-themed play equipment including a tinnie, fishing rod, beach huts and a springboard</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image3</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/yeppoon-beach-setting</td>
+</tr>
+<tr>
+<td>Image3Desc</td>
+<td>The playgroundÆs beach setting and colourful features appealed to children of all ages</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Image4</td>
+<td>/disability/assets/images/children-young-people/all-abilities-playgrounds/yeppoon-climbing-structure</td>
+</tr>
+<tr>
+<td>Image4Desc</td>
+<td>Colourful climbing equipment provides fun and challenging play opportunities</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Contact</td>
+<td>Rockhampton Regional Council on 1300 225 577</td>
+</tr>
+<tr>
+<td>Latitude</td>
+<td>-23.134035</td>
+</tr>
+<tr bgcolor="#D4E4F3">
+<td>Longitude</td>
+<td>150.74945</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</body>
+</html>
+]]></description>
+      <styleUrl>#IconStyle01</styleUrl>
+      <Point>
+        <altitudeMode>clampToGround</altitudeMode>
+        <coordinates> 150.74945,-23.13403499931765,0</coordinates>
+      </Point>
+    </Placemark>
+  </Folder>
+  <Style id="IconStyle01">
+    <IconStyle>
+      <Icon><href>http://maps.google.com/mapfiles/kml/paddle/red-circle.png</href></Icon>
+      <scale>0.750000</scale>
+    </IconStyle>
+    <LabelStyle>
+      <color>00000000</color>
+      <scale>0.000000</scale>
+    </LabelStyle>
+    <PolyStyle>
+      <color>ff000000</color>
+      <outline>0</outline>
+    </PolyStyle>
+  </Style>
+</Document>
+</kml>

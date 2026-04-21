@@ -21,6 +21,7 @@ import {
   User as UserIcon,
   TrendingUp,
   Mail,
+  ShoppingCart,
 } from "lucide-react";
 import {
   Sidebar,
@@ -50,6 +51,7 @@ type NavItem = { title: string; url: string; icon: typeof LayoutDashboard; audio
 const participantNavItems: NavItem[] = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard, audioDesc: "View your dashboard overview" },
   { title: "Book a Carer", url: "/care", icon: HeartHandshake, audioDesc: "Find and book verified NDIS support workers" },
+  { title: "Groceries", url: "/groceries", icon: ShoppingCart, audioDesc: "Order groceries for delivery or book a support worker to shop for you" },
   { title: "Shifts", url: "/shifts", icon: CalendarDays, audioDesc: "Manage shift schedules and track NDIS goal alignment" },
   { title: "Find a Job", url: "/jobs", icon: Briefcase, audioDesc: "Browse disability support employment opportunities" },
   { title: "Get Transport", url: "/transport", icon: Bus, audioDesc: "Arrange wheelchair accessible transport services" },
