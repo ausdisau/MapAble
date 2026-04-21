@@ -116,11 +116,28 @@ export function registerPaymentRoutes(app: Express) {
       return res.status(400).send(`Webhook Error: ${message}`);
     }
 
-    const claimed = await storage.claimWebhookEvent(event.id, event.type);
-    if (!claimed) {
+    // Idempotency: if we've already fully processed this event, ack and skip.
+    if (await storage.wasWebhookProcessed(event.id)) {
       return res.json({ received: true, duplicate: true });
     }
 
+    try {
+      await processStripeEvent(event);
+    } catch (err) {
+      // Do NOT mark processed: let Stripe retry the event so we can recover.
+      console.error(
+        `[stripe-webhook] handler failed for ${event.type} ${event.id}; will allow retry:`,
+        err instanceof Error ? err.message : err,
+      );
+      return res.status(500).json({ received: false, retry: true });
+    }
+
+    // Only after successful processing, record the event so retries are no-ops.
+    await storage.recordWebhookEvent(event.id, event.type);
+    return res.json({ received: true });
+  });
+
+  async function processStripeEvent(event: import("stripe").Stripe.Event) {
     switch (event.type) {
       case "payment_intent.succeeded": {
         const pi = event.data.object;
@@ -321,9 +338,7 @@ export function registerPaymentRoutes(app: Express) {
         break;
       }
     }
-
-    res.json({ received: true });
-  });
+  }
 
   // ============================================================
   // BECS Direct Debit — payment methods & mandates
