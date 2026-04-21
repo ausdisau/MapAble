@@ -1,17 +1,13 @@
 import type { Express, Request, Response } from "express";
-import OpenAI from "openai";
 import { chatStorage } from "./storage";
-
-const openai = new OpenAI({
-  apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY,
-  baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
-});
+import { getUserSessions, processChat } from "../../chat-engine";
+import { requireAuth } from "../../routes/shared";
 
 export function registerChatRoutes(app: Express): void {
   // Get all conversations
-  app.get("/api/conversations", async (req: Request, res: Response) => {
+  app.get("/api/conversations", requireAuth, async (req: Request, res: Response) => {
     try {
-      const conversations = await chatStorage.getAllConversations();
+      const conversations = await chatStorage.getConversationsByUser(req.session.userId!);
       res.json(conversations);
     } catch (error) {
       console.error("Error fetching conversations:", error);
@@ -20,9 +16,14 @@ export function registerChatRoutes(app: Express): void {
   });
 
   // Get single conversation with messages
-  app.get("/api/conversations/:id", async (req: Request, res: Response) => {
+  app.get("/api/conversations/:id", requireAuth, async (req: Request, res: Response) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = String(req.params.id);
+      const sessions = await getUserSessions(req.session.userId!);
+      const owns = sessions.some((session) => session.id === id);
+      if (!owns) {
+        return res.status(403).json({ error: "Access denied" });
+      }
       const conversation = await chatStorage.getConversation(id);
       if (!conversation) {
         return res.status(404).json({ error: "Conversation not found" });
@@ -36,10 +37,10 @@ export function registerChatRoutes(app: Express): void {
   });
 
   // Create new conversation
-  app.post("/api/conversations", async (req: Request, res: Response) => {
+  app.post("/api/conversations", requireAuth, async (req: Request, res: Response) => {
     try {
       const { title } = req.body;
-      const conversation = await chatStorage.createConversation(title || "New Chat");
+      const conversation = await chatStorage.createConversation(title || "New Chat", req.session.userId!);
       res.status(201).json(conversation);
     } catch (error) {
       console.error("Error creating conversation:", error);
@@ -48,9 +49,14 @@ export function registerChatRoutes(app: Express): void {
   });
 
   // Delete conversation
-  app.delete("/api/conversations/:id", async (req: Request, res: Response) => {
+  app.delete("/api/conversations/:id", requireAuth, async (req: Request, res: Response) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = String(req.params.id);
+      const sessions = await getUserSessions(req.session.userId!);
+      const owns = sessions.some((session) => session.id === id);
+      if (!owns) {
+        return res.status(403).json({ error: "Access denied" });
+      }
       await chatStorage.deleteConversation(id);
       res.status(204).send();
     } catch (error) {
@@ -60,46 +66,23 @@ export function registerChatRoutes(app: Express): void {
   });
 
   // Send message and get AI response (streaming)
-  app.post("/api/conversations/:id/messages", async (req: Request, res: Response) => {
+  app.post("/api/conversations/:id/messages", requireAuth, async (req: Request, res: Response) => {
     try {
-      const conversationId = parseInt(req.params.id);
+      const conversationId = String(req.params.id);
       const { content } = req.body;
+      const sessions = await getUserSessions(req.session.userId!);
+      const owns = sessions.some((session) => session.id === conversationId);
+      if (!owns) {
+        return res.status(403).json({ error: "Access denied" });
+      }
 
-      // Save user message
-      await chatStorage.createMessage(conversationId, "user", content);
-
-      // Get conversation history for context
-      const messages = await chatStorage.getMessagesByConversation(conversationId);
-      const chatMessages = messages.map((m) => ({
-        role: m.role as "user" | "assistant",
-        content: m.content,
-      }));
-
-      // Set up SSE
+      const userId = req.session.userId!;
       res.setHeader("Content-Type", "text/event-stream");
       res.setHeader("Cache-Control", "no-cache");
       res.setHeader("Connection", "keep-alive");
 
-      // Stream response from OpenAI
-      const stream = await openai.chat.completions.create({
-        model: "gpt-5.1",
-        messages: chatMessages,
-        stream: true,
-        max_completion_tokens: 8192,
-      });
-
-      let fullResponse = "";
-
-      for await (const chunk of stream) {
-        const content = chunk.choices[0]?.delta?.content || "";
-        if (content) {
-          fullResponse += content;
-          res.write(`data: ${JSON.stringify({ content })}\n\n`);
-        }
-      }
-
-      // Save assistant message
-      await chatStorage.createMessage(conversationId, "assistant", fullResponse);
+      const response = await processChat(conversationId, userId, content);
+      res.write(`data: ${JSON.stringify({ content: response.content })}\n\n`);
 
       res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
       res.end();

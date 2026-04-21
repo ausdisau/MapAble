@@ -5,6 +5,7 @@ import { eq, desc } from "drizzle-orm";
 export interface IChatStorage {
   getConversation(id: string): Promise<typeof chatSessions.$inferSelect | undefined>;
   getAllConversations(): Promise<(typeof chatSessions.$inferSelect)[]>;
+  getConversationsByUser(userId: string): Promise<(typeof chatSessions.$inferSelect)[]>;
   createConversation(title: string, userId?: string): Promise<typeof chatSessions.$inferSelect>;
   deleteConversation(id: string): Promise<void>;
   getMessagesByConversation(sessionId: string): Promise<(typeof chatMessages.$inferSelect)[]>;
@@ -19,6 +20,10 @@ export const chatStorage: IChatStorage = {
 
   async getAllConversations() {
     return db.select().from(chatSessions).orderBy(desc(chatSessions.startedAt));
+  },
+
+  async getConversationsByUser(userId: string) {
+    return db.select().from(chatSessions).where(eq(chatSessions.userId, userId)).orderBy(desc(chatSessions.startedAt));
   },
 
   async createConversation(title: string, userId: string = "system") {
