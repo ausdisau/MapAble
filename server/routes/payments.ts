@@ -150,11 +150,11 @@ export function registerPaymentRoutes(app: Express) {
                 console.error("[webhook] payment success notify failed:", e instanceof Error ? e.message : e);
               }
             }
-          }
-          if (inv?.qbInvoiceId && qbEnabled()) {
-            pushInvoiceToQb(inv.participantId, invoiceId).catch((e) =>
-              console.error("QB re-sync after Stripe payment failed:", e)
-            );
+            if (inv.qbInvoiceId && qbEnabled()) {
+              pushInvoiceToQb(inv.participantId, invoiceId).catch((e) =>
+                console.error("QB re-sync after Stripe payment failed:", e)
+              );
+            }
           }
         }
         if (groceryOrderId) {
