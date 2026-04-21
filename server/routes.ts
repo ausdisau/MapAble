@@ -2365,8 +2365,20 @@ export async function registerRoutes(
       return res.status(403).json({ message: "Worker role required" });
     }
     try {
-      const orders = await storage.getGroceryOrdersForWorker(userId);
-      res.json(orders);
+      // Grocery checkout assigns workerId from /api/workers (workers.id), not the user id.
+      // Resolve the carer's worker record id, then also accept user id as a fallback for
+      // orders created via API/admin tooling that referenced the user id directly.
+      const workerRecordId = await getWorkerIdForUser(userId);
+      const orders = workerRecordId
+        ? [
+            ...(await storage.getGroceryOrdersForWorker(workerRecordId)),
+            ...(await storage.getGroceryOrdersForWorker(userId)),
+          ]
+        : await storage.getGroceryOrdersForWorker(userId);
+      // De-dupe by id (workerRecordId !== userId ensures no overlap, but be defensive).
+      const seen = new Set<string>();
+      const deduped = orders.filter((o) => (seen.has(o.id) ? false : (seen.add(o.id), true)));
+      res.json(deduped);
     } catch (e) {
       console.error("[grocery-supplier] pick-list failed:", e);
       res.status(500).json({ message: "Failed to load pick list" });

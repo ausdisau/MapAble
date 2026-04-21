@@ -106,6 +106,25 @@ app.use((req, res, next) => {
     console.error("Seed error:", e);
   }
 
+  // Best-effort grocery supplier auto-sync at startup. Disabled by default; opt in
+  // with GROCERY_SUPPLIER_AUTOSYNC=1 (and the existing GROCERY_SUPPLIER_DISABLED guard).
+  if (process.env.GROCERY_SUPPLIER_AUTOSYNC === "1" && process.env.GROCERY_SUPPLIER_DISABLED !== "1") {
+    (async () => {
+      try {
+        const { syncGroceryCatalog } = await import("./grocery-supplier");
+        const { storage } = await import("./storage");
+        const status = await storage.getGroceryCatalogStatus();
+        // Only auto-sync if nothing real has been pulled yet; never overwrite a recent admin sync.
+        if (status.supplierCount === 0) {
+          const result = await syncGroceryCatalog();
+          console.log(`[grocery-supplier] autosync: upserted=${result.upserted} replacedSeed=${result.replacedSeed}`);
+        }
+      } catch (e) {
+        console.error("[grocery-supplier] autosync failed:", e);
+      }
+    })();
+  }
+
   app.use((err: any, _req: Request, res: Response, next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
