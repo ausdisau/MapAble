@@ -1,16 +1,14 @@
 import type { Express } from "express";
 import { storage } from "../storage";
-import { getStripe, stripeEnabled } from "../stripe";
+import { getStripe, stripeEnabled, becsEnabled, connectEnabled, getStripeCapabilities, calculatePlatformFee, getPlatformFeeBps } from "../stripe";
+import { getProdaIntegrationStatus, getRecentClaims } from "../ndis-api";
 import { orbEnabled, getCustomerUsage, verifyAndUnwrapWebhook } from "../orb";
 import { qbEnabled, pushInvoiceToQb } from "../quickbooks";
 import { requireAuth, provisionOrbBilling } from "./shared";
 
 export function registerPaymentRoutes(app: Express) {
   app.get("/api/stripe/config", (_req, res) => {
-    res.json({
-      publishableKey: process.env.STRIPE_PUBLISHABLE_KEY || "",
-      enabled: stripeEnabled(),
-    });
+    res.json(getStripeCapabilities());
   });
 
   app.post("/api/payments/create-intent", requireAuth, async (req, res) => {
@@ -61,12 +59,15 @@ export function registerPaymentRoutes(app: Express) {
     }
 
     const amountCents = Math.round(Number(invoice.totalAmount) * 100);
+    const includeBecs = becsEnabled() && req.body.includeBecs !== false;
+    const paymentMethodTypes: string[] = ["link", "card"];
+    if (includeBecs) paymentMethodTypes.push("au_becs_debit");
 
     const paymentIntent = await getStripe().paymentIntents.create({
       amount: amountCents,
       currency: "aud",
       customer: stripeCustomerId,
-      payment_method_types: ["link", "card"],
+      payment_method_types: paymentMethodTypes,
       metadata: {
         invoiceId: invoice.id,
         participantId: invoice.participantId,
@@ -100,6 +101,11 @@ export function registerPaymentRoutes(app: Express) {
       const message = err instanceof Error ? err.message : "Unknown error";
       console.error("Stripe webhook signature verification failed:", message);
       return res.status(400).send(`Webhook Error: ${message}`);
+    }
+
+    const claimed = await storage.claimWebhookEvent(event.id, event.type);
+    if (!claimed) {
+      return res.json({ received: true, duplicate: true });
     }
 
     switch (event.type) {
@@ -155,9 +161,237 @@ export function registerPaymentRoutes(app: Express) {
         }
         break;
       }
+      case "setup_intent.succeeded": {
+        const si: any = event.data.object;
+        const pmId = si.payment_method as string | undefined;
+        if (pmId) {
+          try {
+            const pm = await getStripe().paymentMethods.retrieve(pmId);
+            if (pm.type === "au_becs_debit" && pm.au_becs_debit) {
+              const userId = (si.metadata?.userId as string) || (pm.metadata?.userId as string);
+              if (userId) {
+                const existing = await storage.getBecsMandateByPaymentMethod(pmId);
+                if (!existing) {
+                  await storage.createBecsMandate({
+                    userId,
+                    stripePaymentMethodId: pmId,
+                    stripeMandateId: (si.mandate as string) || null,
+                    bsbLast4: pm.au_becs_debit.bsb_number?.slice(-4) || null,
+                    accountLast4: pm.au_becs_debit.last4 || null,
+                    bankName: null,
+                    status: "active",
+                    mandateUrl: null,
+                    isDefault: false,
+                  } as any);
+                } else {
+                  await storage.updateBecsMandateStatus(pmId, "active", undefined, (si.mandate as string) || undefined);
+                }
+              }
+            }
+          } catch (e) {
+            console.error("setup_intent.succeeded handler error:", e);
+          }
+        }
+        break;
+      }
+      case "mandate.updated": {
+        const mandate: any = event.data.object;
+        const pmId = mandate.payment_method as string | undefined;
+        const status = mandate.status === "active" ? "active" : mandate.status === "inactive" ? "revoked" : "pending";
+        if (pmId) {
+          await storage.updateBecsMandateStatus(pmId, status);
+        }
+        break;
+      }
+      case "account.updated": {
+        const acct: any = event.data.object;
+        const user = await storage.getUserByStripeAccountId(acct.id);
+        if (user) {
+          await storage.setStripeAccount(user.id, {
+            stripeAccountStatus: acct.charges_enabled && acct.payouts_enabled ? "active" : "pending",
+            stripeChargesEnabled: !!acct.charges_enabled,
+            stripePayoutsEnabled: !!acct.payouts_enabled,
+            stripeRequirementsDue: acct.requirements ?? null,
+          });
+        }
+        break;
+      }
+      case "transfer.created":
+      case "payout.paid":
+      case "payout.failed": {
+        console.log(`Stripe Connect event ${event.type}:`, (event.data.object as any).id);
+        break;
+      }
     }
 
     res.json({ received: true });
+  });
+
+  // ============================================================
+  // BECS Direct Debit — payment methods & mandates
+  // ============================================================
+  app.get("/api/payment-methods", requireAuth, async (req, res) => {
+    const userId = req.session.userId!;
+    const mandates = await storage.getBecsMandates(userId);
+    const user = await storage.getUser(userId);
+    res.json({
+      becsMandates: mandates,
+      autoDebitEnabled: user?.autoDebitEnabled ?? false,
+      autoDebitGraceDays: user?.autoDebitGraceDays ?? 3,
+      defaultBecsPaymentMethodId: user?.defaultBecsPaymentMethodId ?? null,
+    });
+  });
+
+  app.post("/api/payment-methods/setup-intent", requireAuth, async (req, res) => {
+    if (!becsEnabled()) return res.status(503).json({ message: "BECS Direct Debit is not enabled" });
+    const userId = req.session.userId!;
+    const user = await storage.getUser(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    let stripeCustomerId = user.stripeCustomerId;
+    if (!stripeCustomerId) {
+      const customer = await getStripe().customers.create({
+        name: user.fullName,
+        email: user.email,
+        metadata: { userId: user.id },
+      });
+      stripeCustomerId = customer.id;
+      await storage.updateUserStripeCustomerId(user.id, stripeCustomerId);
+    }
+
+    const setupIntent = await getStripe().setupIntents.create({
+      customer: stripeCustomerId,
+      payment_method_types: ["au_becs_debit"],
+      usage: "off_session",
+      metadata: { userId: user.id },
+    });
+    res.json({ clientSecret: setupIntent.client_secret, setupIntentId: setupIntent.id });
+  });
+
+  app.post("/api/payment-methods/:id/default", requireAuth, async (req, res) => {
+    const userId = req.session.userId!;
+    const m = await storage.setDefaultBecsMandate(userId, req.params.id as string);
+    if (!m) return res.status(404).json({ message: "Mandate not found" });
+    res.json(m);
+  });
+
+  app.delete("/api/payment-methods/:id", requireAuth, async (req, res) => {
+    const userId = req.session.userId!;
+    const m = await storage.getBecsMandate(req.params.id as string);
+    if (!m || m.userId !== userId) return res.status(404).json({ message: "Mandate not found" });
+    try {
+      await getStripe().paymentMethods.detach(m.stripePaymentMethodId);
+    } catch (e) {
+      console.error("Stripe detach failed (continuing):", e);
+    }
+    await storage.deleteBecsMandate(m.id);
+    res.status(204).send();
+  });
+
+  app.put("/api/billing/auto-debit", requireAuth, async (req, res) => {
+    const userId = req.session.userId!;
+    const { enabled, graceDays } = req.body;
+    if (typeof enabled !== "boolean") return res.status(400).json({ message: "enabled (boolean) required" });
+    if (enabled) {
+      const def = await storage.getDefaultBecsMandate(userId);
+      if (!def) return res.status(400).json({ message: "Set a default BECS payment method before enabling auto-debit" });
+    }
+    const u = await storage.setUserAutoDebit(userId, enabled, typeof graceDays === "number" ? graceDays : undefined);
+    res.json({ autoDebitEnabled: u?.autoDebitEnabled, autoDebitGraceDays: u?.autoDebitGraceDays });
+  });
+
+  // ============================================================
+  // Stripe Connect — provider payouts
+  // ============================================================
+  app.get("/api/payouts/account", requireAuth, async (req, res) => {
+    const user = await storage.getUser(req.session.userId!);
+    if (!user) return res.status(404).json({ message: "User not found" });
+    res.json({
+      connectEnabled: connectEnabled(),
+      stripeAccountId: user.stripeAccountId,
+      stripeAccountStatus: user.stripeAccountStatus,
+      stripeChargesEnabled: user.stripeChargesEnabled,
+      stripePayoutsEnabled: user.stripePayoutsEnabled,
+      stripeRequirementsDue: user.stripeRequirementsDue,
+      platformFeeBps: getPlatformFeeBps(),
+    });
+  });
+
+  app.post("/api/payouts/onboard", requireAuth, async (req, res) => {
+    if (!connectEnabled()) return res.status(503).json({ message: "Stripe Connect is not enabled" });
+    const user = await storage.getUser(req.session.userId!);
+    if (!user) return res.status(404).json({ message: "User not found" });
+    if (user.role !== "carer" && user.role !== "provider") {
+      return res.status(403).json({ message: "Only workers/providers can onboard for payouts" });
+    }
+    const worker = await storage.getWorkerByUserId(user.id);
+    if (!worker?.abnVerified) {
+      return res.status(400).json({ message: "ABN must be verified before payout onboarding" });
+    }
+
+    let accountId = user.stripeAccountId;
+    if (!accountId) {
+      const account = await getStripe().accounts.create({
+        type: "express",
+        country: "AU",
+        email: user.email,
+        capabilities: { transfers: { requested: true }, card_payments: { requested: true } },
+        business_profile: { name: user.fullName },
+        metadata: { userId: user.id },
+      });
+      accountId = account.id;
+      await storage.setStripeAccount(user.id, {
+        stripeAccountId: accountId,
+        stripeAccountStatus: "pending",
+        stripeChargesEnabled: false,
+        stripePayoutsEnabled: false,
+      });
+    }
+
+    const origin = req.headers.origin || `${req.protocol}://${req.get("host")}`;
+    const link = await getStripe().accountLinks.create({
+      account: accountId,
+      refresh_url: `${origin}/payouts?refresh=1`,
+      return_url: `${origin}/payouts?onboarded=1`,
+      type: "account_onboarding",
+    });
+    res.json({ url: link.url, accountId });
+  });
+
+  app.post("/api/payouts/sync", requireAuth, async (req, res) => {
+    const user = await storage.getUser(req.session.userId!);
+    if (!user?.stripeAccountId) return res.status(400).json({ message: "No connected Stripe account" });
+    const acct = await getStripe().accounts.retrieve(user.stripeAccountId);
+    const updated = await storage.setStripeAccount(user.id, {
+      stripeAccountStatus: acct.charges_enabled && acct.payouts_enabled ? "active" : "pending",
+      stripeChargesEnabled: !!acct.charges_enabled,
+      stripePayoutsEnabled: !!acct.payouts_enabled,
+      stripeRequirementsDue: acct.requirements ?? null,
+    });
+    res.json(updated);
+  });
+
+  // ============================================================
+  // NDIS admin endpoints
+  // ============================================================
+  app.get("/api/ndis/integration-status", requireAuth, async (req, res) => {
+    const user = await storage.getUser(req.session.userId!);
+    if (!user || (user.role !== "admin" && user.role !== "provider")) {
+      return res.status(403).json({ message: "Admin or provider access required" });
+    }
+    res.json(getProdaIntegrationStatus());
+  });
+
+  app.get("/api/ndis/claims", requireAuth, async (req, res) => {
+    const user = await storage.getUser(req.session.userId!);
+    if (!user) return res.status(404).json({ message: "User not found" });
+    const limit = Math.min(Number(req.query.limit) || 20, 100);
+    if (user.role === "admin" || user.role === "provider") {
+      const claims = await getRecentClaims(limit);
+      return res.json(claims);
+    }
+    const claims = await storage.getNdisClaims({ participantId: user.id, limit });
+    res.json(claims);
   });
 
   app.post("/api/webhooks/orb", async (req, res) => {

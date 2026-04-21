@@ -41,6 +41,14 @@ MapAble 4.0 is a fullstack TypeScript superapp combining core NDIS services:
 - `STRIPE_SECRET_KEY` — Stripe secret API key
 - `STRIPE_PUBLISHABLE_KEY` — Stripe publishable key (exposed to frontend)
 - `STRIPE_WEBHOOK_SECRET` — Stripe webhook signing secret
+- `STRIPE_BECS_DISABLED` — set to `1` to disable AU BECS Direct Debit option (default: enabled)
+- `STRIPE_CONNECT_ENABLED` — set to `1` to enable Stripe Connect onboarding & payouts for workers/providers
+- `STRIPE_PLATFORM_FEE_BPS` — platform fee in basis points for Connect transfers (default: `500` = 5%)
+- `NDIS_PRODA_BASE_URL` — PRODA API base URL (e.g. `https://api.proda.humanservices.gov.au`)
+- `NDIS_PRODA_CLIENT_ID` — PRODA OAuth client ID
+- `NDIS_PRODA_CLIENT_SECRET` — PRODA OAuth client secret
+- `NDIS_PRODA_DEVICE_NAME` — registered PRODA device name
+- `NDIS_PRODA_ORG_ID` — provider organisation ID registered with PRODA
 - `ORB_API_KEY` — Orb API key for usage-based billing
 - `AUTH0_DOMAIN` — Auth0 tenant domain (default: `adid.au.auth0.com`)
 - `AUTH0_CLIENT_ID` — Auth0 application Client ID

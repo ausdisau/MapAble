@@ -2,7 +2,7 @@ import type { Express } from "express";
 import crypto from "crypto";
 import { z } from "zod";
 import { storage } from "../storage";
-import { lookupParticipant, lookupProvider, lookupWorkerScreening } from "../ndis-api";
+import { lookupParticipant, lookupProvider, lookupWorkerScreening, ProdaNotConfiguredError, ProdaApiError } from "../ndis-api";
 import { requireAuth, sanitizeUser } from "./shared";
 
 export function registerAuthRoutes(app: Express) {
@@ -278,8 +278,11 @@ export function registerAuthRoutes(app: Express) {
         managementType: result.managementType,
       });
     } catch (error) {
+      if (error instanceof ProdaNotConfiguredError) {
+        return res.status(503).json({ message: "NDIS PRODA not configured", code: error.code, missingEnvVars: error.missingEnvVars });
+      }
       console.error("Participant lookup error:", error);
-      res.status(500).json({ message: "Failed to look up participant" });
+      res.status(error instanceof ProdaApiError ? error.status : 500).json({ message: "Failed to look up participant" });
     }
   });
 
@@ -301,8 +304,11 @@ export function registerAuthRoutes(app: Express) {
         registrationGroups: result.registrationGroups,
       });
     } catch (error) {
+      if (error instanceof ProdaNotConfiguredError) {
+        return res.status(503).json({ message: "NDIS PRODA not configured", code: error.code, missingEnvVars: error.missingEnvVars });
+      }
       console.error("Provider lookup error:", error);
-      res.status(500).json({ message: "Failed to look up provider" });
+      res.status(error instanceof ProdaApiError ? error.status : 500).json({ message: "Failed to look up provider" });
     }
   });
 
@@ -324,8 +330,11 @@ export function registerAuthRoutes(app: Express) {
         expiryDate: result.expiryDate,
       });
     } catch (error) {
+      if (error instanceof ProdaNotConfiguredError) {
+        return res.status(503).json({ message: "NDIS PRODA not configured", code: error.code, missingEnvVars: error.missingEnvVars });
+      }
       console.error("Worker screening lookup error:", error);
-      res.status(500).json({ message: "Failed to look up worker screening" });
+      res.status(error instanceof ProdaApiError ? error.status : 500).json({ message: "Failed to look up worker screening" });
     }
   });
 
