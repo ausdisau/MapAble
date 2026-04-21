@@ -35,7 +35,7 @@ export function ChatbotWidget({ savedDrafts = [], pendingActions = [] }: Chatbot
   const [, setLocation] = useLocation();
 
   const sessionsQuery = useQuery<ChatSession[]>({
-    queryKey: ["/api/chat/sessions"],
+    queryKey: [config.endpoints.sessions],
     enabled: isAuthenticated && open,
   });
 
@@ -111,8 +111,10 @@ export function ChatbotWidget({ savedDrafts = [], pendingActions = [] }: Chatbot
             activeSessionId={activeSessionId}
             setActiveSessionId={setActiveSessionId}
             featureFlags={config.featureFlags}
+            endpoints={config.endpoints}
             seedMessage={seedMessage}
             onSeedConsumed={() => setSeedMessage(null)}
+            onClose={() => setOpen(false)}
           />
         }
         actions={<ActionsTab onActionSelect={handleActionSelect} featureFlags={config.featureFlags} />}

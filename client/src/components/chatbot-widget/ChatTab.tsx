@@ -1,17 +1,28 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
-import { Loader2, Send, Mic, MicOff, Bot, User, Plus } from "lucide-react";
+import { Loader2, Send, Mic, MicOff, Plus } from "lucide-react";
 import type { ChatMessage, ChatSession } from "@shared/schema";
-import type { FeatureFlags } from "./types";
+import type { FeatureFlags, ServiceEndpoints } from "./types";
+import { MessageBubble } from "@/components/chat-shared/MessageBubble";
+import { handleQuickAction } from "@/components/chat-shared/quick-actions";
+import {
+  getSpeechRecognitionConstructor,
+  type SpeechRecognitionInstance,
+  type SpeechRecognitionEvent,
+  type SpeechRecognitionErrorEvent,
+} from "@/lib/voice/speech-recognition";
 
 interface ChatTabProps {
   activeSessionId: string | null;
   setActiveSessionId: (id: string | null) => void;
   featureFlags: FeatureFlags;
+  endpoints: ServiceEndpoints;
   seedMessage?: string | null;
   onSeedConsumed?: () => void;
+  onClose?: () => void;
 }
 
 interface ChatResponse {
@@ -28,8 +39,10 @@ export function ChatTab({
   activeSessionId,
   setActiveSessionId,
   featureFlags,
+  endpoints,
   seedMessage,
   onSeedConsumed,
+  onClose,
 }: ChatTabProps) {
   const [input, setInput] = useState("");
   const [micState, setMicState] = useState<MicState>("idle");
@@ -38,13 +51,17 @@ export function ChatTab({
   const [pendingMessages, setPendingMessages] = useState<{ role: string; content: string }[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const recognitionRef = useRef<any>(null);
+  const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
+  const [, setLocation] = useLocation();
+
+  const sessionsEndpoint = endpoints.sessions;
+  const sendEndpoint = endpoints.chat;
 
   const messagesQuery = useQuery<ChatMessage[]>({
-    queryKey: ["/api/chat/sessions", activeSessionId, "messages"],
+    queryKey: [sessionsEndpoint, activeSessionId, "messages"],
     enabled: !!activeSessionId,
     queryFn: async () => {
-      const res = await fetch(`/api/chat/sessions/${activeSessionId}/messages`, { credentials: "include" });
+      const res = await fetch(`${sessionsEndpoint}/${activeSessionId}/messages`, { credentials: "include" });
       if (!res.ok) throw new Error("Failed to fetch messages");
       return res.json();
     },
@@ -52,24 +69,24 @@ export function ChatTab({
 
   const createSessionMutation = useMutation({
     mutationFn: async () => {
-      const res = await apiRequest("POST", "/api/chat/sessions");
+      const res = await apiRequest("POST", sessionsEndpoint);
       return (await res.json()) as ChatSession;
     },
     onSuccess: (session) => {
       setActiveSessionId(session.id);
-      queryClient.invalidateQueries({ queryKey: ["/api/chat/sessions"] });
+      queryClient.invalidateQueries({ queryKey: [sessionsEndpoint] });
     },
   });
 
   const sendMutation = useMutation({
     mutationFn: async ({ sessionId, message }: { sessionId: string; message: string }) => {
-      const res = await apiRequest("POST", "/api/chat/send", { sessionId, message });
+      const res = await apiRequest("POST", sendEndpoint, { sessionId, message });
       return res.json() as Promise<ChatResponse>;
     },
     onSuccess: () => {
       setPendingMessages([]);
-      queryClient.invalidateQueries({ queryKey: ["/api/chat/sessions", activeSessionId, "messages"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/chat/sessions"] });
+      queryClient.invalidateQueries({ queryKey: [sessionsEndpoint, activeSessionId, "messages"] });
+      queryClient.invalidateQueries({ queryKey: [sessionsEndpoint] });
     },
     onError: () => setPendingMessages([]),
   });
@@ -85,7 +102,7 @@ export function ChatTab({
   useEffect(() => {
     return () => {
       try {
-        recognitionRef.current?.stop?.();
+        recognitionRef.current?.stop();
       } catch {
         // ignore
       }
@@ -118,32 +135,29 @@ export function ChatTab({
   const handleMicToggle = () => {
     setVoiceError(null);
     if (micState === "recording") {
-      recognitionRef.current?.stop?.();
+      recognitionRef.current?.stop();
       setMicState("idle");
       return;
     }
-    const SR =
-      (typeof window !== "undefined" &&
-        ((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition)) ||
-      null;
+    const SR = getSpeechRecognitionConstructor();
     if (!SR) {
       setMicState("unsupported");
       setVoiceError("Voice input is not supported in this browser. Please type your message.");
       return;
     }
     try {
-      const recognition = new SR();
+      const recognition: SpeechRecognitionInstance = new SR();
       recognition.continuous = false;
       recognition.interimResults = true;
       recognition.lang = "en-AU";
-      recognition.onresult = (event: any) => {
+      recognition.onresult = (event: SpeechRecognitionEvent) => {
         let transcript = "";
         for (let i = event.resultIndex; i < event.results.length; i++) {
           transcript += event.results[i][0].transcript;
         }
         setVoiceTranscript(transcript);
       };
-      recognition.onerror = (event: any) => {
+      recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
         if (event.error === "not-allowed" || event.error === "service-not-allowed") {
           setMicState("denied");
           setVoiceError("Microphone permission denied. Please enable it in your browser settings or type your message.");
@@ -171,6 +185,20 @@ export function ChatTab({
       inputRef.current?.focus();
     }
   };
+
+  const onQuickAction = useCallback(
+    (action: string) => {
+      handleQuickAction(action, {
+        navigate: (path) => {
+          setLocation(path);
+          onClose?.();
+        },
+        setInput,
+        focusInput: () => inputRef.current?.focus(),
+      });
+    },
+    [setLocation, onClose],
+  );
 
   const messages = messagesQuery.data || [];
 
@@ -207,10 +235,23 @@ export function ChatTab({
           </div>
         )}
         {messages.map((m) => (
-          <MessageBubble key={m.id} role={m.role} content={m.content} />
+          <MessageBubble key={m.id} message={m} onQuickAction={onQuickAction} compact />
         ))}
         {pendingMessages.map((m, i) => (
-          <MessageBubble key={`pending-${i}`} role={m.role} content={m.content} />
+          <MessageBubble
+            key={`pending-${i}`}
+            message={
+              {
+                id: `pending-${i}`,
+                role: m.role,
+                content: m.content,
+                quickActions: [],
+                confidence: "general",
+              } as unknown as ChatMessage
+            }
+            onQuickAction={onQuickAction}
+            compact
+          />
         ))}
         {sendMutation.isPending && (
           <div className="flex items-center gap-2 text-xs text-muted-foreground" data-testid="widget-chat-thinking">
@@ -295,29 +336,6 @@ export function ChatTab({
             {sendMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
           </Button>
         </div>
-      </div>
-    </div>
-  );
-}
-
-function MessageBubble({ role, content }: { role: string; content: string }) {
-  const isUser = role === "user";
-  return (
-    <div className={`flex gap-2 ${isUser ? "flex-row-reverse" : ""}`}>
-      <div
-        className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${
-          isUser ? "bg-[#1B6EB5] text-white" : "bg-[#2EAA6E]/15 text-[#2EAA6E]"
-        }`}
-        aria-hidden="true"
-      >
-        {isUser ? <User className="w-3.5 h-3.5" /> : <Bot className="w-3.5 h-3.5" />}
-      </div>
-      <div
-        className={`rounded-2xl px-3 py-2 text-sm max-w-[80%] whitespace-pre-wrap ${
-          isUser ? "bg-[#1B6EB5] text-white rounded-br-sm" : "bg-card border border-border rounded-bl-sm"
-        }`}
-      >
-        {content}
       </div>
     </div>
   );

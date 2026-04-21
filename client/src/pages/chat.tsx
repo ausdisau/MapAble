@@ -11,6 +11,7 @@ import { Loader2, Send, Plus, Trash2, Bot, User, AlertTriangle, ArrowRight, Bus,
 import type { ChatSession, ChatMessage, AccessContextProfile } from "@shared/schema";
 import { AccessProfileWizard } from "@/components/access-profile-wizard";
 import { BarrierReportForm } from "@/components/barrier-report-form";
+import { QUICK_ACTION_CONFIG, CONFIDENCE_CONFIG } from "@/components/chat-shared/quick-actions";
 
 interface ChatResponse {
   content: string;
@@ -20,24 +21,6 @@ interface ChatResponse {
   toolsUsed: string[];
 }
 
-const QUICK_ACTION_CONFIG: Record<string, { label: string; icon: typeof Bus; color: string }> = {
-  book_transport: { label: "Book Transport", icon: Bus, color: "bg-[#1B6EB5]/10 text-[#1B6EB5] border-[#1B6EB5]/30" },
-  report_barrier: { label: "Report Barrier", icon: Flag, color: "bg-amber-500/10 text-amber-700 border-amber-500/30 dark:text-amber-400" },
-  view_workers: { label: "View Workers", icon: Search, color: "bg-[#2EAA6E]/10 text-[#2EAA6E] border-[#2EAA6E]/30" },
-  escalate: { label: "Get Human Help", icon: Phone, color: "bg-red-500/10 text-red-600 border-red-500/30 dark:text-red-400" },
-  edit_profile: { label: "Edit Profile", icon: UserCog, color: "bg-purple-500/10 text-purple-600 border-purple-500/30 dark:text-purple-400" },
-  view_pricing: { label: "View Pricing", icon: ArrowRight, color: "bg-[#E6A817]/10 text-[#E6A817] border-[#E6A817]/30" },
-  view_shifts: { label: "View Shifts", icon: Calendar, color: "bg-indigo-500/10 text-indigo-600 border-indigo-500/30 dark:text-indigo-400" },
-  pay_invoice: { label: "Pay Invoice", icon: CreditCard, color: "bg-emerald-500/10 text-emerald-600 border-emerald-500/30 dark:text-emerald-400" },
-  check_budget: { label: "Check Budget", icon: PieChart, color: "bg-[#E6A817]/10 text-[#E6A817] border-[#E6A817]/30" },
-};
-
-const CONFIDENCE_CONFIG: Record<string, { label: string; variant: "default" | "secondary" | "outline" }> = {
-  high: { label: "High confidence", variant: "default" },
-  medium: { label: "Medium — limited data", variant: "secondary" },
-  low: { label: "Low — community reports only", variant: "outline" },
-  general: { label: "General guidance", variant: "outline" },
-};
 
 function ConfidenceBadge({ confidence }: { confidence: string }) {
   const config = CONFIDENCE_CONFIG[confidence] || CONFIDENCE_CONFIG.general;
