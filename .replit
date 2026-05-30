@@ -39,6 +39,10 @@ args = "Start application"
 task = "workflow.run"
 args = "AgentMail Service"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "test"
+
 [[workflows.workflow]]
 name = "Start application"
 author = "agent"
@@ -62,6 +66,17 @@ waitForPort = 3001
 
 [workflows.workflow.metadata]
 outputType = "console"
+
+[[workflows.workflow]]
+name = "test"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npx tsx --test server/__tests__/smoke.test.ts"
+
+[workflows.workflow.metadata]
+isValidation = true
 
 [objectStorage]
 defaultBucketID = "replit-objstore-23684864-b650-42b0-b4fb-f420ba4db463"
