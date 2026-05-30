@@ -1,10 +1,15 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, integer, boolean, timestamp, jsonb, pgEnum, uniqueIndex } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, integer, boolean, timestamp, jsonb, pgEnum, uniqueIndex, check } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
 export const geoDomainEnum = pgEnum("geo_domain", ["accessibility", "care", "transport", "employment"]);
 export const geoVisibilityEnum = pgEnum("geo_visibility", ["public", "staff", "admin"]);
+
+// Single source of truth for the allowed map-layer domain values. Used by the
+// layer insert schema (admin create/update + import) and the DB check constraint.
+export const GEO_DOMAINS = geoDomainEnum.enumValues;
+export const geoDomainSchema = z.enum(GEO_DOMAINS);
 export const geoGeometryTypeEnum = pgEnum("geo_geometry_type", ["Point", "LineString", "Polygon", "MultiLineString", "MultiPolygon"]);
 
 export const mapCategories = pgTable("map_categories", {
@@ -32,7 +37,13 @@ export const mapLayers = pgTable("map_layers", {
   ordering: integer("ordering").notNull().default(100),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
-});
+}, (t) => ({
+  // Every layer must have at least one domain and every domain must be valid.
+  domainsValid: check(
+    "map_layers_domains_valid",
+    sql`cardinality(${t.domains}) >= 1 AND ${t.domains} <@ ARRAY['accessibility','care','transport','employment']::text[]`,
+  ),
+}));
 
 export const mapFeatures = pgTable("map_features", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -110,7 +121,14 @@ export const geoAuditLog = pgTable("geo_audit_log", {
 });
 
 export const insertMapCategorySchema = createInsertSchema(mapCategories).omit({ id: true, createdAt: true });
-export const insertMapLayerSchema = createInsertSchema(mapLayers).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertMapLayerSchema = createInsertSchema(mapLayers, {
+  domains: z
+    .array(geoDomainSchema, {
+      invalid_type_error: "domains must be an array of valid domain values",
+    })
+    .min(1, "A layer must belong to at least one domain")
+    .refine((d) => new Set(d).size === d.length, { message: "domains must not contain duplicates" }),
+}).omit({ id: true, createdAt: true, updatedAt: true });
 export const insertMapFeatureSchema = createInsertSchema(mapFeatures).omit({
   id: true, createdAt: true, updatedAt: true, lat: true, lng: true, minLat: true, maxLat: true, minLng: true, maxLng: true,
 });
