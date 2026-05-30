@@ -22,9 +22,11 @@ import {
   DollarSign,
   Navigation,
   AlertCircle,
+  Map as MapIcon,
 } from "lucide-react";
 import { useState } from "react";
 import { usePageTitle } from "@/hooks/use-page-title";
+import { TransportRouteMap } from "@/features/geo/TransportRouteMap";
 import type { TransportRequest, Worker, User } from "@shared/schema";
 
 function TransportBookingForm() {
@@ -405,36 +407,53 @@ function RecentRequests() {
     <div className="space-y-3">
       <h2 className="text-lg font-black tracking-tight">Recent Requests</h2>
       {requests.map((r) => (
-        <Card key={r.id} className="p-4 hover-elevate">
-          <div className="flex items-start justify-between gap-2 mb-2">
-            <div className="text-sm font-medium">
-              <div className="flex items-center gap-1.5">
-                <MapPin className="w-3 h-3 text-primary" />
-                {r.pickupLocation}
-              </div>
-              <div className="flex items-center gap-1.5 mt-1">
-                <ArrowRight className="w-3 h-3 text-emerald-500" />
-                {r.dropoffLocation}
-              </div>
-            </div>
-            <Badge className={statusColors[r.status] || ""}>{r.status.replace("_", " ")}</Badge>
-          </div>
-          <div className="flex items-center gap-3 text-xs text-muted-foreground flex-wrap">
-            <span className="flex items-center gap-1">
-              <Calendar className="w-3 h-3" /> {r.date}
-            </span>
-            <span className="flex items-center gap-1">
-              <Clock className="w-3 h-3" /> {r.time}
-            </span>
-            {r.wheelchairRequired && (
-              <span className="flex items-center gap-1">
-                <Accessibility className="w-3 h-3" /> Wheelchair
-              </span>
-            )}
-          </div>
-        </Card>
+        <RequestCard key={r.id} request={r} statusColors={statusColors} />
       ))}
     </div>
+  );
+}
+
+function RequestCard({ request: r, statusColors }: { request: TransportRequest; statusColors: Record<string, string> }) {
+  const [showMap, setShowMap] = useState(false);
+  return (
+    <Card className="p-4 hover-elevate" data-testid={`card-request-${r.id}`}>
+      <div className="flex items-start justify-between gap-2 mb-2">
+        <div className="text-sm font-medium">
+          <div className="flex items-center gap-1.5">
+            <MapPin className="w-3 h-3 text-primary" />
+            {r.pickupLocation}
+          </div>
+          <div className="flex items-center gap-1.5 mt-1">
+            <ArrowRight className="w-3 h-3 text-emerald-500" />
+            {r.dropoffLocation}
+          </div>
+        </div>
+        <Badge className={statusColors[r.status] || ""}>{r.status.replace("_", " ")}</Badge>
+      </div>
+      <div className="flex items-center gap-3 text-xs text-muted-foreground flex-wrap">
+        <span className="flex items-center gap-1">
+          <Calendar className="w-3 h-3" /> {r.date}
+        </span>
+        <span className="flex items-center gap-1">
+          <Clock className="w-3 h-3" /> {r.time}
+        </span>
+        {r.wheelchairRequired && (
+          <span className="flex items-center gap-1">
+            <Accessibility className="w-3 h-3" /> Wheelchair
+          </span>
+        )}
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-6 px-2 ml-auto text-xs gap-1"
+          onClick={() => setShowMap((v) => !v)}
+          data-testid={`button-toggle-route-${r.id}`}
+        >
+          <MapIcon className="w-3 h-3" /> {showMap ? "Hide map" : "Show on map"}
+        </Button>
+      </div>
+      {showMap && <TransportRouteMap pickup={r.pickupLocation} dropoff={r.dropoffLocation} />}
+    </Card>
   );
 }
 

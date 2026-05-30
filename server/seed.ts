@@ -1,6 +1,7 @@
 import { db } from "./db";
 import { users, workers, jobs, messages, pricingTiers, participantBudgets, serviceSessions, transportTrips, reviews, groceryProducts } from "@shared/schema";
 import { sql, eq, isNull } from "drizzle-orm";
+import { seedGeoData } from "./geo/seed";
 
 export async function seedDatabase() {
   const existingUsers = await db.select().from(users);
@@ -11,6 +12,12 @@ export async function seedDatabase() {
     }
     await backfillVerificationData();
     await seedGroceryProducts();
+    try {
+      const geo = await seedGeoData();
+      if (geo.seeded) console.log(`[seed] Geo: ${geo.layers} layers, ${geo.features} features`);
+    } catch (e) {
+      console.error("[seed] Geo seed failed:", (e as Error).message);
+    }
     return;
   }
 
@@ -276,6 +283,12 @@ export async function seedDatabase() {
 
   await seedPricingAndBudgets();
   await seedGroceryProducts();
+  try {
+    const geo = await seedGeoData();
+    if (geo.seeded) console.log(`[seed] Geo: ${geo.layers} layers, ${geo.features} features`);
+  } catch (e) {
+    console.error("[seed] Geo seed failed:", (e as Error).message);
+  }
 
   console.log("Database seeded successfully");
 }

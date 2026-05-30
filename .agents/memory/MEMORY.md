@@ -1,0 +1,4 @@
+- [Drizzle migrations broken](drizzle-migrations.md) — `drizzle-kit generate` fails on malformed meta snapshot; hand-write idempotent SQL, primary DB method is push.
+- [Geo seed runs in both paths](geo-seed-paths.md) — seedDatabase has fresh + existing-DB branches; new seed steps must be added to both or they skip on first boot.
+- [Two Postgres hosts](two-db-hosts.md) — DATABASE_URL (helium) ≠ NEON_DATABASE_URL (neon); app uses Neon, so manual psql must target NEON_DATABASE_URL.
+- [Geo domain tabs](geo-domain-tabs.md) — Accessibility Map tabs filter by map_layers.domains[]; seed layers need multi-domain tags or Care/Transport/Employment tabs are empty.

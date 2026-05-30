@@ -21,6 +21,23 @@ import type { Request, Response, NextFunction } from "express";
     next();
   }
 
+  export function requireRole(...roles: string[]) {
+    return (req: Request, res: Response, next: NextFunction): void => {
+      if (!req.session.userId) {
+        res.status(401).json({ message: "Not authenticated" });
+        return;
+      }
+      (async () => {
+        const user = await storage.getUser(req.session.userId!);
+        if (!user || !roles.includes(user.role)) {
+          res.status(403).json({ message: "Forbidden" });
+          return;
+        }
+        next();
+      })().catch(next);
+    };
+  }
+
   export function sanitizeUser(user: Record<string, any>) {
     const { password, qbAccessToken, qbRefreshToken, qbTokenExpiresAt, ...safe } = user;
     return safe;
