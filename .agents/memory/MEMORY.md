@@ -2,3 +2,4 @@
 - [Geo seed runs in both paths](geo-seed-paths.md) — seedDatabase has fresh + existing-DB branches; new seed steps must be added to both or they skip on first boot.
 - [Two Postgres hosts](two-db-hosts.md) — DATABASE_URL (helium) ≠ NEON_DATABASE_URL (neon); app uses Neon, so manual psql must target NEON_DATABASE_URL.
 - [Geo domain tabs](geo-domain-tabs.md) — Accessibility Map tabs filter by map_layers.domains[]; seed layers need multi-domain tags or Care/Transport/Employment tabs are empty.
+- [Postgres array CHECK pitfall](postgres-array-check-constraints.md) — array_length on empty array is NULL (CHECK passes); use cardinality() for non-empty tests.
