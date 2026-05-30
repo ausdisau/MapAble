@@ -23,16 +23,142 @@ import {
   Navigation,
   AlertCircle,
   Map as MapIcon,
+  Loader2,
+  Check,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { usePageTitle } from "@/hooks/use-page-title";
 import { TransportRouteMap } from "@/features/geo/TransportRouteMap";
+import { MapView } from "@/features/geo/MapView";
+import { geoApi } from "@/features/geo/api";
+import type { GeocodeResult, MapFeature, MapLayer } from "@/features/geo/types";
 import type { TransportRequest, Worker, User } from "@shared/schema";
+
+interface LatLng { lat: number; lng: number }
+
+function GeocodeInput({
+  value,
+  onChange,
+  onResolved,
+  placeholder,
+  iconClass,
+  testId,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  onResolved: (coords: LatLng | null) => void;
+  placeholder: string;
+  iconClass: string;
+  testId: string;
+}) {
+  const [results, setResults] = useState<GeocodeResult[]>([]);
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [resolved, setResolved] = useState(false);
+  const skipNext = useRef(false);
+
+  useEffect(() => {
+    if (skipNext.current) { skipNext.current = false; return; }
+    onResolved(null);
+    setResolved(false);
+    const q = value.trim();
+    if (q.length < 3) { setResults([]); setOpen(false); return; }
+    let cancelled = false;
+    setLoading(true);
+    const t = setTimeout(async () => {
+      try {
+        const r = await geoApi.geocode(q);
+        if (cancelled) return;
+        setResults(r);
+        setOpen(r.length > 0);
+      } catch {
+        if (!cancelled) { setResults([]); setOpen(false); }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }, 450);
+    return () => { cancelled = true; clearTimeout(t); };
+  }, [value]);
+
+  const pick = (r: GeocodeResult) => {
+    skipNext.current = true;
+    onChange(r.name);
+    onResolved({ lat: r.lat, lng: r.lng });
+    setResolved(true);
+    setOpen(false);
+    setResults([]);
+  };
+
+  return (
+    <div className="relative mt-1">
+      <MapPin className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${iconClass}`} />
+      <Input
+        placeholder={placeholder}
+        className="pl-9 pr-9"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        onFocus={() => results.length && setOpen(true)}
+        autoComplete="off"
+        data-testid={testId}
+      />
+      {loading && <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 animate-spin text-muted-foreground" />}
+      {!loading && resolved && <Check className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500" data-testid={`${testId}-resolved`} />}
+      {open && results.length > 0 && (
+        <ul
+          className="absolute z-30 mt-1 w-full max-h-56 overflow-auto rounded-md border bg-popover shadow-md"
+          data-testid={`${testId}-suggestions`}
+        >
+          {results.map((r, i) => (
+            <li key={`${r.lat}-${r.lng}-${i}`}>
+              <button
+                type="button"
+                className="w-full text-left px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground"
+                onClick={() => pick(r)}
+                data-testid={`${testId}-suggestion-${i}`}
+              >
+                {r.name}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+function BookingPreviewMap({ from, to, pickup, dropoff }: { from: LatLng | null; to: LatLng | null; pickup: string; dropoff: string }) {
+  const layers: MapLayer[] = useMemo(() => [
+    { id: "bk-pts", slug: "bk-pts", name: "Stops", domains: ["transport"], visibility: "public", geometryType: "Point", defaultVisible: true, ordering: 1, color: "#1B6EB5" },
+    { id: "bk-line", slug: "bk-line", name: "Route", domains: ["transport"], visibility: "public", geometryType: "LineString", defaultVisible: true, ordering: 2, color: "#E6A817" },
+  ], []);
+  const features: MapFeature[] = useMemo(() => {
+    const f: MapFeature[] = [];
+    if (from) f.push({ id: "bk-from", layerId: "bk-pts", name: `Pickup: ${pickup}`, geometry: { type: "Point", coordinates: [from.lng, from.lat] } });
+    if (to) f.push({ id: "bk-to", layerId: "bk-pts", name: `Dropoff: ${dropoff}`, geometry: { type: "Point", coordinates: [to.lng, to.lat] } });
+    if (from && to) f.push({ id: "bk-route", layerId: "bk-line", name: "Route", geometry: { type: "LineString", coordinates: [[from.lng, from.lat], [to.lng, to.lat]] } });
+    return f;
+  }, [from, to, pickup, dropoff]);
+  const visibleLayerIds = useMemo(() => new Set(["bk-pts", "bk-line"]), []);
+  const center = useMemo<[number, number] | undefined>(() => {
+    if (from && to) return [(from.lat + to.lat) / 2, (from.lng + to.lng) / 2];
+    if (from) return [from.lat, from.lng];
+    if (to) return [to.lat, to.lng];
+    return undefined;
+  }, [from, to]);
+  if (!from && !to) return null;
+  return (
+    <div className="h-44 rounded-md overflow-hidden border" data-testid="booking-preview-map">
+      <MapView layers={layers} features={features} visibleLayerIds={visibleLayerIds} center={center} zoom={from && to ? 11 : 13} />
+    </div>
+  );
+}
 
 function TransportBookingForm() {
   const { toast } = useToast();
   const [pickup, setPickup] = useState("");
   const [dropoff, setDropoff] = useState("");
+  const [pickupCoords, setPickupCoords] = useState<LatLng | null>(null);
+  const [dropoffCoords, setDropoffCoords] = useState<LatLng | null>(null);
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
   const [wheelchair, setWheelchair] = useState(false);
@@ -58,6 +184,8 @@ function TransportBookingForm() {
       queryClient.invalidateQueries({ queryKey: ["/api/transport"] });
       setPickup("");
       setDropoff("");
+      setPickupCoords(null);
+      setDropoffCoords(null);
       setDate("");
       setTime("");
       setWheelchair(false);
@@ -79,30 +207,29 @@ function TransportBookingForm() {
       <div className="p-5 space-y-4">
         <div>
           <Label className="text-sm font-semibold">Pickup Location</Label>
-          <div className="relative mt-1">
-            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input
-              placeholder="Enter pickup address..."
-              className="pl-9"
-              value={pickup}
-              onChange={(e) => setPickup(e.target.value)}
-              data-testid="input-pickup"
-            />
-          </div>
+          <GeocodeInput
+            value={pickup}
+            onChange={setPickup}
+            onResolved={setPickupCoords}
+            placeholder="Search pickup address..."
+            iconClass="text-muted-foreground"
+            testId="input-pickup"
+          />
         </div>
         <div>
           <Label className="text-sm font-semibold">Dropoff Location</Label>
-          <div className="relative mt-1">
-            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500" />
-            <Input
-              placeholder="Enter destination..."
-              className="pl-9"
-              value={dropoff}
-              onChange={(e) => setDropoff(e.target.value)}
-              data-testid="input-dropoff"
-            />
-          </div>
+          <GeocodeInput
+            value={dropoff}
+            onChange={setDropoff}
+            onResolved={setDropoffCoords}
+            placeholder="Search destination..."
+            iconClass="text-emerald-500"
+            testId="input-dropoff"
+          />
         </div>
+        {(pickupCoords || dropoffCoords) && (
+          <BookingPreviewMap from={pickupCoords} to={dropoffCoords} pickup={pickup} dropoff={dropoff} />
+        )}
         <div className="grid grid-cols-2 gap-3">
           <div>
             <Label className="text-sm font-semibold">Date</Label>

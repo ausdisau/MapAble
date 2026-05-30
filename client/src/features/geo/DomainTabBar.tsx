@@ -18,6 +18,15 @@ interface DomainTabBarProps {
 
 export function DomainTabBar({ active, onChange }: DomainTabBarProps) {
   return (
+    <>
+    <div
+      role="status"
+      aria-live="polite"
+      className="sr-only"
+      data-testid="text-domain-announcement"
+    >
+      {`${DOMAIN_LABELS[active]} map layers now showing`}
+    </div>
     <div
       role="tablist"
       aria-label="Map domains"
@@ -61,5 +70,6 @@ export function DomainTabBar({ active, onChange }: DomainTabBarProps) {
         );
       })}
     </div>
+    </>
   );
 }
