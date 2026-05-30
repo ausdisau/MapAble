@@ -277,7 +277,7 @@ export function registerGeoRoutes(app: Express) {
   app.put("/api/geo/worker-coverage", requireAuth, async (req, res) => {
     const worker = await storage.getWorkerByUserId(req.session.userId!);
     if (!worker) return res.status(404).json({ message: "No worker profile" });
-    const parsed = insertWorkerCoverageZoneSchema.partial({ workerId: true }).safeParse(req.body);
+    const parsed = insertWorkerCoverageZoneSchema.omit({ workerId: true }).safeParse(req.body);
     if (!parsed.success) return res.status(400).json({ message: "Invalid coverage", errors: parsed.error.flatten() });
     const zone = await geoStorage.upsertWorkerCoverageZone(worker.id, parsed.data);
     res.json(zone);

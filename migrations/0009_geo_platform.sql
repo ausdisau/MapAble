@@ -112,3 +112,6 @@ UPDATE "map_layers" SET "domains" = ARRAY['accessibility','care','employment'] W
 UPDATE "map_layers" SET "domains" = ARRAY['accessibility','care','transport'] WHERE "slug" = 'mapable';
 UPDATE "map_layers" SET "domains" = ARRAY['accessibility','transport'] WHERE "slug" IN ('mobility-parking','stairs','lifts','navability-routes');
 UPDATE "map_layers" SET "domains" = ARRAY['accessibility','care'] WHERE "slug" = 'playgrounds';
+
+-- Defense-in-depth: enforce one coverage zone per worker (prevents cross-owner reassignment/corruption)
+CREATE UNIQUE INDEX IF NOT EXISTS worker_coverage_zones_worker_id_key ON worker_coverage_zones (worker_id);

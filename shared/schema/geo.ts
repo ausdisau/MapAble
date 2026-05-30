@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, integer, boolean, timestamp, jsonb, pgEnum } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, integer, boolean, timestamp, jsonb, pgEnum, uniqueIndex } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -95,7 +95,9 @@ export const workerCoverageZones = pgTable("worker_coverage_zones", {
   maxTravelMins: integer("max_travel_mins"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
-});
+}, (t) => ({
+  workerIdUnique: uniqueIndex("worker_coverage_zones_worker_id_key").on(t.workerId),
+}));
 
 export const geoAuditLog = pgTable("geo_audit_log", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
