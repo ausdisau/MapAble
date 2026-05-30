@@ -24,7 +24,7 @@ async function visibilitiesForRequest(req: Request): Promise<string[]> {
   const vis = ["public"];
   if (req.session.userId) {
     const user = await storage.getUser(req.session.userId);
-    if (user?.role === "carer" || user?.role === "participant") vis.push("staff");
+    if (user?.role === "carer" || user?.role === "provider") vis.push("staff");
     if (user?.role === "admin") vis.push("staff", "admin");
   }
   return vis;

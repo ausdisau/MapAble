@@ -21,7 +21,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { queryClient } from "@/lib/queryClient";
 import { geoApi } from "@/features/geo/api";
 import { useLayers, useCategories } from "@/features/geo/hooks";
-import { DOMAIN_LABELS, type GeoDomain, type MapLayer, type MapCategory } from "@/features/geo/types";
+import { DOMAIN_LABELS, type GeoDomain, type MapLayer, type MapCategory, type MapFeature } from "@/features/geo/types";
 
 const DOMAINS: GeoDomain[] = ["accessibility", "care", "transport", "employment"];
 
@@ -63,12 +63,14 @@ export default function GeoAdminPage() {
       <Tabs defaultValue="layers">
         <TabsList data-testid="tabs-geo-admin">
           <TabsTrigger value="layers" data-testid="tab-layers"><LayersIcon className="w-4 h-4 mr-2" /> Layers</TabsTrigger>
+          <TabsTrigger value="features" data-testid="tab-features"><MapPin className="w-4 h-4 mr-2" /> Features</TabsTrigger>
           <TabsTrigger value="imports" data-testid="tab-imports"><Upload className="w-4 h-4 mr-2" /> Imports</TabsTrigger>
           <TabsTrigger value="categories" data-testid="tab-categories"><Tags className="w-4 h-4 mr-2" /> Categories</TabsTrigger>
           <TabsTrigger value="audit" data-testid="tab-audit"><History className="w-4 h-4 mr-2" /> Audit</TabsTrigger>
         </TabsList>
 
         <TabsContent value="layers" className="mt-4"><LayersTab /></TabsContent>
+        <TabsContent value="features" className="mt-4"><FeaturesTab /></TabsContent>
         <TabsContent value="imports" className="mt-4"><ImportsTab /></TabsContent>
         <TabsContent value="categories" className="mt-4"><CategoriesTab /></TabsContent>
         <TabsContent value="audit" className="mt-4"><AuditTab /></TabsContent>
@@ -238,6 +240,142 @@ function LayersTab() {
           ))}
         </div>
       )}
+    </div>
+  );
+}
+
+function FeaturesTab() {
+  const { toast } = useToast();
+  const { data: layers = [] } = useLayers();
+  const [layerId, setLayerId] = useState<string>("");
+  const [search, setSearch] = useState("");
+  const [editing, setEditing] = useState<MapFeature | null>(null);
+  const [editName, setEditName] = useState("");
+  const [editDesc, setEditDesc] = useState("");
+
+  const { data: features = [], isLoading } = useQuery<MapFeature[]>({
+    queryKey: ["/api/geo/features", layerId, "admin"],
+    queryFn: () => geoApi.getFeatures({ layerId, limit: 5000 }),
+    enabled: !!layerId,
+  });
+
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return features;
+    return features.filter((f) => f.name?.toLowerCase().includes(q) || (f.description || "").toLowerCase().includes(q));
+  }, [features, search]);
+
+  const beginEdit = (f: MapFeature) => {
+    setEditing(f);
+    setEditName(f.name || "");
+    setEditDesc(f.description || "");
+  };
+
+  const saveEdit = async () => {
+    if (!editing) return;
+    try {
+      await geoApi.updateFeature(editing.id, { name: editName.trim(), description: editDesc.trim() || undefined });
+      queryClient.invalidateQueries({ queryKey: ["/api/geo/features"] });
+      toast({ title: "Feature updated", description: editName });
+      setEditing(null);
+    } catch (e) {
+      toast({ title: "Update failed", description: (e as Error).message, variant: "destructive" });
+    }
+  };
+
+  const remove = async (f: MapFeature) => {
+    try {
+      await geoApi.deleteFeature(f.id);
+      queryClient.invalidateQueries({ queryKey: ["/api/geo/features"] });
+      toast({ title: "Feature deleted", description: f.name });
+    } catch (e) {
+      toast({ title: "Delete failed", description: (e as Error).message, variant: "destructive" });
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <Card data-testid="card-features-controls">
+        <CardContent className="grid gap-3 md:grid-cols-2 py-4">
+          <div className="space-y-1">
+            <Label>Layer</Label>
+            <Select value={layerId} onValueChange={setLayerId}>
+              <SelectTrigger data-testid="select-features-layer"><SelectValue placeholder="Choose a layer to manage" /></SelectTrigger>
+              <SelectContent>{layers.map((l) => <SelectItem key={l.id} value={l.id}>{l.name}</SelectItem>)}</SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="feature-search">Search</Label>
+            <Input id="feature-search" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Filter by name or description" disabled={!layerId} data-testid="input-feature-search" />
+          </div>
+        </CardContent>
+      </Card>
+
+      {!layerId ? (
+        <div className="p-6 text-center text-muted-foreground" data-testid="text-no-layer-selected">Select a layer to view and manage its features.</div>
+      ) : isLoading ? (
+        <div className="p-6 text-center text-muted-foreground"><Loader2 className="w-5 h-5 animate-spin inline mr-2" /> Loading features…</div>
+      ) : filtered.length === 0 ? (
+        <div className="p-6 text-center text-muted-foreground" data-testid="text-no-features">No features match.</div>
+      ) : (
+        <>
+          <div className="text-sm text-muted-foreground" data-testid="text-feature-total">{filtered.length} feature{filtered.length === 1 ? "" : "s"}</div>
+          <ScrollArea className="h-[520px]">
+            <div className="grid gap-2 pr-3">
+              {filtered.map((f) => (
+                <Card key={f.id} data-testid={`card-feature-${f.id}`}>
+                  <CardContent className="flex items-center gap-3 py-3 flex-wrap">
+                    <MapPin className="w-4 h-4 text-[#1B6EB5] shrink-0" />
+                    <div className="flex-1 min-w-[160px]">
+                      <div className="font-medium leading-tight">{f.name || "(unnamed)"}</div>
+                      {f.description && <div className="text-sm text-muted-foreground line-clamp-1">{f.description}</div>}
+                      <div className="text-xs text-muted-foreground mt-0.5">{f.geometry?.type}{f.lat != null && f.lng != null ? ` · ${Number(f.lat).toFixed(4)}, ${Number(f.lng).toFixed(4)}` : ""}</div>
+                    </div>
+                    <Button variant="outline" size="sm" onClick={() => beginEdit(f)} data-testid={`button-edit-feature-${f.id}`}>Edit</Button>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="ghost" size="icon" className="text-destructive" data-testid={`button-delete-feature-${f.id}`}><Trash2 className="w-4 h-4" /></Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Delete “{f.name}”?</AlertDialogTitle>
+                          <AlertDialogDescription>This permanently deletes the feature. This cannot be undone.</AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel data-testid="button-cancel-delete-feature">Cancel</AlertDialogCancel>
+                          <AlertDialogAction onClick={() => remove(f)} className="bg-destructive text-destructive-foreground" data-testid="button-confirm-delete-feature">Delete</AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </ScrollArea>
+        </>
+      )}
+
+      <AlertDialog open={!!editing} onOpenChange={(o) => { if (!o) setEditing(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Edit feature</AlertDialogTitle>
+          </AlertDialogHeader>
+          <div className="space-y-3">
+            <div className="space-y-1">
+              <Label htmlFor="edit-feature-name">Name</Label>
+              <Input id="edit-feature-name" value={editName} onChange={(e) => setEditName(e.target.value)} data-testid="input-edit-feature-name" />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="edit-feature-desc">Description</Label>
+              <Textarea id="edit-feature-desc" rows={3} value={editDesc} onChange={(e) => setEditDesc(e.target.value)} data-testid="textarea-edit-feature-desc" />
+            </div>
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel data-testid="button-cancel-edit-feature">Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={saveEdit} data-testid="button-save-edit-feature">Save</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

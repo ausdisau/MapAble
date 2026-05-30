@@ -75,6 +75,28 @@ export default function AccessibilityMapPage() {
 
   const visibleFeatureCount = features.filter((f) => visibleLayerIds.has(f.layerId)).length;
 
+  // Features within the current map viewport (bbox = "west,south,east,north")
+  const inViewFeatures = useMemo(() => {
+    const visible = features.filter((f) => visibleLayerIds.has(f.layerId));
+    if (!bbox) return visible.slice(0, 200);
+    const [w, s, e, n] = bbox.split(",").map(Number);
+    if ([w, s, e, n].some((x) => Number.isNaN(x))) return visible.slice(0, 200);
+    const within = visible.filter((f) => {
+      const lat = f.lat != null ? Number(f.lat) : undefined;
+      const lng = f.lng != null ? Number(f.lng) : undefined;
+      if (lat == null || lng == null || Number.isNaN(lat) || Number.isNaN(lng)) return false;
+      return lng >= w && lng <= e && lat >= s && lat <= n;
+    });
+    return within.sort((a, b) => a.name.localeCompare(b.name)).slice(0, 200);
+  }, [features, visibleLayerIds, bbox]);
+
+  const flyToFeature = (f: MapFeature) => {
+    if (f.lat != null && f.lng != null) {
+      mapRef.current?.flyTo(Number(f.lat), Number(f.lng), 17);
+      setHighlightId(f.id);
+    }
+  };
+
   return (
     <div className="flex flex-col h-full" data-testid="page-accessibility-map">
       <div className="px-4 pt-4 pb-2 border-b space-y-3 shrink-0">
@@ -147,6 +169,37 @@ export default function AccessibilityMapPage() {
               ))}
             </div>
           </ScrollArea>
+
+          {/* Features in current viewport */}
+          <div className="border-t flex flex-col min-h-0 max-h-[45%]">
+            <div className="p-3 flex items-center gap-2 text-sm font-semibold shrink-0">
+              <MapPin className="w-4 h-4" /> In view
+              <Badge variant="outline" className="ml-auto" data-testid="badge-inview-count">{inViewFeatures.length}</Badge>
+            </div>
+            <ScrollArea className="flex-1">
+              <div className="px-2 pb-2 space-y-0.5" data-testid="list-inview-features">
+                {visibleFeatureCount === 0 ? (
+                  <div className="p-3 text-sm text-muted-foreground" data-testid="text-inview-empty">Turn on a layer to see places here.</div>
+                ) : inViewFeatures.length === 0 ? (
+                  <div className="p-3 text-sm text-muted-foreground" data-testid="text-inview-empty">No features in this area. Try zooming out or panning the map.</div>
+                ) : (
+                  inViewFeatures.map((f) => (
+                    <button
+                      key={f.id}
+                      type="button"
+                      onClick={() => flyToFeature(f)}
+                      className="w-full text-left p-2 rounded-md hover-elevate text-sm flex items-start gap-2"
+                      data-testid={`inview-feature-${f.id}`}
+                    >
+                      <MapPin className="w-3.5 h-3.5 mt-0.5 shrink-0 text-[#1B6EB5]" />
+                      <span className="leading-tight line-clamp-2">{f.name}</span>
+                    </button>
+                  ))
+                )}
+              </div>
+            </ScrollArea>
+          </div>
+
           {personalPlaces.length > 0 && (
             <div className="p-3 border-t text-xs text-muted-foreground">
               <span className="font-semibold text-[#E6A817]">My places:</span> {personalPlaces.length} saved
