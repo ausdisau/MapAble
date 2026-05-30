@@ -27,6 +27,21 @@ interface MapViewProps {
 
 const AUS_CENTER: [number, number] = [-33.8688, 151.2093]; // Sydney default
 
+const TILES = {
+  light: {
+    url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+  },
+  dark: {
+    url: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+  },
+};
+
+function isDarkMode(): boolean {
+  return typeof document !== "undefined" && document.documentElement.classList.contains("dark");
+}
+
 function colorForLayer(layer?: MapLayer): string {
   return layer?.color || "#1B6EB5";
 }
@@ -66,6 +81,8 @@ export const MapView = forwardRef<MapViewHandle, MapViewProps>(function MapView(
   const clusterRef = useRef<any>(null);
   const lineLayerRef = useRef<L.LayerGroup | null>(null);
   const personalLayerRef = useRef<L.LayerGroup | null>(null);
+  const tileLayerRef = useRef<L.TileLayer | null>(null);
+  const themeObserverRef = useRef<MutationObserver | null>(null);
   const [ready, setReady] = useState(false);
 
   useImperativeHandle(ref, () => ({
@@ -92,10 +109,24 @@ export const MapView = forwardRef<MapViewHandle, MapViewProps>(function MapView(
       zoom: props.zoom || 12,
       zoomControl: true,
     });
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    const initTiles = isDarkMode() ? TILES.dark : TILES.light;
+    const tileLayer = L.tileLayer(initTiles.url, {
+      attribution: initTiles.attribution,
       maxZoom: 19,
     }).addTo(map);
+    tileLayerRef.current = tileLayer;
+
+    // Swap tiles when the app theme (dark class) toggles
+    const themeObserver = new MutationObserver(() => {
+      const next = isDarkMode() ? TILES.dark : TILES.light;
+      if (tileLayerRef.current) {
+        tileLayerRef.current.setUrl(next.url);
+        tileLayerRef.current.options.attribution = next.attribution;
+        map.attributionControl?.addAttribution(next.attribution);
+      }
+    });
+    themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    themeObserverRef.current = themeObserver;
 
     const cluster = (L as any).markerClusterGroup({ chunkedLoading: true, maxClusterRadius: 50 });
     map.addLayer(cluster);
@@ -112,6 +143,8 @@ export const MapView = forwardRef<MapViewHandle, MapViewProps>(function MapView(
 
     setTimeout(() => map.invalidateSize(), 100);
     return () => {
+      themeObserverRef.current?.disconnect();
+      themeObserverRef.current = null;
       map.remove();
       mapRef.current = null;
     };
