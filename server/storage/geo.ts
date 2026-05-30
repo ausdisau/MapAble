@@ -196,14 +196,15 @@ export const geoStorage = {
     return db.select().from(workerCoverageZones);
   },
   async upsertWorkerCoverageZone(workerId: string, data: Partial<InsertWorkerCoverageZone>): Promise<WorkerCoverageZone> {
+    const { workerId: _ignored, ...safeData } = data as Record<string, unknown>;
     const existing = await this.getWorkerCoverageZone(workerId);
     if (existing) {
       const [row] = await db.update(workerCoverageZones)
-        .set({ ...data, updatedAt: new Date() } as any)
+        .set({ ...safeData, updatedAt: new Date() } as any)
         .where(eq(workerCoverageZones.workerId, workerId)).returning();
       return row;
     }
-    const [row] = await db.insert(workerCoverageZones).values({ ...data, workerId } as any).returning();
+    const [row] = await db.insert(workerCoverageZones).values({ ...safeData, workerId } as any).returning();
     return row;
   },
 
