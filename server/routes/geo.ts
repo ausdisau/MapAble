@@ -90,9 +90,14 @@ export function registerGeoRoutes(app: Express) {
     res.status(201).json(layer);
   });
   app.patch("/api/geo/layers/:id", adminOnly, async (req, res) => {
-    const layer = await geoStorage.updateMapLayer((req.params as Record<string, string>).id, req.body);
+    const parsed = insertMapLayerSchema.partial().safeParse(req.body);
+    if (!parsed.success) return res.status(400).json({ message: "Invalid layer", errors: parsed.error.flatten() });
+    if (parsed.data.domains !== undefined && (parsed.data.domains?.length ?? 0) === 0) {
+      return res.status(400).json({ message: "A layer must belong to at least one domain." });
+    }
+    const layer = await geoStorage.updateMapLayer((req.params as Record<string, string>).id, parsed.data);
     if (!layer) return res.status(404).json({ message: "Not found" });
-    await geoStorage.logGeoAudit({ userId: req.session.userId, action: "update", entity: "layer", entityId: layer.id, payload: req.body });
+    await geoStorage.logGeoAudit({ userId: req.session.userId, action: "update", entity: "layer", entityId: layer.id, payload: parsed.data });
     res.json(layer);
   });
   app.delete("/api/geo/layers/:id", adminOnly, async (req, res) => {
@@ -282,7 +287,7 @@ export function registerGeoRoutes(app: Express) {
     const zone = await geoStorage.upsertWorkerCoverageZone(worker.id, parsed.data);
     res.json(zone);
   });
-  app.get("/api/geo/worker-coverage/all", requireAuth, async (_req, res) => {
+  app.get("/api/geo/worker-coverage/all", adminOnly, async (_req, res) => {
     res.json(await geoStorage.getAllWorkerCoverageZones());
   });
 

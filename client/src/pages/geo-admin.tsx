@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
@@ -93,6 +94,56 @@ function LayersTab() {
   const [creating, setCreating] = useState(false);
   const [form, setForm] = useState({ slug: "", name: "", description: "", color: "#1B6EB5", domain: "accessibility" as GeoDomain, geometryType: "Point" as MapLayer["geometryType"], visibility: "public" as MapLayer["visibility"] });
   const [saving, setSaving] = useState(false);
+  const [editing, setEditing] = useState<MapLayer | null>(null);
+  const [editForm, setEditForm] = useState({ name: "", description: "", color: "#1B6EB5", domains: [] as GeoDomain[], visibility: "public" as MapLayer["visibility"] });
+  const [savingEdit, setSavingEdit] = useState(false);
+
+  const beginEdit = (l: MapLayer) => {
+    setEditing(l);
+    setEditForm({
+      name: l.name,
+      description: l.description || "",
+      color: l.color || "#1B6EB5",
+      domains: ((l.domains || []) as GeoDomain[]).filter((d) => DOMAINS.includes(d)),
+      visibility: l.visibility,
+    });
+  };
+
+  const toggleEditDomain = (d: GeoDomain) => {
+    setEditForm((f) => ({
+      ...f,
+      domains: f.domains.includes(d) ? f.domains.filter((x) => x !== d) : [...f.domains, d],
+    }));
+  };
+
+  const saveEdit = async () => {
+    if (!editing) return;
+    if (!editForm.name.trim()) {
+      toast({ title: "Name required", variant: "destructive" });
+      return;
+    }
+    if (editForm.domains.length === 0) {
+      toast({ title: "Pick at least one domain", description: "A layer must belong to a domain.", variant: "destructive" });
+      return;
+    }
+    setSavingEdit(true);
+    try {
+      await geoApi.updateLayer(editing.id, {
+        name: editForm.name.trim(),
+        description: editForm.description.trim() || undefined,
+        color: editForm.color,
+        domains: editForm.domains,
+        visibility: editForm.visibility,
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/geo/layers"] });
+      toast({ title: "Layer updated", description: editForm.name });
+      setEditing(null);
+    } catch (e) {
+      toast({ title: "Update failed", description: (e as Error).message, variant: "destructive" });
+    } finally {
+      setSavingEdit(false);
+    }
+  };
 
   const create = async () => {
     if (!form.slug.trim() || !form.name.trim()) {
@@ -220,6 +271,7 @@ function LayersTab() {
                   <Label htmlFor={`vis-${l.id}`} className="text-xs text-muted-foreground">Default on</Label>
                   <Switch id={`vis-${l.id}`} checked={l.defaultVisible} onCheckedChange={() => toggleVisible(l)} data-testid={`switch-default-${l.slug}`} />
                 </div>
+                <Button variant="outline" size="sm" onClick={() => beginEdit(l)} data-testid={`button-edit-layer-${l.slug}`}>Edit</Button>
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
                     <Button variant="ghost" size="icon" className="text-destructive" data-testid={`button-delete-layer-${l.slug}`}><Trash2 className="w-4 h-4" /></Button>
@@ -240,6 +292,57 @@ function LayersTab() {
           ))}
         </div>
       )}
+
+      <AlertDialog open={!!editing} onOpenChange={(o) => { if (!o) setEditing(null); }}>
+        <AlertDialogContent data-testid="dialog-edit-layer">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Edit layer{editing ? ` — ${editing.slug}` : ""}</AlertDialogTitle>
+            <AlertDialogDescription>Update name, audience visibility, colour and which domain tabs this layer appears under.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="space-y-3">
+            <div className="space-y-1">
+              <Label htmlFor="edit-layer-name">Name</Label>
+              <Input id="edit-layer-name" value={editForm.name} onChange={(e) => setEditForm({ ...editForm, name: e.target.value })} data-testid="input-edit-layer-name" />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="edit-layer-desc">Description</Label>
+              <Textarea id="edit-layer-desc" rows={2} value={editForm.description} onChange={(e) => setEditForm({ ...editForm, description: e.target.value })} data-testid="textarea-edit-layer-desc" />
+            </div>
+            <div className="space-y-1">
+              <Label>Domains</Label>
+              <div className="flex flex-wrap gap-3 pt-1">
+                {DOMAINS.map((d) => (
+                  <label key={d} className="flex items-center gap-2 text-sm cursor-pointer" data-testid={`edit-domain-${d}`}>
+                    <Checkbox checked={editForm.domains.includes(d)} onCheckedChange={() => toggleEditDomain(d)} data-testid={`checkbox-edit-domain-${d}`} />
+                    {DOMAIN_LABELS[d]}
+                  </label>
+                ))}
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <Label>Visibility</Label>
+                <Select value={editForm.visibility} onValueChange={(v) => setEditForm({ ...editForm, visibility: v as MapLayer["visibility"] })}>
+                  <SelectTrigger data-testid="select-edit-layer-visibility"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="public">Public</SelectItem>
+                    <SelectItem value="staff">Staff</SelectItem>
+                    <SelectItem value="admin">Admin</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="edit-layer-color">Colour</Label>
+                <Input id="edit-layer-color" type="color" value={editForm.color} onChange={(e) => setEditForm({ ...editForm, color: e.target.value })} className="h-10 w-20 p-1" data-testid="input-edit-layer-color" />
+              </div>
+            </div>
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel data-testid="button-cancel-edit-layer">Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={(e) => { e.preventDefault(); saveEdit(); }} disabled={savingEdit} data-testid="button-save-edit-layer">{savingEdit && <Loader2 className="w-4 h-4 mr-2 animate-spin" />} Save</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
