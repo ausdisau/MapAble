@@ -347,14 +347,133 @@ function LayersTab() {
   );
 }
 
+type GeoType = "Point" | "LineString" | "Polygon";
+
+function GeometryEditor({
+  type, setType, point, setPoint, coordsText, setCoordsText,
+}: {
+  type: GeoType;
+  setType: (t: GeoType) => void;
+  point: { lat: string; lng: string };
+  setPoint: (p: { lat: string; lng: string }) => void;
+  coordsText: string;
+  setCoordsText: (s: string) => void;
+}) {
+  const [addr, setAddr] = useState("");
+  const [results, setResults] = useState<{ name: string; lat: number; lng: number }[]>([]);
+  const [searching, setSearching] = useState(false);
+
+  const doGeocode = async () => {
+    if (addr.trim().length < 3) return;
+    setSearching(true);
+    try {
+      const r = await geoApi.geocode(addr.trim());
+      setResults(r);
+    } catch { setResults([]); } finally { setSearching(false); }
+  };
+
+  return (
+    <div className="space-y-2">
+      <div className="space-y-1">
+        <Label>Geometry type</Label>
+        <Select value={type} onValueChange={(v) => setType(v as GeoType)}>
+          <SelectTrigger data-testid="select-geometry-type"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="Point">Point</SelectItem>
+            <SelectItem value="LineString">Line</SelectItem>
+            <SelectItem value="Polygon">Polygon</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      {type === "Point" ? (
+        <div className="space-y-2">
+          <div className="flex gap-2">
+            <Input value={addr} onChange={(e) => setAddr(e.target.value)} placeholder="Search an address to set the point" data-testid="input-geometry-geocode" />
+            <Button type="button" variant="outline" onClick={doGeocode} disabled={searching} data-testid="button-geometry-geocode">{searching ? <Loader2 className="w-4 h-4 animate-spin" /> : "Find"}</Button>
+          </div>
+          {results.length > 0 && (
+            <ul className="max-h-40 overflow-auto rounded-md border" data-testid="list-geometry-geocode-results">
+              {results.map((r, i) => (
+                <li key={`${r.lat}-${i}`}>
+                  <button type="button" className="w-full text-left px-3 py-2 text-sm hover:bg-accent" onClick={() => { setPoint({ lat: String(r.lat), lng: String(r.lng) }); setResults([]); setAddr(r.name); }} data-testid={`button-geometry-result-${i}`}>{r.name}</button>
+                </li>
+              ))}
+            </ul>
+          )}
+          <div className="grid grid-cols-2 gap-2">
+            <div className="space-y-1">
+              <Label>Latitude</Label>
+              <Input value={point.lat} onChange={(e) => setPoint({ ...point, lat: e.target.value })} placeholder="-33.87" data-testid="input-geometry-lat" />
+            </div>
+            <div className="space-y-1">
+              <Label>Longitude</Label>
+              <Input value={point.lng} onChange={(e) => setPoint({ ...point, lng: e.target.value })} placeholder="151.21" data-testid="input-geometry-lng" />
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="space-y-1">
+          <Label>Coordinates (JSON)</Label>
+          <Textarea
+            rows={4}
+            value={coordsText}
+            onChange={(e) => setCoordsText(e.target.value)}
+            placeholder={type === "LineString" ? '[[151.21,-33.87],[151.22,-33.88]]' : '[[151.21,-33.87],[151.22,-33.88],[151.23,-33.87],[151.21,-33.87]]'}
+            className="font-mono text-xs"
+            data-testid="textarea-geometry-coords"
+          />
+          <p className="text-xs text-muted-foreground">Array of <code>[lng, lat]</code> pairs. Polygons are auto-closed into a single ring.</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function buildGeometry(
+  type: GeoType,
+  point: { lat: string; lng: string },
+  coordsText: string,
+): { type: GeoType; coordinates: any } | null {
+  if (type === "Point") {
+    const lat = Number(point.lat), lng = Number(point.lng);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+    return { type: "Point", coordinates: [lng, lat] };
+  }
+  let parsed: any;
+  try { parsed = JSON.parse(coordsText); } catch { return null; }
+  if (!Array.isArray(parsed) || parsed.length < 2) return null;
+  const ok = parsed.every((p: any) => Array.isArray(p) && p.length === 2 && Number.isFinite(Number(p[0])) && Number.isFinite(Number(p[1])));
+  if (!ok) return null;
+  const ring = parsed.map((p: any) => [Number(p[0]), Number(p[1])]);
+  if (type === "LineString") return { type: "LineString", coordinates: ring };
+  const first = ring[0], last = ring[ring.length - 1];
+  if (first[0] !== last[0] || first[1] !== last[1]) ring.push([first[0], first[1]]);
+  if (ring.length < 4) return null;
+  return { type: "Polygon", coordinates: [ring] };
+}
+
 function FeaturesTab() {
   const { toast } = useToast();
   const { data: layers = [] } = useLayers();
+  const { data: categories = [] } = useCategories();
   const [layerId, setLayerId] = useState<string>("");
   const [search, setSearch] = useState("");
   const [editing, setEditing] = useState<MapFeature | null>(null);
   const [editName, setEditName] = useState("");
   const [editDesc, setEditDesc] = useState("");
+  const [editCategory, setEditCategory] = useState<string>("__none__");
+  const [editType, setEditType] = useState<GeoType>("Point");
+  const [editPoint, setEditPoint] = useState({ lat: "", lng: "" });
+  const [editCoords, setEditCoords] = useState("");
+
+  const [creating, setCreating] = useState(false);
+  const [newName, setNewName] = useState("");
+  const [newDesc, setNewDesc] = useState("");
+  const [newCategory, setNewCategory] = useState<string>("__none__");
+  const [newType, setNewType] = useState<GeoType>("Point");
+  const [newPoint, setNewPoint] = useState({ lat: "", lng: "" });
+  const [newCoords, setNewCoords] = useState("");
+  const [saving, setSaving] = useState(false);
 
   const { data: features = [], isLoading } = useQuery<MapFeature[]>({
     queryKey: ["/api/geo/features", layerId, "admin"],
@@ -368,16 +487,58 @@ function FeaturesTab() {
     return features.filter((f) => f.name?.toLowerCase().includes(q) || (f.description || "").toLowerCase().includes(q));
   }, [features, search]);
 
+  const create = async () => {
+    if (!layerId) { toast({ title: "Select a layer first", variant: "destructive" }); return; }
+    if (!newName.trim()) { toast({ title: "Name is required", variant: "destructive" }); return; }
+    const geometry = buildGeometry(newType, newPoint, newCoords);
+    if (!geometry) { toast({ title: "Invalid geometry", description: "Provide a valid point or coordinate list.", variant: "destructive" }); return; }
+    setSaving(true);
+    try {
+      await geoApi.createFeature({
+        layerId,
+        name: newName.trim(),
+        description: newDesc.trim() || undefined,
+        categoryId: newCategory === "__none__" ? undefined : newCategory,
+        geometry: geometry as any,
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/geo/features"] });
+      toast({ title: "Feature created", description: newName });
+      setNewName(""); setNewDesc(""); setNewCategory("__none__"); setNewType("Point");
+      setNewPoint({ lat: "", lng: "" }); setNewCoords(""); setCreating(false);
+    } catch (e) {
+      toast({ title: "Create failed", description: (e as Error).message, variant: "destructive" });
+    } finally { setSaving(false); }
+  };
+
   const beginEdit = (f: MapFeature) => {
     setEditing(f);
     setEditName(f.name || "");
     setEditDesc(f.description || "");
+    setEditCategory((f as any).categoryId || "__none__");
+    const t = (f.geometry?.type === "LineString" || f.geometry?.type === "Polygon") ? f.geometry.type : "Point";
+    setEditType(t as GeoType);
+    if (t === "Point") {
+      const c = f.geometry?.coordinates;
+      setEditPoint({ lng: c?.[0] != null ? String(c[0]) : (f.lng != null ? String(f.lng) : ""), lat: c?.[1] != null ? String(c[1]) : (f.lat != null ? String(f.lat) : "") });
+      setEditCoords("");
+    } else {
+      const ring = t === "Polygon" ? f.geometry?.coordinates?.[0] : f.geometry?.coordinates;
+      setEditCoords(ring ? JSON.stringify(ring) : "");
+      setEditPoint({ lat: "", lng: "" });
+    }
   };
 
   const saveEdit = async () => {
     if (!editing) return;
+    const geometry = buildGeometry(editType, editPoint, editCoords);
+    if (!geometry) { toast({ title: "Invalid geometry", description: "Provide a valid point or coordinate list.", variant: "destructive" }); return; }
     try {
-      await geoApi.updateFeature(editing.id, { name: editName.trim(), description: editDesc.trim() || undefined });
+      await geoApi.updateFeature(editing.id, {
+        name: editName.trim(),
+        description: editDesc.trim() || undefined,
+        categoryId: editCategory === "__none__" ? null as any : editCategory,
+        geometry: geometry as any,
+      });
       queryClient.invalidateQueries({ queryKey: ["/api/geo/features"] });
       toast({ title: "Feature updated", description: editName });
       setEditing(null);
@@ -413,6 +574,43 @@ function FeaturesTab() {
           </div>
         </CardContent>
       </Card>
+
+      {layerId && (
+        <Card data-testid="card-create-feature">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0">
+            <CardTitle className="text-base">Add a feature</CardTitle>
+            <Button variant={creating ? "secondary" : "default"} size="sm" onClick={() => setCreating((v) => !v)} data-testid="button-toggle-create-feature">
+              <Plus className="w-4 h-4 mr-1" /> {creating ? "Close" : "New feature"}
+            </Button>
+          </CardHeader>
+          {creating && (
+            <CardContent className="space-y-3">
+              <div className="grid gap-3 md:grid-cols-2">
+                <div className="space-y-1">
+                  <Label htmlFor="new-feature-name">Name</Label>
+                  <Input id="new-feature-name" value={newName} onChange={(e) => setNewName(e.target.value)} data-testid="input-new-feature-name" />
+                </div>
+                <div className="space-y-1">
+                  <Label>Category</Label>
+                  <Select value={newCategory} onValueChange={setNewCategory}>
+                    <SelectTrigger data-testid="select-new-feature-category"><SelectValue placeholder="None" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__none__">None</SelectItem>
+                      {categories.map((c) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="new-feature-desc">Description</Label>
+                <Textarea id="new-feature-desc" rows={2} value={newDesc} onChange={(e) => setNewDesc(e.target.value)} data-testid="textarea-new-feature-desc" />
+              </div>
+              <GeometryEditor type={newType} setType={setNewType} point={newPoint} setPoint={setNewPoint} coordsText={newCoords} setCoordsText={setNewCoords} />
+              <Button onClick={create} disabled={saving} data-testid="button-save-new-feature">{saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />} Create feature</Button>
+            </CardContent>
+          )}
+        </Card>
+      )}
 
       {!layerId ? (
         <div className="p-6 text-center text-muted-foreground" data-testid="text-no-layer-selected">Select a layer to view and manage its features.</div>
@@ -463,7 +661,7 @@ function FeaturesTab() {
           <AlertDialogHeader>
             <AlertDialogTitle>Edit feature</AlertDialogTitle>
           </AlertDialogHeader>
-          <div className="space-y-3">
+          <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-1">
             <div className="space-y-1">
               <Label htmlFor="edit-feature-name">Name</Label>
               <Input id="edit-feature-name" value={editName} onChange={(e) => setEditName(e.target.value)} data-testid="input-edit-feature-name" />
@@ -472,6 +670,17 @@ function FeaturesTab() {
               <Label htmlFor="edit-feature-desc">Description</Label>
               <Textarea id="edit-feature-desc" rows={3} value={editDesc} onChange={(e) => setEditDesc(e.target.value)} data-testid="textarea-edit-feature-desc" />
             </div>
+            <div className="space-y-1">
+              <Label>Category</Label>
+              <Select value={editCategory} onValueChange={setEditCategory}>
+                <SelectTrigger data-testid="select-edit-feature-category"><SelectValue placeholder="None" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__none__">None</SelectItem>
+                  {categories.map((c) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <GeometryEditor type={editType} setType={setEditType} point={editPoint} setPoint={setEditPoint} coordsText={editCoords} setCoordsText={setEditCoords} />
           </div>
           <AlertDialogFooter>
             <AlertDialogCancel data-testid="button-cancel-edit-feature">Cancel</AlertDialogCancel>
