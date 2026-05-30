@@ -9,7 +9,7 @@ import { ThemeProvider, useTheme } from "@/components/theme-provider";
 import { GroceryCartProvider } from "@/lib/grocery-cart";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
-import { Moon, Sun, Search, Bell, Accessibility, LayoutDashboard, HeartHandshake, Briefcase, Bus, MessageSquare, Settings, PanelLeftClose, PanelLeftOpen, DollarSign, Wallet, FileText, Bot, Loader2, CalendarDays, Building2, ClipboardList, User as UserIconLucide, Mail, ShoppingCart } from "lucide-react";
+import { Moon, Sun, Search, Bell, Accessibility, LayoutDashboard, HeartHandshake, Briefcase, Bus, MessageSquare, Settings, PanelLeftClose, PanelLeftOpen, DollarSign, Wallet, FileText, Bot, Loader2, CalendarDays, Building2, ClipboardList, User as UserIconLucide, Mail, ShoppingCart, Map as MapIcon } from "lucide-react";
 import { useState, lazy, Suspense } from "react";
 
 const ChatbotWidget = lazy(() => import("@/components/chatbot-widget"));
@@ -54,6 +54,8 @@ import PaymentMethodsPage from "@/pages/payment-methods";
 import PayoutsPage from "@/pages/payouts";
 import NdisAdminPage from "@/pages/ndis-admin";
 import AdminChatGuardrailsPage from "@/pages/admin-chat-guardrails";
+import AccessibilityMapPage from "@/pages/accessibility-map";
+import GeoAdminPage from "@/pages/geo-admin";
 
 function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
@@ -146,6 +148,7 @@ const participantMobileNavItems = [
   { title: "Shifts", url: "/shifts", icon: CalendarDays, audioDesc: "Manage shift schedules and track NDIS goal alignment" },
   { title: "Find a Job", url: "/jobs", icon: Briefcase, audioDesc: "Browse disability support employment opportunities" },
   { title: "Get Transport", url: "/transport", icon: Bus, audioDesc: "Arrange wheelchair accessible transport services" },
+  { title: "Accessibility Map", url: "/accessibility-map", icon: MapIcon, audioDesc: "Explore accessible places, parking, lifts and routes on an interactive map" },
   { title: "MapAble Chat", url: "/chat", icon: Bot, audioDesc: "Chat with your accessibility-aware travel assistant" },
   { title: "Pricing", url: "/pricing", icon: DollarSign, audioDesc: "View NDIS-aligned pricing for care and transport services" },
   { title: "Budget", url: "/budget", icon: Wallet, audioDesc: "View your NDIS budget usage and remaining funds" },
@@ -251,6 +254,8 @@ function Router() {
       <Route path="/jobs" component={JobsPage} />
       <Route path="/jobs/:id" component={JobDetailPage} />
       <Route path="/transport" component={TransportPage} />
+      <Route path="/accessibility-map" component={AccessibilityMapPage} />
+      <Route path="/admin/geo" component={GeoAdminPage} />
       <Route path="/pricing" component={PricingPage} />
       <Route path="/budget" component={BudgetPage} />
       <Route path="/invoices" component={InvoicesPage} />

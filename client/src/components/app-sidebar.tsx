@@ -22,6 +22,7 @@ import {
   TrendingUp,
   Mail,
   ShoppingCart,
+  Map,
 } from "lucide-react";
 import {
   Sidebar,
@@ -55,6 +56,7 @@ const participantNavItems: NavItem[] = [
   { title: "Shifts", url: "/shifts", icon: CalendarDays, audioDesc: "Manage shift schedules and track NDIS goal alignment" },
   { title: "Find a Job", url: "/jobs", icon: Briefcase, audioDesc: "Browse disability support employment opportunities" },
   { title: "Get Transport", url: "/transport", icon: Bus, audioDesc: "Arrange wheelchair accessible transport services" },
+  { title: "Accessibility Map", url: "/accessibility-map", icon: Map, audioDesc: "Explore accessible places, parking, lifts and routes on an interactive map" },
   { title: "MapAble Chat", url: "/chat", icon: Bot, audioDesc: "Chat with your accessibility-aware travel assistant" },
   { title: "Pricing", url: "/pricing", icon: DollarSign, audioDesc: "View NDIS-aligned pricing for care and transport services" },
   { title: "Budget", url: "/budget", icon: Wallet, audioDesc: "View your NDIS budget usage and remaining funds" },
@@ -76,9 +78,14 @@ const workerNavItems: NavItem[] = [
   { title: "Settings", url: "/settings", icon: Settings, audioDesc: "Manage your account and accessibility preferences" },
 ];
 
+const adminNavItems: NavItem[] = [
+  { title: "Geo Management", url: "/admin/geo", icon: Map, audioDesc: "Manage map layers, features, imports and categories" },
+];
+
 function getNavItems(role?: string): NavItem[] {
-  if (role === "carer") return workerNavItems;
-  return participantNavItems;
+  const base = role === "carer" ? workerNavItems : participantNavItems;
+  if (role === "admin") return [...base, ...adminNavItems];
+  return base;
 }
 
 function speakDescription(text: string) {

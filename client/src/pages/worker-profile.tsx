@@ -36,6 +36,7 @@ import {
   Upload,
 } from "lucide-react";
 import { useState, useEffect } from "react";
+import { CoverageEditor } from "@/features/geo/CoverageEditor";
 import type { Worker, User } from "@shared/schema";
 
 type WorkerWithUser = Worker & { user?: User };
@@ -520,6 +521,8 @@ export default function WorkerProfile() {
           </div>
         </div>
       </Card>
+
+      <CoverageEditor />
     </div>
   );
 }

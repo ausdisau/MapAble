@@ -12,6 +12,7 @@ import type { Express } from "express";
   import { registerSchedulingNdisRoutes } from "./scheduling-ndis";
   import { registerQuickBooksRoutes } from "./quickbooks";
   import { registerGroceryRoutes } from "./grocery";
+  import { registerGeoRoutes } from "./geo";
 
   export async function registerRoutes(httpServer: Server, app: Express): Promise<Server> {
     registerAuthRoutes(app);
@@ -28,6 +29,7 @@ import type { Express } from "express";
       startPaymentPolling();
     }
     registerGroceryRoutes(app);
+    registerGeoRoutes(app);
     return httpServer;
   }
   

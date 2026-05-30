@@ -17,10 +17,13 @@ import {
 } from "lucide-react";
 import { Link } from "wouter";
 import { usePageTitle } from "@/hooks/use-page-title";
+import { useAuth } from "@/hooks/use-auth";
+import { JobCoverageNotice } from "@/features/geo/JobCoverageNotice";
 import type { Job } from "@shared/schema";
 
 export default function JobDetailPage() {
   const params = useParams<{ id: string }>();
+  const { user } = useAuth();
 
   const { data: job, isLoading } = useQuery<Job>({
     queryKey: ["/api/jobs", params.id],
@@ -161,6 +164,10 @@ export default function JobDetailPage() {
               )}
             </div>
           </Card>
+
+          {user?.role === "carer" && (
+            <JobCoverageNotice location={job.location} />
+          )}
 
           <Button className="w-full gap-2" data-testid="button-apply-job">
             <Send className="w-4 h-4" /> Apply Now
