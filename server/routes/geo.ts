@@ -59,12 +59,16 @@ export function registerGeoRoutes(app: Express) {
     res.status(201).json(cat);
   });
   app.patch("/api/geo/categories/:id", adminOnly, async (req, res) => {
-    const cat = await geoStorage.updateMapCategory((req.params as Record<string, string>).id, req.body);
+    const parsed = insertMapCategorySchema.partial().safeParse(req.body);
+    if (!parsed.success) return res.status(400).json({ message: "Invalid category", errors: parsed.error.flatten() });
+    const cat = await geoStorage.updateMapCategory((req.params as Record<string, string>).id, parsed.data);
     if (!cat) return res.status(404).json({ message: "Not found" });
+    await geoStorage.logGeoAudit({ userId: req.session.userId, action: "update", entity: "category", entityId: cat.id, payload: parsed.data });
     res.json(cat);
   });
   app.delete("/api/geo/categories/:id", adminOnly, async (req, res) => {
     await geoStorage.deleteMapCategory((req.params as Record<string, string>).id);
+    await geoStorage.logGeoAudit({ userId: req.session.userId, action: "delete", entity: "category", entityId: (req.params as Record<string, string>).id });
     res.status(204).end();
   });
 
@@ -149,13 +153,15 @@ export function registerGeoRoutes(app: Express) {
     const parsed = insertMapFeatureSchema.safeParse(req.body);
     if (!parsed.success) return res.status(400).json({ message: "Invalid feature", errors: parsed.error.flatten() });
     const feature = await geoStorage.createMapFeature(parsed.data);
-    await geoStorage.logGeoAudit({ userId: req.session.userId, action: "create", entity: "feature", entityId: feature.id });
+    await geoStorage.logGeoAudit({ userId: req.session.userId, action: "create", entity: "feature", entityId: feature.id, payload: parsed.data });
     res.status(201).json(feature);
   });
   app.patch("/api/geo/features/:id", adminOnly, async (req, res) => {
-    const feature = await geoStorage.updateMapFeature((req.params as Record<string, string>).id, req.body);
+    const parsed = insertMapFeatureSchema.partial().safeParse(req.body);
+    if (!parsed.success) return res.status(400).json({ message: "Invalid feature", errors: parsed.error.flatten() });
+    const feature = await geoStorage.updateMapFeature((req.params as Record<string, string>).id, parsed.data);
     if (!feature) return res.status(404).json({ message: "Not found" });
-    await geoStorage.logGeoAudit({ userId: req.session.userId, action: "update", entity: "feature", entityId: feature.id });
+    await geoStorage.logGeoAudit({ userId: req.session.userId, action: "update", entity: "feature", entityId: feature.id, payload: parsed.data });
     res.json(feature);
   });
   app.delete("/api/geo/features/:id", adminOnly, async (req, res) => {
@@ -245,10 +251,12 @@ export function registerGeoRoutes(app: Express) {
     const parsed = insertPersonalPlaceSchema.safeParse(req.body);
     if (!parsed.success) return res.status(400).json({ message: "Invalid place", errors: parsed.error.flatten() });
     const place = await geoStorage.createPersonalPlace(req.session.userId!, parsed.data);
+    await geoStorage.logGeoAudit({ userId: req.session.userId, action: "create", entity: "personal_place", entityId: place.id, payload: parsed.data });
     res.status(201).json(place);
   });
   app.delete("/api/geo/personal-places/:id", requireAuth, async (req, res) => {
     await geoStorage.deletePersonalPlace(req.session.userId!, (req.params as Record<string, string>).id);
+    await geoStorage.logGeoAudit({ userId: req.session.userId, action: "delete", entity: "personal_place", entityId: (req.params as Record<string, string>).id });
     res.status(204).end();
   });
 
@@ -260,15 +268,20 @@ export function registerGeoRoutes(app: Express) {
     const parsed = insertServiceRegionSchema.safeParse(req.body);
     if (!parsed.success) return res.status(400).json({ message: "Invalid region", errors: parsed.error.flatten() });
     const region = await geoStorage.createServiceRegion(parsed.data);
+    await geoStorage.logGeoAudit({ userId: req.session.userId, action: "create", entity: "service_region", entityId: region.id, payload: parsed.data });
     res.status(201).json(region);
   });
   app.patch("/api/geo/service-regions/:id", adminOnly, async (req, res) => {
-    const region = await geoStorage.updateServiceRegion((req.params as Record<string, string>).id, req.body);
+    const parsed = insertServiceRegionSchema.partial().safeParse(req.body);
+    if (!parsed.success) return res.status(400).json({ message: "Invalid region", errors: parsed.error.flatten() });
+    const region = await geoStorage.updateServiceRegion((req.params as Record<string, string>).id, parsed.data);
     if (!region) return res.status(404).json({ message: "Not found" });
+    await geoStorage.logGeoAudit({ userId: req.session.userId, action: "update", entity: "service_region", entityId: region.id, payload: parsed.data });
     res.json(region);
   });
   app.delete("/api/geo/service-regions/:id", adminOnly, async (req, res) => {
     await geoStorage.deleteServiceRegion((req.params as Record<string, string>).id);
+    await geoStorage.logGeoAudit({ userId: req.session.userId, action: "delete", entity: "service_region", entityId: (req.params as Record<string, string>).id });
     res.status(204).end();
   });
 
@@ -285,6 +298,7 @@ export function registerGeoRoutes(app: Express) {
     const parsed = insertWorkerCoverageZoneSchema.omit({ workerId: true }).safeParse(req.body);
     if (!parsed.success) return res.status(400).json({ message: "Invalid coverage", errors: parsed.error.flatten() });
     const zone = await geoStorage.upsertWorkerCoverageZone(worker.id, parsed.data);
+    await geoStorage.logGeoAudit({ userId: req.session.userId, action: "update", entity: "worker_coverage", entityId: zone.id, payload: parsed.data });
     res.json(zone);
   });
   app.get("/api/geo/worker-coverage/all", adminOnly, async (_req, res) => {
