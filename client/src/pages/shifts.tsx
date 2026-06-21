@@ -13,6 +13,7 @@ import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { usePageTitle } from "@/hooks/use-page-title";
+import { ShiftCard } from "@/components/shared/ShiftCard";
 import {
   Calendar as CalendarIcon,
   Clock,
@@ -77,60 +78,6 @@ function formatDate(d: Date): string {
   const month = String(d.getMonth() + 1).padStart(2, "0");
   const day = String(d.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
-}
-
-interface ShiftWithDetails extends Shift {
-  workerName?: string;
-  participantName?: string;
-}
-
-function ShiftCard({ shift, onStatusChange }: { shift: ShiftWithDetails; onStatusChange: (id: string, status: string) => void }) {
-  return (
-    <Card className="p-3 text-sm" data-testid={`card-shift-${shift.id}`}>
-      <div className="flex items-start justify-between gap-2">
-        <div className="min-w-0">
-          <div className="font-semibold truncate">{shift.startTime} – {shift.endTime}</div>
-          {shift.ndisGoal && (
-            <div className="flex items-center gap-1 text-xs text-muted-foreground mt-0.5">
-              <Target className="w-3 h-3 shrink-0" />
-              <span className="truncate">{shift.ndisGoal}</span>
-            </div>
-          )}
-          {shift.ndisCategory && (
-            <Badge variant="outline" className="text-[10px] mt-1">{shift.ndisCategory}</Badge>
-          )}
-        </div>
-        <Badge className={`text-[10px] shrink-0 ${STATUS_COLORS[shift.status] || ""}`}>
-          {shift.status.replace("_", " ")}
-        </Badge>
-      </div>
-      {shift.notes && (
-        <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{shift.notes}</p>
-      )}
-      <div className="flex gap-1 mt-2 flex-wrap">
-        {shift.status === "scheduled" && (
-          <>
-            <Button size="sm" variant="outline" className="h-6 text-[10px] gap-1" onClick={() => onStatusChange(shift.id, "confirmed")} data-testid={`button-confirm-shift-${shift.id}`}>
-              <CheckCircle2 className="w-3 h-3" /> Confirm
-            </Button>
-            <Button size="sm" variant="outline" className="h-6 text-[10px] gap-1 text-red-600" onClick={() => onStatusChange(shift.id, "cancelled")} data-testid={`button-cancel-shift-${shift.id}`}>
-              <XCircle className="w-3 h-3" /> Cancel
-            </Button>
-          </>
-        )}
-        {shift.status === "confirmed" && (
-          <Button size="sm" variant="outline" className="h-6 text-[10px] gap-1" onClick={() => onStatusChange(shift.id, "in_progress")} data-testid={`button-start-shift-${shift.id}`}>
-            <Play className="w-3 h-3" /> Start
-          </Button>
-        )}
-        {shift.status === "in_progress" && (
-          <Button size="sm" className="h-6 text-[10px] gap-1 bg-[#2EAA6E] hover:bg-[#25905D]" onClick={() => onStatusChange(shift.id, "completed")} data-testid={`button-complete-shift-${shift.id}`}>
-            <CheckCircle2 className="w-3 h-3" /> Complete
-          </Button>
-        )}
-      </div>
-    </Card>
-  );
 }
 
 function WeekView({ shifts, currentDate, onStatusChange }: { shifts: Shift[]; currentDate: Date; onStatusChange: (id: string, status: string) => void }) {

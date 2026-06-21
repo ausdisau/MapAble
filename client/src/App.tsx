@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { SidebarProvider, useSidebar } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { ThemeProvider, useTheme } from "@/components/theme-provider";
+import { AccessibilityProvider } from "@/components/accessibility-provider";
 import { GroceryCartProvider } from "@/lib/grocery-cart";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
@@ -117,7 +118,7 @@ function MobileSearchButton() {
         <Search className="w-4 h-4" />
       </Button>
       {open && (
-        <div className="md:hidden absolute top-full left-0 right-0 p-2 z-50" style={{ background: "linear-gradient(90deg, #14578F, #1B6EB5, #2384C9)" }}>
+        <div className="md:hidden absolute top-full left-0 right-0 p-2 z-50 bg-app-header">
           <div className="flex gap-2">
             <input
               type="search"
@@ -296,8 +297,7 @@ function AppLayout() {
         <AppSidebar />
         <div className="flex flex-col flex-1 min-w-0">
           <header
-            className="flex items-center justify-between gap-3 px-4 py-2 sticky top-0 z-40 relative"
-            style={{ background: "linear-gradient(90deg, #14578F, #1B6EB5, #2384C9)" }}
+            className="flex items-center justify-between gap-3 px-4 py-2 sticky top-0 z-40 relative bg-app-header"
             data-testid="header-main"
           >
             <div className="flex items-center gap-3 flex-wrap">
@@ -316,9 +316,9 @@ function AppLayout() {
             </div>
           </header>
           <div className="flex h-[3px] shrink-0" data-testid="accent-tricolor-strip">
-            <div className="flex-1" style={{ backgroundColor: "#2EAA6E" }} />
-            <div className="flex-1" style={{ backgroundColor: "#1A4B7A" }} />
-            <div className="flex-1" style={{ backgroundColor: "#E6A817" }} />
+            <div className="flex-1 bg-brand-teal" />
+            <div className="flex-1 bg-brand-navy" />
+            <div className="flex-1 bg-brand-gold" />
           </div>
           <main id="main-content" className="flex-1 overflow-auto" role="main" aria-label="Main content">
             <Router />
@@ -338,7 +338,7 @@ function AuthGate() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: "linear-gradient(135deg, #0F1A2E 0%, #14578F 50%, #1B6EB5 100%)" }}>
+      <div className="min-h-screen flex items-center justify-center bg-auth-hero">
         <Loader2 className="w-8 h-8 animate-spin text-white/60" />
       </div>
     );
@@ -359,10 +359,12 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <ThemeProvider>
-          <GroceryCartProvider>
-            <AuthGate />
-            <Toaster />
-          </GroceryCartProvider>
+          <AccessibilityProvider>
+            <GroceryCartProvider>
+              <AuthGate />
+              <Toaster />
+            </GroceryCartProvider>
+          </AccessibilityProvider>
         </ThemeProvider>
       </TooltipProvider>
     </QueryClientProvider>

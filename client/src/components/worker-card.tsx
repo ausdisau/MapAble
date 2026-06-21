@@ -2,7 +2,8 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ShieldCheck, MapPin, Star, Car, Accessibility, ArrowRight } from "lucide-react";
+import { VerificationBadge } from "@/components/shared/VerificationBadge";
+import { MapPin, Star, Car, Accessibility, ArrowRight } from "lucide-react";
 import type { Worker, User } from "@shared/schema";
 import { Link } from "wouter";
 
@@ -17,7 +18,7 @@ export function WorkerCard({ worker }: WorkerCardProps) {
 
   return (
     <Card className="group relative flex flex-col hover-elevate overflow-visible shadow-md">
-      <div className="relative h-44 rounded-t-md bg-gradient-to-br from-[#D4EAF7] to-[#E8F0F8] dark:from-[#1a3a5c] dark:to-[#1e2d42] flex items-center justify-center">
+      <div className="relative h-44 rounded-t-md bg-gradient-to-br from-brand-blue/15 to-brand-blue/5 dark:from-brand-blue/25 dark:to-brand-blue/10 flex items-center justify-center">
         <Avatar className="w-22 h-22 border-4 border-background shadow-lg">
           <AvatarImage src={worker.photo || undefined} alt={worker.user?.fullName || "Worker"} />
           <AvatarFallback className="text-2xl font-black bg-primary/15 text-primary">
@@ -26,10 +27,7 @@ export function WorkerCard({ worker }: WorkerCardProps) {
         </Avatar>
         {worker.ndisVerified && (
           <div className="absolute top-3 right-3">
-            <Badge className="gap-1.5 bg-emerald-500 dark:bg-emerald-600 text-white border-emerald-600 dark:border-emerald-500 font-semibold no-default-hover-elevate no-default-active-elevate">
-              <ShieldCheck className="w-3.5 h-3.5" />
-              NDIS Verified
-            </Badge>
+            <VerificationBadge data-testid={`badge-verified-${worker.id}`} />
           </div>
         )}
       </div>
@@ -67,7 +65,7 @@ export function WorkerCard({ worker }: WorkerCardProps) {
           )}
           {worker.rating && Number(worker.rating) > 0 && (
             <span className="flex items-center gap-1 ml-auto font-semibold">
-              <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
+              <Star className="w-3.5 h-3.5 fill-brand-gold text-brand-gold" />
               {Number(worker.rating).toFixed(1)}
             </span>
           )}
@@ -76,7 +74,7 @@ export function WorkerCard({ worker }: WorkerCardProps) {
         <div className="flex gap-2 pt-1">
           <Link href={`/care/${worker.id}`} className="flex-1">
             <Button
-              className="w-full gap-1.5 bg-gradient-to-r from-[#14578F] to-[#1B6EB5] text-white border-primary-border"
+              className="w-full gap-1.5"
               size="sm"
               data-testid={`button-view-worker-${worker.id}`}
             >

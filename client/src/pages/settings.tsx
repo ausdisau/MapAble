@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { useTheme } from "@/components/theme-provider";
+import { useAccessibility } from "@/components/accessibility-provider";
 import { useUpload } from "@/hooks/use-upload";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
@@ -37,26 +38,7 @@ import { AbnLookup } from "@/components/abn-lookup";
 import { useMutation } from "@tanstack/react-query";
 
 function EasyReadToggle() {
-  const [enabled, setEnabled] = useState(() => {
-    return localStorage.getItem("easy-read") === "true";
-  });
-
-  const toggle = (checked: boolean) => {
-    setEnabled(checked);
-    localStorage.setItem("easy-read", String(checked));
-    if (checked) {
-      document.documentElement.classList.add("easy-read");
-    } else {
-      document.documentElement.classList.remove("easy-read");
-    }
-  };
-
-  useEffect(() => {
-    if (enabled) {
-      document.documentElement.classList.add("easy-read");
-    }
-  }, []);
-
+  const { isEnabled, setMode } = useAccessibility();
   return (
     <div className="flex items-center justify-between gap-4">
       <div>
@@ -66,8 +48,8 @@ function EasyReadToggle() {
         <p className="text-xs text-muted-foreground">Larger text, simpler layout, more spacing for easier reading</p>
       </div>
       <Switch
-        checked={enabled}
-        onCheckedChange={toggle}
+        checked={isEnabled("easy-read")}
+        onCheckedChange={(checked) => setMode("easy-read", checked)}
         data-testid="switch-easy-read"
         aria-label="Toggle easy read mode"
       />
@@ -182,57 +164,27 @@ function ProfilePhotoUpload() {
 }
 
 function HighContrastToggle() {
-  const [enabled, setEnabled] = useState(() => localStorage.getItem("high-contrast") === "true");
-
-  const toggle = (checked: boolean) => {
-    setEnabled(checked);
-    localStorage.setItem("high-contrast", String(checked));
-    if (checked) {
-      document.documentElement.classList.add("high-contrast");
-    } else {
-      document.documentElement.classList.remove("high-contrast");
-    }
-  };
-
-  useEffect(() => {
-    if (enabled) document.documentElement.classList.add("high-contrast");
-  }, []);
-
+  const { isEnabled, setMode } = useAccessibility();
   return (
     <div className="flex items-center justify-between gap-4">
       <div>
         <p className="text-sm font-semibold">High Contrast Mode</p>
         <p className="text-xs text-muted-foreground">Increase contrast for better visibility</p>
       </div>
-      <Switch checked={enabled} onCheckedChange={toggle} data-testid="switch-high-contrast" aria-label="Toggle high contrast mode" />
+      <Switch checked={isEnabled("high-contrast")} onCheckedChange={(checked) => setMode("high-contrast", checked)} data-testid="switch-high-contrast" aria-label="Toggle high contrast mode" />
     </div>
   );
 }
 
 function ScreenReaderToggle() {
-  const [enabled, setEnabled] = useState(() => localStorage.getItem("screen-reader-optimized") === "true");
-
-  const toggle = (checked: boolean) => {
-    setEnabled(checked);
-    localStorage.setItem("screen-reader-optimized", String(checked));
-    if (checked) {
-      document.documentElement.classList.add("screen-reader-optimized");
-    } else {
-      document.documentElement.classList.remove("screen-reader-optimized");
-    }
-  };
-
-  useEffect(() => {
-    if (enabled) document.documentElement.classList.add("screen-reader-optimized");
-  }, []);
-
+  const { isEnabled, setMode } = useAccessibility();
   return (
     <div className="flex items-center justify-between gap-4">
       <div>
         <p className="text-sm font-semibold">Screen Reader Optimization</p>
         <p className="text-xs text-muted-foreground">Hide decorative elements, enhance focus outlines</p>
       </div>
-      <Switch checked={enabled} onCheckedChange={toggle} data-testid="switch-screen-reader" aria-label="Toggle screen reader optimization" />
+      <Switch checked={isEnabled("screen-reader-optimized")} onCheckedChange={(checked) => setMode("screen-reader-optimized", checked)} data-testid="switch-screen-reader" aria-label="Toggle screen reader optimization" />
     </div>
   );
 }

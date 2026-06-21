@@ -56,7 +56,7 @@ export function JobCard({ job }: JobCardProps) {
 
         {job.salary && (
           <div className="flex items-center gap-1 text-sm font-semibold">
-            <DollarSign className="w-3.5 h-3.5 text-emerald-500" />
+            <DollarSign className="w-3.5 h-3.5 text-success" />
             {job.salary}
           </div>
         )}

@@ -2,9 +2,10 @@ import { useQuery } from "@tanstack/react-query";
 import { WorkerCard } from "@/components/worker-card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card } from "@/components/ui/card";
+import { PageShell } from "@/components/layout/PageShell";
+import { EmptyState } from "@/components/layout/EmptyState";
 import { Search, SlidersHorizontal, ShieldCheck, Car, Accessibility, Globe, Users, AlertCircle, CalendarDays } from "lucide-react";
 import { Link } from "wouter";
 import { useState } from "react";
@@ -47,22 +48,17 @@ export default function CarePage() {
   });
 
   return (
-    <div className="p-4 md:p-6 max-w-7xl mx-auto space-y-6">
-      <div className="pb-2">
-        <h1 className="text-3xl font-black tracking-tight" data-testid="text-page-title">
-          Book a Carer
-        </h1>
-        <p className="text-muted-foreground mt-1.5 max-w-xl">
-          Find NDIS verified support workers near you. Browse profiles, check qualifications,
-          and book services with confidence.
-        </p>
+    <PageShell
+      title="Book a Carer"
+      description="Find NDIS verified support workers near you. Browse profiles, check qualifications, and book services with confidence."
+      actions={
         <Link href="/shifts">
-          <Button variant="outline" className="mt-3 gap-2" data-testid="link-view-shifts">
+          <Button variant="outline" className="gap-2" data-testid="link-view-shifts">
             <CalendarDays className="w-4 h-4" /> View Shift Schedule
           </Button>
         </Link>
-      </div>
-
+      }
+    >
       <Card className="p-3 shadow-md">
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
@@ -91,7 +87,7 @@ export default function CarePage() {
                 key={tag.value}
                 variant={isActive ? "default" : "ghost"}
                 size="sm"
-                className={`gap-1.5 rounded-md ${isActive ? "bg-gradient-to-r from-[#14578F] to-[#1B6EB5] text-white border-primary-border" : ""}`}
+                className="gap-1.5 rounded-md"
                 onClick={() => setActiveFilter(tag.value)}
                 data-testid={`button-filter-${tag.value}`}
               >
@@ -105,7 +101,7 @@ export default function CarePage() {
 
       <div className="flex items-center gap-4 text-xs text-muted-foreground flex-wrap">
         <span className="flex items-center gap-1">
-          <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" /> NDIS Verified
+          <ShieldCheck className="w-3.5 h-3.5 text-brand-teal" /> NDIS Verified
         </span>
         <span className="flex items-center gap-1">
           <Car className="w-3.5 h-3.5" /> Transport Available
@@ -119,12 +115,13 @@ export default function CarePage() {
       </div>
 
       {isError ? (
-        <Card className="p-12 text-center">
-          <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-          <h3 className="font-bold text-lg mb-1">Something went wrong</h3>
-          <p className="text-sm text-muted-foreground mb-4">We couldn't load the data. Please try again.</p>
-          <Button onClick={() => refetch()} data-testid="button-retry">Try Again</Button>
-        </Card>
+        <EmptyState
+          icon={AlertCircle}
+          tone="error"
+          title="Something went wrong"
+          description="We couldn't load the data. Please try again."
+          action={<Button onClick={() => refetch()} data-testid="button-retry">Try Again</Button>}
+        />
       ) : isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -138,13 +135,11 @@ export default function CarePage() {
           ))}
         </div>
       ) : filtered?.length === 0 ? (
-        <Card className="p-12 text-center shadow-md">
-          <Search className="w-12 h-12 text-muted-foreground mx-auto mb-4 opacity-40" />
-          <h3 className="font-bold text-lg mb-1">No workers found</h3>
-          <p className="text-sm text-muted-foreground">
-            Try adjusting your search or filters
-          </p>
-        </Card>
+        <EmptyState
+          icon={Search}
+          title="No workers found"
+          description="Try adjusting your search or filters"
+        />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {filtered?.map((worker) => (
@@ -156,6 +151,6 @@ export default function CarePage() {
       <div className="text-center text-xs text-muted-foreground pt-4">
         Showing {filtered?.length || 0} of {workers?.length || 0} support workers
       </div>
-    </div>
+    </PageShell>
   );
 }
