@@ -115,6 +115,19 @@ export const safeguardingConcernFlags = pgTable("safeguarding_concern_flags", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+export const chatHandoffs = pgTable("chat_handoffs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  sessionId: varchar("session_id").notNull(),
+  userId: varchar("user_id").notNull(),
+  reason: text("reason").notNull(),
+  status: text("status").notNull().default("requested"),
+  channel: text("channel").default("web"),
+  assignedTo: varchar("assigned_to"),
+  resolutionNotes: text("resolution_notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 export const communityReports = pgTable("community_reports", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   reporterUserId: varchar("reporter_user_id"),
@@ -171,6 +184,12 @@ export const insertSafeguardingConcernFlagSchema = createInsertSchema(safeguardi
   createdAt: true,
 });
 
+export const insertChatHandoffSchema = createInsertSchema(chatHandoffs).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export const insertCommunityReportSchema = createInsertSchema(communityReports).omit({
   id: true,
   createdAt: true,
@@ -194,6 +213,8 @@ export type InsertSafeguardingConsentRecord = z.infer<typeof insertSafeguardingC
 export type SafeguardingConsentRecord = typeof safeguardingConsentRecords.$inferSelect;
 export type InsertSafeguardingConcernFlag = z.infer<typeof insertSafeguardingConcernFlagSchema>;
 export type SafeguardingConcernFlag = typeof safeguardingConcernFlags.$inferSelect;
+export type InsertChatHandoff = z.infer<typeof insertChatHandoffSchema>;
+export type ChatHandoff = typeof chatHandoffs.$inferSelect;
 export type InsertCommunityReport = z.infer<typeof insertCommunityReportSchema>;
 export type CommunityReport = typeof communityReports.$inferSelect;
   export const userEmailInboxes = pgTable("user_email_inboxes", {
