@@ -55,7 +55,7 @@ function ActiveGroceryOrders() {
     <Card className="p-5" data-testid="card-active-grocery-orders">
       <div className="flex items-center justify-between gap-2 mb-4">
         <div className="flex items-center gap-2">
-          <ShoppingCart className="w-5 h-5 text-[#2EAA6E]" />
+          <ShoppingCart className="w-5 h-5 text-brand-teal" />
           <h2 className="text-lg font-black tracking-tight">
             Active grocery orders
           </h2>
@@ -90,7 +90,7 @@ function ActiveGroceryOrders() {
                     {o.deliveryAddress}
                   </p>
                 </div>
-                <span className="font-black text-[#2EAA6E] text-sm">
+                <span className="font-black text-brand-teal text-sm">
                   ${Number(o.totalAmount).toFixed(2)}
                 </span>
               </div>
@@ -215,21 +215,21 @@ function HeroSection() {
   };
 
   return (
-    <div className="relative rounded-md overflow-visible bg-gradient-to-r from-[#14578F] via-[#1B6EB5] to-[#2384C9] dark:from-[#0F1A2E] dark:via-[#14578F] dark:to-[#1B6EB5] p-8 md:p-12 text-white">
+    <div className="relative rounded-md overflow-visible bg-auth-hero p-8 md:p-12 text-white">
       <div className="absolute inset-0 rounded-md bg-[radial-gradient(ellipse_at_70%_20%,rgba(255,255,255,0.10)_0%,transparent_60%)]" />
       <div
         className="absolute right-8 md:right-16 top-1/2 -translate-y-1/2 w-20 h-28 md:w-28 md:h-40 opacity-[0.07] pointer-events-none"
         style={{
-          background: "linear-gradient(180deg, #2EAA6E 33%, #1A4B7A 33% 66%, #E6A817 66%)",
+          background: "linear-gradient(180deg, hsl(var(--brand-teal)) 33%, hsl(var(--brand-navy)) 33% 66%, hsl(var(--brand-gold)) 66%)",
           borderRadius: "50% 50% 50% 50% / 35% 35% 65% 65%",
         }}
         data-testid="deco-pin-silhouette"
       />
-      <div className="absolute top-6 right-24 md:right-40 w-2 h-2 rounded-full opacity-30 pointer-events-none" style={{ backgroundColor: "#E6A817" }} />
-      <div className="absolute top-12 right-12 md:right-24 w-1.5 h-1.5 rounded-full opacity-25 pointer-events-none" style={{ backgroundColor: "#E6A817" }} />
-      <div className="absolute bottom-8 right-20 md:right-36 w-1 h-1 rounded-full opacity-35 pointer-events-none" style={{ backgroundColor: "#E6A817" }} />
-      <div className="absolute bottom-16 right-32 md:right-48 w-1.5 h-1.5 rounded-full opacity-20 pointer-events-none" style={{ backgroundColor: "#E6A817" }} />
-      <div className="absolute top-20 right-36 md:right-56 w-1 h-1 rounded-full opacity-30 pointer-events-none" style={{ backgroundColor: "#E6A817" }} />
+      <div className="absolute top-6 right-24 md:right-40 w-2 h-2 rounded-full opacity-30 pointer-events-none bg-brand-gold" />
+      <div className="absolute top-12 right-12 md:right-24 w-1.5 h-1.5 rounded-full opacity-25 pointer-events-none bg-brand-gold" />
+      <div className="absolute bottom-8 right-20 md:right-36 w-1 h-1 rounded-full opacity-35 pointer-events-none bg-brand-gold" />
+      <div className="absolute bottom-16 right-32 md:right-48 w-1.5 h-1.5 rounded-full opacity-20 pointer-events-none bg-brand-gold" />
+      <div className="absolute top-20 right-36 md:right-56 w-1 h-1 rounded-full opacity-30 pointer-events-none bg-brand-gold" />
       <div className="relative z-10 max-w-3xl">
         <Badge className="mb-5 bg-white/15 text-white border-white/25 no-default-hover-elevate no-default-active-elevate">
           <ShieldCheck className="w-3 h-3 mr-1" /> NDIS Registered Platform
@@ -248,7 +248,7 @@ function HeroSection() {
             "Arrange services independently",
           ].map((benefit) => (
             <div key={benefit} className="flex items-center gap-2.5">
-              <CheckCircle2 className="w-4 h-4 text-[#2EAA6E] flex-shrink-0" />
+              <CheckCircle2 className="w-4 h-4 text-brand-teal flex-shrink-0" />
               <span className="text-sm md:text-base font-medium text-white/90">{benefit}</span>
             </div>
           ))}
@@ -292,32 +292,32 @@ function QuickActions() {
       description: "Find verified support workers near you",
       icon: HeartHandshake,
       href: "/care",
-      iconBg: "bg-[#E6A817]/15 dark:bg-[#E6A817]/20",
-      iconColor: "text-[#C48F14] dark:text-[#E6A817]",
+      iconBg: "bg-brand-gold/15",
+      iconColor: "text-brand-gold",
     },
     {
       title: "Get Transport",
       description: "Wheelchair accessible transport services",
       icon: Bus,
       href: "/transport",
-      iconBg: "bg-[#E6A817]/15 dark:bg-[#E6A817]/20",
-      iconColor: "text-[#C48F14] dark:text-[#E6A817]",
+      iconBg: "bg-brand-gold/15",
+      iconColor: "text-brand-gold",
     },
     {
       title: "Find a Job",
       description: "Employment opportunities in disability support",
       icon: Briefcase,
       href: "/jobs",
-      iconBg: "bg-[#E6A817]/15 dark:bg-[#E6A817]/20",
-      iconColor: "text-[#C48F14] dark:text-[#E6A817]",
+      iconBg: "bg-brand-gold/15",
+      iconColor: "text-brand-gold",
     },
     {
       title: "Order Groceries",
       description: "Delivered to your door, or book a worker to shop",
       icon: ShoppingCart,
       href: "/groceries",
-      iconBg: "bg-[#E6A817]/15 dark:bg-[#E6A817]/20",
-      iconColor: "text-[#C48F14] dark:text-[#E6A817]",
+      iconBg: "bg-brand-gold/15",
+      iconColor: "text-brand-gold",
     },
   ];
 
@@ -465,8 +465,8 @@ function KeyFeatures() {
       <div className="space-y-3">
         {features.map((f, i) => (
           <div key={i} className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-md bg-[#2EAA6E]/15 dark:bg-[#2EAA6E]/20 flex items-center justify-center flex-shrink-0">
-              <f.icon className="w-4 h-4 text-[#2EAA6E]" />
+            <div className="w-8 h-8 rounded-md bg-brand-teal/15 flex items-center justify-center flex-shrink-0">
+              <f.icon className="w-4 h-4 text-brand-teal" />
             </div>
             <span className="text-sm font-medium">{f.label}</span>
           </div>
@@ -483,7 +483,7 @@ export default function Dashboard() {
   const { data: me } = useQuery<User>({ queryKey: ["/api/me"] });
 
   return (
-    <div className="space-y-6 p-4 md:p-6 max-w-7xl mx-auto">
+    <div className="mx-auto w-full max-w-content px-4 md:px-6 py-6 md:py-8 space-y-section-gap animate-fade-in">
       {me && <AbnVerificationPrompt user={me} />}
       <HeroSection />
 

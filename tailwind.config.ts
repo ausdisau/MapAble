@@ -77,6 +77,24 @@ export default {
         "map-teal": "hsl(var(--map-teal) / <alpha-value>)",
         "map-navy": "hsl(var(--map-navy) / <alpha-value>)",
         "map-gold": "hsl(var(--map-gold) / <alpha-value>)",
+        brand: {
+          blue: "hsl(var(--brand-blue) / <alpha-value>)",
+          teal: "hsl(var(--brand-teal) / <alpha-value>)",
+          gold: "hsl(var(--brand-gold) / <alpha-value>)",
+          orange: "hsl(var(--brand-orange) / <alpha-value>)",
+        },
+        success: {
+          DEFAULT: "hsl(var(--success) / <alpha-value>)",
+          foreground: "hsl(var(--success-foreground) / <alpha-value>)",
+        },
+        warning: {
+          DEFAULT: "hsl(var(--warning) / <alpha-value>)",
+          foreground: "hsl(var(--warning-foreground) / <alpha-value>)",
+        },
+        info: {
+          DEFAULT: "hsl(var(--info) / <alpha-value>)",
+          foreground: "hsl(var(--info-foreground) / <alpha-value>)",
+        },
         status: {
           online: "rgb(34 197 94)",
           away: "rgb(245 158 11)",
@@ -89,6 +107,24 @@ export default {
         serif: ["var(--font-serif)"],
         mono: ["var(--font-mono)"],
       },
+      fontSize: {
+        display: ["3rem", { lineHeight: "1.05", letterSpacing: "-0.02em", fontWeight: "800" }],
+        h1: ["2.25rem", { lineHeight: "1.1", letterSpacing: "-0.02em", fontWeight: "800" }],
+        h2: ["1.75rem", { lineHeight: "1.15", letterSpacing: "-0.015em", fontWeight: "700" }],
+        h3: ["1.375rem", { lineHeight: "1.25", letterSpacing: "-0.01em", fontWeight: "700" }],
+        h4: ["1.125rem", { lineHeight: "1.3", letterSpacing: "-0.005em", fontWeight: "600" }],
+        body: ["1rem", { lineHeight: "1.6" }],
+        small: ["0.875rem", { lineHeight: "1.5" }],
+        caption: ["0.75rem", { lineHeight: "1.4", letterSpacing: "0.01em" }],
+      },
+      maxWidth: {
+        content: "80rem",
+        prose: "65ch",
+      },
+      spacing: {
+        "page-x": "1.5rem",
+        "section-gap": "2.5rem",
+      },
       keyframes: {
         "accordion-down": {
           from: { height: "0" },
@@ -98,10 +134,25 @@ export default {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        "fade-in": {
+          from: { opacity: "0" },
+          to: { opacity: "1" },
+        },
+        "fade-up": {
+          from: { opacity: "0", transform: "translateY(8px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
+        },
+        "scale-in": {
+          from: { opacity: "0", transform: "scale(0.97)" },
+          to: { opacity: "1", transform: "scale(1)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "fade-in": "fade-in 0.4s ease-out both",
+        "fade-up": "fade-up 0.45s ease-out both",
+        "scale-in": "scale-in 0.3s ease-out both",
       },
     },
   },

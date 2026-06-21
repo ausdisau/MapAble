@@ -121,8 +121,8 @@ export function AppSidebar() {
               {!isCollapsed && (
                 <div className="flex flex-col overflow-hidden">
                   <div className="flex items-baseline gap-1.5">
-                    <span className="text-xl font-black tracking-tight" style={{ color: "#E6A817" }}>MapAble</span>
-                    <span className="text-[10px] font-bold" style={{ color: "#E6A817", opacity: 0.7 }}>4.0</span>
+                    <span className="text-xl font-black tracking-tight text-brand-gold">MapAble</span>
+                    <span className="text-[10px] font-bold text-brand-gold/70">4.0</span>
                   </div>
                   <span className="text-[11px] text-muted-foreground leading-none tracking-wide mt-0.5">Empowering Independence</span>
                 </div>
@@ -178,7 +178,7 @@ export function AppSidebar() {
                         aria-label={`${item.title} — ${item.audioDesc}`}
                         onFocus={() => speakDescription(item.audioDesc)}
                       >
-                        <item.icon className={`w-4 h-4 ${active ? "text-[#2EAA6E]" : ""}`} />
+                        <item.icon className={`w-4 h-4 ${active ? "text-brand-teal" : ""}`} />
                         <span className={active ? "font-semibold" : ""}>{item.title}</span>
                       </Link>
                     </SidebarMenuButton>
@@ -190,9 +190,9 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter className="p-4 relative space-y-2">
-        <div className="absolute top-1 left-6 w-1.5 h-1.5 rounded-full opacity-40" style={{ backgroundColor: "#E6A817" }} />
-        <div className="absolute top-3 right-5 w-1 h-1 rounded-full opacity-30" style={{ backgroundColor: "#E6A817" }} />
-        <div className="absolute bottom-2 left-10 w-1 h-1 rounded-full opacity-25" style={{ backgroundColor: "#E6A817" }} />
+        <div className="absolute top-1 left-6 w-1.5 h-1.5 rounded-full opacity-40 bg-brand-gold" />
+        <div className="absolute top-3 right-5 w-1 h-1 rounded-full opacity-30 bg-brand-gold" />
+        <div className="absolute bottom-2 left-10 w-1 h-1 rounded-full opacity-25 bg-brand-gold" />
         {user && !isCollapsed && (
           <div className="flex items-center justify-between px-1">
             <span className="text-xs text-muted-foreground truncate">{user.fullName}</span>
@@ -219,7 +219,7 @@ export function AppSidebar() {
             </SidebarMenuItem>
           </SidebarMenu>
         )}
-        <Badge variant="outline" className="no-default-active-elevate gap-2 py-1.5 px-3 border-[#2EAA6E]/30 bg-[#2EAA6E]/10 text-[#2EAA6E] dark:text-[#3CC87F] justify-center" data-testid="badge-ndis-registered">
+        <Badge variant="outline" className="no-default-active-elevate gap-2 py-1.5 px-3 border-brand-teal/30 bg-brand-teal/10 text-brand-teal justify-center" data-testid="badge-ndis-registered">
           <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
           {!isCollapsed && <span className="text-xs font-semibold">NDIS Registered Provider</span>}
         </Badge>

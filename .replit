@@ -82,7 +82,7 @@ isValidation = true
 defaultBucketID = "replit-objstore-23684864-b650-42b0-b4fb-f420ba4db463"
 
 [agent]
-integrations = ["javascript_object_storage:2.0.0", "javascript_openai_ai_integrations:2.0.0", "agentmail:1.0.0"]
+integrations = ["javascript_object_storage:2.0.0", "javascript_openai_ai_integrations:2.0.0", "agentmail:1.0.0", "github:1.0.0"]
 
 [userenv]
 

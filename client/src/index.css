@@ -7,6 +7,26 @@
   --map-teal: 160 58% 42%;
   --map-navy: 210 65% 29%;
   --map-gold: 42 82% 50%;
+
+  /* MapAble brand palette (dynamic/animated accents) */
+  --brand-blue: 207 73% 41%;
+  --brand-teal: 151 56% 40%;
+  --brand-gold: 42 82% 50%;
+  --brand-orange: 25 90% 50%;
+  /* Brand blue shades + navy for header / hero gradients */
+  --brand-blue-dark: 207 76% 32%;
+  --brand-blue-light: 205 70% 46%;
+  --brand-navy: 210 64% 29%;
+  --brand-navy-deep: 220 51% 12%;
+
+  /* Semantic status roles */
+  --success: 151 56% 38%;
+  --success-foreground: 0 0% 100%;
+  --warning: 28 90% 48%;
+  --warning-foreground: 0 0% 100%;
+  --info: 207 73% 41%;
+  --info-foreground: 0 0% 100%;
+
   --button-outline: rgba(0,0,0, .10);
   --badge-outline: rgba(0,0,0, .05);
   --opaque-button-border-intensity: -8;
@@ -46,9 +66,9 @@
   --chart-3: 42 82% 50%;
   --chart-4: 280 65% 45%;
   --chart-5: 350 70% 50%;
-  --font-sans: Inter, system-ui, -apple-system, sans-serif;
+  --font-sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-serif: Georgia, serif;
-  --font-mono: Menlo, monospace;
+  --font-mono: "IBM Plex Mono", Menlo, monospace;
   --radius: .75rem;
   --shadow-2xs: 0 1px 2px rgba(15,23,42,.04);
   --shadow-xs: 0 1px 3px rgba(15,23,42,.06);
@@ -88,6 +108,26 @@
   --map-teal: 160 58% 55%;
   --map-navy: 210 65% 40%;
   --map-gold: 42 82% 60%;
+
+  /* MapAble brand palette (dark) */
+  --brand-blue: 207 73% 58%;
+  --brand-teal: 151 52% 52%;
+  --brand-gold: 42 82% 60%;
+  --brand-orange: 25 90% 60%;
+  /* Brand blue shades + navy for header / hero gradients (dark) */
+  --brand-blue-dark: 207 70% 26%;
+  --brand-blue-light: 205 70% 40%;
+  --brand-navy: 210 64% 22%;
+  --brand-navy-deep: 220 51% 9%;
+
+  /* Semantic status roles (dark) */
+  --success: 151 52% 50%;
+  --success-foreground: 0 0% 100%;
+  --warning: 28 90% 56%;
+  --warning-foreground: 30 40% 12%;
+  --info: 207 73% 60%;
+  --info-foreground: 0 0% 100%;
+
   --button-outline: rgba(255,255,255, .10);
   --badge-outline: rgba(255,255,255, .05);
   --opaque-button-border-intensity: 9;
@@ -304,10 +344,81 @@
   display: none !important;
 }
 .screen-reader-optimized *:focus {
-  outline: 3px solid #1B6EB5 !important;
+  outline: 3px solid hsl(var(--brand-blue)) !important;
   outline-offset: 2px;
 }
 .screen-reader-optimized .blur-3xl,
 .screen-reader-optimized [class*="opacity-[0.0"] {
   display: none !important;
+}
+
+/* ---- Motion primitives (calm brand accents) ---- */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes brand-gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+@keyframes status-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+
+@layer utilities {
+  .animate-fade-in { animation: fade-in 0.4s ease-out both; }
+  .animate-fade-up { animation: fade-up 0.45s ease-out both; }
+  .animate-scale-in { animation: scale-in 0.3s ease-out both; }
+  .animate-status-pulse { animation: status-pulse 2s ease-in-out infinite; }
+
+  /* Animated brand gradient surface */
+  .brand-gradient-animate {
+    background-size: 200% 200%;
+    animation: brand-gradient-shift 12s ease infinite;
+  }
+
+  /* App header bar (token-driven brand blue gradient) */
+  .bg-app-header {
+    background-image: linear-gradient(
+      90deg,
+      hsl(var(--brand-blue-dark)),
+      hsl(var(--brand-blue)),
+      hsl(var(--brand-blue-light))
+    );
+  }
+
+  /* Auth / hero full-screen brand gradient */
+  .bg-auth-hero {
+    background-image: linear-gradient(
+      135deg,
+      hsl(var(--brand-navy-deep)) 0%,
+      hsl(var(--brand-blue-dark)) 50%,
+      hsl(var(--brand-blue)) 100%
+    );
+  }
+}
+
+/* Respect reduced-motion: disable all decorative motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .brand-gradient-animate {
+    animation: none !important;
+  }
 }

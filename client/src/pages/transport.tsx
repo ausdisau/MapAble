@@ -16,18 +16,19 @@ import {
   Car,
   Accessibility,
   Calendar,
-  ArrowRight,
-  ShieldCheck,
   Star,
   DollarSign,
   Navigation,
   AlertCircle,
-  Map as MapIcon,
   Loader2,
   Check,
 } from "lucide-react";
 import { useState, useEffect, useRef, useMemo } from "react";
 import { usePageTitle } from "@/hooks/use-page-title";
+import { PageShell } from "@/components/layout/PageShell";
+import { EmptyState } from "@/components/layout/EmptyState";
+import { TripCard } from "@/components/shared/TripCard";
+import { VerificationBadge } from "@/components/shared/VerificationBadge";
 import { TransportRouteMap } from "@/features/geo/TransportRouteMap";
 import { MapView } from "@/features/geo/MapView";
 import { geoApi } from "@/features/geo/api";
@@ -102,7 +103,7 @@ function GeocodeInput({
         data-testid={testId}
       />
       {loading && <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 animate-spin text-muted-foreground" />}
-      {!loading && resolved && <Check className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500" data-testid={`${testId}-resolved`} />}
+      {!loading && resolved && <Check className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-brand-teal" data-testid={`${testId}-resolved`} />}
       {open && results.length > 0 && (
         <ul
           className="absolute z-30 mt-1 w-full max-h-56 overflow-auto rounded-md border bg-popover shadow-md"
@@ -198,7 +199,7 @@ function TransportBookingForm() {
 
   return (
     <Card className="overflow-visible">
-      <div className="rounded-t-md bg-gradient-to-r from-primary via-blue-600 to-indigo-700 dark:from-primary dark:via-blue-800 dark:to-indigo-900 px-5 py-4">
+      <div className="rounded-t-md bg-app-header px-5 py-4">
         <h2 className="text-lg font-black text-white flex items-center gap-2">
           <Bus className="w-5 h-5" /> Request Transport
         </h2>
@@ -223,7 +224,7 @@ function TransportBookingForm() {
             onChange={setDropoff}
             onResolved={setDropoffCoords}
             placeholder="Search destination..."
-            iconClass="text-emerald-500"
+            iconClass="text-brand-teal"
             testId="input-dropoff"
           />
         </div>
@@ -305,12 +306,13 @@ function TransportDrivers() {
 
   if (isError) {
     return (
-      <Card className="p-12 text-center">
-        <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-        <h3 className="font-bold text-lg mb-1">Something went wrong</h3>
-        <p className="text-sm text-muted-foreground mb-4">We couldn't load the data. Please try again.</p>
-        <Button onClick={() => refetch()} data-testid="button-retry">Try Again</Button>
-      </Card>
+      <EmptyState
+        icon={AlertCircle}
+        tone="error"
+        title="Something went wrong"
+        description="We couldn't load the data. Please try again."
+        action={<Button onClick={() => refetch()} data-testid="button-retry">Try Again</Button>}
+      />
     );
   }
 
@@ -336,16 +338,14 @@ function TransportDrivers() {
       {transportWorkers?.map((w) => (
         <Card key={w.id} className="p-4 hover-elevate">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-full bg-gradient-to-br from-blue-100 to-indigo-50 dark:from-blue-950/40 dark:to-indigo-950/30 flex items-center justify-center font-bold text-sm flex-shrink-0 text-primary">
+            <div className="w-11 h-11 rounded-full bg-gradient-to-br from-brand-blue/15 to-brand-blue/5 dark:from-brand-blue/25 dark:to-brand-blue/10 flex items-center justify-center font-bold text-sm flex-shrink-0 text-primary">
               {w.user?.fullName?.split(" ").map((n) => n[0]).join("") || "SW"}
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="font-bold text-sm truncate">{w.user?.fullName}</span>
                 {w.ndisVerified && (
-                  <Badge variant="secondary" className="gap-0.5 bg-green-100 dark:bg-green-950/50 text-green-800 dark:text-green-300 text-[10px]">
-                    <ShieldCheck className="w-3 h-3" /> Verified
-                  </Badge>
+                  <VerificationBadge label="Verified" className="text-[10px] gap-0.5" data-testid={`badge-verified-${w.id}`} />
                 )}
               </div>
               <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5 flex-wrap">
@@ -362,7 +362,7 @@ function TransportDrivers() {
                 </span>
                 {w.rating && Number(w.rating) > 0 && (
                   <span className="flex items-center gap-1">
-                    <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                    <Star className="w-3 h-3 fill-brand-gold text-brand-gold" />
                     {Number(w.rating).toFixed(1)}
                   </span>
                 )}
@@ -428,7 +428,7 @@ function TripLogger() {
 
   return (
     <Card className="overflow-hidden" data-testid="card-trip-logger">
-      <div className="bg-gradient-to-r from-[#2EAA6E] to-[#25905D] px-5 py-3">
+      <div className="bg-brand-teal px-5 py-3">
         <h3 className="font-bold text-sm text-white flex items-center gap-2">
           <Navigation className="w-4 h-4" /> Log a Trip
         </h3>
@@ -510,14 +510,6 @@ function RecentRequests() {
     queryKey: ["/api/transport"],
   });
 
-  const statusColors: Record<string, string> = {
-    requested: "bg-amber-100 dark:bg-amber-950/50 text-amber-800 dark:text-amber-300",
-    accepted: "bg-blue-100 dark:bg-blue-950/50 text-blue-800 dark:text-blue-300",
-    in_transit: "bg-violet-100 dark:bg-violet-950/50 text-violet-800 dark:text-violet-300",
-    completed: "bg-emerald-100 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300",
-    cancelled: "bg-red-100 dark:bg-red-950/50 text-red-800 dark:text-red-300",
-  };
-
   if (isLoading) {
     return (
       <Card className="p-4">
@@ -534,67 +526,19 @@ function RecentRequests() {
     <div className="space-y-3">
       <h2 className="text-lg font-black tracking-tight">Recent Requests</h2>
       {requests.map((r) => (
-        <RequestCard key={r.id} request={r} statusColors={statusColors} />
+        <TripCard key={r.id} request={r} />
       ))}
     </div>
-  );
-}
-
-function RequestCard({ request: r, statusColors }: { request: TransportRequest; statusColors: Record<string, string> }) {
-  const [showMap, setShowMap] = useState(false);
-  return (
-    <Card className="p-4 hover-elevate" data-testid={`card-request-${r.id}`}>
-      <div className="flex items-start justify-between gap-2 mb-2">
-        <div className="text-sm font-medium">
-          <div className="flex items-center gap-1.5">
-            <MapPin className="w-3 h-3 text-primary" />
-            {r.pickupLocation}
-          </div>
-          <div className="flex items-center gap-1.5 mt-1">
-            <ArrowRight className="w-3 h-3 text-emerald-500" />
-            {r.dropoffLocation}
-          </div>
-        </div>
-        <Badge className={statusColors[r.status] || ""}>{r.status.replace("_", " ")}</Badge>
-      </div>
-      <div className="flex items-center gap-3 text-xs text-muted-foreground flex-wrap">
-        <span className="flex items-center gap-1">
-          <Calendar className="w-3 h-3" /> {r.date}
-        </span>
-        <span className="flex items-center gap-1">
-          <Clock className="w-3 h-3" /> {r.time}
-        </span>
-        {r.wheelchairRequired && (
-          <span className="flex items-center gap-1">
-            <Accessibility className="w-3 h-3" /> Wheelchair
-          </span>
-        )}
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-6 px-2 ml-auto text-xs gap-1"
-          onClick={() => setShowMap((v) => !v)}
-          data-testid={`button-toggle-route-${r.id}`}
-        >
-          <MapIcon className="w-3 h-3" /> {showMap ? "Hide map" : "Show on map"}
-        </Button>
-      </div>
-      {showMap && <TransportRouteMap pickup={r.pickupLocation} dropoff={r.dropoffLocation} />}
-    </Card>
   );
 }
 
 export default function TransportPage() {
   usePageTitle("Get Transport");
   return (
-    <div className="p-4 md:p-6 max-w-7xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-2xl font-black tracking-tight" data-testid="text-page-title">Get Transport</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Book wheelchair accessible transport with verified NDIS drivers
-        </p>
-      </div>
-
+    <PageShell
+      title="Get Transport"
+      description="Book wheelchair accessible transport with verified NDIS drivers"
+    >
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1 space-y-6">
           <TransportBookingForm />
@@ -605,6 +549,6 @@ export default function TransportPage() {
           <TransportDrivers />
         </div>
       </div>
-    </div>
+    </PageShell>
   );
 }
