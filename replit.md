@@ -35,7 +35,8 @@ Participant-facing HITL AI features (Concepts B, C, E from `research/hitl-ai-dis
 - **Main Workflow**: `npm run dev` — Express + Vite on port 5000 (primary app)
 - **AgentMail Service**: `npx tsx server/agentmail-service.ts` (runs on port 3001 internally)
 - **DB push**: `npx drizzle-kit push`
-- **Chat guardrail rollout**: apply migration `migrations/0007_chat_guardrails_safeguarding.sql` before enabling chat/prep-brief traffic in a new environment; guardrail writes fail fast if these tables are missing.
+- **Chat guardrail rollout**: apply migration `migrations/0009_chat_guardrails_safeguarding.sql` before enabling chat/prep-brief traffic in a new environment; guardrail writes fail fast if these tables are missing.
+- **Migration history**: `drizzle-kit push` (schema-diff against the live DB) is the source of truth for schema setup; the numbered SQL files in `migrations/` are an ordered historical ledger and `migrations/meta/_journal.json` is the manifest of that order. Every SQL file has a matching journal entry (idx 0–11) and vice versa — keep them in lockstep. Hand-written migrations (0003 onward) are idempotent (`IF NOT EXISTS`); never edit an already-applied file's SQL, add a new numbered file instead.
 
 ## Environment Variables
 - `NEON_DATABASE_URL` / `DATABASE_URL` — Neon PostgreSQL connection string
