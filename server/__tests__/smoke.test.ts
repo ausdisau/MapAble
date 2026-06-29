@@ -1,6 +1,9 @@
 import { test, before, after, describe } from "node:test";
 import assert from "node:assert/strict";
 import { startTestServer, type TestServer } from "./helpers";
+import { registry, defaultIntentRouter, chatModules } from "../chat";
+import type { ChatContext } from "../chat";
+import { handoffModule } from "../chat/modules";
 
 let server: TestServer;
 
@@ -159,5 +162,125 @@ describe("API route smoke tests", () => {
       const { status } = await req("POST", "/api/auth/logout", {});
       assert.equal(status, 200);
     });
+  });
+});
+
+// The chat refactor must preserve the exact tool surface the monolithic engine
+// exposed. These checks guard against a module silently dropping a tool, the
+// registry failing to wire a handler, or the router losing always-on safety
+// modules / its fall-back-to-all behaviour.
+describe("MapAble Chat module registry + router parity", () => {
+  const EXPECTED_TOOLS = [
+    "get_user_profile",
+    "search_transport_workers",
+    "get_transport_pricing",
+    "book_transport",
+    "check_barrier_reports",
+    "submit_barrier_report",
+    "get_upcoming_shifts",
+    "book_shift",
+    "get_pending_invoices",
+    "get_budget_summary",
+    "get_ndis_plan_goals",
+    "search_grocery_products",
+    "get_grocery_orders",
+    "navigate_to_groceries",
+    "view_grocery_cart",
+    "log_incident_draft",
+    "log_complaint_draft",
+    "record_consent",
+    "flag_safeguarding_concern",
+    "escalate_to_human",
+  ].sort();
+
+  const ctx = {} as ChatContext;
+
+  test("registry exposes exactly the original tool set", () => {
+    const toolNames = registry
+      .getAllTools()
+      .map((t) => (t.type === "function" ? t.function.name : ""))
+      .sort();
+    assert.deepEqual(toolNames, EXPECTED_TOOLS);
+  });
+
+  test("every registered tool resolves to a handler", () => {
+    for (const tool of registry.getAllTools()) {
+      if (tool.type !== "function") continue;
+      assert.ok(
+        typeof registry.getHandler(tool.function.name) === "function",
+        `no handler wired for tool ${tool.function.name}`,
+      );
+    }
+  });
+
+  test("router always includes always-on modules (safeguarding/handoff/profile)", () => {
+    const selected = defaultIntentRouter.selectModules(
+      "what is the weather like",
+      chatModules,
+      ctx,
+    );
+    const names = selected.map((m) => m.name);
+    for (const required of ["profile", "safeguarding", "handoff"]) {
+      assert.ok(names.includes(required), `router dropped always-on module ${required}`);
+    }
+  });
+
+  test("router falls back to all modules on an ambiguous turn", () => {
+    const selected = defaultIntentRouter.selectModules("xyzzy", chatModules, ctx);
+    assert.equal(selected.length, chatModules.length);
+  });
+
+  test("router narrows to a keyword-matched module plus always-on modules", () => {
+    const selected = defaultIntentRouter.selectModules(
+      "I need wheelchair transport pricing",
+      chatModules,
+      ctx,
+    );
+    const names = selected.map((m) => m.name);
+    assert.ok(names.includes("transport"), "expected transport module to match");
+    assert.ok(names.includes("safeguarding"), "expected always-on safeguarding retained");
+    assert.ok(selected.length < chatModules.length, "expected narrowing, not full fallback");
+  });
+
+  test("escalate_to_human persists a handoff and acknowledges success", async () => {
+    const created: any[] = [];
+    const fakeCtx = {
+      sessionId: "s1",
+      userId: "u1",
+      channel: "web",
+      storage: {
+        createChatHandoff: async (data: any) => {
+          created.push(data);
+          return { id: "handoff-1", ...data };
+        },
+      },
+    } as unknown as ChatContext;
+
+    const raw = await handoffModule.handlers.escalate_to_human({ reason: "stuck" }, fakeCtx);
+    const out = JSON.parse(raw);
+    assert.equal(out.escalated, true);
+    assert.equal(out.handoffId, "handoff-1");
+    assert.equal(out.status, "requested");
+    assert.equal(created.length, 1);
+    assert.equal(created[0].sessionId, "s1");
+  });
+
+  test("escalate_to_human fails closed when persistence throws", async () => {
+    const fakeCtx = {
+      sessionId: "s1",
+      userId: "u1",
+      channel: "web",
+      storage: {
+        createChatHandoff: async () => {
+          throw new Error("db down");
+        },
+      },
+    } as unknown as ChatContext;
+
+    const raw = await handoffModule.handlers.escalate_to_human({ reason: "stuck" }, fakeCtx);
+    const out = JSON.parse(raw);
+    assert.equal(out.escalated, false, "must not claim escalation succeeded when DB insert failed");
+    assert.equal(out.handoffId, null);
+    assert.equal(out.status, "error");
   });
 });
