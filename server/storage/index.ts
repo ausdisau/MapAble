@@ -22,6 +22,7 @@ import {
   type GroceryOrderItem, type InsertGroceryOrderItem,
   type BecsMandate, type InsertBecsMandate,
   type NdisClaim, type InsertNdisClaim,
+  type ChatHandoff, type InsertChatHandoff,
   users, workers, bookings, jobs, transportRequests, messages,
   pricingTiers, serviceSessions, transportTrips, invoices, reviews, participantBudgets,
   accessContextProfiles, communityReports,
@@ -36,6 +37,7 @@ import { usersWorkersStorage } from "./users-workers";
   import { quickBooksStorage } from "./quickbooks";
   import { groceryStorage } from "./grocery";
   import { paymentsStorage } from "./payments";
+  import { chatStorage } from "./chat";
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
@@ -128,6 +130,11 @@ export interface IStorage {
   updateGroceryOrderPayment(id: string, data: { stripePaymentIntentId?: string; paymentStatus?: string }): Promise<GroceryOrder | undefined>;
   deleteGroceryOrder(id: string): Promise<boolean>;
   getActiveGroceryOrders(participantId: string): Promise<GroceryOrder[]>;
+
+  createChatHandoff(data: InsertChatHandoff): Promise<ChatHandoff>;
+  getChatHandoffs(status?: string): Promise<ChatHandoff[]>;
+  getChatHandoffsByUser(userId: string): Promise<ChatHandoff[]>;
+  updateChatHandoffStatus(id: string, data: { status?: string; assignedTo?: string | null; resolutionNotes?: string | null }): Promise<ChatHandoff | undefined>;
 
   createBecsMandate(data: InsertBecsMandate): Promise<BecsMandate>;
   getBecsMandates(userId: string): Promise<BecsMandate[]>;
@@ -515,6 +522,11 @@ export class DatabaseStorage implements IStorage {
   getInvoicesAwaitingAutoDebit(...a: Parameters<IStorage["getInvoicesAwaitingAutoDebit"]>) { return (paymentsStorage.getInvoicesAwaitingAutoDebit as any).apply(this, a); }
   recordPayoutEvent(...a: Parameters<IStorage["recordPayoutEvent"]>) { return (paymentsStorage.recordPayoutEvent as any).apply(this, a); }
   listPayoutEvents(...a: Parameters<IStorage["listPayoutEvents"]>) { return (paymentsStorage.listPayoutEvents as any).apply(this, a); }
+
+  createChatHandoff(...a: Parameters<IStorage["createChatHandoff"]>) { return (chatStorage.createChatHandoff as any).apply(this, a); }
+  getChatHandoffs(...a: Parameters<IStorage["getChatHandoffs"]>) { return (chatStorage.getChatHandoffs as any).apply(this, a); }
+  getChatHandoffsByUser(...a: Parameters<IStorage["getChatHandoffsByUser"]>) { return (chatStorage.getChatHandoffsByUser as any).apply(this, a); }
+  updateChatHandoffStatus(...a: Parameters<IStorage["updateChatHandoffStatus"]>) { return (chatStorage.updateChatHandoffStatus as any).apply(this, a); }
 }
 
 export const storage = new DatabaseStorage();

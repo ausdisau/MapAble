@@ -1,6 +1,6 @@
 import type { Express } from "express";
 import { storage } from "../storage";
-import { processChat, createChatSession, getUserSessions, getSessionMessages, deleteChatSession } from "../chat-engine";
+import { processInbound, webPlatformAdapter, createChatSession, getUserSessions, getSessionMessages, deleteChatSession } from "../chat-engine";
 import { getGuardrailAuditLogs } from "../chat-guardrails";
 import { requireAuth } from "./shared";
 
@@ -48,7 +48,12 @@ export function registerChatCommunityRoutes(app: Express) {
       const sessions = await getUserSessions(req.session.userId!);
       const owns = sessions.some((s) => s.id === sessionId);
       if (!owns) return res.status(403).json({ message: "Access denied" });
-      const response = await processChat(sessionId, req.session.userId!, message, clientContext);
+      const response = await processInbound(webPlatformAdapter, {
+        sessionId,
+        userId: req.session.userId!,
+        message,
+        clientContext,
+      });
       res.json(response);
     } catch (error) {
       console.error("Chat error:", error);
@@ -69,6 +74,45 @@ export function registerChatCommunityRoutes(app: Express) {
     } catch (error) {
       console.error("Guardrail audit error:", error);
       res.status(500).json({ message: "Failed to fetch guardrail audit logs" });
+    }
+  });
+
+  app.get("/api/admin/chat/handoffs", requireAuth, async (req, res) => {
+    try {
+      const user = await storage.getUser(req.session.userId!);
+      if (!user || user.role !== "admin") {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      const status = typeof req.query.status === "string" ? req.query.status : undefined;
+      const handoffs = await storage.getChatHandoffs(status);
+      res.json(handoffs);
+    } catch (error) {
+      console.error("Handoff list error:", error);
+      res.status(500).json({ message: "Failed to fetch handoffs" });
+    }
+  });
+
+  app.patch("/api/admin/chat/handoffs/:id", requireAuth, async (req, res) => {
+    try {
+      const user = await storage.getUser(req.session.userId!);
+      if (!user || user.role !== "admin") {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      const { status, resolutionNotes } = req.body || {};
+      const allowed = ["requested", "assigned", "resolved"];
+      if (status && !allowed.includes(status)) {
+        return res.status(400).json({ message: "Invalid status" });
+      }
+      const updated = await storage.updateChatHandoffStatus(String(req.params.id), {
+        status,
+        resolutionNotes,
+        assignedTo: status === "assigned" || status === "resolved" ? user.id : undefined,
+      });
+      if (!updated) return res.status(404).json({ message: "Handoff not found" });
+      res.json(updated);
+    } catch (error) {
+      console.error("Handoff update error:", error);
+      res.status(500).json({ message: "Failed to update handoff" });
     }
   });
 
