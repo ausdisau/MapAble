@@ -247,4 +247,31 @@ export const insertNdisClaimSchema = createInsertSchema(ndisClaims).omit({
 export type InsertNdisClaim = z.infer<typeof insertNdisClaimSchema>;
 export type NdisClaim = typeof ndisClaims.$inferSelect;
 
+/**
+ * Same as {@link NdisClaim} but with the money/decimal fields as numbers.
+ *
+ * Postgres returns `decimal` columns (quantity, unitPrice, totalAmount) as
+ * strings. Any arithmetic on the raw strings produces NaN, so reporting,
+ * aggregation and API responses should read claims through
+ * {@link toNumericNdisClaim} / {@link toNumericNdisClaims} first.
+ */
+export type NdisClaimNumeric = Omit<NdisClaim, "quantity" | "unitPrice" | "totalAmount"> & {
+  quantity: number;
+  unitPrice: number;
+  totalAmount: number;
+};
+
+export function toNumericNdisClaim(claim: NdisClaim): NdisClaimNumeric {
+  return {
+    ...claim,
+    quantity: Number(claim.quantity),
+    unitPrice: Number(claim.unitPrice),
+    totalAmount: Number(claim.totalAmount),
+  };
+}
+
+export function toNumericNdisClaims(claims: NdisClaim[]): NdisClaimNumeric[] {
+  return claims.map(toNumericNdisClaim);
+}
+
 export type StripeWebhookEvent = typeof stripeWebhookEvents.$inferSelect;
