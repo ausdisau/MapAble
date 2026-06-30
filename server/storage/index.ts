@@ -81,7 +81,9 @@ export interface IStorage {
   getAccessProfile(userId: string): Promise<AccessContextProfile | undefined>;
   upsertAccessProfile(userId: string, data: Partial<InsertAccessContextProfile>): Promise<AccessContextProfile>;
   getCommunityReports(): Promise<CommunityReport[]>;
+  getCommunityReportsByReporter(userId: string): Promise<CommunityReport[]>;
   createCommunityReport(data: InsertCommunityReport): Promise<CommunityReport>;
+  updateCommunityReport(id: string, reporterUserId: string, data: Partial<InsertCommunityReport>): Promise<CommunityReport | undefined>;
   updateUserStripeCustomerId(userId: string, stripeCustomerId: string): Promise<User | undefined>;
   updateUserOrbIds(userId: string, orbCustomerId: string, orbSubscriptionId: string | null): Promise<User | undefined>;
   getInvoiceById(id: string): Promise<Invoice | undefined>;
@@ -321,8 +323,16 @@ export class DatabaseStorage implements IStorage {
     return (billingStorage.getCommunityReports as any).apply(this, args);
   }
 
+  getCommunityReportsByReporter(...args: Parameters<IStorage["getCommunityReportsByReporter"]>): ReturnType<IStorage["getCommunityReportsByReporter"]> {
+    return (billingStorage.getCommunityReportsByReporter as any).apply(this, args);
+  }
+
   createCommunityReport(...args: Parameters<IStorage["createCommunityReport"]>): ReturnType<IStorage["createCommunityReport"]> {
     return (billingStorage.createCommunityReport as any).apply(this, args);
+  }
+
+  updateCommunityReport(...args: Parameters<IStorage["updateCommunityReport"]>): ReturnType<IStorage["updateCommunityReport"]> {
+    return (billingStorage.updateCommunityReport as any).apply(this, args);
   }
 
   updateUserStripeCustomerId(...args: Parameters<IStorage["updateUserStripeCustomerId"]>): ReturnType<IStorage["updateUserStripeCustomerId"]> {

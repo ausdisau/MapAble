@@ -83,10 +83,20 @@ export function ChatTab({
       const res = await apiRequest("POST", sendEndpoint, { sessionId, message });
       return res.json() as Promise<ChatResponse>;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       setPendingMessages([]);
       queryClient.invalidateQueries({ queryKey: [sessionsEndpoint, activeSessionId, "messages"] });
       queryClient.invalidateQueries({ queryKey: [sessionsEndpoint] });
+      const toolsUsed = data?.toolsUsed || [];
+      if (toolsUsed.includes("update_user_profile")) {
+        queryClient.invalidateQueries({ queryKey: ["/api/access-profile"] });
+      }
+      if (
+        toolsUsed.includes("submit_barrier_report") ||
+        toolsUsed.includes("update_barrier_report")
+      ) {
+        queryClient.invalidateQueries({ queryKey: ["/api/community-reports"] });
+      }
     },
     onError: () => setPendingMessages([]),
   });

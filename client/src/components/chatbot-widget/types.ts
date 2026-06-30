@@ -55,7 +55,9 @@ export type ActionKey =
   | "book_transport"
   | "create_job_post"
   | "ask_ndis_funding"
-  | "contact_support";
+  | "contact_support"
+  | "update_profile"
+  | "edit_barrier_report";
 
 export const DEFAULT_WIDGET_CONFIG: WidgetConfig = {
   enabled: true,

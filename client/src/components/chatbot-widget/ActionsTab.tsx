@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { HeartHandshake, Bus, Briefcase, HelpCircle, Phone } from "lucide-react";
+import { HeartHandshake, Bus, Briefcase, HelpCircle, Phone, UserCog, Flag } from "lucide-react";
 import type { ActionKey, FeatureFlags } from "./types";
 
 interface ActionDef {
@@ -29,6 +29,18 @@ const ACTIONS: ActionDef[] = [
     description: "Post a disability support role for workers to apply.",
     icon: Briefcase,
     requiresFlag: "matchingEnabled",
+  },
+  {
+    key: "update_profile",
+    title: "Update my profile",
+    description: "Change your access profile by chatting — mobility, stairs, sensory and more.",
+    icon: UserCog,
+  },
+  {
+    key: "edit_barrier_report",
+    title: "Edit a barrier report",
+    description: "Update or review a barrier report you've submitted.",
+    icon: Flag,
   },
   {
     key: "ask_ndis_funding",

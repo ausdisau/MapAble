@@ -23,6 +23,8 @@ const ACTION_SEEDS: Record<ActionKey, string> = {
   create_job_post: "I want to create a job post for a support worker role.",
   ask_ndis_funding: "Can you help me understand my NDIS funding?",
   contact_support: "I'd like to talk to a real person from the MapAble team.",
+  update_profile: "I'd like to update my access profile. Can you show me my current settings first?",
+  edit_barrier_report: "I'd like to edit one of my barrier reports. Can you show me the ones I've submitted?",
 };
 
 export function ChatbotWidget({ savedDrafts = [], pendingActions = [] }: ChatbotWidgetProps) {
