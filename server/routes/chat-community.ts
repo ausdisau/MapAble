@@ -1,7 +1,14 @@
 import type { Express } from "express";
 import { storage } from "../storage";
 import { processInbound, webPlatformAdapter, createChatSession, getUserSessions, getSessionMessages, deleteChatSession } from "../chat-engine";
-import { getGuardrailAuditLogs } from "../chat-guardrails";
+import {
+  getGuardrailAuditLogs,
+  getSafeguardingQueue,
+  updateSafeguardingItem,
+  SAFEGUARDING_ITEM_KINDS,
+  SAFEGUARDING_QUEUE_STATUSES,
+  type SafeguardingItemKind,
+} from "../chat-guardrails";
 import { requireAuth } from "./shared";
 
 export function registerChatCommunityRoutes(app: Express) {
@@ -113,6 +120,52 @@ export function registerChatCommunityRoutes(app: Express) {
     } catch (error) {
       console.error("Handoff update error:", error);
       res.status(500).json({ message: "Failed to update handoff" });
+    }
+  });
+
+  app.get("/api/admin/chat/safeguarding", requireAuth, async (req, res) => {
+    try {
+      const user = await storage.getUser(req.session.userId!);
+      if (!user || (user.role !== "admin" && user.role !== "provider")) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      const status = typeof req.query.status === "string" ? req.query.status : undefined;
+      const items = await getSafeguardingQueue(status);
+      res.json(items);
+    } catch (error) {
+      console.error("Safeguarding queue error:", error);
+      res.status(500).json({ message: "Failed to fetch safeguarding queue" });
+    }
+  });
+
+  app.patch("/api/admin/chat/safeguarding/:kind/:id", requireAuth, async (req, res) => {
+    try {
+      const user = await storage.getUser(req.session.userId!);
+      if (!user || (user.role !== "admin" && user.role !== "provider")) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      const kind = req.params.kind as SafeguardingItemKind;
+      if (!SAFEGUARDING_ITEM_KINDS.includes(kind)) {
+        return res.status(400).json({ message: "Invalid item kind" });
+      }
+      const { status, reviewNotes } = req.body || {};
+      if (status !== undefined && !SAFEGUARDING_QUEUE_STATUSES.includes(status)) {
+        return res.status(400).json({ message: "Invalid status" });
+      }
+      if (reviewNotes !== undefined && reviewNotes !== null && typeof reviewNotes !== "string") {
+        return res.status(400).json({ message: "Invalid review notes" });
+      }
+      const assignedTo = status === "in_review" || status === "closed" ? user.id : undefined;
+      const updated = await updateSafeguardingItem(kind, String(req.params.id), {
+        status,
+        reviewNotes,
+        assignedTo,
+      });
+      if (!updated) return res.status(404).json({ message: "Safeguarding item not found" });
+      res.json(updated);
+    } catch (error) {
+      console.error("Safeguarding update error:", error);
+      res.status(500).json({ message: "Failed to update safeguarding item" });
     }
   });
 

@@ -27,3 +27,11 @@ exactly — do NOT add indexes that aren't in the schema, or `push` will try to 
 them (drift). Validate with `psql "$NEON_DATABASE_URL" -v ON_ERROR_STOP=1 -f <file>`.
 Avoid running `push` blindly: it currently wants to drop unrelated Provider/
 ServiceLocation tables (pre-existing schema drift).
+
+**`push` HANGS in the agent shell:** `drizzle-kit push` is interactive — it prompts
+for confirmation on column/table changes (and on the drift drops above) and there is
+no TTY, so the command silently times out / exits with no output and applies nothing.
+Do NOT rely on `push` to apply changes here. Instead apply your idempotent numbered
+SQL file directly: `psql "$NEON_DATABASE_URL" -f migrations/<file>.sql`, then verify
+with an `information_schema.columns` query. The app reads NEON_DATABASE_URL, not
+DATABASE_URL.
