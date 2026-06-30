@@ -76,7 +76,10 @@ export const safeguardingIncidentDrafts = pgTable("safeguarding_incident_drafts"
   investigationSummary: text("investigation_summary"),
   correctiveActions: text("corrective_actions"),
   status: text("status").notNull().default("draft"),
+  assignedTo: varchar("assigned_to"),
+  reviewNotes: text("review_notes"),
   createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export const safeguardingComplaintDrafts = pgTable("safeguarding_complaint_drafts", {
@@ -90,7 +93,10 @@ export const safeguardingComplaintDrafts = pgTable("safeguarding_complaint_draft
   appeal: boolean("appeal").notNull().default(false),
   improvementsLogged: text("improvements_logged"),
   status: text("status").notNull().default("draft"),
+  assignedTo: varchar("assigned_to"),
+  reviewNotes: text("review_notes"),
   createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export const safeguardingConsentRecords = pgTable("safeguarding_consent_records", {
@@ -101,7 +107,11 @@ export const safeguardingConsentRecords = pgTable("safeguarding_consent_records"
   scope: text("scope").notNull(),
   granted: boolean("granted").notNull(),
   evidence: text("evidence"),
+  status: text("status").notNull().default("open"),
+  assignedTo: varchar("assigned_to"),
+  reviewNotes: text("review_notes"),
   createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export const safeguardingConcernFlags = pgTable("safeguarding_concern_flags", {
@@ -112,7 +122,10 @@ export const safeguardingConcernFlags = pgTable("safeguarding_concern_flags", {
   summary: text("summary").notNull(),
   severity: text("severity").notNull().default("medium"),
   status: text("status").notNull().default("needs_review"),
+  assignedTo: varchar("assigned_to"),
+  reviewNotes: text("review_notes"),
   createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export const chatHandoffs = pgTable("chat_handoffs", {
@@ -167,21 +180,25 @@ export const insertChatGuardrailAuditLogSchema = createInsertSchema(chatGuardrai
 export const insertSafeguardingIncidentDraftSchema = createInsertSchema(safeguardingIncidentDrafts).omit({
   id: true,
   createdAt: true,
+  updatedAt: true,
 });
 
 export const insertSafeguardingComplaintDraftSchema = createInsertSchema(safeguardingComplaintDrafts).omit({
   id: true,
   createdAt: true,
+  updatedAt: true,
 });
 
 export const insertSafeguardingConsentRecordSchema = createInsertSchema(safeguardingConsentRecords).omit({
   id: true,
   createdAt: true,
+  updatedAt: true,
 });
 
 export const insertSafeguardingConcernFlagSchema = createInsertSchema(safeguardingConcernFlags).omit({
   id: true,
   createdAt: true,
+  updatedAt: true,
 });
 
 export const insertChatHandoffSchema = createInsertSchema(chatHandoffs).omit({

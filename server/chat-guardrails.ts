@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { desc } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import { readFileSync } from "fs";
 import { db } from "./db";
 import {
@@ -468,4 +468,214 @@ export async function getGuardrailAuditLogs(limit = 100, includeRaw = false) {
     output: includeRaw ? log.output : undefined,
     rawContentIncluded: includeRaw,
   }));
+}
+
+// ---------------------------------------------------------------------------
+// Safeguarding follow-up queue
+//
+// Staff (admin/provider) review incident drafts, complaint drafts, consent
+// records and safeguarding flags from one queue: update status, add review
+// notes, assign and close items. Each item links back to its chat session and
+// the policy references that apply to its type.
+// ---------------------------------------------------------------------------
+
+export type SafeguardingItemKind = "incident" | "complaint" | "consent" | "flag";
+
+export const SAFEGUARDING_ITEM_KINDS: SafeguardingItemKind[] = ["incident", "complaint", "consent", "flag"];
+
+// Canonical lifecycle staff can move an item through. Items may start in their
+// native creation status (e.g. "draft", "needs_review", "open"); "closed" is the
+// shared terminal state used to clear an item from the open queue.
+export const SAFEGUARDING_QUEUE_STATUSES = ["open", "in_review", "closed"] as const;
+export type SafeguardingQueueStatus = typeof SAFEGUARDING_QUEUE_STATUSES[number];
+
+export interface SafeguardingQueueItem {
+  id: string;
+  kind: SafeguardingItemKind;
+  sessionId: string;
+  userId: string;
+  status: string;
+  assignedTo: string | null;
+  reviewNotes: string | null;
+  title: string;
+  detail: string;
+  severity: string | null;
+  reportable: boolean | null;
+  granted: boolean | null;
+  policyRefs: string[];
+  createdAt: Date | null;
+  updatedAt: Date | null;
+}
+
+export function policyRefsForKind(kind: SafeguardingItemKind): string[] {
+  switch (kind) {
+    case "incident":
+      return uniq([POLICY_PACK.refs.incidents, POLICY_PACK.refs.quality]);
+    case "complaint":
+      return uniq([POLICY_PACK.refs.complaints, POLICY_PACK.refs.quality]);
+    case "consent":
+      return uniq([POLICY_PACK.refs.privacy, POLICY_PACK.refs.retention]);
+    case "flag":
+      return uniq([POLICY_PACK.refs.quality, POLICY_PACK.refs.incidents]);
+  }
+}
+
+function isOpenStatus(status: string): boolean {
+  return status !== "closed" && status !== "resolved";
+}
+
+/**
+ * Returns the unified safeguarding follow-up queue across all four record types,
+ * newest first. Pass status="open" to return only items still needing attention
+ * (anything not closed/resolved), or a specific status to filter exactly.
+ */
+export async function getSafeguardingQueue(status?: string): Promise<SafeguardingQueueItem[]> {
+  await ensureGuardrailTables();
+
+  const [incidents, complaints, consents, flags] = await Promise.all([
+    db.select().from(safeguardingIncidentDrafts).orderBy(desc(safeguardingIncidentDrafts.createdAt)),
+    db.select().from(safeguardingComplaintDrafts).orderBy(desc(safeguardingComplaintDrafts.createdAt)),
+    db.select().from(safeguardingConsentRecords).orderBy(desc(safeguardingConsentRecords.createdAt)),
+    db.select().from(safeguardingConcernFlags).orderBy(desc(safeguardingConcernFlags.createdAt)),
+  ]);
+
+  const items: SafeguardingQueueItem[] = [];
+
+  for (const row of incidents) {
+    items.push({
+      id: row.id,
+      kind: "incident",
+      sessionId: row.sessionId,
+      userId: row.userId,
+      status: row.status,
+      assignedTo: row.assignedTo ?? null,
+      reviewNotes: row.reviewNotes ?? null,
+      title: `Incident draft — ${row.incidentType}`,
+      detail: row.investigationSummary || row.immediateActions,
+      severity: row.reportable ? "reportable" : null,
+      reportable: row.reportable,
+      granted: null,
+      policyRefs: policyRefsForKind("incident"),
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt ?? row.createdAt,
+    });
+  }
+
+  for (const row of complaints) {
+    items.push({
+      id: row.id,
+      kind: "complaint",
+      sessionId: row.sessionId,
+      userId: row.userId,
+      status: row.status,
+      assignedTo: row.assignedTo ?? null,
+      reviewNotes: row.reviewNotes ?? null,
+      title: `Complaint draft — raised by ${row.raisedBy}`,
+      detail: row.issue,
+      severity: null,
+      reportable: null,
+      granted: null,
+      policyRefs: policyRefsForKind("complaint"),
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt ?? row.createdAt,
+    });
+  }
+
+  for (const row of consents) {
+    items.push({
+      id: row.id,
+      kind: "consent",
+      sessionId: row.sessionId,
+      userId: row.userId,
+      status: row.status,
+      assignedTo: row.assignedTo ?? null,
+      reviewNotes: row.reviewNotes ?? null,
+      title: `Consent record — ${row.granted ? "granted" : "declined"}`,
+      detail: `${row.subject}: ${row.scope}`,
+      severity: null,
+      reportable: null,
+      granted: row.granted,
+      policyRefs: policyRefsForKind("consent"),
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt ?? row.createdAt,
+    });
+  }
+
+  for (const row of flags) {
+    items.push({
+      id: row.id,
+      kind: "flag",
+      sessionId: row.sessionId,
+      userId: row.userId,
+      status: row.status,
+      assignedTo: row.assignedTo ?? null,
+      reviewNotes: row.reviewNotes ?? null,
+      title: `Safeguarding flag — ${row.concernType}`,
+      detail: row.summary,
+      severity: row.severity,
+      reportable: null,
+      granted: null,
+      policyRefs: policyRefsForKind("flag"),
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt ?? row.createdAt,
+    });
+  }
+
+  const filtered = status === "open"
+    ? items.filter((item) => isOpenStatus(item.status))
+    : status
+      ? items.filter((item) => item.status === status)
+      : items;
+
+  return filtered.sort((a, b) => {
+    const at = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+    const bt = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+    return bt - at;
+  });
+}
+
+/**
+ * Updates one safeguarding queue item (status / review notes / assignee) and
+ * returns it in the same normalized shape as the queue, or undefined if not
+ * found.
+ */
+export async function updateSafeguardingItem(
+  kind: SafeguardingItemKind,
+  id: string,
+  data: { status?: string; reviewNotes?: string | null; assignedTo?: string | null },
+): Promise<SafeguardingQueueItem | undefined> {
+  await ensureGuardrailTables();
+
+  const patch: Record<string, unknown> = { updatedAt: new Date() };
+  if (data.status !== undefined) patch.status = data.status;
+  if (data.reviewNotes !== undefined) patch.reviewNotes = data.reviewNotes;
+  if (data.assignedTo !== undefined) patch.assignedTo = data.assignedTo;
+
+  let updatedId: string | undefined;
+  switch (kind) {
+    case "incident": {
+      const [row] = await db.update(safeguardingIncidentDrafts).set(patch).where(eq(safeguardingIncidentDrafts.id, id)).returning();
+      updatedId = row?.id;
+      break;
+    }
+    case "complaint": {
+      const [row] = await db.update(safeguardingComplaintDrafts).set(patch).where(eq(safeguardingComplaintDrafts.id, id)).returning();
+      updatedId = row?.id;
+      break;
+    }
+    case "consent": {
+      const [row] = await db.update(safeguardingConsentRecords).set(patch).where(eq(safeguardingConsentRecords.id, id)).returning();
+      updatedId = row?.id;
+      break;
+    }
+    case "flag": {
+      const [row] = await db.update(safeguardingConcernFlags).set(patch).where(eq(safeguardingConcernFlags.id, id)).returning();
+      updatedId = row?.id;
+      break;
+    }
+  }
+
+  if (!updatedId) return undefined;
+  const queue = await getSafeguardingQueue();
+  return queue.find((item) => item.kind === kind && item.id === updatedId);
 }
