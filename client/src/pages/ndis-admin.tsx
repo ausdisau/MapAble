@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2, RefreshCw, ShieldCheck, ShieldOff } from "lucide-react";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import type { NdisClaim } from "@shared/schema";
+import type { NdisClaimNumeric } from "@shared/schema";
 
 interface IntegrationStatus {
   configured: boolean;
@@ -22,7 +22,7 @@ interface IntegrationStatus {
 export default function NdisAdminPage() {
   const { toast } = useToast();
   const { data: status, isLoading: loadingStatus } = useQuery<IntegrationStatus>({ queryKey: ["/api/ndis/integration-status"] });
-  const { data: claims, isLoading: loadingClaims } = useQuery<NdisClaim[]>({ queryKey: ["/api/ndis/claims"] });
+  const { data: claims, isLoading: loadingClaims } = useQuery<NdisClaimNumeric[]>({ queryKey: ["/api/ndis/claims"] });
 
   const syncPriceGuide = useMutation({
     mutationFn: async () => {

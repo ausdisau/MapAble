@@ -5,6 +5,7 @@ import { getProdaIntegrationStatus, getRecentClaims, fetchPriceGuide, prodaConfi
 import { orbEnabled, getCustomerUsage, verifyAndUnwrapWebhook } from "../orb";
 import { qbEnabled, pushInvoiceToQb } from "../quickbooks";
 import { requireAuth, provisionOrbBilling } from "./shared";
+import { toNumericNdisClaims } from "@shared/schema";
 
 export function registerPaymentRoutes(app: Express) {
   app.get("/api/stripe/config", (_req, res) => {
@@ -579,14 +580,14 @@ export function registerPaymentRoutes(app: Express) {
     const limit = Math.min(Number(req.query.limit) || 20, 100);
     if (user.role === "admin") {
       const claims = await getRecentClaims(limit);
-      return res.json(claims);
+      return res.json(toNumericNdisClaims(claims));
     }
     if (user.role === "provider") {
       const claims = await storage.getNdisClaims({ providerId: user.id, limit });
-      return res.json(claims);
+      return res.json(toNumericNdisClaims(claims));
     }
     const claims = await storage.getNdisClaims({ participantId: user.id, limit });
-    res.json(claims);
+    res.json(toNumericNdisClaims(claims));
   });
 
   app.post("/api/webhooks/orb", async (req, res) => {

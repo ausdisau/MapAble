@@ -4,6 +4,7 @@ import { startTestServer, type TestServer } from "./helpers";
 import { registry, defaultIntentRouter, chatModules } from "../chat";
 import type { ChatContext } from "../chat";
 import { handoffModule } from "../chat/modules";
+import { toNumericNdisClaim, toNumericNdisClaims, type NdisClaim } from "@shared/schema";
 
 let server: TestServer;
 
@@ -282,5 +283,37 @@ describe("MapAble Chat module registry + router parity", () => {
     assert.equal(out.escalated, false, "must not claim escalation succeeded when DB insert failed");
     assert.equal(out.handoffId, null);
     assert.equal(out.status, "error");
+  });
+});
+
+describe("ndis claim money casting", () => {
+  test("casts string decimal money fields to numbers without NaN", () => {
+    const raw = {
+      id: "c1",
+      quantity: "2.00",
+      unitPrice: "70.23",
+      totalAmount: "140.46",
+      itemCode: "01_011_0107_1_1",
+      status: "submitted",
+    } as unknown as NdisClaim;
+
+    const c = toNumericNdisClaim(raw);
+    assert.equal(typeof c.quantity, "number");
+    assert.equal(typeof c.unitPrice, "number");
+    assert.equal(typeof c.totalAmount, "number");
+    assert.equal(c.quantity * c.unitPrice, 140.46);
+    assert.ok(!Number.isNaN(c.totalAmount));
+    // non-money fields are preserved verbatim
+    assert.equal(c.itemCode, "01_011_0107_1_1");
+    assert.equal(c.status, "submitted");
+  });
+
+  test("toNumericNdisClaims sums totals without NaN", () => {
+    const rows = [
+      { totalAmount: "10.50", quantity: "1", unitPrice: "10.50" },
+      { totalAmount: "5.25", quantity: "1", unitPrice: "5.25" },
+    ] as unknown as NdisClaim[];
+    const total = toNumericNdisClaims(rows).reduce((s, c) => s + c.totalAmount, 0);
+    assert.equal(total, 15.75);
   });
 });
