@@ -11,6 +11,9 @@ MapAble 4.0 is a fullstack TypeScript superapp combining core NDIS services:
 - **Email** - AgentMail integration for sending/receiving emails (shift confirmations, invoices, support)
 - **ABN Lookup** - Australian Business Number validation and ABR registry lookup
 
+## From-Scratch LLM (Cursor, not Replit)
+MapAble's own from-scratch PyTorch LLM (tokenizer → pretraining → MoE → SFT → RM → RLHF → OpenAI-compatible inference server → `CHAT_LLM_PROVIDER` switch) is fully specified in `docs/llm/mapable-llm-spec.md`. That work is **intended to be executed in Cursor in a separate GPU-capable environment, not in Replit** — do not start building training/inference code or PyTorch deps here. The only Replit-side change is the eventual provider seam (spec §13, milestone M8), which keeps `CHAT_LLM_PROVIDER=openai` as the default.
+
 ## Co-Design Gate
 Participant-facing HITL AI features (Concepts B, C, E from `research/hitl-ai-disability-services-au.md`) are gated by `docs/co-design-protocol.md` — engagement charter with PWDA / AFDO / FPDN / Inclusion Australia, consent and transparency template, harms escalation path, and accessible-formats spec (Easy Read, AAC, Auslan, key community languages). No build on those concepts before the protocol's S0/S1 stages are signed off by the relevant DROs.
 
