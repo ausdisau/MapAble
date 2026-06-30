@@ -383,7 +383,9 @@ export class WoolworthsAdapter implements GrocerySupplierAdapter {
     const searchPath = process.env.WOOLWORTHS_API_SEARCH_PATH || "/product/v1/products/search";
     const searchParam = process.env.WOOLWORTHS_API_SEARCH_PARAM || "searchTerm";
     const limitParam = process.env.WOOLWORTHS_API_LIMIT_PARAM || "pageSize";
+    const storeParam = process.env.WOOLWORTHS_API_STORE_PARAM || "storeId";
     const key = process.env.WOOLWORTHS_API_KEY!;
+    const location = getEffectiveSupplierLocation(this.name);
     try {
       return await fetchSearchProducts({
         supplier: this.name,
@@ -392,6 +394,8 @@ export class WoolworthsAdapter implements GrocerySupplierAdapter {
           const url = new URL(searchPath, baseUrl);
           url.searchParams.set(searchParam, term);
           url.searchParams.set(limitParam, String(perTermLimit));
+          if (location.storeId) url.searchParams.set(storeParam, location.storeId);
+          if (location.postcode) url.searchParams.set("postcode", location.postcode);
           return {
             url: url.toString(),
             tags: [term],
@@ -411,6 +415,7 @@ export class WoolworthsAdapter implements GrocerySupplierAdapter {
   }
 
   private async fetchPublicStorefront(limit: number): Promise<SupplierProductInput[]> {
+    const location = getEffectiveSupplierLocation(this.name);
     try {
       return await fetchSearchProducts({
         supplier: this.name,
@@ -432,6 +437,7 @@ export class WoolworthsAdapter implements GrocerySupplierAdapter {
               SortType: "TraderRelevance",
               Filters: [],
               Location: `/shop/search/products?searchTerm=${encodeURIComponent(term)}`,
+              ...(location.storeId ? { StoreId: location.storeId } : {}),
             }),
           },
         }),
@@ -448,7 +454,8 @@ export class ColesAdapter implements GrocerySupplierAdapter {
 
   async fetchProducts({ limit }: { limit: number }): Promise<SupplierProductInput[]> {
     const baseUrl = process.env.COLES_API_BASE_URL || "https://apigw.coles.com.au/digital/colesappbff";
-    const storeId = process.env.COLES_STORE_ID || "0584";
+    const location = getEffectiveSupplierLocation(this.name);
+    const storeId = location.storeId || "0584";
     try {
       return await fetchSearchProducts({
         supplier: this.name,
@@ -457,6 +464,7 @@ export class ColesAdapter implements GrocerySupplierAdapter {
           const url = new URL("/v2/products/search", baseUrl);
           url.searchParams.set("searchTerm", term);
           url.searchParams.set("storeId", storeId);
+          if (location.postcode) url.searchParams.set("postcode", location.postcode);
           url.searchParams.set("start", "0");
           url.searchParams.set("limit", String(perTermLimit));
           return {
@@ -480,6 +488,7 @@ export class IgaAdapter implements GrocerySupplierAdapter {
     const baseUrl = process.env.IGA_API_BASE_URL || "https://www.igashop.com.au";
     const searchPath = process.env.IGA_API_SEARCH_PATH || "/api/products/search";
     const searchParam = process.env.IGA_API_SEARCH_PARAM || "q";
+    const location = getEffectiveSupplierLocation(this.name);
     try {
       return await fetchSearchProducts({
         supplier: this.name,
@@ -488,6 +497,8 @@ export class IgaAdapter implements GrocerySupplierAdapter {
           const url = new URL(searchPath, baseUrl);
           url.searchParams.set(searchParam, term);
           url.searchParams.set("limit", String(perTermLimit));
+          if (location.storeId) url.searchParams.set("storeId", location.storeId);
+          if (location.postcode) url.searchParams.set("postcode", location.postcode);
           return { url: url.toString(), tags: [term] };
         },
       });
@@ -655,6 +666,83 @@ export function getSupplierProvider(): string {
   return (process.env.GROCERY_SUPPLIER_PROVIDER || "openfoodfacts").toLowerCase();
 }
 
+export interface SupplierLocation {
+  storeId: string | null;
+  postcode: string | null;
+  suburb: string | null;
+}
+
+const COMPOSITE_ALIASES = ["composite", "firstavailable", "first-available"];
+
+function cleanEnv(value: string | undefined): string | null {
+  if (value === undefined || value === null) return null;
+  const text = String(value).trim();
+  return text || null;
+}
+
+// Resolves the configured store/location for a provider. A provider-specific
+// value (e.g. WOOLWORTHS_STORE_ID) takes precedence over the generic
+// GROCERY_SUPPLIER_* fallback so operators can set one default and override
+// individual chains. Composite providers have no location of their own — each
+// child adapter resolves its own location at request time.
+export function resolveSupplierLocation(provider: string): SupplierLocation {
+  const key = provider.trim().toUpperCase().replace(/[^A-Z0-9]+/g, "_");
+  const pick = (suffix: string) =>
+    cleanEnv(process.env[`${key}_${suffix}`]) ?? cleanEnv(process.env[`GROCERY_SUPPLIER_${suffix}`]);
+  return {
+    storeId: pick("STORE_ID"),
+    postcode: pick("POSTCODE"),
+    suburb: pick("SUBURB"),
+  };
+}
+
+// Provider-specific location defaults applied when the operator has not
+// configured a store/location. Coles' BFF requires a store id, so we fall back
+// to a Sydney metro store rather than failing the request.
+const PROVIDER_LOCATION_DEFAULTS: Record<string, Partial<SupplierLocation>> = {
+  coles: { storeId: "0584" },
+};
+
+// The location actually used for a provider's requests: the configured location
+// with provider defaults filled in. Used both when issuing requests and when
+// reporting which store/location the latest sync used, so the two never drift.
+export function getEffectiveSupplierLocation(provider: string): SupplierLocation {
+  const resolved = resolveSupplierLocation(provider);
+  const defaults = PROVIDER_LOCATION_DEFAULTS[provider.trim().toLowerCase()] ?? {};
+  return {
+    storeId: resolved.storeId ?? defaults.storeId ?? null,
+    postcode: resolved.postcode ?? defaults.postcode ?? null,
+    suburb: resolved.suburb ?? defaults.suburb ?? null,
+  };
+}
+
+export function hasSupplierLocation(location: SupplierLocation): boolean {
+  return !!(location.storeId || location.postcode || location.suburb);
+}
+
+export function describeSupplierLocation(location: SupplierLocation): string | null {
+  const parts: string[] = [];
+  if (location.storeId) parts.push(`store ${location.storeId}`);
+  if (location.suburb) parts.push(location.suburb);
+  if (location.postcode) parts.push(location.postcode);
+  return parts.length ? parts.join(", ") : null;
+}
+
+export interface LastSyncMeta {
+  provider: string;
+  location: SupplierLocation;
+  locationLabel: string | null;
+  syncedAt: string;
+  fetched: number;
+  upserted: number;
+}
+
+let lastSyncMeta: LastSyncMeta | null = null;
+
+export function getLastSyncMeta(): LastSyncMeta | null {
+  return lastSyncMeta;
+}
+
 export function buildAdapter(provider = getSupplierProvider()): GrocerySupplierAdapter {
   const normalised = provider.trim().toLowerCase();
   switch (normalised) {
@@ -682,7 +770,7 @@ function buildCompositeAdapter(): GrocerySupplierAdapter {
     .split(",")
     .map((provider) => provider.trim().toLowerCase())
     .filter(Boolean)
-    .filter((provider) => !["composite", "firstavailable", "first-available"].includes(provider));
+    .filter((provider) => !COMPOSITE_ALIASES.includes(provider));
   if (chain.length === 0) throw new Error("GROCERY_SUPPLIER_CHAIN must include at least one non-composite provider");
   return new CompositeSupplierAdapter(chain.map((provider) => buildAdapter(provider)));
 }
@@ -703,6 +791,8 @@ export interface SyncResult {
   fetched: number;
   upserted: number;
   removedSeed: number;
+  location: SupplierLocation;
+  locationLabel: string | null;
 }
 
 export async function syncGroceryCatalog(opts: SyncOptions = {}): Promise<SyncResult> {
@@ -727,8 +817,18 @@ export async function syncGroceryCatalog(opts: SyncOptions = {}): Promise<SyncRe
   if (replaceSeed && upserted > 0) {
     removedSeed = await storage.deleteGroceryProductsBySource("seed");
   }
-  logSupplier(adapter.name, "sync_complete", { selectedProvider: producingProvider, fetched: supplierProducts.length, upserted, removedSeed });
-  return { provider: producingProvider, fetched: supplierProducts.length, upserted, removedSeed };
+  const location = getEffectiveSupplierLocation(producingProvider);
+  const locationLabel = describeSupplierLocation(location);
+  lastSyncMeta = {
+    provider: producingProvider,
+    location,
+    locationLabel,
+    syncedAt: new Date().toISOString(),
+    fetched: supplierProducts.length,
+    upserted,
+  };
+  logSupplier(adapter.name, "sync_complete", { selectedProvider: producingProvider, location: locationLabel, fetched: supplierProducts.length, upserted, removedSeed });
+  return { provider: producingProvider, fetched: supplierProducts.length, upserted, removedSeed, location, locationLabel };
 }
 
 export function toInsertProduct(p: SupplierProductInput, source: string): InsertGroceryProduct {

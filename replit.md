@@ -70,6 +70,8 @@ Participant-facing HITL AI features (Concepts B, C, E from `research/hitl-ai-dis
 - `WOOLWORTHS_API_KEY` — optional official Woolworths API portal key; public storefront fallback is used when absent
 - `GROCERY_SUPPLIER_CSV_PATH` — local path or URL for a fooddatascrape-style grocery CSV when provider is `csv`
 - `GROCERY_SUPPLIER_SEARCH_TERMS` — optional comma-separated terms used by public supermarket search adapters
+- `GROCERY_SUPPLIER_STORE_ID` / `GROCERY_SUPPLIER_POSTCODE` / `GROCERY_SUPPLIER_SUBURB` — generic store/location applied to supplier syncs (used where each provider supports it). Provider-specific overrides take precedence: `WOOLWORTHS_STORE_ID`/`WOOLWORTHS_POSTCODE`/`WOOLWORTHS_SUBURB`, `COLES_STORE_ID`/`COLES_POSTCODE`/`COLES_SUBURB`, `IGA_STORE_ID`/`IGA_POSTCODE`/`IGA_SUBURB`. The supplier status response (`/api/grocery/supplier/status`) reports the `location`/`locationLabel` used by the latest sync (or the effective location config + provider defaults the next sync would use when none has run). Coles defaults to store `0584` when none is set.
+- `WOOLWORTHS_API_STORE_PARAM` — query-param name for the store ID on the official Woolworths API (default `storeId`)
 
 ## Project Structure
 ```

@@ -2,7 +2,14 @@ import type { Express } from "express";
 import { z } from "zod";
 import { storage } from "../storage";
 import { getStripe, stripeEnabled } from "../stripe";
-import { getSupplierLimit, getSupplierProvider, syncGroceryCatalog } from "../grocery-supplier";
+import {
+  describeSupplierLocation,
+  getEffectiveSupplierLocation,
+  getLastSyncMeta,
+  getSupplierLimit,
+  getSupplierProvider,
+  syncGroceryCatalog,
+} from "../grocery-supplier";
 import { getWorkerIdForUser, requireAuth } from "./shared";
 
 export function registerGroceryRoutes(app: Express) {
@@ -31,7 +38,28 @@ export function registerGroceryRoutes(app: Express) {
         return res.status(403).json({ message: "Admin access required" });
       }
       const status = await storage.getGroceryCatalogStatus();
-      res.json({ ...status, provider: getSupplierProvider(), limit: getSupplierLimit() });
+      const provider = getSupplierProvider();
+      const lastSync = getLastSyncMeta();
+      const isComposite = ["composite", "firstavailable", "first-available"].includes(provider);
+      // Prefer the location actually used by the latest in-process sync; fall
+      // back to the effective location (config + provider defaults) the next
+      // sync would use for the active provider.
+      const configuredLocation = isComposite ? null : getEffectiveSupplierLocation(provider);
+      const location = lastSync ? lastSync.location : configuredLocation;
+      const locationLabel = lastSync
+        ? lastSync.locationLabel
+        : configuredLocation
+          ? describeSupplierLocation(configuredLocation)
+          : null;
+      res.json({
+        ...status,
+        provider,
+        limit: getSupplierLimit(),
+        location,
+        locationLabel,
+        lastSyncProvider: lastSync?.provider ?? null,
+        lastSyncAt: lastSync?.syncedAt ?? null,
+      });
     } catch (e) {
       console.error("Grocery supplier status failed:", e);
       res.status(500).json({ message: "Failed to load supplier status" });
