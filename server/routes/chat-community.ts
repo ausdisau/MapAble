@@ -135,4 +135,19 @@ export function registerChatCommunityRoutes(app: Express) {
     });
     res.status(201).json(report);
   });
+
+  app.patch("/api/community-reports/:id", requireAuth, async (req, res) => {
+    const { locationRef, barrierType, severity, description } = req.body || {};
+    const data: Record<string, unknown> = {};
+    if (locationRef !== undefined) data.locationRef = locationRef;
+    if (barrierType !== undefined) data.barrierType = barrierType;
+    if (severity !== undefined) data.severity = severity;
+    if (description !== undefined) data.description = description || null;
+    if (Object.keys(data).length === 0) {
+      return res.status(400).json({ message: "No fields to update" });
+    }
+    const updated = await storage.updateCommunityReport(String(req.params.id), req.session.userId!, data);
+    if (!updated) return res.status(404).json({ message: "Report not found or not yours" });
+    res.json(updated);
+  });
 }

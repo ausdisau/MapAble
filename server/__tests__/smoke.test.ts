@@ -173,11 +173,14 @@ describe("API route smoke tests", () => {
 describe("MapAble Chat module registry + router parity", () => {
   const EXPECTED_TOOLS = [
     "get_user_profile",
+    "update_user_profile",
     "search_transport_workers",
     "get_transport_pricing",
     "book_transport",
     "check_barrier_reports",
+    "list_my_barrier_reports",
     "submit_barrier_report",
+    "update_barrier_report",
     "get_upcoming_shifts",
     "book_shift",
     "get_pending_invoices",

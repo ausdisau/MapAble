@@ -278,6 +278,25 @@ export const billingStorage = {
     return report;
   },
 
+  async getCommunityReportsByReporter(userId: string): Promise<CommunityReport[]> {
+    return db.select().from(communityReports)
+      .where(eq(communityReports.reporterUserId, userId))
+      .orderBy(desc(communityReports.createdAt))
+      .limit(50);
+  },
+
+  async updateCommunityReport(
+    id: string,
+    reporterUserId: string,
+    data: Partial<InsertCommunityReport>,
+  ): Promise<CommunityReport | undefined> {
+    const [updated] = await db.update(communityReports)
+      .set(data)
+      .where(and(eq(communityReports.id, id), eq(communityReports.reporterUserId, reporterUserId)))
+      .returning();
+    return updated;
+  },
+
   async updateUserStripeCustomerId(userId: string, stripeCustomerId: string): Promise<User | undefined> {
     const [user] = await db.update(users)
       .set({ stripeCustomerId })
