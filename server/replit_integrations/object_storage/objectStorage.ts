@@ -1,4 +1,4 @@
-import { Storage, File } from "@google-cloud/storage";
+import { File } from "@google-cloud/storage";
 import { Response } from "express";
 import { randomUUID } from "crypto";
 import {
@@ -8,27 +8,12 @@ import {
   getObjectAclPolicy,
   setObjectAclPolicy,
 } from "./objectAcl";
+import { objectStorageClient, parseObjectPath, signObjectURL } from "./client";
+import { assetStore } from "./assetStore";
+import { DEFAULT_BUCKET_NAME, getBucketConfig } from "./buckets";
 
-const REPLIT_SIDECAR_ENDPOINT = "http://127.0.0.1:1106";
-
-// The object storage client is used to interact with the object storage service.
-export const objectStorageClient = new Storage({
-  credentials: {
-    audience: "replit",
-    subject_token_type: "access_token",
-    token_url: `${REPLIT_SIDECAR_ENDPOINT}/token`,
-    type: "external_account",
-    credential_source: {
-      url: `${REPLIT_SIDECAR_ENDPOINT}/credential`,
-      format: {
-        type: "json",
-        subject_token_field_name: "access_token",
-      },
-    },
-    universe_domain: "googleapis.com",
-  },
-  projectId: "",
-});
+// Re-exported for backwards compatibility with existing importers.
+export { objectStorageClient };
 
 export class ObjectNotFoundError extends Error {
   constructor() {
@@ -74,15 +59,28 @@ export class ObjectStorageService {
     return dir;
   }
 
+  // The underlying bucket id of the logical `default` bucket, used to decide
+  // whether a full path resolves through AssetStore's default bucket.
+  private defaultBucketId(): string {
+    return getBucketConfig(DEFAULT_BUCKET_NAME).bucketId;
+  }
+
+  // Resolves a full `/<bucket_name>/<object_name>` path to a File. Paths on the
+  // default bucket are routed through AssetStore; anything else falls back to the
+  // raw client so behaviour is unchanged for non-default paths.
+  private fileForFullPath(fullPath: string): File {
+    const { bucketName, objectName } = parseObjectPath(fullPath);
+    if (bucketName === this.defaultBucketId()) {
+      return assetStore.file(DEFAULT_BUCKET_NAME, objectName);
+    }
+    return objectStorageClient.bucket(bucketName).file(objectName);
+  }
+
   // Search for a public object from the search paths.
   async searchPublicObject(filePath: string): Promise<File | null> {
     for (const searchPath of this.getPublicObjectSearchPaths()) {
       const fullPath = `${searchPath}/${filePath}`;
-
-      // Full path format: /<bucket_name>/<object_name>
-      const { bucketName, objectName } = parseObjectPath(fullPath);
-      const bucket = objectStorageClient.bucket(bucketName);
-      const file = bucket.file(objectName);
+      const file = this.fileForFullPath(fullPath);
 
       // Check if file exists
       const [exists] = await file.exists();
@@ -145,7 +143,11 @@ export class ObjectStorageService {
 
     const { bucketName, objectName } = parseObjectPath(fullPath);
 
-    // Sign URL for PUT method with TTL
+    // Sign URL for PUT method with TTL. Default-bucket uploads route through
+    // AssetStore; non-default paths keep the raw signing path unchanged.
+    if (bucketName === this.defaultBucketId()) {
+      return assetStore.getSignedUploadUrl(DEFAULT_BUCKET_NAME, objectName, 900);
+    }
     return signObjectURL({
       bucketName,
       objectName,
@@ -171,9 +173,7 @@ export class ObjectStorageService {
       entityDir = `${entityDir}/`;
     }
     const objectEntityPath = `${entityDir}${entityId}`;
-    const { bucketName, objectName } = parseObjectPath(objectEntityPath);
-    const bucket = objectStorageClient.bucket(bucketName);
-    const objectFile = bucket.file(objectName);
+    const objectFile = this.fileForFullPath(objectEntityPath);
     const [exists] = await objectFile.exists();
     if (!exists) {
       throw new ObjectNotFoundError();
@@ -237,64 +237,5 @@ export class ObjectStorageService {
       requestedPermission: requestedPermission ?? ObjectPermission.READ,
     });
   }
-}
-
-function parseObjectPath(path: string): {
-  bucketName: string;
-  objectName: string;
-} {
-  if (!path.startsWith("/")) {
-    path = `/${path}`;
-  }
-  const pathParts = path.split("/");
-  if (pathParts.length < 3) {
-    throw new Error("Invalid path: must contain at least a bucket name");
-  }
-
-  const bucketName = pathParts[1];
-  const objectName = pathParts.slice(2).join("/");
-
-  return {
-    bucketName,
-    objectName,
-  };
-}
-
-async function signObjectURL({
-  bucketName,
-  objectName,
-  method,
-  ttlSec,
-}: {
-  bucketName: string;
-  objectName: string;
-  method: "GET" | "PUT" | "DELETE" | "HEAD";
-  ttlSec: number;
-}): Promise<string> {
-  const request = {
-    bucket_name: bucketName,
-    object_name: objectName,
-    method,
-    expires_at: new Date(Date.now() + ttlSec * 1000).toISOString(),
-  };
-  const response = await fetch(
-    `${REPLIT_SIDECAR_ENDPOINT}/object-storage/signed-object-url`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(request),
-    }
-  );
-  if (!response.ok) {
-    throw new Error(
-      `Failed to sign object URL, errorcode: ${response.status}, ` +
-        `make sure you're running on Replit`
-    );
-  }
-
-  const { signed_url: signedURL } = await response.json();
-  return signedURL;
 }
 

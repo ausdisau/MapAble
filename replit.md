@@ -75,6 +75,16 @@ Participant-facing HITL AI features (Concepts B, C, E from `research/hitl-ai-dis
 - `GROCERY_SUPPLIER_SEARCH_TERMS` — optional comma-separated terms used by public supermarket search adapters
 - `GROCERY_SUPPLIER_STORE_ID` / `GROCERY_SUPPLIER_POSTCODE` / `GROCERY_SUPPLIER_SUBURB` — generic store/location applied to supplier syncs (used where each provider supports it). Provider-specific overrides take precedence: `WOOLWORTHS_STORE_ID`/`WOOLWORTHS_POSTCODE`/`WOOLWORTHS_SUBURB`, `COLES_STORE_ID`/`COLES_POSTCODE`/`COLES_SUBURB`, `IGA_STORE_ID`/`IGA_POSTCODE`/`IGA_SUBURB`. The supplier status response (`/api/grocery/supplier/status`) reports the `location`/`locationLabel` used by the latest sync (or the effective location config + provider defaults the next sync would use when none has run). Coles defaults to store `0584` when none is set.
 - `WOOLWORTHS_API_STORE_PARAM` — query-param name for the store ID on the official Woolworths API (default `storeId`)
+- `DEFAULT_BUCKET_ID` — underlying bucket id for the logical `default` bucket (drives PUBLIC_OBJECT_SEARCH_PATHS/PRIVATE_OBJECT_DIR, uploads + ACL). Defaults to the provisioned default bucket.
+- `ASSETS_BUCKET_ID` — underlying bucket id for the logical `assets` bucket (app-managed assets). Defaults to the platform default bucket.
+- `ASSET_BUCKETS` — optional registry override, comma-separated `name:bucketId[:mode[:publicPrefix]]` entries; `mode` is a `+`-separated flag set (`ro`, `private`, `ro+private`). Only fields explicitly provided override built-in defaults (omitting `publicPrefix` keeps the built-in prefix). Used by the multi-bucket `AssetStore` abstraction.
+
+## Multi-Bucket Asset Abstraction
+- **Registry** (`server/replit_integrations/object_storage/buckets.ts`): typed `BucketConfig` registry of logical buckets (`default`, `assets`) with `bucketId`, optional `publicPrefix`, `readOnly`, and `privateOnly` flags. Env overrides via `ASSET_BUCKETS`. Typed `UnknownBucketError`/`BucketReadOnlyError`. Merged-view order `MERGED_DEFAULT_ORDER=["assets","default"]` (assets shadow defaults).
+- **AssetStore** (`assetStore.ts`): `assetStore` singleton with `file/list/exists/head/read/getSignedReadUrl/getSignedUploadUrl/putStream/delete/findFirst/listMerged/readJson/readText`. Writes are gated by the `readOnly` flag. Module-level `readJson`/`readText` helpers for callers.
+- **Shared primitives** (`client.ts`): `objectStorageClient`, `parseObjectPath`, `signObjectURL` extracted to avoid circular imports; consumed by both `objectStorage.ts` and `assetStore.ts`.
+- **Legacy service** (`objectStorage.ts`): existing upload/ACL/`/objects/*` behaviour unchanged — default-bucket paths now route through `assetStore`; non-default paths fall back to the raw client.
+- **HTTP surface** (`routes.ts`): `GET /assets/:bucket/*key` streams public assets (400 unknown bucket/invalid key, 403 private-only or outside `publicPrefix`, 404 missing, immutable Cache-Control for content-hashed keys). `GET /api/assets/:bucket?prefix=&limit=&pageToken=` is staff-gated (`admin`/`provider`) JSON listing.
 
 ## Project Structure
 ```

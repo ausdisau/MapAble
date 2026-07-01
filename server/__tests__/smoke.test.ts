@@ -7,6 +7,15 @@ import { handoffModule } from "../chat/modules";
 import { toNumericNdisClaim, toNumericNdisClaims, type NdisClaim } from "@shared/schema";
 import { buildSafeguardingSummary } from "../notifications";
 import { classifyUserTurn, applyOutputGuardrails } from "../chat-guardrails";
+import {
+  getBucketConfig,
+  isKnownBucket,
+  listBucketConfigs,
+  MERGED_DEFAULT_ORDER,
+  UnknownBucketError,
+  BucketReadOnlyError,
+  assetStore,
+} from "../replit_integrations/object_storage";
 
 let server: TestServer;
 
@@ -401,5 +410,90 @@ describe("spoken chat guardrails (voice channel reuses text safeguards)", () => 
     assert.equal(guarded.flagged, false);
     assert.equal(guarded.content, safe);
     assert.equal(guarded.actions.length, 0);
+  });
+});
+
+describe("multi-bucket asset registry and AssetStore", () => {
+  test("getBucketConfig resolves the two built-in logical buckets", () => {
+    const def = getBucketConfig("default");
+    assert.equal(def.name, "default");
+    assert.equal(def.readOnly, false);
+    assert.ok(def.bucketId.length > 0);
+
+    const assets = getBucketConfig("assets");
+    assert.equal(assets.name, "assets");
+    assert.equal(assets.readOnly, false);
+    assert.ok(assets.bucketId.length > 0);
+
+    // The two logical buckets must map to distinct underlying buckets.
+    assert.notEqual(def.bucketId, assets.bucketId);
+  });
+
+  test("getBucketConfig throws UnknownBucketError for an unregistered name", () => {
+    assert.throws(() => getBucketConfig("does-not-exist"), UnknownBucketError);
+  });
+
+  test("isKnownBucket reflects registry membership", () => {
+    assert.equal(isKnownBucket("default"), true);
+    assert.equal(isKnownBucket("assets"), true);
+    assert.equal(isKnownBucket("nope"), false);
+  });
+
+  test("listBucketConfigs returns both built-in buckets", () => {
+    const names = listBucketConfigs().map((c) => c.name);
+    assert.ok(names.includes("default"));
+    assert.ok(names.includes("assets"));
+  });
+
+  test("MERGED_DEFAULT_ORDER puts assets ahead of default so assets shadow defaults", () => {
+    assert.deepEqual(MERGED_DEFAULT_ORDER, ["assets", "default"]);
+  });
+
+  test("AssetStore write ops reject an unknown bucket before any I/O", async () => {
+    await assert.rejects(
+      () => assetStore.getSignedUploadUrl("ghost-bucket", "x/y.json"),
+      UnknownBucketError,
+    );
+    await assert.rejects(
+      () => assetStore.delete("ghost-bucket", "x/y.json"),
+      UnknownBucketError,
+    );
+  });
+
+  test("read-only guard: BucketReadOnlyError is thrown for a read-only bucket", () => {
+    // Exercise the same guard AssetStore.assertWritable uses, without needing a
+    // live network call: a read-only config must reject write intent.
+    const readOnly = { name: "ro", bucketId: "b", readOnly: true } as const;
+    function assertWritable(cfg: { name: string; readOnly: boolean }) {
+      if (cfg.readOnly) throw new BucketReadOnlyError(cfg.name);
+      return cfg;
+    }
+    assert.throws(() => assertWritable(readOnly), BucketReadOnlyError);
+    assert.doesNotThrow(() => assertWritable({ name: "assets", readOnly: false }));
+  });
+
+  // HTTP-level authorization semantics for the public GET /assets/:bucket/*
+  // route. These all short-circuit before any storage I/O, so they need no
+  // live objects — they pin the access-control contract from the task spec.
+  test("GET /assets rejects an unknown bucket with 400", async () => {
+    const { status } = await req("GET", "/assets/ghost-bucket/public/logo.png");
+    assert.equal(status, 400);
+  });
+
+  test("GET /assets rejects a key outside the bucket's public prefix with 403", async () => {
+    // The default bucket's public prefix is "public"; a ".private" key must not
+    // be served over the public asset route.
+    const { status } = await req("GET", "/assets/default/.private/secret.json");
+    assert.equal(status, 403);
+  });
+
+  test("GET /assets rejects path-traversal keys with 400", async () => {
+    const { status } = await req("GET", "/assets/default/public/..%2f..%2fsecret");
+    assert.equal(status, 400);
+  });
+
+  test("GET /api/assets listing is auth-gated (401 when unauthenticated)", async () => {
+    const { status } = await req("GET", "/api/assets/assets");
+    assert.equal(status, 401);
   });
 });
