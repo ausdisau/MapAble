@@ -111,7 +111,14 @@ export default function PaymentMethodsPage() {
                   BSB •••{m.bsbLast4 ?? "----"} / Acct •••{m.accountLast4 ?? "----"}
                   {m.isDefault && <Badge className="ml-2" data-testid={`badge-default-${m.id}`}>Default</Badge>}
                 </div>
-                <div className="text-xs text-muted-foreground">Status: {m.status}</div>
+                <div className="mt-1 flex items-center gap-2">
+                  <MandateStatusBadge status={m.status} id={m.id} />
+                  {m.status === "pending" && (
+                    <span className="text-xs text-muted-foreground" data-testid={`text-pending-hint-${m.id}`}>
+                      Bank verification can take 3–5 business days
+                    </span>
+                  )}
+                </div>
               </div>
               <div className="flex gap-2">
                 {!m.isDefault && (
@@ -132,6 +139,22 @@ export default function PaymentMethodsPage() {
         <BecsSetupModal publishableKey={caps.publishableKey} onClose={() => setShowSetup(false)} />
       )}
     </div>
+  );
+}
+
+function MandateStatusBadge({ status, id }: { status: string; id: string }) {
+  // BECS mandates are 'pending' until the bank verifies the debit (3–5 business
+  // days), then 'active'. 'revoked' means the mandate is no longer usable.
+  const map: Record<string, { label: string; variant: "success" | "warning" | "destructive" | "secondary" }> = {
+    active: { label: "Active", variant: "success" },
+    pending: { label: "Pending verification", variant: "warning" },
+    revoked: { label: "Revoked", variant: "destructive" },
+  };
+  const { label, variant } = map[status] ?? { label: status, variant: "secondary" as const };
+  return (
+    <Badge variant={variant} data-testid={`badge-status-${id}`}>
+      {label}
+    </Badge>
   );
 }
 
