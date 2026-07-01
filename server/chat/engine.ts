@@ -78,7 +78,8 @@ export async function processChat(
   sessionId: string,
   userId: string,
   userMessage: string,
-  clientContext?: ClientContext
+  clientContext?: ClientContext,
+  channel: "text" | "voice" = "text"
 ): Promise<ChatResponse> {
   await ensureGuardrailTables();
 
@@ -94,6 +95,8 @@ export async function processChat(
   const guardrailToolCalls: string[] = [];
   const guardrailActions = [...inputVerdict.actions];
   const policyRefs = [...inputVerdict.policyRefs];
+  // Record the channel so voice turns are identifiable in the shared audit log.
+  if (channel !== "text") guardrailActions.push(`channel:${channel}`);
 
   await db.insert(chatMessages).values({
     sessionId,

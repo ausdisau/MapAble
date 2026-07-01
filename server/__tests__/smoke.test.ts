@@ -6,6 +6,7 @@ import type { ChatContext } from "../chat";
 import { handoffModule } from "../chat/modules";
 import { toNumericNdisClaim, toNumericNdisClaims, type NdisClaim } from "@shared/schema";
 import { buildSafeguardingSummary } from "../notifications";
+import { classifyUserTurn, applyOutputGuardrails } from "../chat-guardrails";
 
 let server: TestServer;
 
@@ -358,5 +359,47 @@ describe("safeguarding alert summary safety", () => {
       assert.doesNotMatch(summary, /\b(?:\+?61|0)[2-478](?:[ -]?\d){8}\b/, "no phone numbers");
       assert.doesNotMatch(summary, /\b\d{9,}\b/, "no long ID numbers");
     }
+  });
+});
+
+describe("spoken chat guardrails (voice channel reuses text safeguards)", () => {
+  // The voice route transcribes audio then hands the transcript to the same
+  // processChat pipeline as text chat. These tests pin the two safety-critical
+  // seams that pipeline relies on, so a spoken turn gets the identical treatment.
+
+  test("a spoken self-harm transcript is flagged and escalated by the input classifier", () => {
+    // Natural spoken phrasing, as speech-to-text would produce it.
+    const verdict = classifyUserTurn("i just feel like i want to die and can't go on");
+    assert.ok(verdict.categories.includes("self_harm_suicide"));
+    assert.ok(verdict.categories.includes("immediate_danger"));
+    assert.ok(verdict.actions.includes("flag_safeguarding_concern"));
+    assert.ok(verdict.actions.includes("escalate_to_human"));
+    assert.ok(verdict.policyRefs.length > 0);
+  });
+
+  test("a spoken abuse disclosure produces a safeguarding + incident draft path", () => {
+    const verdict = classifyUserTurn("my support worker hit me yesterday and i feel unsafe with my worker");
+    assert.ok(verdict.categories.includes("abuse_neglect_exploitation"));
+    assert.ok(verdict.actions.includes("flag_safeguarding_concern"));
+    assert.ok(verdict.actions.includes("log_incident_draft"));
+    assert.ok(verdict.actions.includes("escalate_to_human"));
+  });
+
+  test("an unsafe response is refused before it can be spoken back", () => {
+    // Output guardrails run on the assistant text BEFORE TTS synthesis, so an
+    // unsafe clinical instruction can never be turned into audio.
+    const unsafe = "Your diagnosis is autism and you should take 50mg of that medication.";
+    const guarded = applyOutputGuardrails(unsafe);
+    assert.equal(guarded.flagged, true);
+    assert.ok(guarded.actions.includes("output_refusal"));
+    assert.notEqual(guarded.content, unsafe);
+  });
+
+  test("a safe, on-scope response passes output guardrails unchanged", () => {
+    const safe = "I can help you book accessible transport for your appointment. Would you like me to find a time?";
+    const guarded = applyOutputGuardrails(safe);
+    assert.equal(guarded.flagged, false);
+    assert.equal(guarded.content, safe);
+    assert.equal(guarded.actions.length, 0);
   });
 });
