@@ -5,6 +5,7 @@ import { registry, defaultIntentRouter, chatModules } from "../chat";
 import type { ChatContext } from "../chat";
 import { handoffModule } from "../chat/modules";
 import { toNumericNdisClaim, toNumericNdisClaims, type NdisClaim } from "@shared/schema";
+import { buildSafeguardingSummary } from "../notifications";
 
 let server: TestServer;
 
@@ -318,5 +319,44 @@ describe("ndis claim money casting", () => {
     ] as unknown as NdisClaim[];
     const total = toNumericNdisClaims(rows).reduce((s, c) => s + c.totalAmount, 0);
     assert.equal(total, 15.75);
+  });
+});
+
+describe("safeguarding alert summary safety", () => {
+  const categories = [
+    "immediate_danger",
+    "self_harm_suicide",
+    "abuse_neglect_exploitation",
+    "privacy_breach",
+    "safeguarding",
+  ];
+
+  test("returns a fixed, non-empty templated summary per concern type", () => {
+    const seen = new Set<string>();
+    for (const c of categories) {
+      const summary = buildSafeguardingSummary(c);
+      assert.ok(summary.length > 0, `summary for ${c} should be non-empty`);
+      seen.add(summary);
+    }
+    // immediate_danger/self_harm/abuse/privacy each have distinct copy
+    assert.ok(seen.size >= 4);
+  });
+
+  test("falls back to the generic summary for unknown concern types", () => {
+    assert.equal(
+      buildSafeguardingSummary("something_unexpected"),
+      buildSafeguardingSummary("safeguarding"),
+    );
+  });
+
+  test("summary never echoes participant free-text or PII patterns", () => {
+    // The builder takes only the concern category, so raw chat text can never
+    // reach the summary. Verify the templated output contains no PII-like tokens.
+    for (const c of categories) {
+      const summary = buildSafeguardingSummary(c);
+      assert.doesNotMatch(summary, /[\w.+-]+@[\w-]+\.[\w.-]+/, "no email addresses");
+      assert.doesNotMatch(summary, /\b(?:\+?61|0)[2-478](?:[ -]?\d){8}\b/, "no phone numbers");
+      assert.doesNotMatch(summary, /\b\d{9,}\b/, "no long ID numbers");
+    }
   });
 });

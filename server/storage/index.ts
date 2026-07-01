@@ -45,6 +45,7 @@ export interface IStorage {
   getUserByEmail(email: string): Promise<User | undefined>;
   getUserByAuth0Sub(auth0Sub: string): Promise<User | undefined>;
   getUserByRole(role: string): Promise<User | undefined>;
+  getUsersByRole(role: string): Promise<User[]>;
   updateUserAuth0Sub(id: string, auth0Sub: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUserAvatar(id: string, avatar: string): Promise<User | undefined>;
@@ -181,6 +182,10 @@ export class DatabaseStorage implements IStorage {
 
   getUserByRole(...args: Parameters<IStorage["getUserByRole"]>): ReturnType<IStorage["getUserByRole"]> {
     return (usersWorkersStorage.getUserByRole as any).apply(this, args);
+  }
+
+  getUsersByRole(...args: Parameters<IStorage["getUsersByRole"]>): ReturnType<IStorage["getUsersByRole"]> {
+    return (usersWorkersStorage.getUsersByRole as any).apply(this, args);
   }
 
   updateUserAuth0Sub(...args: Parameters<IStorage["updateUserAuth0Sub"]>): ReturnType<IStorage["updateUserAuth0Sub"]> {

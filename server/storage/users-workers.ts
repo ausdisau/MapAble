@@ -55,6 +55,10 @@ export const usersWorkersStorage = {
     return user;
   },
 
+  async getUsersByRole(role: string): Promise<User[]> {
+    return db.select().from(users).where(eq(users.role, role as any));
+  },
+
   async updateUserAuth0Sub(id: string, auth0Sub: string): Promise<User | undefined> {
     const [user] = await db.update(users).set({ auth0Sub }).where(eq(users.id, id)).returning();
     return user;

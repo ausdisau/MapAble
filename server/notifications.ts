@@ -1,4 +1,5 @@
 import type { GroceryOrder, User } from "@shared/schema";
+import { storage } from "./storage";
 
 const AGENTMAIL_BASE_URL = process.env.AGENTMAIL_SERVICE_URL || "http://127.0.0.1:3001";
 const NOTIFY_INBOX_ENV = "AGENTMAIL_NOTIFY_INBOX_ID";
@@ -154,4 +155,108 @@ export async function notifyGroceryOrderStatus(
   }
 
   return result;
+}
+
+export interface SafeguardingAlert {
+  sessionId: string;
+  concernType: string;
+  severity: string;
+}
+
+export interface SafeguardingAlertResult {
+  attempted: boolean;
+  recipients: number;
+  emailed: number;
+  reason?: string;
+}
+
+/**
+ * Map a guardrail concern category to a fixed, non-identifying description.
+ * Alerts deliberately never include the participant's free-text message —
+ * only this templated summary — so no names, addresses, DOB or other narrative
+ * PII can leak to the (potentially broad) staff distribution list.
+ */
+const SAFEGUARDING_SUMMARIES: Record<string, string> = {
+  immediate_danger: "Possible immediate danger to a person's safety was detected in the conversation.",
+  self_harm_suicide: "Possible self-harm or suicide risk was detected in the conversation.",
+  abuse_neglect_exploitation: "Possible abuse, neglect or exploitation was detected in the conversation.",
+  privacy_breach: "A possible privacy or personal-information breach was detected in the conversation.",
+  safeguarding: "A safeguarding concern requiring human review was detected in the conversation.",
+};
+
+export function buildSafeguardingSummary(concernType: string): string {
+  return SAFEGUARDING_SUMMARIES[concernType] || SAFEGUARDING_SUMMARIES.safeguarding;
+}
+
+/**
+ * Resolve the staff recipients for urgent safeguarding alerts. Prefers an
+ * explicit distribution list in SAFEGUARDING_ALERT_EMAIL (comma-separated);
+ * otherwise falls back to the email addresses of all admin and provider users.
+ */
+async function resolveSafeguardingRecipients(): Promise<string[]> {
+  const configured = (process.env.SAFEGUARDING_ALERT_EMAIL || "")
+    .split(",")
+    .map((e) => e.trim())
+    .filter(Boolean);
+  if (configured.length > 0) return Array.from(new Set(configured));
+
+  try {
+    const [admins, providers] = await Promise.all([
+      storage.getUsersByRole("admin"),
+      storage.getUsersByRole("provider"),
+    ]);
+    const emails = [...admins, ...providers].map((u) => u.email).filter(Boolean);
+    return Array.from(new Set(emails));
+  } catch (e) {
+    console.warn("[notifications] safeguarding recipient lookup threw:", e instanceof Error ? e.message : e);
+    return [];
+  }
+}
+
+/**
+ * Notify MapAble staff in real time when the guardrail layer raises an urgent
+ * safeguarding concern (immediate danger, self-harm, abuse/neglect, privacy
+ * breach). Sends only the session ID, concern type, severity and a PII-redacted
+ * summary — never the raw chat content. Never throws: notification failures are
+ * logged and must not block the chat response.
+ */
+export async function notifySafeguardingAlert(alert: SafeguardingAlert): Promise<SafeguardingAlertResult> {
+  try {
+    const recipients = await resolveSafeguardingRecipients();
+    if (recipients.length === 0) {
+      console.warn(`[notifications] safeguarding alert (session ${alert.sessionId}, ${alert.concernType}) has no staff recipients`);
+      return { attempted: false, recipients: 0, emailed: 0, reason: "no_recipients" };
+    }
+
+    const subject = `[MapAble URGENT] Safeguarding concern (${alert.severity}) — ${alert.concernType}`;
+    const text = [
+      "An urgent safeguarding concern was raised in MapAble Chat and needs human review.",
+      "",
+      `Severity: ${alert.severity}`,
+      `Concern type: ${alert.concernType}`,
+      `Chat session: ${alert.sessionId}`,
+      `Summary: ${buildSafeguardingSummary(alert.concernType)}`,
+      "",
+      "Open the safeguarding queue in MapAble → Admin → Chat Guardrails to review, assign and action this item.",
+      "",
+      "This alert intentionally omits sensitive details. Review the full record in the queue.",
+      "",
+      "— MapAble Safeguarding",
+    ].join("\n");
+
+    let emailed = 0;
+    for (const to of recipients) {
+      const ok = await sendEmailViaAgentMail(to, subject, text);
+      if (ok) emailed += 1;
+    }
+
+    if (emailed === 0) {
+      console.warn(`[notifications] safeguarding alert (session ${alert.sessionId}) reached 0/${recipients.length} staff (AgentMail unavailable)`);
+      return { attempted: true, recipients: recipients.length, emailed: 0, reason: "agentmail_unavailable" };
+    }
+    return { attempted: true, recipients: recipients.length, emailed };
+  } catch (e) {
+    console.warn("[notifications] safeguarding alert threw:", e instanceof Error ? e.message : e);
+    return { attempted: true, recipients: 0, emailed: 0, reason: "exception" };
+  }
 }
