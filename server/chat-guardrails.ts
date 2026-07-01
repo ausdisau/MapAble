@@ -2,6 +2,7 @@ import { sql } from "drizzle-orm";
 import { desc, eq } from "drizzle-orm";
 import { readFileSync } from "fs";
 import { db } from "./db";
+import { notifySafeguardingAlert } from "./notifications";
 import {
   chatGuardrailAuditLogs,
   safeguardingComplaintDrafts,
@@ -414,12 +415,24 @@ export async function logGuardrailAudit(args: {
 export async function runRequiredSafeguardingActions(sessionId: string, userId: string, input: string, verdict: GuardrailVerdict): Promise<string[]> {
   const toolsUsed: string[] = [];
   if (verdict.actions.includes("flag_safeguarding_concern")) {
+    const concernType = verdict.categories[0] || "safeguarding";
+    const severity = verdict.categories.includes("immediate_danger") || verdict.categories.includes("self_harm_suicide") ? "critical" : "high";
     await flagSafeguardingConcern(sessionId, userId, {
-      concernType: verdict.categories[0] || "safeguarding",
+      concernType,
       summary: input,
-      severity: verdict.categories.includes("immediate_danger") || verdict.categories.includes("self_harm_suicide") ? "critical" : "high",
+      severity,
     });
     toolsUsed.push("flag_safeguarding_concern");
+    // Fire-and-forget: alert staff in real time without blocking the chat
+    // response. notifySafeguardingAlert never throws, but guard the promise
+    // anyway so an unexpected rejection can't crash the request.
+    void notifySafeguardingAlert({
+      sessionId,
+      concernType,
+      severity,
+    }).catch((e) => {
+      console.warn("[chat-guardrails] safeguarding alert dispatch failed:", e instanceof Error ? e.message : e);
+    });
   }
   if (verdict.actions.includes("log_incident_draft")) {
     await logIncidentDraft(sessionId, userId, {
