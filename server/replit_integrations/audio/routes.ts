@@ -1,6 +1,10 @@
 import express, { type Express, type Request, type Response } from "express";
 import { chatStorage } from "../chat/storage";
-import { openai, speechToText, ensureCompatibleFormat } from "./client";
+import { processChat } from "../../chat/engine";
+import { speechToText, ensureCompatibleFormat, textToSpeechStream } from "./client";
+
+type TtsVoice = "alloy" | "echo" | "fable" | "onyx" | "nova" | "shimmer";
+const ALLOWED_VOICES: TtsVoice[] = ["alloy", "echo", "fable", "onyx", "nova", "shimmer"];
 
 // Body parser with 50MB limit for audio payloads
 const audioBodyParser = express.json({ limit: "50mb" });
@@ -20,7 +24,7 @@ export function registerAudioRoutes(app: Express): void {
   // Get single conversation with messages
   app.get("/api/conversations/:id", async (req: Request, res: Response) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = String(req.params.id);
       const conversation = await chatStorage.getConversation(id);
       if (!conversation) {
         return res.status(404).json({ error: "Conversation not found" });
@@ -48,7 +52,7 @@ export function registerAudioRoutes(app: Express): void {
   // Delete conversation
   app.delete("/api/conversations/:id", async (req: Request, res: Response) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = String(req.params.id);
       await chatStorage.deleteConversation(id);
       res.status(204).send();
     } catch (error) {
@@ -57,16 +61,28 @@ export function registerAudioRoutes(app: Express): void {
     }
   });
 
-  // Send voice message and get streaming audio response
-  // Auto-detects audio format and converts WebM/MP4/OGG to WAV
-  // Uses gpt-4o-mini-transcribe for STT, gpt-audio for voice response
+  // Send voice message and get a streaming audio response.
+  // Auto-detects audio format and converts WebM/MP4/OGG to WAV.
+  // Spoken chat runs through the SAME guardrail, safeguarding, refusal and audit
+  // stack as text chat: the transcript is processed by `processChat`, which runs
+  // the input classifier + required safeguarding actions, applies output
+  // guardrails, persists the turn and writes a policy-pack-stamped audit log.
+  // Audio is synthesised only AFTER the response text has been guardrail-approved,
+  // so an unsafe response can never be spoken back to the user.
   app.post("/api/conversations/:id/messages", audioBodyParser, async (req: Request, res: Response) => {
     try {
-      const conversationId = parseInt(req.params.id);
-      const { audio, voice = "alloy" } = req.body;
+      const conversationId = String(req.params.id);
+      const { audio } = req.body;
+      const requestedVoice = req.body.voice;
+      const voice: TtsVoice = ALLOWED_VOICES.includes(requestedVoice) ? requestedVoice : "alloy";
 
       if (!audio) {
         return res.status(400).json({ error: "Audio data (base64) is required" });
+      }
+
+      const conversation = await chatStorage.getConversation(conversationId);
+      if (!conversation) {
+        return res.status(404).json({ error: "Conversation not found" });
       }
 
       // 1. Auto-detect format and convert to OpenAI-compatible format
@@ -76,52 +92,30 @@ export function registerAudioRoutes(app: Express): void {
       // 2. Transcribe user audio
       const userTranscript = await speechToText(audioBuffer, inputFormat);
 
-      // 3. Save user message
-      await chatStorage.createMessage(conversationId, "user", userTranscript);
-
-      // 4. Get conversation history
-      const existingMessages = await chatStorage.getMessagesByConversation(conversationId);
-      const chatHistory = existingMessages.map((m) => ({
-        role: m.role as "user" | "assistant",
-        content: m.content,
-      }));
-
-      // 5. Set up SSE
+      // 3. Set up SSE
       res.setHeader("Content-Type", "text/event-stream");
       res.setHeader("Cache-Control", "no-cache");
       res.setHeader("Connection", "keep-alive");
 
       res.write(`data: ${JSON.stringify({ type: "user_transcript", data: userTranscript })}\n\n`);
 
-      // 6. Stream audio response from gpt-audio
-      const stream = await openai.chat.completions.create({
-        model: "gpt-audio",
-        modalities: ["text", "audio"],
-        audio: { voice, format: "pcm16" },
-        messages: chatHistory,
-        stream: true,
-      });
+      // 4. Run the transcript through the shared MapAble Chat guardrail engine.
+      //    processChat persists the user + assistant messages, runs the input
+      //    classifier and safeguarding actions, applies output guardrails and
+      //    writes a voice-channel audit log (transcript, guardrail actions,
+      //    policy pack version). The returned content is already guardrail-safe.
+      const result = await processChat(conversationId, conversation.userId, userTranscript, undefined, "voice");
+      const safeText = result.content;
 
-      let assistantTranscript = "";
+      // 5. Emit the guardrail-approved transcript, then synthesise its speech.
+      res.write(`data: ${JSON.stringify({ type: "transcript", data: safeText })}\n\n`);
 
-      for await (const chunk of stream) {
-        const delta = chunk.choices?.[0]?.delta as any;
-        if (!delta) continue;
-
-        if (delta?.audio?.transcript) {
-          assistantTranscript += delta.audio.transcript;
-          res.write(`data: ${JSON.stringify({ type: "transcript", data: delta.audio.transcript })}\n\n`);
-        }
-
-        if (delta?.audio?.data) {
-          res.write(`data: ${JSON.stringify({ type: "audio", data: delta.audio.data })}\n\n`);
-        }
+      const audioStream = await textToSpeechStream(safeText, voice);
+      for await (const audioChunk of audioStream) {
+        res.write(`data: ${JSON.stringify({ type: "audio", data: audioChunk })}\n\n`);
       }
 
-      // 7. Save assistant message
-      await chatStorage.createMessage(conversationId, "assistant", assistantTranscript);
-
-      res.write(`data: ${JSON.stringify({ type: "done", transcript: assistantTranscript })}\n\n`);
+      res.write(`data: ${JSON.stringify({ type: "done", transcript: safeText, warnings: result.warnings, toolsUsed: result.toolsUsed })}\n\n`);
       res.end();
     } catch (error) {
       console.error("Error processing voice message:", error);
