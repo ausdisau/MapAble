@@ -140,6 +140,9 @@ model User {
   caseTasksCompleted        CaseTask[]             @relation("CaseTaskCompletedBy")
   caseLinksCreated          CaseLink[]             @relation("CaseLinkCreatedBy")
   caseAiInsightsRequested   CaseAIInsight[]        @relation("CaseAIInsightRequestedBy")
+  careOSLifeTwin            ParticipantLifeTwin?
+  careOSMissions            CareOSMission[]
+  careOSActivityEvents      CareOSActivityEvent[]
 }
 
 model PasskeyCredential {
@@ -652,6 +655,104 @@ model AccessibilityProfile {
   shareWithProviders       Json     @default("{}")
   createdAt                DateTime @default(now())
   updatedAt                DateTime @updatedAt
+}
+
+/// Participant-controlled preferences used by CareOS. This is not a clinical
+/// record and is intentionally separate from operational care records.
+model ParticipantLifeTwin {
+  id            String   @id @default(cuid())
+  participantId String   @unique
+  participant   User     @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  preferences   Json     @default("{}")
+  version       Int      @default(1)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  deletedAt     DateTime?
+  memories      ParticipantPreferenceMemory[]
+
+  @@index([participantId, deletedAt])
+  @@map("participant_life_twins")
+}
+
+model ParticipantPreferenceMemory {
+  id            String               @id @default(cuid())
+  lifeTwinId    String
+  lifeTwin      ParticipantLifeTwin  @relation(fields: [lifeTwinId], references: [id], onDelete: Cascade)
+  participantId String
+  key           String
+  value         Json
+  source        String
+  verifiedAt    DateTime?
+  consentScope  String?
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+  deletedAt     DateTime?
+
+  @@unique([lifeTwinId, key])
+  @@index([participantId, deletedAt])
+  @@map("participant_preference_memories")
+}
+
+model CareOSMission {
+  id            String   @id @default(cuid())
+  participantId String
+  participant   User     @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  requestId     String   @unique
+  missionType   String
+  status        String   @default("proposed")
+  inputSummary  Json
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  recommendations CareOSRecommendation[]
+
+  @@index([participantId, createdAt])
+  @@map("careos_missions")
+}
+
+model CareOSRecommendation {
+  id            String   @id @default(cuid())
+  missionId     String
+  mission       CareOSMission @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  title         String
+  summary       String
+  confidence    String
+  uncertainty   Json     @default("[]")
+  result        Json
+  createdAt     DateTime @default(now())
+  evidence      CareOSEvidenceReference[]
+
+  @@index([missionId, createdAt])
+  @@map("careos_recommendations")
+}
+
+model CareOSEvidenceReference {
+  id               String               @id @default(cuid())
+  recommendationId String
+  recommendation   CareOSRecommendation @relation(fields: [recommendationId], references: [id], onDelete: Cascade)
+  sourceType       String
+  sourceId         String?
+  sourceDate       DateTime?
+  summary          String
+  verificationStatus String
+  createdAt        DateTime             @default(now())
+
+  @@index([recommendationId])
+  @@map("careos_evidence_references")
+}
+
+model CareOSActivityEvent {
+  id            String   @id @default(cuid())
+  participantId String
+  participant   User     @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  requestId     String?
+  eventType     String
+  summary       String
+  metadata      Json?
+  auditEventId  String?
+  createdAt     DateTime @default(now())
+
+  @@index([participantId, createdAt])
+  @@map("careos_activity_events")
 }
 
 model Organisation {

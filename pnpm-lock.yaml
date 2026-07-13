@@ -23,6 +23,9 @@ importers:
       '@chat-adapter/state-memory':
         specifier: ^4.30.0
         version: 4.30.0(ai@6.0.196(zod@4.3.6))(zod@4.3.6)
+      '@openai/agents':
+        specifier: ^0.13.2
+        version: 0.13.2(ws@8.21.0)(zod@4.3.6)
       '@prisma/client':
         specifier: 6.19.2
         version: 6.19.2(prisma@6.19.2(typescript@5.9.3))(typescript@5.9.3)
@@ -1113,6 +1116,29 @@ packages:
   '@nolyfill/is-core-module@1.0.39':
     resolution: {integrity: sha512-nn5ozdjYQpUCZlWGuxcJY/KpxkWQs4DcbMCmKojjyrYDEAGy4Ce19NN4v5MduafTwJlbKc99UA8YhSVqq9yPZA==}
     engines: {node: '>=12.4.0'}
+
+  '@openai/agents-core@0.13.2':
+    resolution: {integrity: sha512-j/CDl6kL2CITe6HtKr0hQOURAjUa4bmKxgQy8AnSuk15s1mOxs3YRJ0EZxVZVnnii0PphyVNYTC/+/boIl3oJA==}
+    peerDependencies:
+      zod: ^4.0.0
+    peerDependenciesMeta:
+      zod:
+        optional: true
+
+  '@openai/agents-openai@0.13.2':
+    resolution: {integrity: sha512-ECMqRZyFrjQ+uGgrn5a4EZS2IHmnefy/v9GVLfwvDy5KrCCHRcy40QjczetSDW7ZIR1Qhv19WaKtei5RAUH9xQ==}
+    peerDependencies:
+      zod: ^4.0.0
+
+  '@openai/agents-realtime@0.13.2':
+    resolution: {integrity: sha512-HxV/K3pZ0+NKYpL2Cjb7EykQ2mQUDA3g6MtN9MMiPZHCmR749gHX2V7g5T0lx3aAheAUDQ4/wSDGNJgYxxWF7w==}
+    peerDependencies:
+      zod: ^4.0.0
+
+  '@openai/agents@0.13.2':
+    resolution: {integrity: sha512-Jth+sOF9Fklg9aiJFOfvcnPJtNgq9EvBHm206AMJXHa2yadfZ5BN1oYUxhlFGt38YigK4gFvBdmcR+qX1gNJbQ==}
+    peerDependencies:
+      zod: ^4.0.0
 
   '@opentelemetry/api@1.9.1':
     resolution: {integrity: sha512-gLyJlPHPZYdAk1JENA9LeHejZe1Ti77/pTeFm/nMXmQH/HFZlcS/O2XJB+L8fkbrNSqhdtlvjBVjxwUYanNH5Q==}
@@ -3686,6 +3712,26 @@ packages:
     resolution: {integrity: sha512-VXJjc87FScF88uafS3JllDgvAm+c/Slfz06lorj2uAY34rlUu0Nt+v8wreiImcrgAjjIHp1rXpTDlLOGw29WwQ==}
     engines: {node: '>=18'}
 
+  openai@6.46.0:
+    resolution: {integrity: sha512-DFg6jEPT2RO+oAyXtddeUJU8zkGy1OQ1AjGzNIJUMQG03TTqvCpy9tBpQ+2VVVnvrl3E56F8GEin2JYtWpITtA==}
+    peerDependencies:
+      '@aws-sdk/credential-provider-node': '>=3.972.0 <4'
+      '@smithy/hash-node': '>=4.3.0 <5'
+      '@smithy/signature-v4': '>=5.4.0 <6'
+      ws: ^8.18.0
+      zod: ^3.25 || ^4.0
+    peerDependenciesMeta:
+      '@aws-sdk/credential-provider-node':
+        optional: true
+      '@smithy/hash-node':
+        optional: true
+      '@smithy/signature-v4':
+        optional: true
+      ws:
+        optional: true
+      zod:
+        optional: true
+
   openid-client@5.7.1:
     resolution: {integrity: sha512-jDBPgSVfTnkIh71Hg9pRvtJc6wTwqjRkN88+gCFtYWrlP4Yx2Dsrow8uPi3qLr/aeymPF3o2+dS+wOpglK04ew==}
 
@@ -4754,6 +4800,18 @@ packages:
       utf-8-validate:
         optional: true
 
+  ws@8.21.0:
+    resolution: {integrity: sha512-Vsp28b7DRcimFQvrqu2Wek3z1iYxDCWqHYB8Qsnk/S4RfaCQzPGPyBNuVjJV3cd6UiKtUtp6sNM77gWvzcCH+g==}
+    engines: {node: '>=10.0.0'}
+    peerDependencies:
+      bufferutil: ^4.0.1
+      utf-8-validate: '>=5.0.2'
+    peerDependenciesMeta:
+      bufferutil:
+        optional: true
+      utf-8-validate:
+        optional: true
+
   xml-crypto@6.1.2:
     resolution: {integrity: sha512-leBOVQdVi8FvPJrMYoum7Ici9qyxfE4kVi+AkpUoYCSXaQF4IlBm1cneTK9oAxR61LpYxTx7lNcsnBIeRpGW2w==}
     engines: {node: '>=16'}
@@ -5488,6 +5546,69 @@ snapshots:
       fastq: 1.20.1
 
   '@nolyfill/is-core-module@1.0.39': {}
+
+  '@openai/agents-core@0.13.2(ws@8.21.0)(zod@4.3.6)':
+    dependencies:
+      debug: 4.4.3
+      openai: 6.46.0(ws@8.21.0)(zod@4.3.6)
+    optionalDependencies:
+      '@modelcontextprotocol/sdk': 1.29.0(zod@4.3.6)
+      zod: 4.3.6
+    transitivePeerDependencies:
+      - '@aws-sdk/credential-provider-node'
+      - '@cfworker/json-schema'
+      - '@smithy/hash-node'
+      - '@smithy/signature-v4'
+      - supports-color
+      - ws
+
+  '@openai/agents-openai@0.13.2(ws@8.21.0)(zod@4.3.6)':
+    dependencies:
+      '@openai/agents-core': 0.13.2(ws@8.21.0)(zod@4.3.6)
+      debug: 4.4.3
+      openai: 6.46.0(ws@8.21.0)(zod@4.3.6)
+      zod: 4.3.6
+    transitivePeerDependencies:
+      - '@aws-sdk/credential-provider-node'
+      - '@cfworker/json-schema'
+      - '@smithy/hash-node'
+      - '@smithy/signature-v4'
+      - supports-color
+      - ws
+
+  '@openai/agents-realtime@0.13.2(zod@4.3.6)':
+    dependencies:
+      '@openai/agents-core': 0.13.2(ws@8.21.0)(zod@4.3.6)
+      '@types/ws': 8.18.1
+      debug: 4.4.3
+      ws: 8.21.0
+      zod: 4.3.6
+    transitivePeerDependencies:
+      - '@aws-sdk/credential-provider-node'
+      - '@cfworker/json-schema'
+      - '@smithy/hash-node'
+      - '@smithy/signature-v4'
+      - bufferutil
+      - supports-color
+      - utf-8-validate
+
+  '@openai/agents@0.13.2(ws@8.21.0)(zod@4.3.6)':
+    dependencies:
+      '@openai/agents-core': 0.13.2(ws@8.21.0)(zod@4.3.6)
+      '@openai/agents-openai': 0.13.2(ws@8.21.0)(zod@4.3.6)
+      '@openai/agents-realtime': 0.13.2(zod@4.3.6)
+      debug: 4.4.3
+      openai: 6.46.0(ws@8.21.0)(zod@4.3.6)
+      zod: 4.3.6
+    transitivePeerDependencies:
+      - '@aws-sdk/credential-provider-node'
+      - '@cfworker/json-schema'
+      - '@smithy/hash-node'
+      - '@smithy/signature-v4'
+      - bufferutil
+      - supports-color
+      - utf-8-validate
+      - ws
 
   '@opentelemetry/api@1.9.1': {}
 
@@ -8443,6 +8564,11 @@ snapshots:
     dependencies:
       mimic-function: 5.0.1
 
+  openai@6.46.0(ws@8.21.0)(zod@4.3.6):
+    optionalDependencies:
+      ws: 8.21.0
+      zod: 4.3.6
+
   openid-client@5.7.1:
     dependencies:
       jose: 4.15.9
@@ -9696,6 +9822,8 @@ snapshots:
   wrappy@1.0.2: {}
 
   ws@8.20.1: {}
+
+  ws@8.21.0: {}
 
   xml-crypto@6.1.2:
     dependencies:
