@@ -34,9 +34,16 @@ export function reduceAppointmentEvent(
   state: AppointmentMissionState,
   event: AppointmentEvent,
 ): AppointmentMissionState {
+  if (state.events.some((existing) => existing.id === event.id)) {
+    return state;
+  }
+
   const next: AppointmentMissionState = {
     ...state,
-    dependencies: state.dependencies.map((item) => ({ ...item })),
+    dependencies: state.dependencies.map((item) => ({
+      ...item,
+      evidence: [...item.evidence],
+    })),
     pendingConfirmations: [...state.pendingConfirmations],
     receipts: [...state.receipts],
     outcomeEvidence: [...state.outcomeEvidence],
@@ -56,8 +63,9 @@ export function reduceAppointmentEvent(
       return next;
     case "support_intelligence_generated":
       if (Array.isArray(event.payload.dependencies)) {
-        next.dependencies = event.payload
-          .dependencies as AppointmentMissionState["dependencies"];
+        next.dependencies = (
+          event.payload.dependencies as AppointmentMissionState["dependencies"]
+        ).map((item) => ({ ...item, evidence: [...item.evidence] }));
       } else {
         markDependency(
           next,
@@ -111,14 +119,15 @@ export function reduceAppointmentEvent(
     case "service_completed": {
       const receipt = event.payload.receipt;
       if (receipt && typeof receipt === "object") {
-        next.receipts.push(
+        addUniqueReceipt(
+          next,
           receipt as AppointmentMissionState["receipts"][number],
         );
       } else if (event.entityId) {
         addReceipt(next, event);
       }
       if (event.entityId) {
-        next.outcomeEvidence.push({
+        addUniqueOutcomeEvidence(next, {
           type: "service_completed",
           sourceId: event.entityId,
           observedAt: event.occurredAt,
@@ -130,11 +139,12 @@ export function reduceAppointmentEvent(
     case "outcome_recorded": {
       const evidence = event.payload.evidence;
       if (evidence && typeof evidence === "object") {
-        next.outcomeEvidence.push(
+        addUniqueOutcomeEvidence(
+          next,
           evidence as AppointmentMissionState["outcomeEvidence"][number],
         );
       } else if (event.entityId) {
-        next.outcomeEvidence.push({
+        addUniqueOutcomeEvidence(next, {
           type: "participant_outcome",
           sourceId: event.entityId,
           observedAt: event.occurredAt,
@@ -176,7 +186,7 @@ function addReceipt(
   event: AppointmentEvent,
 ) {
   if (!event.entityId) return;
-  state.receipts.push({
+  addUniqueReceipt(state, {
     actionType: event.type,
     entityType:
       typeof event.payload.entityType === "string"
@@ -188,6 +198,31 @@ function addReceipt(
         ? event.payload.receiptId
         : event.id,
   });
+}
+
+function addUniqueReceipt(
+  state: AppointmentMissionState,
+  receipt: AppointmentMissionState["receipts"][number],
+) {
+  if (!state.receipts.some((item) => item.receiptId === receipt.receiptId)) {
+    state.receipts.push(receipt);
+  }
+}
+
+function addUniqueOutcomeEvidence(
+  state: AppointmentMissionState,
+  evidence: AppointmentMissionState["outcomeEvidence"][number],
+) {
+  if (
+    !state.outcomeEvidence.some(
+      (item) =>
+        item.type === evidence.type &&
+        item.sourceId === evidence.sourceId &&
+        item.observedAt === evidence.observedAt,
+    )
+  ) {
+    state.outcomeEvidence.push(evidence);
+  }
 }
 
 function markDependency(
