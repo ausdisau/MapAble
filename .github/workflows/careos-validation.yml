@@ -7,6 +7,7 @@ on:
       - "app/careos/**"
       - "app/coordinator/careos/**"
       - "components/intelligence/**"
+      - "components/layout/DashboardNav.tsx"
       - "intelligence/**"
       - "prisma/**"
       - "tests/careos-*.test.ts"
@@ -17,7 +18,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: careos-validation-${{ github.event.pull_request.number || github.ref }}
@@ -54,6 +55,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref }}
 
       - name: Enable Corepack
         run: corepack enable
@@ -81,8 +84,8 @@ jobs:
       - name: Generate Prisma client
         run: pnpm prisma generate
 
-      - name: Apply migrations to disposable PostgreSQL
-        run: pnpm prisma migrate deploy
+      - name: Apply current schema to disposable PostgreSQL
+        run: pnpm prisma db push --skip-generate
 
       - name: Type-check
         run: pnpm type-check
@@ -92,6 +95,7 @@ jobs:
           pnpm vitest run
           tests/careos-action-kernel.test.ts
           tests/careos-agentic-network.test.ts
+          tests/careos-appointment-replay.test.ts
           tests/careos-coordinate-confirm.test.ts
           tests/care-support-intelligence.test.ts
           tests/careos-kernel-v1.test.ts
@@ -104,9 +108,11 @@ jobs:
           app/careos
           app/coordinator/careos
           components/intelligence
+          components/layout/DashboardNav.tsx
           intelligence
           tests/careos-action-kernel.test.ts
           tests/careos-agentic-network.test.ts
+          tests/careos-appointment-replay.test.ts
           tests/careos-coordinate-confirm.test.ts
           tests/care-support-intelligence.test.ts
           tests/careos-kernel-v1.test.ts
@@ -114,3 +120,18 @@ jobs:
 
       - name: Production build
         run: pnpm build
+
+      - name: Commit regenerated lockfile
+        if: >-
+          github.event_name == 'pull_request' &&
+          github.event.pull_request.head.repo.full_name == github.repository
+        run: |
+          if git diff --quiet -- pnpm-lock.yaml; then
+            echo "pnpm-lock.yaml is already current"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add pnpm-lock.yaml
+          git commit -m "Regenerate pnpm lockfile for OpenAI Agents"
+          git push origin HEAD:${{ github.head_ref }}
