@@ -1,10 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { Card, CardContent } from "@/components/ui/card";
 
- type Mission = {
+type Mission = {
   id: string;
   requestId: string;
   goal: string;
@@ -68,7 +69,7 @@ export function CareOSActivityPanel() {
           My CareOS activity
         </h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          Inspect saved missions and receipts for actions that were actually executed.
+          Inspect saved missions, event timelines and receipts for actions that were actually executed.
         </p>
       </div>
 
@@ -97,7 +98,12 @@ export function CareOSActivityPanel() {
                 <ul className="mt-4 space-y-3">
                   {missions.slice(0, 10).map((mission) => (
                     <li key={mission.id} className="rounded-lg border p-3">
-                      <p className="font-medium">{mission.goal}</p>
+                      <Link
+                        href={`/careos/missions/${mission.id}`}
+                        className="font-medium text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      >
+                        {mission.goal}
+                      </Link>
                       <p className="mt-1 text-xs text-muted-foreground">
                         {mission.status.replaceAll("_", " ")} · {new Date(mission.createdAt).toLocaleString("en-AU")}
                       </p>
