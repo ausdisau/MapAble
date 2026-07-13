@@ -8,61 +8,24 @@ import { Card, CardContent } from "@/components/ui/card";
 import type { CareOSNetworkResponse } from "@/intelligence/network/types";
 import type { MapAbleModule } from "@/intelligence/types";
 
-const MODULES: Array<{
-  id: MapAbleModule;
-  label: string;
-  description: string;
-}> = [
-  {
-    id: "core",
-    label: "Core",
-    description: "Calendar and participant-controlled mission context",
-  },
-  {
-    id: "care",
-    label: "Care",
-    description: "Care requests, support coverage and worker coordination",
-  },
-  {
-    id: "transport",
-    label: "Transport",
-    description: "Accessible transport records and journey dependencies",
-  },
-  {
-    id: "access",
-    label: "Access",
-    description: "Published venue and destination accessibility evidence",
-  },
-  {
-    id: "jobs",
-    label: "Jobs",
-    description: "Inclusive employment context when relevant",
-  },
-  {
-    id: "payments",
-    label: "AbilityPay",
-    description: "Invoice summaries only, never approval or payment",
-  },
+const MODULES: Array<{ id: MapAbleModule; label: string; description: string }> = [
+  { id: "core", label: "Core", description: "Calendar and mission context" },
+  { id: "care", label: "Care", description: "Support coverage and care requests" },
+  { id: "transport", label: "Transport", description: "Accessible journeys and transport records" },
+  { id: "access", label: "Access", description: "Venue and destination access evidence" },
+  { id: "jobs", label: "Jobs", description: "Employment context when relevant" },
+  { id: "payments", label: "AbilityPay", description: "Invoice summaries only, never payment approval" },
 ];
 
-function networkStatusLabel(status: CareOSNetworkResponse["status"]): string {
-  switch (status) {
-    case "ready":
-      return "Ready for participant review";
-    case "human_review_required":
-      return "Human review required";
-    default:
-      return "More information needed";
-  }
+function statusLabel(status: CareOSNetworkResponse["status"]): string {
+  if (status === "ready") return "Ready for participant review";
+  if (status === "human_review_required") return "Human review required";
+  return "More information needed";
 }
 
 function alertClass(severity: "information" | "attention" | "urgent"): string {
-  if (severity === "urgent") {
-    return "border-destructive/50 bg-destructive/10";
-  }
-  if (severity === "attention") {
-    return "border-amber-500/50 bg-amber-500/10";
-  }
+  if (severity === "urgent") return "border-destructive/50 bg-destructive/10";
+  if (severity === "attention") return "border-amber-500/50 bg-amber-500/10";
   return "border-border bg-muted/30";
 }
 
@@ -136,15 +99,14 @@ export function CareOSAgenticNetwork() {
     <section aria-labelledby="careos-network-heading" className="space-y-6">
       <div className="space-y-2">
         <p className="text-sm font-semibold uppercase tracking-wide text-primary">
-          CareOS Agentic Network
+          CareOS Coordinate and Confirm
         </p>
         <h2 id="careos-network-heading" className="text-2xl font-bold">
           Turn a life goal into a coordinated support mission
         </h2>
         <p className="max-w-3xl text-muted-foreground">
-          Choose what CareOS may read for this request. The network maps care,
-          transport, access and other dependencies, then shows its agents,
-          evidence gaps and recovery options. It cannot make a booking or payment.
+          Choose what CareOS may read for this request. It maps dependencies, prepares
+          reviewable drafts and routes uncertainty to people. Nothing is submitted by this screen.
         </p>
       </div>
 
@@ -190,7 +152,7 @@ export function CareOSAgenticNetwork() {
           </fieldset>
 
           <div className="grid gap-3 md:grid-cols-2">
-            <label className="flex min-h-14 items-start gap-3 rounded-lg border border-input p-4 focus-within:ring-2 focus-within:ring-ring">
+            <label className="flex min-h-14 items-start gap-3 rounded-lg border border-input p-4">
               <input
                 type="checkbox"
                 className="mt-1 size-5"
@@ -200,12 +162,11 @@ export function CareOSAgenticNetwork() {
               <span>
                 <span className="block font-medium">Run Continuity Radar</span>
                 <span className="block text-sm text-muted-foreground">
-                  Identify missing services and dependencies that could interrupt the mission.
+                  Find missing services and dependencies that could interrupt the mission.
                 </span>
               </span>
             </label>
-
-            <label className="flex min-h-14 items-start gap-3 rounded-lg border border-input p-4 focus-within:ring-2 focus-within:ring-ring">
+            <label className="flex min-h-14 items-start gap-3 rounded-lg border border-input p-4">
               <input
                 type="checkbox"
                 className="mt-1 size-5"
@@ -213,23 +174,16 @@ export function CareOSAgenticNetwork() {
                 onChange={(event) => setIncludeProfile(event.target.checked)}
               />
               <span>
-                <span className="block font-medium">
-                  Use my accessibility profile
-                </span>
+                <span className="block font-medium">Use my accessibility profile</span>
                 <span className="block text-sm text-muted-foreground">
-                  Off by default. Applies to this request only.
+                  Off by default and applies to this request only.
                 </span>
               </span>
             </label>
           </div>
 
           <div className="flex flex-wrap gap-3">
-            <Button
-              type="button"
-              size="lg"
-              loading={loading}
-              onClick={() => void prepareNetwork()}
-            >
+            <Button type="button" size="lg" loading={loading} onClick={() => void prepareNetwork()}>
               Build my CareOS mission
             </Button>
             <Link
@@ -243,64 +197,26 @@ export function CareOSAgenticNetwork() {
       </Card>
 
       {error ? (
-        <p
-          role="alert"
-          className="rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-destructive"
-        >
+        <p role="alert" className="rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-destructive">
           {error}
         </p>
       ) : null}
 
       {network ? (
-        <div className="space-y-6" aria-live="polite" aria-atomic="false">
-          <div className="rounded-xl border bg-card p-5">
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">
-                  Mission status
-                </p>
-                <h3 className="text-xl font-semibold">
-                  {networkStatusLabel(network.status)}
-                </h3>
-              </div>
-              <span className="rounded-full border px-3 py-1 text-sm font-medium">
-                {network.agents.filter((agent) => agent.status === "active").length} active agents
-              </span>
-            </div>
+        <div className="space-y-8" aria-live="polite" aria-atomic="false">
+          <section className="rounded-xl border bg-card p-5" aria-labelledby="mission-status-heading">
+            <p className="text-sm font-medium text-muted-foreground">Mission status</p>
+            <h3 id="mission-status-heading" className="text-xl font-semibold">
+              {statusLabel(network.status)}
+            </h3>
             <p className="mt-3">{network.goal}</p>
             <ul className="mt-4 list-disc space-y-1 pl-5 text-sm">
-              {network.notices.map((notice) => (
-                <li key={notice}>{notice}</li>
-              ))}
+              {network.notices.map((notice) => <li key={notice}>{notice}</li>)}
             </ul>
-          </div>
+          </section>
 
-          <div>
-            <h3 className="text-xl font-semibold">Agent network</h3>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Every agent has a visible purpose, status and authority ceiling.
-            </p>
-            <div className="mt-4 grid gap-4 lg:grid-cols-3">
-              {network.agents.map((agent) => (
-                <article key={agent.id} className="rounded-xl border bg-card p-5">
-                  <div className="flex flex-wrap items-start justify-between gap-2">
-                    <h4 className="font-semibold">{agent.name}</h4>
-                    <span className="rounded-full border px-2 py-1 text-xs font-medium">
-                      {agent.status.replaceAll("_", " ")}
-                    </span>
-                  </div>
-                  <p className="mt-2 text-sm">{agent.purpose}</p>
-                  <p className="mt-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                    Maximum authority: {agent.maximumAuthorityLevel}
-                  </p>
-                  <p className="mt-2 text-sm text-muted-foreground">{agent.reason}</p>
-                </article>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <h3 className="text-xl font-semibold">Mission dependency graph</h3>
+          <section aria-labelledby="mission-graph-heading">
+            <h3 id="mission-graph-heading" className="text-xl font-semibold">Mission dependency graph</h3>
             <div className="mt-4 grid gap-4 lg:grid-cols-2">
               {network.mission.nodes.map((node) => (
                 <article key={node.id} className="rounded-xl border bg-card p-5">
@@ -311,71 +227,80 @@ export function CareOSAgenticNetwork() {
                     </span>
                   </div>
                   <p className="mt-2 text-sm">{node.details}</p>
-                  <p className="mt-3 text-xs text-muted-foreground">
-                    Source: {node.sourceModule}
-                    {node.startsAt
-                      ? `, ${new Date(node.startsAt).toLocaleString("en-AU")}`
-                      : ""}
-                  </p>
+                  <p className="mt-3 text-xs text-muted-foreground">Source: {node.sourceModule}</p>
                 </article>
               ))}
             </div>
-          </div>
+          </section>
 
-          <div>
-            <h3 className="text-xl font-semibold">Continuity Radar</h3>
+          <section aria-labelledby="continuity-heading">
+            <h3 id="continuity-heading" className="text-xl font-semibold">Continuity Radar</h3>
             {network.continuityAlerts.length === 0 ? (
               <p className="mt-3 rounded-lg border bg-muted/30 p-4">
-                No obvious continuity gap was found in the authorised records. Live service
-                availability still needs confirmation.
+                No obvious continuity gap was found. Live availability still needs confirmation.
               </p>
             ) : (
               <div className="mt-4 space-y-3">
                 {network.continuityAlerts.map((alert) => (
-                  <article
-                    key={alert.id}
-                    className={`rounded-xl border p-5 ${alertClass(alert.severity)}`}
-                  >
-                    <div className="flex flex-wrap items-start justify-between gap-2">
-                      <h4 className="font-semibold">{alert.title}</h4>
-                      <span className="rounded-full border px-2 py-1 text-xs font-medium">
-                        {alert.severity}
-                      </span>
-                    </div>
+                  <article key={alert.id} className={`rounded-xl border p-5 ${alertClass(alert.severity)}`}>
+                    <h4 className="font-semibold">{alert.title}</h4>
                     <p className="mt-2 text-sm">{alert.explanation}</p>
-                    <ul className="mt-3 list-disc space-y-1 pl-5 text-sm">
-                      {alert.recoveryActions.map((action) => (
-                        <li key={action}>{action}</li>
-                      ))}
+                    <ul className="mt-3 list-disc pl-5 text-sm">
+                      {alert.recoveryActions.map((action) => <li key={action}>{action}</li>)}
                     </ul>
                   </article>
                 ))}
               </div>
             )}
-          </div>
+          </section>
 
-          <div>
-            <h3 className="text-xl font-semibold">Recommended next steps</h3>
+          <section aria-labelledby="proposal-heading">
+            <h3 id="proposal-heading" className="text-xl font-semibold">Draft actions for your review</h3>
+            <p className="mt-1 text-sm text-muted-foreground">
+              These are proposals only. They have payload hashes and expiry times, but no execution token.
+            </p>
             <div className="mt-4 space-y-3">
-              {network.recommendations.map((recommendation) => (
-                <article key={recommendation.id} className="rounded-xl border bg-card p-5">
-                  <h4 className="font-semibold">{recommendation.title}</h4>
-                  <p className="mt-2 text-sm">{recommendation.explanation}</p>
-                  <p className="mt-3 text-xs text-muted-foreground">
-                    Authority level: {recommendation.nextAction.authorityLevel}
-                  </p>
-                  {recommendation.nextAction.href ? (
-                    <Link
-                      href={recommendation.nextAction.href}
-                      className="mt-3 inline-block font-medium text-primary underline-offset-4 hover:underline"
-                    >
-                      {recommendation.nextAction.label}
-                    </Link>
-                  ) : null}
+              {network.actionProposals.map((proposal) => (
+                <article key={proposal.id} className="rounded-xl border bg-card p-5">
+                  <div className="flex flex-wrap items-start justify-between gap-2">
+                    <h4 className="font-semibold">{proposal.title}</h4>
+                    <span className="rounded-full border px-2 py-1 text-xs font-medium">Draft</span>
+                  </div>
+                  <p className="mt-2 text-sm">{proposal.summary}</p>
+                  <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
+                    <div><dt className="font-medium">Information to share</dt><dd>{proposal.informationToShare.join(", ")}</dd></div>
+                    <div><dt className="font-medium">Expires</dt><dd>{new Date(proposal.expiresAt).toLocaleString("en-AU")}</dd></div>
+                  </dl>
+                  <p className="mt-3 break-all text-xs text-muted-foreground">Payload hash: {proposal.payloadHash}</p>
+                  <Button type="button" variant="outline" size="sm" className="mt-4" disabled>
+                    Confirmation flow not enabled
+                  </Button>
                 </article>
               ))}
             </div>
-          </div>
+          </section>
+
+          <section aria-labelledby="human-review-heading">
+            <h3 id="human-review-heading" className="text-xl font-semibold">Human review queue</h3>
+            {network.humanReviewQueue.length === 0 ? (
+              <p className="mt-3 rounded-lg border bg-muted/30 p-4">No human review item was created.</p>
+            ) : (
+              <div className="mt-4 space-y-3">
+                {network.humanReviewQueue.map((item) => (
+                  <article key={item.id} className="rounded-xl border bg-card p-5">
+                    <div className="flex flex-wrap items-start justify-between gap-2">
+                      <h4 className="font-semibold">{item.title}</h4>
+                      <span className="rounded-full border px-2 py-1 text-xs font-medium">{item.priority}</span>
+                    </div>
+                    <p className="mt-2 text-sm">{item.summary}</p>
+                    <p className="mt-3 text-xs text-muted-foreground">
+                      Routed to {item.assignedRole.replaceAll("_", " ")} by {new Date(item.dueAt).toLocaleString("en-AU")}.
+                    </p>
+                  </article>
+                ))}
+              </div>
+            )}
+          </section>
         </div>
       ) : null}
     </section>
