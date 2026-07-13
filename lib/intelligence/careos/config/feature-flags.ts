@@ -10,6 +10,7 @@ function enabled(name: string, defaultValue = false): boolean {
 
 export const careOSFeatureFlags = {
   aiEnabled: enabled("MAPABLE_AI_ENABLED"),
+  modelReasoningEnabled: enabled("MAPABLE_CAREOS_MODEL_REASONING_ENABLED"),
   enabled: enabled("MAPABLE_CAREOS_ENABLED"),
   coreEnabled: enabled("MAPABLE_CAREOS_CORE_ENABLED", true),
   careEnabled: enabled("MAPABLE_CAREOS_CARE_ENABLED", true),
@@ -20,6 +21,11 @@ export const careOSFeatureFlags = {
   foodsEnabled: enabled("MAPABLE_CAREOS_FOODS_ENABLED"),
   paymentsEnabled: enabled("MAPABLE_CAREOS_PAYMENTS_ENABLED"),
   writeActionsEnabled: enabled("MAPABLE_CAREOS_WRITE_ACTIONS"),
+  writeActionsRuntimeEnabled: enabled("MAPABLE_CAREOS_WRITE_ACTIONS_ENABLED"),
+  ambientEnabled: enabled("MAPABLE_CAREOS_AMBIENT_ENABLED"),
+  simulationEnabled: enabled("MAPABLE_CAREOS_SIMULATION_ENABLED"),
+  swarmEnabled: enabled("MAPABLE_CAREOS_SWARM_ENABLED"),
+  commonsEnabled: enabled("MAPABLE_CAREOS_COMMONS_ENABLED"),
   memoryEnabled: enabled("MAPABLE_CAREOS_MEMORY_ENABLED"),
   continuityRadarEnabled: enabled("MAPABLE_CAREOS_CONTINUITY_RADAR_ENABLED"),
   auditEnabled: enabled("MAPABLE_CAREOS_AUDIT_ENABLED", true),

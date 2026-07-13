@@ -3,6 +3,7 @@ import Link from "next/link";
 import { CareOSActivity } from "./CareOSActivity";
 import { MemoryControls } from "./MemoryControls";
 import { MissionComposer } from "./MissionComposer";
+import { MyDayPanel } from "./MyDayPanel";
 
 export function CareOSPanel() {
   return (
@@ -13,6 +14,7 @@ export function CareOSPanel() {
           CareOS helps you coordinate care, transport and access information. It provides suggestions using information you authorise. You remain in control.
         </p>
       </header>
+      <MyDayPanel />
       <MissionComposer />
       <CareOSActivity />
       <MemoryControls />

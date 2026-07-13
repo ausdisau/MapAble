@@ -83,7 +83,16 @@ export async function composeCareTransportMission(
     };
   }
 
-  const [workers, vehicles, access] = await Promise.all([
+  const [preferences, existingCareRequests, existingTransportRequests, workers, vehicles, access] = await Promise.all([
+    tools.execute<{
+      preferences: { key: string; value: unknown }[];
+    }>("read_care_preferences", {}, context),
+    tools.execute<{
+      requests: { id: string; status: string; createdAt: string }[];
+    }>("read_existing_care_requests", {}, context),
+    tools.execute<{
+      trips: { id: string; status: string; startAt: string }[];
+    }>("read_existing_transport_requests", {}, context),
     tools.execute<{
       workers: { id: string; name: string; organisationId: string }[];
     }>("search_compatible_workers", { serviceType: parsed.supportRequirement }, context),
@@ -125,10 +134,20 @@ export async function composeCareTransportMission(
     summary: `${item.placeName}: ${item.summary}`,
     verified: item.confidence === "verified",
   }));
-  const uncertainty =
-    evidence.length === 0
+  const uncertainty = [
+    ...(evidence.length === 0
       ? ["No destination accessibility evidence was found. Confirm access directly with the destination."]
-      : [];
+      : []),
+    ...(existingCareRequests.requests.length > 0
+      ? ["Existing care requests were found. Review them before creating another request."]
+      : []),
+    ...(existingTransportRequests.trips.length > 0
+      ? ["Existing transport trips were found. Check for a timing conflict."]
+      : []),
+    ...(preferences.preferences.length === 0
+      ? ["No participant-confirmed care preferences were available for this comparison."]
+      : []),
+  ];
   const recommendations = Array.from({ length: recommendationCount }, (_, index) => {
     const worker = workers.workers[index];
     const vehicle = vehicles.vehicles[index];
@@ -180,6 +199,19 @@ export async function composeCareTransportMission(
     risk: "read",
     decision: "recommendation_created",
     metadata: { missionId: mission.id, recommendationCount },
+  });
+  await prisma.careOSActivityEvent.create({
+    data: {
+      participantId: context.participant.participantId,
+      requestId: context.requestId,
+      eventType: "recommendation_created",
+      summary: `${recommendationCount} coordinated care and transport option(s) were prepared. No booking was made.`,
+      metadata: {
+        missionId: mission.id,
+        recommendationCount,
+        humanReviewRequired: uncertainty.length > 0,
+      },
+    },
   });
 
   return {

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { prisma } from "@/lib/prisma";
+import { listCalendarEvents } from "@/lib/calendar/calendar-service";
 
 import type { CareOSToolDefinition } from "./tool-definition";
 
@@ -35,24 +35,25 @@ export const readUpcomingAppointmentsTool: CareOSToolDefinition<
   authorityLevel: "L0_INFORMATION",
   requiresParticipantConfirmation: false,
   async execute(input, context) {
-    const events = await prisma.calendarEvent.findMany({
-      where: {
-        participantId: context.participant.participantId,
-        startAt: { gte: input.after ? new Date(input.after) : new Date() },
-        ...(input.query
-          ? { title: { contains: input.query, mode: "insensitive" } }
-          : {}),
-      },
-      select: { id: true, title: true, startAt: true, endAt: true, timezone: true },
-      orderBy: { startAt: "asc" },
-      take: 10,
+    const events = await listCalendarEvents({
+      participantId: context.participant.participantId,
+      from: input.after ? new Date(input.after) : new Date(),
     });
     return {
-      appointments: events.map((event) => ({
-        ...event,
-        startAt: event.startAt.toISOString(),
-        endAt: event.endAt.toISOString(),
-      })),
+      appointments: events
+        .filter((event) =>
+          input.query
+            ? event.title.toLowerCase().includes(input.query.toLowerCase())
+            : true
+        )
+        .slice(0, 10)
+        .map((event) => ({
+          id: event.id,
+          title: event.title,
+          startAt: event.startAt.toISOString(),
+          endAt: event.endAt.toISOString(),
+          timezone: event.timezone,
+        })),
     };
   },
 };
