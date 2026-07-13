@@ -5,6 +5,7 @@ import React, { useMemo } from "react";
 
 import { CopilotPanel } from "@/components/copilot/CopilotPanel";
 import { AccessibleJourneyAssistant } from "@/components/intelligence/AccessibleJourneyAssistant";
+import { CareOSActionWorkbench } from "@/components/intelligence/CareOSActionWorkbench";
 import { CareOSActivityPanel } from "@/components/intelligence/CareOSActivityPanel";
 import { CareOSAgenticNetwork } from "@/components/intelligence/CareOSAgenticNetwork";
 import { MapAbleCoreBrief } from "@/components/intelligence/MapAbleCoreBrief";
@@ -25,6 +26,7 @@ export function AskPageClient() {
     <div className="space-y-12">
       <CopilotPanel initialQuery={initialQuery} />
       <CareOSAgenticNetwork />
+      <CareOSActionWorkbench />
       <CareOSActivityPanel />
       <MapAbleCoreBrief />
       <AccessibleJourneyAssistant />
