@@ -11,7 +11,9 @@ import type {
   TransportOption,
 } from "./types";
 
-function buildOptions(context: Awaited<ReturnType<typeof buildMapAbleIntelligenceContext>>): TransportOption[] {
+function buildOptions(
+  context: Awaited<ReturnType<typeof buildMapAbleIntelligenceContext>>,
+): TransportOption[] {
   const mobility = context.mobilityRequirements;
   const needsVehicle =
     mobility.requiresWheelchairAccessible ||
@@ -29,7 +31,9 @@ function buildOptions(context: Awaited<ReturnType<typeof buildMapAbleIntelligenc
       pickupLeadMinutes: extra,
       accessibilityFeatures: [
         mobility.requiresHoist ? "Hoist requested" : "Ramp or lift access requested",
-        mobility.driverAssistanceRequired ? "Driver assistance requested" : "Driver assistance optional",
+        mobility.driverAssistanceRequired
+          ? "Driver assistance requested"
+          : "Driver assistance optional",
       ],
       rationale:
         "This option most directly matches the mobility requirements stored in your participant-controlled profile.",
@@ -46,7 +50,10 @@ function buildOptions(context: Awaited<ReturnType<typeof buildMapAbleIntelligenc
     accessibilityFeatures: ["Pre-booked accessible service", "Longer boarding buffer"],
     rationale:
       "Community transport may offer more assistance and scheduling support than a standard point-to-point service.",
-    limitations: ["Eligibility and operating hours vary by provider.", "Live availability has not been checked."],
+    limitations: [
+      "Eligibility and operating hours vary by provider.",
+      "Live availability has not been checked.",
+    ],
     liveAvailabilityChecked: false,
   });
 
@@ -59,7 +66,9 @@ function buildOptions(context: Awaited<ReturnType<typeof buildMapAbleIntelligenc
       accessibilityFeatures: ["Step-free route required", "Disruption checks required"],
       rationale:
         "This may be suitable when the route is step-free and assistance requirements can be met.",
-      limitations: ["Lift outages and live service conditions have not been checked."],
+      limitations: [
+        "Lift outages and live service conditions have not been checked.",
+      ],
       liveAvailabilityChecked: false,
     });
   }
@@ -74,16 +83,22 @@ export async function planAccessibleJourney(params: {
   const requestId = randomUUID();
   const context = await buildMapAbleIntelligenceContext(params.user, params.request);
   const toolsCalled = ["read_upcoming_appointments"];
-  if (params.request.useAccessibilityProfile) toolsCalled.push("read_mobility_preferences");
+  if (params.request.useAccessibilityProfile) {
+    toolsCalled.push("read_mobility_preferences");
+  }
 
-  const missing = !context.selectedAppointment || !params.request.origin || !params.request.destination;
-  if (missing) {
+  const appointment = context.selectedAppointment;
+  const origin = params.request.origin;
+  const destination = params.request.destination;
+  if (!appointment || !origin || !destination) {
     return {
       requestId,
       status: "needs_information",
-      appointment: context.selectedAppointment,
-      summary: "MapAble needs an appointment, pickup address and destination before it can prepare a journey.",
-      reasoning: "These details are required to create a specific transport proposal.",
+      appointment,
+      summary:
+        "MapAble needs an appointment, pickup address and destination before it can prepare a journey.",
+      reasoning:
+        "These details are required to create a specific transport proposal.",
       uncertainty: [],
       options: [],
       selectedOptionId: null,
@@ -93,26 +108,35 @@ export async function planAccessibleJourney(params: {
         action: "create_transport_trip",
         token: null,
         expiresAt: null,
-        confirmationText: "No booking can be created until the missing details are supplied.",
+        confirmationText:
+          "No booking can be created until the missing details are supplied.",
       },
-      nonAiPath: { label: "Use the standard transport request form", href: "/dashboard/transport/new" },
+      nonAiPath: {
+        label: "Use the standard transport request form",
+        href: "/dashboard/transport/new",
+      },
       toolsCalled,
     };
   }
 
   const options = buildOptions(context);
-  const narrative = await explainJourneyPlan({ context, options, message: params.request.message });
-  const selected = options.find((option) => option.id === narrative.selectedOptionId) ?? options[0];
-  const appointmentStart = new Date(context.selectedAppointment.startAt);
+  const narrative = await explainJourneyPlan({
+    context,
+    options,
+    message: params.request.message,
+  });
+  const selected =
+    options.find((option) => option.id === narrative.selectedOptionId) ?? options[0];
+  const appointmentStart = new Date(appointment.startAt);
   const scheduledStart = new Date(
-    appointmentStart.getTime() - selected.pickupLeadMinutes * 60 * 1000
+    appointmentStart.getTime() - selected.pickupLeadMinutes * 60 * 1000,
   ).toISOString();
   const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString();
   const trip = {
-    pickupAddress: params.request.origin,
-    dropoffAddress: params.request.destination,
+    pickupAddress: origin,
+    dropoffAddress: destination,
     scheduledStart,
-    scheduledEnd: context.selectedAppointment.endAt,
+    scheduledEnd: appointment.endAt,
     accessNotes: context.accessNotes,
     mobilityRequirements: context.mobilityRequirements,
     prefillFromProfile: false as const,
@@ -138,7 +162,7 @@ export async function planAccessibleJourney(params: {
   return {
     requestId,
     status: "ready_for_confirmation",
-    appointment: context.selectedAppointment,
+    appointment,
     summary: narrative.summary,
     reasoning: narrative.reasoning,
     uncertainty: narrative.uncertainty,
@@ -149,15 +173,18 @@ export async function planAccessibleJourney(params: {
         source: "calendar",
         label: "Appointment time",
         confidence: 1,
-        details: context.selectedAppointment.startAt,
+        details: appointment.startAt,
       },
       ...(context.profileUsed
-        ? [{
-            source: "participant_profile" as const,
-            label: "Participant-controlled mobility preferences",
-            confidence: 1,
-            details: "Used only because profile sharing was selected for this request.",
-          }]
+        ? [
+            {
+              source: "participant_profile" as const,
+              label: "Participant-controlled mobility preferences",
+              confidence: 1,
+              details:
+                "Used only because profile sharing was selected for this request.",
+            },
+          ]
         : []),
       {
         source: "mapable_transport_rules",
@@ -173,7 +200,10 @@ export async function planAccessibleJourney(params: {
       expiresAt,
       confirmationText: `Confirm ${selected.label}. This will create a transport request; it does not guarantee provider acceptance.`,
     },
-    nonAiPath: { label: "Use the standard transport request form", href: "/dashboard/transport/new" },
+    nonAiPath: {
+      label: "Use the standard transport request form",
+      href: "/dashboard/transport/new",
+    },
     toolsCalled,
   };
 }
