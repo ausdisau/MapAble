@@ -6,7 +6,10 @@ import type {
   AppointmentMissionRequest,
   AppointmentMissionState,
 } from "@/intelligence/kernel/v1/appointment-types";
-import { reduceAppointmentMission } from "@/intelligence/kernel/v1/event-reducer";
+import {
+  reduceAppointmentMission,
+  replayAppointmentMission,
+} from "@/intelligence/kernel/v1/event-reducer";
 
 const request: AppointmentMissionRequest = {
   outcome: "Attend my appointment with reliable support.",
@@ -84,11 +87,7 @@ function event(
 
 describe("CareOS Kernel v1 appointment mission", () => {
   it("keeps consequential actions prohibited while allowing draft handoffs", () => {
-    const authority = evaluateAppointmentAuthority({
-      participantId: "participant-1",
-      request,
-    });
-
+    const authority = evaluateAppointmentAuthority({ participantId: "participant-1", request });
     expect(authority.decision).toBe("allow");
     expect(authority.permittedActions).toContain("draft_care_request");
     expect(authority.permittedActions).toContain("draft_transport_request");
@@ -99,12 +98,8 @@ describe("CareOS Kernel v1 appointment mission", () => {
   it("requires human review for high-intensity support", () => {
     const authority = evaluateAppointmentAuthority({
       participantId: "participant-1",
-      request: {
-        ...request,
-        care: { ...request.care, highIntensitySupport: true },
-      },
+      request: { ...request, care: { ...request.care, highIntensitySupport: true } },
     });
-
     expect(authority.decision).toBe("human_review_required");
     expect(authority.reasons.join(" ")).toContain("High-intensity support");
   });
@@ -113,7 +108,6 @@ describe("CareOS Kernel v1 appointment mission", () => {
     let state = baseState();
     state = reduceAppointmentMission(state, event("care_action_prepared"));
     state = reduceAppointmentMission(state, event("transport_action_prepared"));
-
     expect(state.phase).toBe("awaiting_participant");
     expect(state.pendingConfirmations).toEqual(["care", "transport"]);
   });
@@ -129,17 +123,26 @@ describe("CareOS Kernel v1 appointment mission", () => {
         payload: { receiptId: "receipt-1", entityType: "CareRequest" },
       }),
     );
-
     expect(state.pendingConfirmations).not.toContain("care");
-    expect(state.dependencies.find((item) => item.id === "care")?.status).toBe(
-      "confirmed",
-    );
+    expect(state.dependencies.find((item) => item.id === "care")?.status).toBe("confirmed");
     expect(state.receipts).toContainEqual({
       actionType: "care_action_confirmed",
       entityType: "CareRequest",
       entityId: "care-request-1",
       receiptId: "receipt-1",
     });
+  });
+
+  it("replays the same event idempotently without duplicating receipts", () => {
+    const confirmed = event("care_action_confirmed", {
+      id: "confirmed-once",
+      source: "care",
+      entityId: "care-request-1",
+      payload: { receiptId: "receipt-1", entityType: "CareRequest" },
+    });
+    const state = replayAppointmentMission(baseState(), [confirmed, confirmed]);
+    expect(state.events.filter((item) => item.id === "confirmed-once")).toHaveLength(1);
+    expect(state.receipts).toHaveLength(1);
   });
 
   it("routes urgent continuity events to human review without executing recovery", () => {
@@ -151,22 +154,16 @@ describe("CareOS Kernel v1 appointment mission", () => {
         summary: "Worker cancellation affects the appointment mission.",
       }),
     );
-
     expect(state.phase).toBe("awaiting_human_review");
     expect(state.humanReviewRequired).toBe(true);
     expect(state.receipts).toHaveLength(0);
   });
 
   it("completes only after outcome evidence is recorded", () => {
-    let state = baseState();
-    state = reduceAppointmentMission(
-      state,
-      event("outcome_recorded", {
-        source: "participant",
-        entityId: "outcome-1",
-      }),
+    const state = reduceAppointmentMission(
+      baseState(),
+      event("outcome_recorded", { source: "participant", entityId: "outcome-1" }),
     );
-
     expect(state.phase).toBe("completed");
     expect(state.outcomeEvidence).toContainEqual({
       type: "participant_outcome",
