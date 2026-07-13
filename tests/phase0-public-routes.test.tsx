@@ -30,7 +30,6 @@ const publicModuleLayouts = [
   "app/care/layout.tsx",
   "app/transport/layout.tsx",
   "app/employment/layout.tsx",
-  "app/marketplace/layout.tsx",
   "app/foods/layout.tsx",
 ];
 
