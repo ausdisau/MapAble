@@ -66,6 +66,14 @@ export const appointmentEventSchema = z.object({
 
 export type AppointmentEvent = z.infer<typeof appointmentEventSchema>;
 
+export type AppointmentOutcomeEvidence = {
+  type: string;
+  sourceId: string;
+  observedAt: string;
+  summary?: string;
+  correctionOf?: string;
+};
+
 export type AppointmentMissionState = {
   missionId: string;
   participantId: string;
@@ -76,6 +84,6 @@ export type AppointmentMissionState = {
   pendingConfirmations: Array<"care" | "transport">;
   humanReviewRequired: boolean;
   receipts: Array<{ actionType: string; entityType: string; entityId: string; receiptId: string }>;
-  outcomeEvidence: Array<{ type: string; sourceId: string; observedAt: string }>;
+  outcomeEvidence: AppointmentOutcomeEvidence[];
   events: AppointmentEvent[];
 };
