@@ -1,3 +1,5 @@
+import { randomUUID } from "node:crypto";
+
 import { NextResponse } from "next/server";
 import { ZodError, z } from "zod";
 
@@ -9,6 +11,7 @@ import {
 import { hashCareOSPayload } from "@/intelligence/actions/action-envelope";
 import { verifyCareOSActionToken } from "@/intelligence/actions/action-token";
 import { getMapAbleIntelligenceConfig } from "@/intelligence/config";
+import { appendAppointmentMissionEvent } from "@/intelligence/kernel/v1/appointment-event-service";
 import { requireApiSession } from "@/lib/api/auth-handler";
 import { hasPermission } from "@/lib/auth/permissions";
 import { createAuditEvent } from "@/lib/audit/audit-event-service";
@@ -97,6 +100,39 @@ export async function POST(request: Request) {
       resultEntityType: entityType,
       resultEntityId: entityId,
     });
+
+    let missionStateUpdated = false;
+    try {
+      await appendAppointmentMissionEvent({
+        id: randomUUID(),
+        missionId: envelope.requestId,
+        participantId: user.id,
+        type:
+          envelope.actionType === "submit_care_request"
+            ? "care_action_confirmed"
+            : "transport_action_confirmed",
+        source:
+          envelope.actionType === "submit_care_request" ? "care" : "transport",
+        severity: "information",
+        occurredAt: new Date().toISOString(),
+        summary:
+          envelope.actionType === "submit_care_request"
+            ? "The participant confirmed and submitted the Care request."
+            : "The participant confirmed and submitted the Transport request.",
+        entityId,
+        payload: { receiptId, entityType, payloadHash: envelope.payloadHash },
+      });
+      missionStateUpdated = true;
+    } catch (error) {
+      const code = error instanceof Error ? error.message : "";
+      if (
+        code !== "CAREOS_APPOINTMENT_MISSION_NOT_FOUND" &&
+        code !== "CAREOS_APPOINTMENT_STATE_UNAVAILABLE"
+      ) {
+        throw error;
+      }
+    }
+
     await createAuditEvent({
       actorUserId: user.id,
       actorRole: user.primaryRole,
@@ -106,10 +142,11 @@ export async function POST(request: Request) {
       entityId,
       metadata: {
         receiptId,
-        requestId: envelope.requestId,
+        missionId: envelope.requestId,
         proposalId: envelope.proposalId,
         actionType: envelope.actionType,
         payloadHash: envelope.payloadHash,
+        missionStateUpdated,
       },
     });
 
@@ -117,12 +154,14 @@ export async function POST(request: Request) {
       {
         receipt: {
           id: receiptId,
+          missionId: envelope.requestId,
           actionType: envelope.actionType,
           status: "completed",
           resultEntityType: entityType,
           resultEntityId: entityId,
           payloadHash: envelope.payloadHash,
         },
+        missionStateUpdated,
         result,
       },
       { status: 201 },
