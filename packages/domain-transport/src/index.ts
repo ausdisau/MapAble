@@ -23,7 +23,7 @@ export type TransportReasonCode = z.infer<typeof transportReasonCodeSchema>;
 
 export const verificationSchema = z.object({
   kind: z.string().min(1),
-  status: z.enum(["verified", "pending_review", "rejected", "not_provided"]),
+  status: z.enum(["verified", "pending_review", "expired", "rejected", "not_provided"]),
   expiresAt: z.string().datetime().nullable(),
 });
 
