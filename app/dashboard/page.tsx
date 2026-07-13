@@ -132,6 +132,11 @@ export default async function DashboardPage() {
           href="/dashboard/consent"
         />
         <CoreHubCard
+          title="My CareOS"
+          description="Coordinate care and transport with participant-controlled recommendations"
+          href="/dashboard/careos"
+        />
+        <CoreHubCard
           title="Bookings"
           description={`${bookingsCount} booking request(s)`}
           href="/dashboard/bookings"

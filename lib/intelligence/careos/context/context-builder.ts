@@ -27,6 +27,7 @@ export async function buildCareOSContext(params: {
   requestId?: string;
   traceId?: string;
   channel?: CareOSContext["runtime"]["channel"];
+  requestScopedConsent?: string[];
 }): Promise<CareOSContext> {
   const participantId = params.participantId ?? params.user.id;
   const profile = await prisma.participantProfile.findUnique({
@@ -48,6 +49,7 @@ export async function buildCareOSContext(params: {
     participantId,
     actorUserId: params.user.id,
   });
+  const requestScopedConsent = params.requestScopedConsent ?? [];
   const permissions = CAREOS_READ_PERMISSIONS.filter((permission) =>
     hasPermission(params.user.primaryRole, permission)
   );
@@ -80,7 +82,7 @@ export async function buildCareOSContext(params: {
       responseLength: "standard",
     },
     consent: {
-      grantedScopes,
+      grantedScopes: [...new Set([...grantedScopes, ...requestScopedConsent])],
       deniedScopes: [],
       requestScoped: true,
     },
