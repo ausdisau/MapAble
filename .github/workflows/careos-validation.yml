@@ -64,9 +64,16 @@ jobs:
           node-version: 20
           cache: pnpm
 
-      - name: Install dependencies
-        # Temporary until pnpm-lock.yaml is regenerated and committed for @openai/agents.
+      - name: Install dependencies and regenerate lockfile
         run: pnpm install --no-frozen-lockfile
+
+      - name: Upload regenerated lockfile
+        uses: actions/upload-artifact@v4
+        with:
+          name: careos-pnpm-lock
+          path: pnpm-lock.yaml
+          if-no-files-found: error
+          retention-days: 3
 
       - name: Validate Prisma schema
         run: pnpm prisma validate
