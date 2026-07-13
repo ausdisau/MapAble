@@ -4,6 +4,7 @@ import { CareOSActivity } from "./CareOSActivity";
 import { MemoryControls } from "./MemoryControls";
 import { MissionComposer } from "./MissionComposer";
 import { MyDayPanel } from "./MyDayPanel";
+import { TransportSimulationPanel } from "./TransportSimulationPanel";
 
 export function CareOSPanel() {
   return (
@@ -16,6 +17,7 @@ export function CareOSPanel() {
       </header>
       <MyDayPanel />
       <MissionComposer />
+      <TransportSimulationPanel />
       <CareOSActivity />
       <MemoryControls />
       <section aria-labelledby="careos-non-ai-heading" className="rounded-xl border border-primary/20 bg-primary/5 p-5">
