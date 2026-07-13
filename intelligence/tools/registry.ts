@@ -10,6 +10,10 @@ import { getMobilityPrefillForUser } from "@/lib/transport/profile-prefill-servi
 import { listTransportTripsForUser } from "@/lib/transport/transport-trip-service";
 
 import {
+  readVerifiedProviderCapacity,
+  readVerifiedWorkerCapabilities,
+} from "../capacity/live-capacity-service";
+import {
   hasSessionConsent,
   type IntelligenceSessionConsentScope,
 } from "../consent/session-consent";
@@ -34,6 +38,19 @@ export type IntelligenceToolDefinition<TInput, TOutput> = {
 };
 
 const emptyInput = z.object({});
+const capacityInput = z.object({
+  region: z.string().trim().min(1).max(120).optional(),
+  serviceType: z.string().trim().min(1).max(120).optional(),
+  days: z.number().int().min(1).max(90).default(14),
+  limit: z.number().int().min(1).max(50).default(20),
+});
+const workerCapabilityInput = z.object({
+  region: z.string().trim().min(1).max(120).optional(),
+  serviceType: z.string().trim().min(1).max(120).optional(),
+  language: z.string().trim().min(1).max(120).optional(),
+  highIntensityRequired: z.boolean().default(false),
+  limit: z.number().int().min(1).max(50).default(20),
+});
 
 export const intelligenceToolRegistry = {
   read_upcoming_appointments: {
@@ -83,6 +100,32 @@ export const intelligenceToolRegistry = {
           linkedTransportRequired: true,
         },
       });
+    },
+  },
+  read_verified_provider_capacity: {
+    name: "read_verified_provider_capacity",
+    module: "care",
+    description:
+      "Read live provider capacity records and separate provider claims from MapAble verification evidence.",
+    mode: "read",
+    inputSchema: capacityInput,
+    requiredPermissions: ["search:providers"],
+    requiredConsent: ["care.summary"],
+    async execute(input: z.infer<typeof capacityInput>) {
+      return readVerifiedProviderCapacity(input);
+    },
+  },
+  read_verified_worker_capabilities: {
+    name: "read_verified_worker_capabilities",
+    module: "care",
+    description:
+      "Read recorded worker capabilities, credential states, verified trust credentials and availability without ranking or assignment.",
+    mode: "read",
+    inputSchema: workerCapabilityInput,
+    requiredPermissions: ["search:providers"],
+    requiredConsent: ["care.summary"],
+    async execute(input: z.infer<typeof workerCapabilityInput>) {
+      return readVerifiedWorkerCapabilities(input);
     },
   },
   read_transport_trips: {
@@ -161,7 +204,7 @@ export class IntelligenceToolAccessError extends Error {
     public readonly code:
       | "TOOL_NOT_READ_ONLY"
       | "PERMISSION_DENIED"
-      | "CONSENT_REQUIRED"
+      | "CONSENT_REQUIRED",
   ) {
     super(code);
   }
@@ -170,7 +213,7 @@ export class IntelligenceToolAccessError extends Error {
 export async function executeIntelligenceReadTool(
   name: IntelligenceToolName,
   rawInput: unknown,
-  context: IntelligenceToolContext
+  context: IntelligenceToolContext,
 ): Promise<unknown> {
   const tool = intelligenceToolRegistry[name] as unknown as IntelligenceToolDefinition<
     unknown,
@@ -181,7 +224,7 @@ export async function executeIntelligenceReadTool(
   }
 
   const authorised = tool.requiredPermissions.every((permission) =>
-    hasPermission(context.user.primaryRole, permission)
+    hasPermission(context.user.primaryRole, permission),
   );
   if (!authorised) throw new IntelligenceToolAccessError("PERMISSION_DENIED");
   if (!hasSessionConsent(context.consentScopes, tool.requiredConsent)) {
@@ -193,6 +236,6 @@ export async function executeIntelligenceReadTool(
 
 export function listIntelligenceToolsForModule(module: MapAbleModule) {
   return Object.values(intelligenceToolRegistry).filter(
-    (tool) => tool.module === module
+    (tool) => tool.module === module,
   );
 }
