@@ -10,6 +10,7 @@ on:
       - "intelligence/**"
       - "prisma/**"
       - "tests/careos-*.test.ts"
+      - "tests/care-support-intelligence.test.ts"
       - "package.json"
       - "pnpm-lock.yaml"
       - ".github/workflows/careos-validation.yml"
@@ -79,10 +80,25 @@ jobs:
         run: pnpm type-check
 
       - name: Run CareOS tests
-        run: pnpm vitest run tests/careos-action-kernel.test.ts tests/careos-agentic-network.test.ts tests/careos-coordinate-confirm.test.ts
+        run: >-
+          pnpm vitest run
+          tests/careos-action-kernel.test.ts
+          tests/careos-agentic-network.test.ts
+          tests/careos-coordinate-confirm.test.ts
+          tests/care-support-intelligence.test.ts
 
       - name: Lint CareOS implementation
-        run: pnpm eslint app/api/intelligence app/careos app/coordinator/careos components/intelligence intelligence tests/careos-action-kernel.test.ts tests/careos-agentic-network.test.ts tests/careos-coordinate-confirm.test.ts
+        run: >-
+          pnpm eslint
+          app/api/intelligence
+          app/careos
+          app/coordinator/careos
+          components/intelligence
+          intelligence
+          tests/careos-action-kernel.test.ts
+          tests/careos-agentic-network.test.ts
+          tests/careos-coordinate-confirm.test.ts
+          tests/care-support-intelligence.test.ts
 
       - name: Production build
         run: pnpm build
