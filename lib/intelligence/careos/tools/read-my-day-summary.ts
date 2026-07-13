@@ -48,14 +48,14 @@ export const readMyDaySummaryTool: CareOSToolDefinition<
         prisma.careRequest.count({
           where: {
             participantId: context.participant.participantId,
-            status: { in: ["draft", "submitted", "awaiting_provider_acceptance"] },
+            status: { in: ["draft", "submitted", "awaiting_provider_response"] },
           },
         }),
         prisma.transportTrip.count({
           where: {
             participantId: context.participant.participantId,
             scheduledStart: { gte: start, lte: end },
-            status: { notIn: ["cancelled", "completed"] },
+            status: { notIn: ["cancelled", "closed"] },
           },
         }),
         prisma.careOSRecommendation.count({
