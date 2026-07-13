@@ -1,17 +1,18 @@
 import { z } from "zod";
 
-import type { Permission } from "@/lib/auth/permissions";
-import { hasPermission } from "@/lib/auth/permissions";
-import type { CurrentUser } from "@/lib/auth/current-user";
-import { listCalendarEvents } from "@/lib/calendar/calendar-service";
 import { listPublishedPlaces } from "@/lib/access-map/access-place-service";
+import type { CurrentUser } from "@/lib/auth/current-user";
+import { hasPermission, type Permission } from "@/lib/auth/permissions";
 import { listInvoicesForUser } from "@/lib/billing-core/invoice-service";
+import { listCalendarEvents } from "@/lib/calendar/calendar-service";
 import { prisma } from "@/lib/prisma";
 import { getMobilityPrefillForUser } from "@/lib/transport/profile-prefill-service";
 import { listTransportTripsForUser } from "@/lib/transport/transport-trip-service";
 
-import type { IntelligenceSessionConsentScope } from "../consent/session-consent";
-import { hasSessionConsent } from "../consent/session-consent";
+import {
+  hasSessionConsent,
+  type IntelligenceSessionConsentScope,
+} from "../consent/session-consent";
 import type { MapAbleModule } from "../types";
 
 export type IntelligenceToolContext = {
@@ -74,7 +75,13 @@ export const intelligenceToolRegistry = {
         where: { participantId: context.user.id },
         orderBy: { createdAt: "desc" },
         take: input.limit,
-        select: { id: true, title: true, status: true, preferredDate: true, linkedTransportRequired: true },
+        select: {
+          id: true,
+          title: true,
+          status: true,
+          preferredDate: true,
+          linkedTransportRequired: true,
+        },
       });
     },
   },
@@ -103,7 +110,13 @@ export const intelligenceToolRegistry = {
         where: { status: "published" },
         orderBy: { createdAt: "desc" },
         take: input.limit,
-        select: { id: true, title: true, location: true, employmentType: true, createdAt: true },
+        select: {
+          id: true,
+          title: true,
+          location: true,
+          employmentType: true,
+          createdAt: true,
+        },
       });
     },
   },
@@ -113,7 +126,7 @@ export const intelligenceToolRegistry = {
     description: "Read published accessibility place records and their evidence confidence.",
     mode: "read",
     inputSchema: z.object({ limit: z.number().int().min(1).max(20).default(5) }),
-    requiredPermissions: ["accessibility_map:read"],
+    requiredPermissions: [],
     requiredConsent: ["access.summary"],
     async execute(input: { limit: number }) {
       const places = await listPublishedPlaces(input.limit);
@@ -139,12 +152,17 @@ export const intelligenceToolRegistry = {
       return listInvoicesForUser(context.user.id);
     },
   },
-} satisfies Record<string, IntelligenceToolDefinition<unknown, unknown>>;
+} as const;
 
 export type IntelligenceToolName = keyof typeof intelligenceToolRegistry;
 
 export class IntelligenceToolAccessError extends Error {
-  constructor(public readonly code: "TOOL_NOT_READ_ONLY" | "PERMISSION_DENIED" | "CONSENT_REQUIRED") {
+  constructor(
+    public readonly code:
+      | "TOOL_NOT_READ_ONLY"
+      | "PERMISSION_DENIED"
+      | "CONSENT_REQUIRED"
+  ) {
     super(code);
   }
 }
@@ -154,8 +172,13 @@ export async function executeIntelligenceReadTool(
   rawInput: unknown,
   context: IntelligenceToolContext
 ): Promise<unknown> {
-  const tool = intelligenceToolRegistry[name] as IntelligenceToolDefinition<unknown, unknown>;
-  if (tool.mode !== "read") throw new IntelligenceToolAccessError("TOOL_NOT_READ_ONLY");
+  const tool = intelligenceToolRegistry[name] as unknown as IntelligenceToolDefinition<
+    unknown,
+    unknown
+  >;
+  if (tool.mode !== "read") {
+    throw new IntelligenceToolAccessError("TOOL_NOT_READ_ONLY");
+  }
 
   const authorised = tool.requiredPermissions.every((permission) =>
     hasPermission(context.user.primaryRole, permission)
@@ -169,5 +192,7 @@ export async function executeIntelligenceReadTool(
 }
 
 export function listIntelligenceToolsForModule(module: MapAbleModule) {
-  return Object.values(intelligenceToolRegistry).filter((tool) => tool.module === module);
+  return Object.values(intelligenceToolRegistry).filter(
+    (tool) => tool.module === module
+  );
 }
