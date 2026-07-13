@@ -48,7 +48,10 @@ export async function POST(request: Request) {
       );
     }
     if (hashCareOSPayload(envelope.payload) !== envelope.payloadHash) {
-      return NextResponse.json({ error: "The approved payload has changed." }, { status: 400 });
+      return NextResponse.json(
+        { error: "The approved payload has changed." },
+        { status: 400 },
+      );
     }
 
     const permission =
@@ -56,7 +59,10 @@ export async function POST(request: Request) {
         ? "care:manage:self"
         : "transport:manage:self";
     if (!hasPermission(user.primaryRole, permission)) {
-      return NextResponse.json({ error: "You cannot execute this action." }, { status: 403 });
+      return NextResponse.json(
+        { error: "You cannot execute this action." },
+        { status: 403 },
+      );
     }
 
     receiptId = await claimCareOSAction(envelope);
@@ -82,11 +88,15 @@ export async function POST(request: Request) {
       const payload = createTransportTripSchema.parse(envelope.payload);
       const transport = await createTransportTrip(user, payload);
       entityType = "TransportTrip";
-      entityId = transport.trip?.id ?? transport.request?.id ?? receiptId;
+      entityId = transport.trip.id;
       result = transport;
     }
 
-    await completeCareOSAction({ receiptId, resultEntityType: entityType, resultEntityId: entityId });
+    await completeCareOSAction({
+      receiptId,
+      resultEntityType: entityType,
+      resultEntityId: entityId,
+    });
     await createAuditEvent({
       actorUserId: user.id,
       actorRole: user.primaryRole,
@@ -118,8 +128,11 @@ export async function POST(request: Request) {
       { status: 201 },
     );
   } catch (error) {
-    const code = error instanceof Error ? error.message : "CAREOS_ACTION_FAILED";
-    if (receiptId) await failCareOSAction({ receiptId, errorCode: code });
+    const code =
+      error instanceof Error ? error.message : "CAREOS_ACTION_FAILED";
+    if (receiptId) {
+      await failCareOSAction({ receiptId, errorCode: code });
+    }
     if (error instanceof ZodError) {
       return NextResponse.json(
         { error: "The approved action is invalid.", issues: error.flatten() },
@@ -127,17 +140,29 @@ export async function POST(request: Request) {
       );
     }
     if (code === "CAREOS_ACTION_ALREADY_USED") {
-      return NextResponse.json({ error: "This action has already been used." }, { status: 409 });
+      return NextResponse.json(
+        { error: "This action has already been used." },
+        { status: 409 },
+      );
     }
     if (code === "EXPIRED_CAREOS_ACTION_TOKEN") {
-      return NextResponse.json({ error: "This action approval has expired." }, { status: 410 });
+      return NextResponse.json(
+        { error: "This action approval has expired." },
+        { status: 410 },
+      );
     }
     if (code === "INVALID_CAREOS_ACTION_TOKEN") {
-      return NextResponse.json({ error: "This action approval could not be verified." }, { status: 400 });
+      return NextResponse.json(
+        { error: "This action approval could not be verified." },
+        { status: 400 },
+      );
     }
     console.error("[careos-action-execute]", error);
     return NextResponse.json(
-      { error: "The action was not completed. Prepare a new approval before retrying." },
+      {
+        error:
+          "The action was not completed. Prepare a new approval before retrying.",
+      },
       { status: 500 },
     );
   }
