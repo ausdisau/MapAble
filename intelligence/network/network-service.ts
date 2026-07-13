@@ -16,10 +16,11 @@ import { analyseCareOSContinuity } from "./continuity-radar";
 import { buildCareOSMissionGraph } from "./mission-graph";
 import type {
   CareOSContinuityAlert,
+  CareOSMissionNode,
+  CareOSModuleReadResult,
   CareOSNetworkRequest,
   CareOSNetworkResponse,
   CareOSRecommendation,
-  CareOSModuleReadResult,
 } from "./types";
 
 type ModuleReadSpec = {
@@ -86,6 +87,91 @@ async function readModule(params: {
   }
 }
 
+async function readAccessibilityProfileNode(params: {
+  requested: boolean;
+  user: CurrentUser;
+  consentScopes: ReturnType<typeof buildSessionConsent>;
+}): Promise<CareOSMissionNode | null> {
+  if (!params.requested) return null;
+
+  const config = getMapAbleIntelligenceConfig();
+  if (!config.modules.transport) {
+    return {
+      id: "mission-profile",
+      type: "accessibility",
+      label: "Participant accessibility profile",
+      status: "disabled",
+      sourceModule: "transport",
+      recordId: null,
+      startsAt: null,
+      details: "Transport intelligence is disabled, so the profile was not read.",
+      evidence: [],
+    };
+  }
+
+  try {
+    const value = (await executeIntelligenceReadTool(
+      "read_mobility_preferences",
+      {},
+      {
+        user: params.user,
+        consentScopes: params.consentScopes,
+      }
+    )) as {
+      mobilityRequirements?: Record<string, unknown>;
+      accessNotes?: string;
+      fromProfile?: boolean;
+    };
+
+    return {
+      id: "mission-profile",
+      type: "accessibility",
+      label: "Participant accessibility profile",
+      status: value.fromProfile ? "available" : "missing",
+      sourceModule: "transport",
+      recordId: null,
+      startsAt: null,
+      details: value.fromProfile
+        ? `Participant-controlled mobility requirements were read for this request${
+            value.accessNotes ? ", including access notes" : ""
+          }.`
+        : "Profile access was authorised, but no participant-controlled mobility preferences were available.",
+      evidence: value.fromProfile ? ["participant_controlled_profile"] : [],
+    };
+  } catch (error) {
+    if (error instanceof IntelligenceToolAccessError) {
+      return {
+        id: "mission-profile",
+        type: "accessibility",
+        label: "Participant accessibility profile",
+        status:
+          error.code === "PERMISSION_DENIED" || error.code === "CONSENT_REQUIRED"
+            ? "not_authorised"
+            : "needs_review",
+        sourceModule: "transport",
+        recordId: null,
+        startsAt: null,
+        details:
+          "The accessibility profile could not be read. Continue without it or review the request permissions.",
+        evidence: [],
+      };
+    }
+
+    console.error("[careos-network-profile]", error);
+    return {
+      id: "mission-profile",
+      type: "accessibility",
+      label: "Participant accessibility profile",
+      status: "needs_review",
+      sourceModule: "transport",
+      recordId: null,
+      startsAt: null,
+      details: "The accessibility profile was unavailable for this request.",
+      evidence: [],
+    };
+  }
+}
+
 function routeForAlert(alert: CareOSContinuityAlert): string | null {
   switch (alert.code) {
     case "APPOINTMENT_NOT_FOUND":
@@ -130,35 +216,60 @@ function recommendationsFromAlerts(
       const weight = { urgent: 3, attention: 2, information: 1 } as const;
       return weight[right.severity] - weight[left.severity];
     })
-    .map((alert, index) => ({
+    .map<CareOSRecommendation>((alert, index) => ({
       id: `recommendation-${alert.id}`,
-      priority: Math.min(10, alert.severity === "urgent" ? 10 : 8 - index),
+      priority: Math.max(
+        1,
+        Math.min(10, alert.severity === "urgent" ? 10 : 8 - index)
+      ),
       title: alert.title,
-      explanation: `${alert.explanation} ${alert.recoveryActions[0] ?? "Review this dependency."}`,
+      explanation: `${alert.explanation} ${
+        alert.recoveryActions[0] ?? "Review this dependency."
+      }`,
       agentIds:
         alert.code === "ACCESS_EVIDENCE_MISSING"
           ? ["manager", "participant_advocate", "access_evidence", "continuity"]
           : alert.code === "TRANSPORT_UNCONFIRMED" ||
               alert.code === "LINKED_TRANSPORT_MISSING"
-            ? ["manager", "participant_advocate", "transport_coordination", "continuity"]
+            ? [
+                "manager",
+                "participant_advocate",
+                "transport_coordination",
+                "continuity",
+              ]
             : alert.code === "CARE_COVERAGE_UNCONFIRMED"
-              ? ["manager", "participant_advocate", "care_coordination", "continuity"]
+              ? [
+                  "manager",
+                  "participant_advocate",
+                  "care_coordination",
+                  "continuity",
+                ]
               : ["manager", "participant_advocate", "continuity"],
       affectedNodeIds: alert.affectedNodeIds,
       nextAction: {
         label: alert.recoveryActions[0] ?? "Review this dependency",
         href: routeForAlert(alert),
-        authorityLevel: alert.humanReviewRequired ? "L2_RECOMMEND" : "L1_DRAFT",
+        authorityLevel: alert.humanReviewRequired
+          ? "L2_RECOMMEND"
+          : "L1_DRAFT",
       },
     }));
 }
 
 function responseStatus(
   results: CareOSModuleReadResult[],
-  alerts: CareOSContinuityAlert[]
+  alerts: CareOSContinuityAlert[],
+  profileNode: CareOSMissionNode | null
 ): CareOSNetworkResponse["status"] {
   if (alerts.some((alert) => alert.humanReviewRequired)) {
     return "human_review_required";
+  }
+
+  if (
+    profileNode &&
+    !["available", "confirmed"].includes(profileNode.status)
+  ) {
+    return "needs_information";
   }
 
   if (
@@ -186,16 +297,32 @@ export async function buildCareOSAgenticNetwork(params: {
     includeAccessibilityProfile: params.request.includeAccessibilityProfile,
   });
 
-  const results = await Promise.all(
-    modules.map((module) =>
-      readModule({ module, user: params.user, consentScopes })
-    )
-  );
+  const [results, profileNode] = await Promise.all([
+    Promise.all(
+      modules.map((module) =>
+        readModule({ module, user: params.user, consentScopes })
+      )
+    ),
+    readAccessibilityProfileNode({
+      requested: params.request.includeAccessibilityProfile,
+      user: params.user,
+      consentScopes,
+    }),
+  ]);
 
   const mission = buildCareOSMissionGraph({
     goal: params.request.goal,
     results,
   });
+
+  if (profileNode) {
+    mission.nodes.push(profileNode);
+    mission.edges.push({
+      from: "mission-transport",
+      to: profileNode.id,
+      relationship: "validated_by",
+    });
+  }
 
   const continuityEnabled =
     config.continuityRadarEnabled && params.request.includeContinuityAnalysis;
@@ -224,6 +351,7 @@ export async function buildCareOSAgenticNetwork(params: {
           status: result.status,
           itemCount: result.items.length,
         })),
+        profileStatus: profileNode?.status ?? "not_requested",
         activeAgents: agents
           .filter((agent) => agent.status === "active")
           .map((agent) => agent.id),
@@ -240,7 +368,7 @@ export async function buildCareOSAgenticNetwork(params: {
     requestId,
     participantId: params.user.id,
     goal: params.request.goal,
-    status: responseStatus(results, continuityAlerts),
+    status: responseStatus(results, continuityAlerts, profileNode),
     agents,
     mission,
     continuityAlerts,
