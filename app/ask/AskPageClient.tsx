@@ -8,6 +8,7 @@ import { AccessibleJourneyAssistant } from "@/components/intelligence/Accessible
 import { CareOSActionWorkbench } from "@/components/intelligence/CareOSActionWorkbench";
 import { CareOSActivityPanel } from "@/components/intelligence/CareOSActivityPanel";
 import { CareOSAgenticNetwork } from "@/components/intelligence/CareOSAgenticNetwork";
+import { CareSupportIntelligencePanel } from "@/components/intelligence/CareSupportIntelligencePanel";
 import { MapAbleCoreBrief } from "@/components/intelligence/MapAbleCoreBrief";
 
 export function AskPageClient() {
@@ -26,6 +27,7 @@ export function AskPageClient() {
     <div className="space-y-12">
       <CopilotPanel initialQuery={initialQuery} />
       <CareOSAgenticNetwork />
+      <CareSupportIntelligencePanel />
       <CareOSActionWorkbench />
       <CareOSActivityPanel />
       <MapAbleCoreBrief />
