@@ -88,7 +88,19 @@ jobs:
         run: pnpm prisma db push --skip-generate
 
       - name: Type-check
-        run: pnpm type-check
+        shell: bash
+        run: |
+          set -o pipefail
+          pnpm type-check 2>&1 | tee careos-typecheck.log
+
+      - name: Upload type-check diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: careos-typecheck-diagnostics
+          path: careos-typecheck.log
+          if-no-files-found: warn
+          retention-days: 3
 
       - name: Run CareOS tests
         run: >-
