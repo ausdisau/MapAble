@@ -2,7 +2,10 @@ import { randomUUID } from "node:crypto";
 
 import { prisma } from "@/lib/prisma";
 
-import type { AppointmentMissionRequest, AppointmentMissionState } from "./appointment-types";
+import type {
+  AppointmentMissionRequest,
+  AppointmentMissionState,
+} from "./appointment-types";
 
 export async function persistAppointmentMission(params: {
   request: AppointmentMissionRequest;
@@ -11,8 +14,7 @@ export async function persistAppointmentMission(params: {
   const graphJson = JSON.stringify({
     type: "appointment",
     appointment: params.request.appointment,
-    dependencies: params.state.dependencies,
-    authority: params.state.authority,
+    state: params.state,
   });
   const alertsJson = JSON.stringify(
     params.state.events
@@ -72,13 +74,19 @@ export async function persistAppointmentMission(params: {
           "id", "missionId", "requestId", "participantId", "category",
           "priority", "title", "summary", "assignedRole", "status", "dueAt",
           "participantContactRequired", "evidenceJson", "createdAt", "updatedAt"
-        ) VALUES (
+        )
+        SELECT
           ${randomUUID()}, ${params.state.missionId}, ${params.state.missionId},
           ${params.state.participantId}, 'care_coordination', 'attention',
           'Review appointment support mission',
           'Review unresolved authority, competency, backup or continuity requirements before execution.',
           'support_coordinator', 'open', NOW() + INTERVAL '24 hours', true,
           CAST(${evidence} AS JSONB), NOW(), NOW()
+        WHERE NOT EXISTS (
+          SELECT 1 FROM "careos_human_reviews"
+          WHERE "missionId" = ${params.state.missionId}
+            AND "category" = 'care_coordination'
+            AND "status" IN ('open', 'assigned', 'in_progress')
         )
       `;
     }
