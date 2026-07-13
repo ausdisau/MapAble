@@ -20,6 +20,7 @@ export default function robots(): MetadataRoute.Robots {
           "/providers",
           "/provider-finder",
           "/resources",
+          "/guides",
           "/help",
           "/about",
           "/pricing",

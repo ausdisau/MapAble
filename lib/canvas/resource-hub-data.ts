@@ -34,6 +34,13 @@ export const resourceModuleLinks: ResourceModuleLink[] = [
       "Participant-controlled access notes, venue profiles, and community access data.",
   },
   {
+    eyebrow: "Guides",
+    label: "Access Guides",
+    href: "/guides",
+    description:
+      "Capital and regional accessibility guides for Australian cities and towns.",
+  },
+  {
     eyebrow: "Employment",
     label: "MapAble Employment",
     href: "/employment",

@@ -8,6 +8,7 @@ import { PolicyResourceGrid } from "@/components/canvas/PolicyResourceGrid";
 import { ResourceModuleGrid } from "@/components/canvas/ResourceModuleGrid";
 import { TrustLayer } from "@/components/canvas/TrustLayer";
 import { PublicInfoPage } from "@/components/marketing/PublicInfoPage";
+import { AccessGuidesSection } from "@/components/resources/AccessGuidesSection";
 import { canvasBlocks } from "@/lib/canvas/canvas-data";
 import {
   getParticipantJourneySteps,
@@ -17,26 +18,77 @@ import {
   policyResourceLinks,
   resourceModuleLinks,
 } from "@/lib/canvas/resource-hub-data";
+import {
+  accessGuideDownloads,
+  accessGuides,
+  getCapitalAccessGuides,
+} from "@/lib/resources/access-guides-data";
 
 export const metadata = {
   title: "Resources | MapAble",
   description:
-    "MapAble resource hub for participants, providers, and pilot partners — modules, ecosystem canvas, policy links, and support pathways.",
+    "MapAble resource hub for Access Guides, modules, ecosystem canvas, policy links, and support pathways.",
 };
 
 export default function ResourcesPage() {
   const participantJourney = getParticipantJourneySteps();
   const resourceTrustPrinciples = getResourceTrustPrinciples();
+  const capitalGuides = getCapitalAccessGuides();
+  const regionalCount = accessGuides.length - capitalGuides.length;
 
   return (
     <>
       <PublicInfoPage
         eyebrow="Resource hub"
         title="Practical resources for the MapAble pilot."
-        description="Explore public modules, the Complete Support ecosystem, policy documents, and support pathways while the operating system is prepared for controlled pilots."
-        ctaLabel="Contact MapAble"
-        ctaHref="/contact"
+        description="Explore Access Guides for Australian cities, public modules, the Complete Support ecosystem, policy documents, and support pathways while the operating system is prepared for controlled pilots."
+        ctaLabel="Browse Access Guides"
+        ctaHref="#access-guides"
         sections={[
+          {
+            title: "Access Guides",
+            content: (
+              <ul className="list-disc space-y-2 pl-5">
+                <li>
+                  <Link
+                    href="#access-guides"
+                    className="font-medium text-primary hover:underline"
+                  >
+                    Capital city starter guides
+                  </Link>{" "}
+                  for Canberra, Sydney, Melbourne, Brisbane, Adelaide, Perth,
+                  Hobart and Darwin.
+                </li>
+                <li>
+                  <a
+                    href={accessGuideDownloads.pdf}
+                    download
+                    className="font-medium text-primary hover:underline"
+                  >
+                    Download the Australia Accessibility Guides pack (PDF)
+                  </a>{" "}
+                  or{" "}
+                  <a
+                    href={accessGuideDownloads.docx}
+                    download
+                    className="font-medium text-primary hover:underline"
+                  >
+                    Word (.docx)
+                  </a>
+                  .
+                </li>
+                <li>
+                  <Link
+                    href="/guides"
+                    className="font-medium text-primary hover:underline"
+                  >
+                    Full Access Guides directory
+                  </Link>{" "}
+                  including {regionalCount} regional Tier 1–3 locations.
+                </li>
+              </ul>
+            ),
+          },
           {
             title: "Participant resources",
             content: (
@@ -131,6 +183,10 @@ export default function ResourcesPage() {
             ),
           },
         ]}
+      />
+      <AccessGuidesSection
+        capitalGuides={capitalGuides}
+        regionalCount={regionalCount}
       />
       <ResourceModuleGrid modules={resourceModuleLinks} />
       <CanvasBlockGrid
