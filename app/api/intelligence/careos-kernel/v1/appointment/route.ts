@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 
-import { buildAppointmentMission } from "@/intelligence/kernel/v1/appointment-kernel";
-import { appointmentMissionRequestSchema } from "@/intelligence/kernel/v1/appointment-types";
 import { getMapAbleIntelligenceConfig } from "@/intelligence/config";
+import { buildAppointmentMission } from "@/intelligence/kernel/v1/appointment-kernel";
+import { persistAppointmentMission } from "@/intelligence/kernel/v1/appointment-persistence";
+import { appointmentMissionRequestSchema } from "@/intelligence/kernel/v1/appointment-types";
 import { requireApiSession } from "@/lib/api/auth-handler";
 import { hasPermission } from "@/lib/auth/permissions";
 import { createAuditEvent } from "@/lib/audit/audit-event-service";
@@ -29,6 +30,16 @@ export async function POST(request: Request) {
   try {
     const input = appointmentMissionRequestSchema.parse(await request.json());
     const mission = await buildAppointmentMission({ user, request: input });
+    let persisted = false;
+
+    if (config.careOSPersistenceEnabled) {
+      try {
+        await persistAppointmentMission({ request: input, state: mission });
+        persisted = true;
+      } catch (error) {
+        console.error("[careos-kernel-v1-appointment-persistence]", error);
+      }
+    }
 
     if (config.auditEnabled) {
       await createAuditEvent({
@@ -48,12 +59,16 @@ export async function POST(request: Request) {
           pendingConfirmations: mission.pendingConfirmations,
           humanReviewRequired: mission.humanReviewRequired,
           eventTypes: mission.events.map((event) => event.type),
+          persisted,
         },
       });
     }
 
     return NextResponse.json({
+      kernelVersion: "1.0",
+      missionType: "appointment",
       mission,
+      persisted,
       execution: {
         actionsExecuted: false,
         confirmationEndpoint: "/api/intelligence/careos-actions/prepare",
