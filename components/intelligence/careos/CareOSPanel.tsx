@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { CareOSActivity } from "./CareOSActivity";
+import { MemoryControls } from "./MemoryControls";
 import { MissionComposer } from "./MissionComposer";
 
 export function CareOSPanel() {
@@ -12,6 +14,8 @@ export function CareOSPanel() {
         </p>
       </header>
       <MissionComposer />
+      <CareOSActivity />
+      <MemoryControls />
       <section aria-labelledby="careos-non-ai-heading" className="rounded-xl border border-primary/20 bg-primary/5 p-5">
         <h2 id="careos-non-ai-heading" className="font-heading text-lg font-bold">
           Continue without CareOS
