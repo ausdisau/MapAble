@@ -34,6 +34,9 @@ export type MapAbleIntelligenceRuntimeConfig = {
   writeActionsEnabled: boolean;
   participantMemoryEnabled: boolean;
   auditEnabled: boolean;
+  careOSNetworkEnabled: boolean;
+  continuityRadarEnabled: boolean;
+  roboticsMcpEnabled: boolean;
   modules: Record<MapAbleModule, boolean>;
 };
 
@@ -49,10 +52,19 @@ export function getMapAbleIntelligenceConfig(): MapAbleIntelligenceRuntimeConfig
   return {
     enabled,
     modelReasoningEnabled:
-      enabled && Boolean(process.env.OPENAI_API_KEY) && envBoolean("MAPABLE_AI_MODEL_REASONING_ENABLED", true),
+      enabled &&
+      Boolean(process.env.OPENAI_API_KEY) &&
+      envBoolean("MAPABLE_AI_MODEL_REASONING_ENABLED", true),
     writeActionsEnabled: enabled && envBoolean("MAPABLE_AI_WRITE_ACTIONS", false),
-    participantMemoryEnabled: enabled && envBoolean("MAPABLE_AI_MEMORY_ENABLED", false),
+    participantMemoryEnabled:
+      enabled && envBoolean("MAPABLE_AI_MEMORY_ENABLED", false),
     auditEnabled: envBoolean("MAPABLE_AI_AUDIT_ENABLED", true),
+    careOSNetworkEnabled:
+      enabled && envBoolean("MAPABLE_CAREOS_NETWORK_ENABLED", true),
+    continuityRadarEnabled:
+      enabled && envBoolean("MAPABLE_CAREOS_CONTINUITY_ENABLED", true),
+    roboticsMcpEnabled:
+      enabled && envBoolean("MAPABLE_CAREOS_ROBOTICS_MCP_ENABLED", false),
     modules,
   };
 }
