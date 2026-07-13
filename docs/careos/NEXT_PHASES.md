@@ -9,3 +9,7 @@ testing.
 Payments, claims, autonomous bookings, emergency decisions, clinical
 decisions, restrictive practices, and persistent model learning are explicitly
 out of scope.
+
+The separate Intelligence Mainframe Phase A is synthetic-only and does not
+wire into CareOS services, participant data, or live operations. Any future
+connection requires its own shadow-mode safety case and governance approval.
