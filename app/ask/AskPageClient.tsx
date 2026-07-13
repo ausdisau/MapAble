@@ -4,6 +4,7 @@ import { useSearchParams } from "next/navigation";
 import React, { useMemo } from "react";
 
 import { CopilotPanel } from "@/components/copilot/CopilotPanel";
+import { AccessibleJourneyAssistant } from "@/components/intelligence/AccessibleJourneyAssistant";
 
 export function AskPageClient() {
   const searchParams = useSearchParams();
@@ -17,5 +18,10 @@ export function AskPageClient() {
     return `Tell me about ${name} and what supports they offer`;
   }, [searchParams]);
 
-  return <CopilotPanel initialQuery={initialQuery} />;
+  return (
+    <div className="space-y-12">
+      <CopilotPanel initialQuery={initialQuery} />
+      <AccessibleJourneyAssistant />
+    </div>
+  );
 }
