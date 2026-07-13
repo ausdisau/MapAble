@@ -20,7 +20,9 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./*"],
-      "@server/*": ["server/*"]
+      "@server/*": ["server/*"],
+      "@mapable/contracts": ["packages/contracts/src/index.ts"],
+      "@mapable/intelligence-kernel": ["packages/intelligence-kernel/src/index.ts"]
     },
     "target": "ES2021"
   },
