@@ -23,6 +23,9 @@ importers:
       '@chat-adapter/state-memory':
         specifier: ^4.30.0
         version: 4.30.0(ai@6.0.196(zod@4.3.6))(zod@4.3.6)
+      '@mapable/domain-transport':
+        specifier: workspace:*
+        version: link:packages/domain-transport
       '@openai/agents':
         specifier: ^0.13.2
         version: 0.13.2(ws@8.21.0)(zod@4.3.6)
@@ -229,6 +232,15 @@ importers:
 
   packages/contracts:
     dependencies:
+      zod:
+        specifier: ^4.3.6
+        version: 4.3.6
+
+  packages/domain-transport:
+    dependencies:
+      '@mapable/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       zod:
         specifier: ^4.3.6
         version: 4.3.6
