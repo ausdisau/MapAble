@@ -10,20 +10,58 @@ import {
   type CareOSOperationalEvent,
 } from "./event-engine";
 
-async function latestOpenMission(participantId: string) {
-  const missions = await prisma.$queryRaw<Array<{ id: string; requestId: string }>>`
+type MissionRef = { id: string; requestId: string };
+
+async function resolveMission(params: {
+  participantId: string;
+  missionId?: string;
+  sourceModule: CareOSOperationalEvent["sourceModule"];
+  sourceEntityId?: string;
+}): Promise<MissionRef | null> {
+  if (params.missionId) {
+    const rows = await prisma.$queryRaw<MissionRef[]>`
+      SELECT "id", "requestId"
+      FROM "careos_missions"
+      WHERE "id" = ${params.missionId}
+        AND "participantId" = ${params.participantId}
+      LIMIT 1
+    `;
+    return rows[0] ?? null;
+  }
+
+  if (params.sourceEntityId) {
+    const rows = await prisma.$queryRaw<MissionRef[]>`
+      SELECT m."id", m."requestId"
+      FROM "careos_action_receipts" r
+      JOIN "careos_missions" m ON m."id" = r."requestId"
+      WHERE r."participantId" = ${params.participantId}
+        AND r."resultEntityId" = ${params.sourceEntityId}
+        AND r."status" = 'completed'
+      ORDER BY r."completedAt" DESC
+      LIMIT 1
+    `;
+    if (rows[0]) return rows[0];
+  }
+
+  // Care and Transport events must never guess which open mission they belong to.
+  if (params.sourceModule === "care" || params.sourceModule === "transport") {
+    return null;
+  }
+
+  const rows = await prisma.$queryRaw<MissionRef[]>`
     SELECT "id", "requestId"
     FROM "careos_missions"
-    WHERE "participantId" = ${participantId}
+    WHERE "participantId" = ${params.participantId}
       AND "status" NOT IN ('completed', 'cancelled')
     ORDER BY "updatedAt" DESC
     LIMIT 1
   `;
-  return missions[0] ?? null;
+  return rows[0] ?? null;
 }
 
 export async function emitCareOSDomainEvent(params: {
   participantId: string;
+  missionId?: string;
   eventType: CareOSOperationalEvent["eventType"];
   sourceModule: CareOSOperationalEvent["sourceModule"];
   sourceEntityId?: string;
@@ -36,7 +74,7 @@ export async function emitCareOSDomainEvent(params: {
     return null;
   }
 
-  const mission = await latestOpenMission(params.participantId);
+  const mission = await resolveMission(params);
   if (!mission) return null;
 
   const event: CareOSOperationalEvent = {
@@ -58,7 +96,11 @@ export async function emitCareOSDomainEvent(params: {
     sourceEntityId: event.sourceEntityId,
     severity: intervention.severity,
     summary: event.summary,
-    payload: { occurredAt: event.occurredAt, intervention, metadata: event.metadata ?? {} },
+    payload: {
+      occurredAt: event.occurredAt,
+      intervention,
+      metadata: event.metadata ?? {},
+    },
   });
 
   let reviewId: string | null = null;
@@ -67,20 +109,27 @@ export async function emitCareOSDomainEvent(params: {
     const evidence = JSON.stringify([
       `${event.sourceModule}:${event.sourceEntityId ?? "unknown"}`,
     ]);
-    await prisma.$executeRaw`
+    const inserted = await prisma.$executeRaw`
       INSERT INTO "careos_human_reviews" (
         "id", "missionId", "requestId", "participantId", "category",
         "priority", "title", "summary", "assignedRole", "status", "dueAt",
         "participantContactRequired", "evidenceJson", "createdAt", "updatedAt"
-      ) VALUES (
+      )
+      SELECT
         ${reviewId}, ${mission.id}, ${mission.requestId}, ${params.participantId},
         ${event.eventType}, ${intervention.severity}, ${intervention.title},
         ${intervention.explanation}, ${intervention.assignedRole}, 'open',
         NOW() + CASE WHEN ${intervention.severity} = 'urgent'
           THEN INTERVAL '4 hours' ELSE INTERVAL '24 hours' END,
         true, CAST(${evidence} AS JSONB), NOW(), NOW()
+      WHERE NOT EXISTS (
+        SELECT 1 FROM "careos_human_reviews"
+        WHERE "missionId" = ${mission.id}
+          AND "category" = ${event.eventType}
+          AND "status" IN ('open', 'assigned', 'in_progress')
       )
     `;
+    if (inserted !== 1) reviewId = null;
   }
 
   await createAuditEvent({
