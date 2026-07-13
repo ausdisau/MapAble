@@ -141,6 +141,65 @@ export const careOSRecommendationSchema = z.object({
 
 export type CareOSRecommendation = z.infer<typeof careOSRecommendationSchema>;
 
+export const careOSActionProposalSchema = z.object({
+  id: z.string(),
+  requestId: z.string(),
+  participantId: z.string(),
+  actionType: z.enum([
+    "submit_care_request",
+    "submit_transport_request",
+    "send_provider_message",
+    "save_participant_preference",
+    "request_human_coordination",
+  ]),
+  title: z.string(),
+  summary: z.string(),
+  status: z.enum(["draft", "awaiting_approval", "approved", "expired", "cancelled"]),
+  authorityLevel: z.literal("L3_CONFIRMED_ACTION"),
+  requiredApprovals: z.array(z.enum(["participant", "authorised_delegate"])),
+  informationToShare: z.array(z.string()),
+  estimatedCost: z.number().nonnegative().nullable(),
+  cancellationTerms: z.string().nullable(),
+  payload: z.record(z.string(), z.unknown()),
+  payloadHash: z.string().regex(/^[a-f0-9]{64}$/),
+  expiresAt: z.string().datetime(),
+});
+
+export type CareOSActionProposal = z.infer<typeof careOSActionProposalSchema>;
+
+export const careOSHumanReviewItemSchema = z.object({
+  id: z.string(),
+  requestId: z.string(),
+  participantId: z.string(),
+  category: z.enum([
+    "care_coordination",
+    "transport_continuity",
+    "access_evidence",
+    "safeguarding",
+    "authority_review",
+    "financial_review",
+    "general_coordination",
+  ]),
+  priority: z.enum(["information", "attention", "urgent"]),
+  title: z.string(),
+  summary: z.string(),
+  affectedNodeIds: z.array(z.string()),
+  recommendedActions: z.array(z.string()),
+  status: z.enum(["open", "assigned", "in_progress", "resolved", "cancelled"]),
+  assignedRole: z.enum([
+    "support_coordinator",
+    "provider_coordinator",
+    "safeguarding_officer",
+    "financial_reviewer",
+    "system_administrator",
+  ]),
+  dueAt: z.string().datetime(),
+  participantContactRequired: z.boolean(),
+  evidence: z.array(z.string()),
+});
+
+export type CareOSHumanReviewItem = z.infer<typeof careOSHumanReviewItemSchema>;
+
 export const careOSNetworkResponseSchema = z.object({
   generatedAt: z.string(),
   requestId: z.string(),
@@ -154,6 +213,8 @@ export const careOSNetworkResponseSchema = z.object({
   }),
   continuityAlerts: z.array(careOSContinuityAlertSchema),
   recommendations: z.array(careOSRecommendationSchema),
+  actionProposals: z.array(careOSActionProposalSchema),
+  humanReviewQueue: z.array(careOSHumanReviewItemSchema),
   notices: z.array(z.string()),
   modelReasoningUsed: z.boolean(),
   writeActionsEnabled: z.boolean(),
