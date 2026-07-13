@@ -17,6 +17,10 @@ export default defineConfig({
         __dirname,
         "packages/intelligence-kernel/src/index.ts"
       ),
+      "@mapable/domain-transport": path.resolve(
+        __dirname,
+        "packages/domain-transport/src/index.ts"
+      ),
     },
   },
 });

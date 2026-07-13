@@ -22,7 +22,8 @@
       "@/*": ["./*"],
       "@server/*": ["server/*"],
       "@mapable/contracts": ["packages/contracts/src/index.ts"],
-      "@mapable/intelligence-kernel": ["packages/intelligence-kernel/src/index.ts"]
+      "@mapable/intelligence-kernel": ["packages/intelligence-kernel/src/index.ts"],
+      "@mapable/domain-transport": ["packages/domain-transport/src/index.ts"]
     },
     "target": "ES2021"
   },
