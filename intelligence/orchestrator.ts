@@ -6,11 +6,18 @@ import { createAgentRun } from "@/lib/agent-ops/agent-run-service";
 import {
   accessAgent,
   careAgent,
+  continuityAgent,
   foodsAgent,
   jobsAgent,
   movesAgent,
+  participantAdvocateAgent,
   paymentsAgent,
+  providerCapacityAgent,
+  rightsAgent,
+  roboticsAgent,
+  safeguardingAgent,
   transportAgent,
+  workerSupportAgent,
 } from "./agents";
 import type {
   JourneyNarrative,
@@ -26,19 +33,29 @@ const narrativeOutput = z.object({
 });
 
 export const mapAbleOrchestrator = new Agent({
-  name: "MapAble Intelligence Fabric",
+  name: "MapAble CareOS Mission Manager",
   instructions: `
-You are the single participant-facing manager agent for MapAble.
-Use specialist agents for domain analysis, but keep responsibility for the final answer.
+You are the single participant-facing manager agent for MapAble CareOS.
+Use bounded specialist agents for domain analysis, but keep responsibility for the final answer.
+Start with the participant's stated goal. Protect their hard requirements, consent, exclusions,
+communication choices and right to reject or continue without AI.
+Use the participant advocate for rights and authority checks and the continuity agent to identify
+missing care, transport, access, provider and contingency dependencies.
 Explain important recommendations in plain, respectful language.
 Clearly state uncertainty and evidence limitations.
-Never perform a booking, payment, application, roster change, disclosure, eligibility
-decision, clinical decision, emotion recognition, disability scoring, or employment rejection.
-Consequential actions require an explicit human approval workflow outside the model.
+Never perform a booking, payment, application, roster change, disclosure, eligibility decision,
+clinical decision, safeguarding conclusion, emotion recognition, disability scoring, emergency
+action or robotics actuation. Consequential actions require an explicit human approval workflow
+outside the model and execution by an existing deterministic MapAble service.
 Return only the requested structured output.
   `.trim(),
   outputType: narrativeOutput,
   tools: [
+    participantAdvocateAgent.asTool({
+      toolName: "consult_participant_advocate",
+      toolDescription:
+        "Protect participant authority, hard requirements, exclusions, consent and non-AI pathways.",
+    }),
     careAgent.asTool({
       toolName: "consult_care_specialist",
       toolDescription: "Analyse care and support coordination considerations.",
@@ -47,13 +64,28 @@ Return only the requested structured output.
       toolName: "consult_transport_specialist",
       toolDescription: "Analyse accessible journey and transport considerations.",
     }),
-    jobsAgent.asTool({
-      toolName: "consult_jobs_specialist",
-      toolDescription: "Analyse inclusive employment considerations.",
-    }),
     accessAgent.asTool({
       toolName: "consult_access_specialist",
       toolDescription: "Analyse venue and physical accessibility evidence.",
+    }),
+    continuityAgent.asTool({
+      toolName: "consult_continuity_radar",
+      toolDescription:
+        "Identify missing dependencies and likely service-system continuity failures.",
+    }),
+    providerCapacityAgent.asTool({
+      toolName: "consult_provider_capacity",
+      toolDescription:
+        "Analyse verified provider capabilities and thin-market capacity without assigning services.",
+    }),
+    workerSupportAgent.asTool({
+      toolName: "consult_worker_support",
+      toolDescription:
+        "Prepare participant-approved worker guidance and handover considerations.",
+    }),
+    jobsAgent.asTool({
+      toolName: "consult_jobs_specialist",
+      toolDescription: "Analyse inclusive employment considerations.",
     }),
     movesAgent.asTool({
       toolName: "consult_moves_specialist",
@@ -66,6 +98,21 @@ Return only the requested structured output.
     paymentsAgent.asTool({
       toolName: "consult_payments_specialist",
       toolDescription: "Explain budgets, invoices and payment evidence without transacting.",
+    }),
+    rightsAgent.asTool({
+      toolName: "consult_rights_specialist",
+      toolDescription:
+        "Explain rights, records and escalation options without providing legal representation.",
+    }),
+    safeguardingAgent.asTool({
+      toolName: "consult_safeguarding_gate",
+      toolDescription:
+        "Identify when the request must be escalated to an authorised human safeguarding process.",
+    }),
+    roboticsAgent.asTool({
+      toolName: "consult_robotics_coordinator",
+      toolDescription:
+        "Prepare simulation-only robotics considerations without physical actuation.",
     }),
   ],
 });
@@ -110,7 +157,7 @@ export async function explainJourneyPlan(params: {
     accessNotes: params.context.accessNotes,
     options: params.options,
     instruction:
-      "Ask the transport specialist to assess the options, then produce a concise participant-facing recommendation. Do not claim live availability and do not book anything.",
+      "Ask the participant advocate, transport specialist, access specialist and continuity radar to assess the options, then produce a concise participant-facing recommendation. Do not claim live availability and do not book anything.",
   });
 
   try {
