@@ -5,6 +5,7 @@ import React, { useMemo } from "react";
 
 import { CopilotPanel } from "@/components/copilot/CopilotPanel";
 import { AccessibleJourneyAssistant } from "@/components/intelligence/AccessibleJourneyAssistant";
+import { CareOSAgenticNetwork } from "@/components/intelligence/CareOSAgenticNetwork";
 import { MapAbleCoreBrief } from "@/components/intelligence/MapAbleCoreBrief";
 
 export function AskPageClient() {
@@ -22,6 +23,7 @@ export function AskPageClient() {
   return (
     <div className="space-y-12">
       <CopilotPanel initialQuery={initialQuery} />
+      <CareOSAgenticNetwork />
       <MapAbleCoreBrief />
       <AccessibleJourneyAssistant />
     </div>
