@@ -88,6 +88,9 @@ The data model lives in a single schema: `prisma/schema.prisma`. Apply changes w
 │   └── qa/                   # QA checklists
 ├── apps/
 │   └── realtime-server/      # Socket.IO server (pnpm workspace)
+├── packages/
+│   ├── contracts/            # Runtime-validated CSI contracts
+│   └── intelligence-kernel/  # Pure deterministic CSI kernel
 ├── mcp/
 │   └── av/                   # Autonomous-vehicle MCP server
 ├── mobile-contracts/         # Mobile API / screen contracts

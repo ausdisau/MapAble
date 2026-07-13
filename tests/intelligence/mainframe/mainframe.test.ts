@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import {
   syntheticContext,
@@ -55,5 +55,21 @@ describe("synthetic Intelligence Mainframe", () => {
       expect(prompt.manifest.contentHash).toMatch(/^sha256:[a-f0-9]{64}$/);
       expect(prompt.manifest.allowedDataClasses).toEqual(["SYNTHETIC"]);
     }
+  });
+
+  it("fails closed when a synthetic context has expired", async () => {
+    const previous = process.env.MAPABLE_CORE_INTELLIGENCE_MAINFRAME_ENABLED;
+    process.env.MAPABLE_CORE_INTELLIGENCE_MAINFRAME_ENABLED = "true";
+    vi.resetModules();
+    const { assertSyntheticOnly } = await import(
+      "@/lib/intelligence/mainframe/config/synthetic-guard"
+    );
+    expect(() =>
+      assertSyntheticOnly({
+        dataClassification: "SYNTHETIC",
+        expiresAt: "2000-01-01T00:00:00.000Z",
+      })
+    ).toThrow("SYNTHETIC_CONTEXT_EXPIRED");
+    process.env.MAPABLE_CORE_INTELLIGENCE_MAINFRAME_ENABLED = previous;
   });
 });

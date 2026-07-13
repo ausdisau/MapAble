@@ -12,7 +12,10 @@ export function runSyntheticMainframe(params: {
   goal: string;
   context: MainframeContextManifest;
 }): MainframeOutcome {
-  assertSyntheticOnly(params.context.dataClassification);
+  assertSyntheticOnly({
+    dataClassification: params.context.dataClassification,
+    expiresAt: params.context.expiresAt,
+  });
   const draft = parseDeterministicDraft(
     composeSyntheticCareTransportMission(params.goal, syntheticRights)
   );

@@ -6,17 +6,24 @@ export class SyntheticMainframeError extends Error {
       | "MAINFRAME_DISABLED"
       | "SYNTHETIC_ONLY_REQUIRED"
       | "SYNTHETIC_CLASSIFICATION_REQUIRED"
+      | "SYNTHETIC_CONTEXT_EXPIRED"
   ) {
     super(code);
     this.name = "SyntheticMainframeError";
   }
 }
 
-export function assertSyntheticOnly(dataClassification: string): void {
+export function assertSyntheticOnly(params: {
+  dataClassification: string;
+  expiresAt: string;
+}): void {
   if (!isSyntheticMainframeEnabled()) {
     throw new SyntheticMainframeError("MAINFRAME_DISABLED");
   }
-  if (dataClassification !== "SYNTHETIC") {
+  if (params.dataClassification !== "SYNTHETIC") {
     throw new SyntheticMainframeError("SYNTHETIC_CLASSIFICATION_REQUIRED");
+  }
+  if (new Date(params.expiresAt) <= new Date()) {
+    throw new SyntheticMainframeError("SYNTHETIC_CONTEXT_EXPIRED");
   }
 }
