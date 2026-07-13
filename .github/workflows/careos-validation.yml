@@ -1,0 +1,88 @@
+name: CareOS validation
+
+on:
+  pull_request:
+    paths:
+      - "app/api/intelligence/**"
+      - "app/careos/**"
+      - "app/coordinator/careos/**"
+      - "components/intelligence/**"
+      - "intelligence/**"
+      - "prisma/**"
+      - "tests/careos-*.test.ts"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - ".github/workflows/careos-validation.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: careos-validation-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mapable_test
+      DIRECT_URL: postgresql://postgres:postgres@localhost:5432/mapable_test
+      MAPABLE_AI_APPROVAL_SECRET: ci-only-careos-approval-secret-at-least-32-characters
+      MAPABLE_AI_ENABLED: "true"
+      MAPABLE_CAREOS_NETWORK_ENABLED: "true"
+      MAPABLE_CAREOS_PERSISTENCE_ENABLED: "false"
+      MAPABLE_CAREOS_EVENT_AUTOMATION_ENABLED: "false"
+      MAPABLE_AI_WRITE_ACTIONS: "false"
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: mapable_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Validate Prisma schema
+        run: pnpm prisma validate
+
+      - name: Generate Prisma client
+        run: pnpm prisma generate
+
+      - name: Apply migrations to disposable PostgreSQL
+        run: pnpm prisma migrate deploy
+
+      - name: Type-check
+        run: pnpm type-check
+
+      - name: Run CareOS tests
+        run: pnpm vitest run tests/careos-action-kernel.test.ts tests/careos-agentic-network.test.ts tests/careos-coordinate-confirm.test.ts
+
+      - name: Lint CareOS implementation
+        run: pnpm eslint app/api/intelligence app/careos app/coordinator/careos components/intelligence intelligence tests/careos-action-kernel.test.ts tests/careos-agentic-network.test.ts tests/careos-coordinate-confirm.test.ts
+
+      - name: Production build
+        run: pnpm build
