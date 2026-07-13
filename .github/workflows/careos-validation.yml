@@ -88,6 +88,7 @@ jobs:
           tests/careos-coordinate-confirm.test.ts
           tests/care-support-intelligence.test.ts
           tests/careos-kernel-v1.test.ts
+          tests/careos-kernel-v1-appointment.test.ts
 
       - name: Lint CareOS implementation
         run: >-
@@ -102,6 +103,7 @@ jobs:
           tests/careos-coordinate-confirm.test.ts
           tests/care-support-intelligence.test.ts
           tests/careos-kernel-v1.test.ts
+          tests/careos-kernel-v1-appointment.test.ts
 
       - name: Production build
         run: pnpm build
