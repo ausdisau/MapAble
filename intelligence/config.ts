@@ -36,6 +36,8 @@ export type MapAbleIntelligenceRuntimeConfig = {
   auditEnabled: boolean;
   careOSNetworkEnabled: boolean;
   continuityRadarEnabled: boolean;
+  careOSPersistenceEnabled: boolean;
+  careOSEventAutomationEnabled: boolean;
   roboticsMcpEnabled: boolean;
   modules: Record<MapAbleModule, boolean>;
 };
@@ -46,7 +48,7 @@ export function getMapAbleIntelligenceConfig(): MapAbleIntelligenceRuntimeConfig
     (Object.keys(MODULE_FLAG_NAMES) as MapAbleModule[]).map((module) => [
       module,
       enabled && envBoolean(MODULE_FLAG_NAMES[module], MODULE_DEFAULTS[module]),
-    ])
+    ]),
   ) as Record<MapAbleModule, boolean>;
 
   return {
@@ -55,7 +57,8 @@ export function getMapAbleIntelligenceConfig(): MapAbleIntelligenceRuntimeConfig
       enabled &&
       Boolean(process.env.OPENAI_API_KEY) &&
       envBoolean("MAPABLE_AI_MODEL_REASONING_ENABLED", true),
-    writeActionsEnabled: enabled && envBoolean("MAPABLE_AI_WRITE_ACTIONS", false),
+    writeActionsEnabled:
+      enabled && envBoolean("MAPABLE_AI_WRITE_ACTIONS", false),
     participantMemoryEnabled:
       enabled && envBoolean("MAPABLE_AI_MEMORY_ENABLED", false),
     auditEnabled: envBoolean("MAPABLE_AI_AUDIT_ENABLED", true),
@@ -63,12 +66,18 @@ export function getMapAbleIntelligenceConfig(): MapAbleIntelligenceRuntimeConfig
       enabled && envBoolean("MAPABLE_CAREOS_NETWORK_ENABLED", true),
     continuityRadarEnabled:
       enabled && envBoolean("MAPABLE_CAREOS_CONTINUITY_ENABLED", true),
+    careOSPersistenceEnabled:
+      enabled && envBoolean("MAPABLE_CAREOS_PERSISTENCE_ENABLED", false),
+    careOSEventAutomationEnabled:
+      enabled && envBoolean("MAPABLE_CAREOS_EVENT_AUTOMATION_ENABLED", false),
     roboticsMcpEnabled:
       enabled && envBoolean("MAPABLE_CAREOS_ROBOTICS_MCP_ENABLED", false),
     modules,
   };
 }
 
-export function isMapAbleIntelligenceModuleEnabled(module: MapAbleModule): boolean {
+export function isMapAbleIntelligenceModuleEnabled(
+  module: MapAbleModule,
+): boolean {
   return getMapAbleIntelligenceConfig().modules[module];
 }
