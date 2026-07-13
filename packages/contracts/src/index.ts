@@ -148,3 +148,48 @@ export type ToolInvocation = z.infer<typeof toolInvocationSchema>;
 export type DomainEventEnvelope = z.infer<typeof domainEventEnvelopeSchema>;
 export type AuditEvent = z.infer<typeof auditEventSchema>;
 export type EvaluationResult = z.infer<typeof evaluationResultSchema>;
+
+export const commonsContributionPreferenceSchema = z.object({
+  schemaVersion: contractVersionSchema,
+  participantId: opaqueIdSchema,
+  categories: z.array(z.string()).default([]),
+  geographicPrecision: z.enum(["none", "region", "coarse_locality"]),
+  retentionDays: z.number().int().min(1).max(3650),
+  allowResearch: z.boolean().default(false),
+  allowAdvocacy: z.boolean().default(false),
+  allowModelEvaluation: z.boolean().default(false),
+  optedInAt: z.string().datetime(),
+  revokedAt: z.string().datetime().nullable(),
+}).strict();
+
+export const commonsEvidenceTypeSchema = z.enum([
+  "participant_report",
+  "carer_report",
+  "provider_statement",
+  "professional_assessment",
+  "mapable_verification",
+  "government_data",
+  "transport_feed",
+  "community_corroboration",
+  "ai_inference",
+]);
+
+export const publicDecisionRegisterEntrySchema = z.object({
+  schemaVersion: contractVersionSchema,
+  systemName: z.string().min(1),
+  purpose: z.string().min(1),
+  affectedUsers: z.array(z.string()),
+  dataCategories: z.array(z.string()),
+  decisionAuthority: z.string().min(1),
+  humanOversight: z.string().min(1),
+  risks: z.array(z.string()),
+  prohibitedUses: z.array(z.string()),
+  testingCompleted: z.array(z.string()),
+  versionHistory: z.array(z.string()),
+  complaintPathway: z.string().min(1),
+  rollbackProcess: z.string().min(1),
+}).strict();
+
+export type CommonsContributionPreference = z.infer<
+  typeof commonsContributionPreferenceSchema
+>;

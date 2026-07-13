@@ -669,6 +669,7 @@ model ParticipantLifeTwin {
   updatedAt     DateTime @updatedAt
   deletedAt     DateTime?
   memories      ParticipantPreferenceMemory[]
+  domainRecords LifeTwinDomainRecord[]
 
   @@index([participantId, deletedAt])
   @@map("participant_life_twins")
@@ -691,6 +692,29 @@ model ParticipantPreferenceMemory {
   @@unique([lifeTwinId, key])
   @@index([participantId, deletedAt])
   @@map("participant_preference_memories")
+}
+
+model LifeTwinDomainRecord {
+  id                  String               @id @default(cuid())
+  lifeTwinId          String
+  lifeTwin            ParticipantLifeTwin  @relation(fields: [lifeTwinId], references: [id], onDelete: Cascade)
+  participantId       String
+  domain              String
+  value               Json
+  source              String
+  verificationStatus  String
+  consentScopes       String[]             @default([])
+  version             Int                  @default(1)
+  supersedesRecordId  String?
+  expiresAt           DateTime?
+  disputedAt          DateTime?
+  deletedAt           DateTime?
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+
+  @@index([participantId, domain, deletedAt])
+  @@index([lifeTwinId, domain, version])
+  @@map("life_twin_domain_records")
 }
 
 model CareOSMission {
