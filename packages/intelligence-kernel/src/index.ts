@@ -118,3 +118,23 @@ export const deterministicFakeModel: DeterministicModelProvider = {
     return input;
   },
 };
+
+export type IntelligencePlanner = {
+  id: string;
+  propose: (input: unknown) => Promise<unknown>;
+};
+export type ContextProvider<TContext> = {
+  build: (request: unknown) => Promise<TContext>;
+};
+export type PolicyEvaluator = {
+  evaluate: (params: { authority: AuthorityGrant; intent: DomainIntent }) => PolicyDecision;
+};
+export type ActionExecutor = {
+  execute: (action: unknown, token: string) => Promise<never>;
+};
+export type AuditRecorder = {
+  record: (event: Record<string, unknown>) => Promise<void>;
+};
+export type HumanReviewRouter = {
+  route: (reasonCodes: string[]) => Promise<void>;
+};

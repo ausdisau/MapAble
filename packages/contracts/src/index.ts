@@ -206,3 +206,63 @@ export const humanReviewCaseSchema = z.object({
   dueAt: z.string().datetime().nullable(),
   status: z.enum(["open", "acknowledged", "resolved"]),
 }).strict();
+
+export const capabilityRiskTierSchema = z.enum(["low", "moderate", "high", "restricted"]);
+export const actionDecisionSchema = z.enum([
+  "ALLOW_DISPLAY",
+  "ALLOW_DRAFT",
+  "REQUIRE_PARTICIPANT_CONFIRMATION",
+  "REQUIRE_HUMAN_REVIEW",
+  "REQUIRE_MORE_EVIDENCE",
+  "DENY_NO_AUTHORITY",
+  "DENY_PROHIBITED",
+  "DENY_EXPIRED",
+  "ESCALATE_SAFEGUARDING",
+]);
+export const evidenceReferenceSchema = z.object({
+  sourceType: z.enum(["verified_platform_fact", "participant_preference", "provider_claim", "derived_inference", "model_suggestion", "missing"]),
+  sourceId: opaqueIdSchema.optional(),
+  timestamp: z.string().datetime(),
+  jurisdiction: jurisdictionCodeSchema,
+  verificationStatus: z.enum(["verified", "unverified", "conflicting", "missing"]),
+}).strict();
+export const proposedActionSchema = z.object({
+  id: opaqueIdSchema,
+  capability: z.string().min(1),
+  domain: z.string().min(1),
+  purpose: z.string().min(1),
+  participantId: opaqueIdSchema,
+  operation: z.string().min(1),
+  input: z.record(z.string(), z.unknown()),
+  evidence: z.array(evidenceReferenceSchema),
+  uncertainty: z.array(z.string()),
+  reversibility: z.enum(["reversible", "irreversible", "unknown"]),
+  autonomyLevel: autonomyLevelSchema,
+  confirmationRequired: z.boolean(),
+  expiresAt: z.string().datetime(),
+}).strict();
+export const intelligenceRequestSchema = z.object({
+  requestId: correlationIdSchema,
+  participantId: opaqueIdSchema,
+  actorId: opaqueIdSchema,
+  tenantId: opaqueIdSchema,
+  capability: z.string().min(1),
+  purpose: z.string().min(1),
+  input: z.record(z.string(), z.unknown()),
+}).strict();
+export const intelligenceContextSchema = z.object({
+  participantId: opaqueIdSchema,
+  actorId: opaqueIdSchema,
+  tenantId: opaqueIdSchema,
+  authority: authorityGrantSchema,
+  evidence: z.array(evidenceReferenceSchema),
+  jurisdiction: jurisdictionCodeSchema,
+}).strict();
+export const proposedPlanSchema = z.object({
+  id: opaqueIdSchema,
+  actions: z.array(proposedActionSchema),
+  uncertainty: z.array(z.string()),
+  humanFallback: z.string().min(1),
+}).strict();
+export type ProposedAction = z.infer<typeof proposedActionSchema>;
+export type ActionDecision = z.infer<typeof actionDecisionSchema>;
