@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { filterParticipantControlledCandidates } from "@mapable/domain-provider";
 
 import { prisma } from "@/lib/prisma";
 
@@ -47,10 +48,28 @@ export const searchCompatibleWorkersTool: CareOSToolDefinition<
     });
     const requiredCommunication = new Set(rights.requiredCommunicationCapabilities);
     const requiredCredentials = new Set(rights.requiredWorkerCredentials);
+    const hardFilteredIds = new Set(
+      filterParticipantControlledCandidates({
+        candidates: workers.map((worker) => ({
+          id: worker.id,
+          providerId: worker.organisationId,
+          verified: worker.verificationStatus === "verified",
+          capabilities: worker.serviceTypes,
+          communicationSupport: Array.isArray(worker.communicationCapabilities)
+            ? worker.communicationCapabilities.filter(
+                (value): value is string => typeof value === "string"
+              )
+            : [],
+        })),
+        blockedWorkerIds: rights.blockedWorkerIds,
+        blockedProviderIds: rights.blockedProviderIds,
+        requiredCapabilities: input.serviceType ? [input.serviceType] : [],
+        requiredCommunicationSupport: rights.requiredCommunicationCapabilities,
+      }).map((candidate) => candidate.id)
+    );
     return {
       workers: workers
-        .filter((worker) => !rights.blockedWorkerIds.includes(worker.id))
-        .filter((worker) => !rights.blockedProviderIds.includes(worker.organisationId))
+        .filter((worker) => hardFilteredIds.has(worker.id))
         .filter((worker) =>
           rights.requiredLanguagePreference
             ? worker.languages.includes(rights.requiredLanguagePreference)
