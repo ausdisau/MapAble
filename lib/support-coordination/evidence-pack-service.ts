@@ -16,15 +16,26 @@ export interface EvidenceClaim {
 
 function parseClaims(json: Prisma.JsonValue): EvidenceClaim[] {
   if (!Array.isArray(json)) return [];
-  return json.filter(
-    (item): item is EvidenceClaim =>
-      typeof item === "object" &&
-      item !== null &&
-      "statement" in item &&
-      "sourceRef" in item &&
-      typeof (item as EvidenceClaim).sourceRef === "string" &&
-      (item as EvidenceClaim).sourceRef.length > 0,
-  );
+  const claims: EvidenceClaim[] = [];
+  for (const item of json) {
+    if (typeof item !== "object" || item === null) continue;
+    const record = item as Record<string, unknown>;
+    if (
+      typeof record.statement === "string" &&
+      typeof record.sourceRef === "string" &&
+      record.sourceRef.length > 0
+    ) {
+      claims.push({
+        statement: record.statement,
+        sourceRef: record.sourceRef,
+        collectedAt:
+          typeof record.collectedAt === "string"
+            ? record.collectedAt
+            : undefined,
+      });
+    }
+  }
+  return claims;
 }
 
 async function requireCaseAuthority(caseId: string, actorUserId: string) {

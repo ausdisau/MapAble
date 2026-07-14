@@ -116,15 +116,15 @@ export async function buildDisclosurePreview(
     create: {
       applicationId,
       participantId,
-      fieldsToDisclose,
-      fieldsWithheld,
-      employerVisible,
+      fieldsToDisclose: fieldsToDisclose as Prisma.InputJsonValue,
+      fieldsWithheld: fieldsWithheld as Prisma.InputJsonValue,
+      employerVisible: employerVisible as Prisma.InputJsonValue,
       status: "previewed",
     },
     update: {
-      fieldsToDisclose,
-      fieldsWithheld,
-      employerVisible,
+      fieldsToDisclose: fieldsToDisclose as Prisma.InputJsonValue,
+      fieldsWithheld: fieldsWithheld as Prisma.InputJsonValue,
+      employerVisible: employerVisible as Prisma.InputJsonValue,
       status: "previewed",
     },
   });
@@ -233,18 +233,15 @@ export async function getEmployerSafeApplicationView(
   if (!app) throw new Error("APPLICATION_NOT_FOUND");
 
   if (app.disclosurePreview?.status === "confirmed") {
+    const visible = (app.disclosurePreview.employerVisible ?? {}) as DisclosureFieldMap;
     return {
       ...app,
-      applicantSummary: app.disclosurePreview.employerVisible.applicantSummary ?? null,
-      coverLetter: app.disclosurePreview.employerVisible.coverLetter ?? null,
+      applicantSummary: (visible.applicantSummary as string | null | undefined) ?? null,
+      coverLetter: (visible.coverLetter as string | null | undefined) ?? null,
       reasonableAdjustmentRequest:
-        app.disclosurePreview.employerVisible.reasonableAdjustmentRequest ?? null,
-      transportSupportNeeded: Boolean(
-        app.disclosurePreview.employerVisible.transportSupportNeeded,
-      ),
-      careSupportNeeded: Boolean(
-        app.disclosurePreview.employerVisible.careSupportNeeded,
-      ),
+        (visible.reasonableAdjustmentRequest as string | null | undefined) ?? null,
+      transportSupportNeeded: Boolean(visible.transportSupportNeeded),
+      careSupportNeeded: Boolean(visible.careSupportNeeded),
     };
   }
 

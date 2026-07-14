@@ -51,7 +51,7 @@ export async function scheduleActivity(
       title: input.title,
       scheduledAt: input.scheduledAt ?? null,
       instructionsAccessible: input.instructionsAccessible,
-      equipmentJson: input.equipment ?? [],
+      equipmentJson: (input.equipment ?? []) as Prisma.InputJsonValue,
       status: "scheduled",
     },
     include: ACTIVITY_INCLUDE,

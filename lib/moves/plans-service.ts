@@ -52,7 +52,8 @@ export async function createPlan(input: CreatePlanInput, actorUserId: string) {
       versions: {
         create: {
           version: 1,
-          instructionsJson: input.initialInstructions ?? {},
+          instructionsJson: (input.initialInstructions ??
+            {}) as Prisma.InputJsonValue,
           changeSummary: input.changeSummary ?? "Initial plan version",
           authoredById: actorUserId,
         },
@@ -103,7 +104,7 @@ export async function addVersion(input: AddVersionInput, actorUserId: string) {
     data: {
       planId: input.planId,
       version: nextVersion,
-      instructionsJson: input.instructionsJson,
+      instructionsJson: input.instructionsJson as Prisma.InputJsonValue,
       changeSummary: input.changeSummary,
       authoredById: actorUserId,
       approvedAt: input.approve ? new Date() : null,

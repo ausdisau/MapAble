@@ -1,3 +1,5 @@
+import type { Prisma } from "@prisma/client";
+
 import { createAuditEvent } from "@/lib/audit/audit-event-service";
 import {
   ensureMovesRehabilitationEnabled,
@@ -5,8 +7,8 @@ import {
 } from "@/lib/config/moves-rehabilitation";
 import { assertClinicalBoundaryAllowed } from "@/lib/moves/clinical-boundaries";
 import { requireClinicalAuthor } from "@/lib/moves/plans-service";
-import { mockVideoAdapter } from "@/lib/telehealth/video/mock-video-adapter";
 import { prisma } from "@/lib/prisma";
+import { mockVideoAdapter } from "@/lib/telehealth/video/mock-video-adapter";
 
 export interface CreateTelehealthSessionInput {
   participantId: string;
@@ -82,7 +84,7 @@ export async function importHealthDeviceData(
     data: {
       participantId: input.participantId,
       sourceLabel: input.sourceLabel.trim(),
-      payloadJson: input.payload,
+      payloadJson: input.payload as Prisma.InputJsonValue,
     },
   });
 
