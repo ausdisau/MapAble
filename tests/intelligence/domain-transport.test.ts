@@ -5,6 +5,7 @@ import {
   evaluateRouteFeasibility,
   evaluateVehicleEligibility,
   proposeDisruptionRecovery,
+  buildRecoveryReviewProposal,
   transportRequirementsSchema,
 } from "@mapable/domain-transport";
 
@@ -70,5 +71,16 @@ describe("CSI transport domain policy", () => {
       reasonCodes: ["NO_FEASIBLE_OPTION", "HUMAN_RECOVERY_REVIEW_REQUIRED"],
       noOperationalChangeMade: true,
     });
+  });
+
+  it("creates a human review proposal when recovery lacks a compliant option", () => {
+    const proposal = buildRecoveryReviewProposal({
+      participantId: "participant-1",
+      tenantId: "tenant-1",
+      reasonCodes: ["NO_FEASIBLE_OPTION"],
+      hasCompliantAlternative: false,
+    });
+    expect(proposal.reviewCase?.category).toBe("recovery");
+    expect(proposal.noOperationalChangeMade).toBe(true);
   });
 });

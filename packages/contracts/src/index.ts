@@ -193,3 +193,16 @@ export const publicDecisionRegisterEntrySchema = z.object({
 export type CommonsContributionPreference = z.infer<
   typeof commonsContributionPreferenceSchema
 >;
+
+export const humanReviewCaseSchema = z.object({
+  schemaVersion: contractVersionSchema,
+  id: opaqueIdSchema,
+  participantId: opaqueIdSchema,
+  tenantId: opaqueIdSchema,
+  category: z.enum(["uncertainty", "recovery", "safeguarding"]),
+  priority: z.enum(["low", "medium", "high", "critical"]),
+  reasonCodes: z.array(z.string()).min(1),
+  ownerId: opaqueIdSchema.nullable(),
+  dueAt: z.string().datetime().nullable(),
+  status: z.enum(["open", "acknowledged", "resolved"]),
+}).strict();

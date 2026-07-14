@@ -162,3 +162,34 @@ export function proposeDisruptionRecovery(params: {
         noOperationalChangeMade: true,
       };
 }
+
+export function buildRecoveryReviewProposal(params: {
+  participantId: string;
+  tenantId: string;
+  reasonCodes: TransportReasonCode[];
+  hasCompliantAlternative: boolean;
+}) {
+  const recovery = proposeDisruptionRecovery({
+    disruption: "transport_cancellation",
+    hasCompliantAlternative: params.hasCompliantAlternative,
+  });
+  return {
+    recovery,
+    reviewCase:
+      recovery.outcome === "ESCALATE"
+        ? {
+            schemaVersion: "1.0" as const,
+            id: `review_${params.participantId}`,
+            participantId: params.participantId,
+            tenantId: params.tenantId,
+            category: "recovery" as const,
+            priority: "high" as const,
+            reasonCodes: [...params.reasonCodes, ...recovery.reasonCodes],
+            ownerId: null,
+            dueAt: null,
+            status: "open" as const,
+          }
+        : null,
+    noOperationalChangeMade: true as const,
+  };
+}
