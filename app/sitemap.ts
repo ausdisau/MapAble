@@ -15,6 +15,7 @@ const publicRoutes = [
   "/providers",
   "/provider-finder",
   "/resources",
+  "/guides",
   "/help",
   "/about",
   "/pricing",
