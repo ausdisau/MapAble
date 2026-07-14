@@ -1,10 +1,12 @@
 import { createHash } from "crypto";
 
 import {
+  actionDecisionSchema,
   autonomyLevelSchema,
   type AuthorityGrant,
   type DomainIntent,
   type PolicyDecision,
+  type ProposedAction,
 } from "@mapable/contracts";
 import { z } from "zod";
 
@@ -138,3 +140,41 @@ export type AuditRecorder = {
 export type HumanReviewRouter = {
   route: (reasonCodes: string[]) => Promise<void>;
 };
+
+export function decideProposedAction(params: {
+  action: ProposedAction;
+  authority: AuthorityGrant | null;
+  capabilityEnabled: boolean;
+  evidenceComplete: boolean;
+  safeguardingSignal?: boolean;
+  now?: Date;
+}): { decision: z.infer<typeof actionDecisionSchema>; reasonCodes: string[] } {
+  const now = params.now ?? new Date();
+  if (params.safeguardingSignal) {
+    return { decision: "ESCALATE_SAFEGUARDING", reasonCodes: ["SAFEGUARDING_HUMAN_ONLY"] };
+  }
+  if (!params.capabilityEnabled) {
+    return { decision: "DENY_NO_AUTHORITY", reasonCodes: ["CAPABILITY_DISABLED"] };
+  }
+  if (!params.authority) {
+    return { decision: "DENY_NO_AUTHORITY", reasonCodes: ["AUTHORITY_MISSING"] };
+  }
+  if (params.authority.revokedAt || new Date(params.authority.expiresAt) <= now) {
+    return { decision: "DENY_EXPIRED", reasonCodes: ["AUTHORITY_INACTIVE"] };
+  }
+  if (params.action.autonomyLevel > 2 || params.action.operation.includes("execute")) {
+    return { decision: "DENY_PROHIBITED", reasonCodes: ["SYNTHETIC_L2_CEILING"] };
+  }
+  if (!params.evidenceComplete) {
+    return { decision: "REQUIRE_MORE_EVIDENCE", reasonCodes: ["EVIDENCE_INCOMPLETE"] };
+  }
+  if (!params.authority.permittedActions.includes(params.action.operation)) {
+    return { decision: "DENY_NO_AUTHORITY", reasonCodes: ["ACTION_NOT_GRANTED"] };
+  }
+  return {
+    decision: params.action.confirmationRequired
+      ? "REQUIRE_PARTICIPANT_CONFIRMATION"
+      : "ALLOW_DRAFT",
+    reasonCodes: ["POLICY_REQUIREMENTS_SATISFIED"],
+  };
+}
