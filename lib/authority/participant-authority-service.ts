@@ -14,7 +14,8 @@ export async function grantParticipantAuthority(input: {
   if (input.participantId !== input.actorUserId) {
     throw new Error("PARTICIPANT_AUTHORITY_REQUIRED");
   }
-  if (input.expiresAt <= new Date()) throw new Error("AUTHORITY_EXPIRY_REQUIRED");
+  if (input.expiresAt <= new Date())
+    throw new Error("AUTHORITY_EXPIRY_REQUIRED");
   const grant = await prisma.participantAuthorityGrant.create({
     data: {
       participantId: input.participantId,
@@ -51,7 +52,11 @@ export async function revokeParticipantAuthority(input: {
     throw new Error("PARTICIPANT_AUTHORITY_REQUIRED");
   }
   const result = await prisma.participantAuthorityGrant.updateMany({
-    where: { id: input.grantId, participantId: input.participantId, revokedAt: null },
+    where: {
+      id: input.grantId,
+      participantId: input.participantId,
+      revokedAt: null,
+    },
     data: { revokedAt: new Date(), revokedById: input.actorUserId },
   });
   if (result.count !== 1) throw new Error("AUTHORITY_GRANT_NOT_FOUND");

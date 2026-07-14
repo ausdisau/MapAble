@@ -1,8 +1,8 @@
 import type { Prisma } from "@prisma/client";
 import { z } from "zod";
 
-import { prisma } from "@/lib/prisma";
 import type { QueueProvider } from "@/lib/platform/cloud-providers";
+import { prisma } from "@/lib/prisma";
 
 export const cloudEventEnvelopeSchema = z.object({
   id: z.string().uuid(),
@@ -84,8 +84,13 @@ export async function publishPendingCloudEvents(
         where: { id: event.id },
         data: {
           attempts,
-          lastError: error instanceof Error ? error.message.slice(0, 500) : "PUBLISH_FAILED",
-          nextAttemptAt: new Date(now.getTime() + Math.min(3600, 2 ** attempts * 30) * 1000),
+          lastError:
+            error instanceof Error
+              ? error.message.slice(0, 500)
+              : "PUBLISH_FAILED",
+          nextAttemptAt: new Date(
+            now.getTime() + Math.min(3600, 2 ** attempts * 30) * 1000,
+          ),
           deadLetteredAt: attempts >= 5 ? now : null,
         },
       });

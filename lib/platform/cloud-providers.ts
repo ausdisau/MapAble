@@ -33,7 +33,8 @@ export interface CacheProvider {
  * network path and never sends an external message.
  */
 export class RecordingQueueProvider implements QueueProvider {
-  readonly messages: Array<{ id: string; topic: string; payload: unknown }> = [];
+  readonly messages: Array<{ id: string; topic: string; payload: unknown }> =
+    [];
 
   async publish<T>(topic: string, payload: T) {
     const messageId = crypto.randomUUID();

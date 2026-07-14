@@ -86,9 +86,7 @@ export async function scheduleWorkflowRetry(input: {
 }
 
 export function calculateWorkflowRetryAt(attempts: number, now = new Date()) {
-  return new Date(
-    now.getTime() + Math.min(3600, 2 ** attempts * 30) * 1000,
-  );
+  return new Date(now.getTime() + Math.min(3600, 2 ** attempts * 30) * 1000);
 }
 
 export async function cancelWorkflow(workflowId: string) {

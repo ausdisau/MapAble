@@ -10,13 +10,19 @@ export const cloudEnvironmentSchema = z
     NEXTAUTH_SECRET: z.string().min(32).optional(),
     CLOUD_OUTBOX_ENABLED: z.enum(["true", "false"]).default("false"),
     CLOUD_WORKFLOWS_ENABLED: z.enum(["true", "false"]).default("false"),
-    CLOUD_STORAGE_PROVIDER: z.enum(["recording", "s3", "supabase"]).default("recording"),
+    CLOUD_STORAGE_PROVIDER: z
+      .enum(["recording", "s3", "supabase"])
+      .default("recording"),
     CLOUD_QUEUE_PROVIDER: z.enum(["recording", "managed"]).default("recording"),
     CLOUD_CACHE_PROVIDER: z.enum(["memory", "redis"]).default("memory"),
   })
   .superRefine((value, context) => {
     if (value.MAPABLE_ENVIRONMENT === "production") {
-      for (const variable of ["DATABASE_URL", "DIRECT_URL", "NEXTAUTH_SECRET"] as const) {
+      for (const variable of [
+        "DATABASE_URL",
+        "DIRECT_URL",
+        "NEXTAUTH_SECRET",
+      ] as const) {
         if (!value[variable]) {
           context.addIssue({
             code: "custom",
@@ -33,7 +39,8 @@ export const cloudEnvironmentSchema = z
         context.addIssue({
           code: "custom",
           path: ["MAPABLE_ENVIRONMENT"],
-          message: "Recording or memory cloud providers cannot be used in production",
+          message:
+            "Recording or memory cloud providers cannot be used in production",
         });
       }
     }

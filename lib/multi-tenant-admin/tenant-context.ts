@@ -1,7 +1,7 @@
 import type { CurrentUser } from "@/lib/auth/current-user";
 import { y2OrchestrationConfig } from "@/lib/config/y2-orchestration";
-import { prisma } from "@/lib/prisma";
 import { assertTenantAccess } from "@/lib/multi-tenant-admin/tenant-service";
+import { prisma } from "@/lib/prisma";
 
 export type TenantContext = {
   tenantId: string | null;
@@ -13,7 +13,7 @@ export type TenantContext = {
 };
 
 export async function resolveTenantContext(
-  user: CurrentUser
+  user: CurrentUser,
 ): Promise<TenantContext> {
   if (!y2OrchestrationConfig.multiTenantWorkspaceV2Enabled) {
     return {
@@ -68,7 +68,7 @@ export async function resolveTenantContext(
 
 export function whereOrganisationScope(
   ctx: TenantContext,
-  organisationField = "organisationId"
+  organisationField = "organisationId",
 ) {
   if (!ctx.enabled || !ctx.organisationId) return {};
   return { [organisationField]: ctx.organisationId };
@@ -79,7 +79,9 @@ export function whereTenantOrganisations(ctx: TenantContext) {
   return {
     organisation: {
       id: {
-        in: ctx.organisationIds ?? (ctx.organisationId ? [ctx.organisationId] : []),
+        in:
+          ctx.organisationIds ??
+          (ctx.organisationId ? [ctx.organisationId] : []),
       },
     },
   };
@@ -87,7 +89,7 @@ export function whereTenantOrganisations(ctx: TenantContext) {
 
 export async function assertOrganisationInTenant(
   ctx: TenantContext,
-  organisationId: string
+  organisationId: string,
 ) {
   if (!ctx.enabled || !ctx.tenantId) return;
 
