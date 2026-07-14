@@ -169,6 +169,8 @@ export async function composeCareTransportMission(
       participantId: context.participant.participantId,
       requestId: context.requestId,
       missionType: "CARE_TRANSPORT_APPOINTMENT",
+      desiredOutcome: `Attend ${appointment.title} with linked Care and Transport`,
+      correlationId: context.requestId,
       inputSummary: {
         appointmentId: appointment.id,
         pickupProvided: Boolean(parsed.pickupLocation),

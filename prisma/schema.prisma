@@ -174,6 +174,10 @@ model User {
   careOSLifeTwin            ParticipantLifeTwin?
   careOSMissions            CareOSMission[]
   careOSActivityEvents      CareOSActivityEvent[]
+  careOSMissionEvents       CareOSMissionEvent[]
+  careOSHumanReviews        CareOSHumanReview[]
+  careOSActionReceipts      CareOSActionReceipt[]
+  careOSParticipantPreferences CareOSParticipantPreference[]
   coordinationCasesAsCoordinator CoordinationCase[] @relation("CoordinationCaseCoordinator")
   coordinationCasesAsParticipant CoordinationCase[] @relation("CoordinationCaseParticipant")
   coordinationTasksCreated       CoordinationTask[] @relation("CoordinationTaskCreator")
@@ -898,20 +902,127 @@ model WorkerEquipmentEvidence {
 }
 
 model CareOSMission {
-  id            String   @id @default(cuid())
-  participantId String
-  participant   User     @relation(fields: [participantId], references: [id], onDelete: Cascade)
-  requestId     String   @unique
-  missionType   String
-  status        String   @default("proposed")
-  inputSummary  Json
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  recommendations CareOSRecommendation[]
+  id                  String   @id @default(cuid())
+  participantId       String
+  participant         User     @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  tenantId            String?
+  requestId           String   @unique
+  missionType         String
+  /// Participant-facing desired outcome (fabric: goal).
+  desiredOutcome      String   @default("")
+  status              String   @default("proposed")
+  authorityDecisionId String?
+  inputSummary        Json     @default("{}")
+  graphJson           Json     @default("{}")
+  modulesJson         Json     @default("[]")
+  alertsJson          Json     @default("[]")
+  proposalsJson       Json     @default("[]")
+  stateVersion        Int      @default(1)
+  correlationId       String   @default(cuid())
+  workflowRunId       String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  recommendations     CareOSRecommendation[]
+  events              CareOSMissionEvent[]
+  humanReviews        CareOSHumanReview[]
+  actionReceipts      CareOSActionReceipt[]
   linkedCoordinationCases CoordinationCase[] @relation("CoordinationCaseLinkedMission")
 
   @@index([participantId, createdAt])
+  @@index([tenantId, status])
+  @@index([correlationId])
+  @@index([missionType, status])
   @@map("careos_missions")
+}
+
+model CareOSMissionEvent {
+  id             String        @id @default(cuid())
+  missionId      String
+  mission        CareOSMission @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  participantId  String
+  participant    User          @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  eventType      String
+  sourceModule   String
+  sourceEntityId String?
+  severity       String        @default("information")
+  summary        String
+  payloadJson    Json?
+  /// Idempotency key for replay-safe appends.
+  eventKey       String?
+  createdAt      DateTime      @default(now())
+
+  @@unique([missionId, eventKey])
+  @@index([missionId, createdAt])
+  @@index([participantId, createdAt])
+  @@map("careos_mission_events")
+}
+
+model CareOSHumanReview {
+  id                         String        @id @default(cuid())
+  missionId                  String
+  mission                    CareOSMission @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  requestId                  String
+  participantId              String
+  participant                User          @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  category                   String
+  priority                   String
+  title                      String
+  summary                    String
+  assignedRole               String
+  status                     String        @default("open")
+  dueAt                      DateTime
+  participantContactRequired Boolean       @default(true)
+  evidenceJson               Json          @default("[]")
+  resolvedAt                 DateTime?
+  createdAt                  DateTime      @default(now())
+  updatedAt                  DateTime      @updatedAt
+
+  @@index([participantId, status])
+  @@index([assignedRole, status])
+  @@index([missionId, createdAt])
+  @@map("careos_human_reviews")
+}
+
+model CareOSActionReceipt {
+  id               String         @id @default(cuid())
+  tokenId          String         @unique
+  proposalId       String
+  requestId        String
+  participantId    String
+  participant      User           @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  missionId        String?
+  mission          CareOSMission? @relation(fields: [missionId], references: [id], onDelete: SetNull)
+  actionType       String
+  payloadHash      String
+  status           String         @default("claimed")
+  resultEntityType String?
+  resultEntityId   String?
+  errorCode        String?
+  claimedAt        DateTime       @default(now())
+  completedAt      DateTime?
+
+  @@index([participantId, claimedAt])
+  @@index([requestId])
+  @@index([missionId])
+  @@map("careos_action_receipts")
+}
+
+model CareOSParticipantPreference {
+  id            String    @id @default(cuid())
+  participantId String
+  participant   User      @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  preferenceKey String
+  valueJson     Json
+  source        String    @default("participant_confirmed")
+  status        String    @default("active")
+  confirmedAt   DateTime  @default(now())
+  expiresAt     DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@unique([participantId, preferenceKey])
+  @@index([participantId, status])
+  @@map("careos_participant_preferences")
 }
 
 model CareOSRecommendation {

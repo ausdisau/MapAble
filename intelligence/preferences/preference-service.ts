@@ -1,6 +1,6 @@
-import { randomUUID } from "node:crypto";
-
 import { z } from "zod";
+
+import type { Prisma } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
 
@@ -43,15 +43,26 @@ export type CareOSPreference = {
 export async function listCareOSPreferences(
   participantId: string,
 ): Promise<CareOSPreference[]> {
-  return prisma.$queryRaw<CareOSPreference[]>`
-    SELECT "id", "participantId", "preferenceKey", "valueJson", "source",
-           "status", "confirmedAt", "expiresAt", "createdAt", "updatedAt"
-    FROM "careos_participant_preferences"
-    WHERE "participantId" = ${participantId}
-      AND "status" = 'active'
-      AND ("expiresAt" IS NULL OR "expiresAt" > NOW())
-    ORDER BY "preferenceKey" ASC
-  `;
+  const rows = await prisma.careOSParticipantPreference.findMany({
+    where: {
+      participantId,
+      status: "active",
+      OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
+    },
+    orderBy: { preferenceKey: "asc" },
+  });
+  return rows.map((row) => ({
+    id: row.id,
+    participantId: row.participantId,
+    preferenceKey: row.preferenceKey as CareOSPreference["preferenceKey"],
+    valueJson: row.valueJson,
+    source: row.source,
+    status: row.status as CareOSPreference["status"],
+    confirmedAt: row.confirmedAt,
+    expiresAt: row.expiresAt,
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt,
+  }));
 }
 
 export async function upsertCareOSPreference(params: {
@@ -60,37 +71,43 @@ export async function upsertCareOSPreference(params: {
   value: z.infer<typeof careOSPreferenceValueSchema>;
   expiresAt?: string | null;
 }): Promise<void> {
-  const id = randomUUID();
-  const valueJson = JSON.stringify(params.value);
   const expiresAt = params.expiresAt ? new Date(params.expiresAt) : null;
-  await prisma.$executeRaw`
-    INSERT INTO "careos_participant_preferences" (
-      "id", "participantId", "preferenceKey", "valueJson", "source",
-      "status", "confirmedAt", "expiresAt", "createdAt", "updatedAt"
-    ) VALUES (
-      ${id}, ${params.participantId}, ${params.key}, CAST(${valueJson} AS JSONB),
-      'participant_confirmed', 'active', NOW(), ${expiresAt}, NOW(), NOW()
-    )
-    ON CONFLICT ("participantId", "preferenceKey") DO UPDATE SET
-      "valueJson" = EXCLUDED."valueJson",
-      "source" = 'participant_confirmed',
-      "status" = 'active',
-      "confirmedAt" = NOW(),
-      "expiresAt" = EXCLUDED."expiresAt",
-      "updatedAt" = NOW()
-  `;
+  await prisma.careOSParticipantPreference.upsert({
+    where: {
+      participantId_preferenceKey: {
+        participantId: params.participantId,
+        preferenceKey: params.key,
+      },
+    },
+    create: {
+      participantId: params.participantId,
+      preferenceKey: params.key,
+      valueJson: params.value as Prisma.InputJsonValue,
+      source: "participant_confirmed",
+      status: "active",
+      expiresAt,
+    },
+    update: {
+      valueJson: params.value as Prisma.InputJsonValue,
+      source: "participant_confirmed",
+      status: "active",
+      confirmedAt: new Date(),
+      expiresAt,
+    },
+  });
 }
 
 export async function revokeCareOSPreference(params: {
   participantId: string;
   key: z.infer<typeof careOSPreferenceKeySchema>;
 }): Promise<boolean> {
-  const changed = await prisma.$executeRaw`
-    UPDATE "careos_participant_preferences"
-    SET "status" = 'revoked', "updatedAt" = NOW()
-    WHERE "participantId" = ${params.participantId}
-      AND "preferenceKey" = ${params.key}
-      AND "status" = 'active'
-  `;
-  return changed === 1;
+  const result = await prisma.careOSParticipantPreference.updateMany({
+    where: {
+      participantId: params.participantId,
+      preferenceKey: params.key,
+      status: "active",
+    },
+    data: { status: "revoked" },
+  });
+  return result.count === 1;
 }

@@ -1,5 +1,7 @@
 import { randomUUID } from "node:crypto";
 
+import type { Prisma } from "@prisma/client";
+
 import { prisma } from "@/lib/prisma";
 
 import type {
@@ -11,84 +13,113 @@ export async function persistAppointmentMission(params: {
   request: AppointmentMissionRequest;
   state: AppointmentMissionState;
 }): Promise<void> {
-  const graphJson = JSON.stringify({
+  const graphJson = {
     type: "appointment",
     appointment: params.request.appointment,
     state: params.state,
-  });
-  const alertsJson = JSON.stringify(
-    params.state.events
-      .filter((event) => event.type === "continuity_alerted")
-      .map((event) => ({
-        id: event.id,
-        severity: event.severity,
-        summary: event.summary,
-      })),
-  );
-  const proposalsJson = JSON.stringify(
-    params.state.pendingConfirmations.map((action) => ({
-      action,
-      status: "awaiting_participant",
-    })),
-  );
+  } as unknown as Prisma.InputJsonValue;
+  const alertsJson = params.state.events
+    .filter((event) => event.type === "continuity_alerted")
+    .map((event) => ({
+      id: event.id,
+      severity: event.severity,
+      summary: event.summary,
+    })) as unknown as Prisma.InputJsonValue;
+  const proposalsJson = params.state.pendingConfirmations.map((action) => ({
+    action,
+    status: "awaiting_participant",
+  })) as unknown as Prisma.InputJsonValue;
+  const modulesJson = ["core", "care", "transport", "access"];
 
   await prisma.$transaction(async (tx) => {
-    await tx.$executeRaw`
-      INSERT INTO "careos_missions" (
-        "id", "requestId", "participantId", "goal", "status", "modules",
-        "graphJson", "alertsJson", "proposalsJson", "createdAt", "updatedAt"
-      ) VALUES (
-        ${params.state.missionId}, ${params.state.missionId},
-        ${params.state.participantId}, ${params.state.outcome}, ${params.state.phase},
-        ARRAY['core', 'care', 'transport', 'access']::TEXT[],
-        CAST(${graphJson} AS JSONB), CAST(${alertsJson} AS JSONB),
-        CAST(${proposalsJson} AS JSONB), NOW(), NOW()
-      )
-      ON CONFLICT ("id") DO UPDATE SET
-        "status" = EXCLUDED."status",
-        "graphJson" = EXCLUDED."graphJson",
-        "alertsJson" = EXCLUDED."alertsJson",
-        "proposalsJson" = EXCLUDED."proposalsJson",
-        "updatedAt" = NOW()
-    `;
+    await tx.careOSMission.upsert({
+      where: { id: params.state.missionId },
+      create: {
+        id: params.state.missionId,
+        requestId: params.state.missionId,
+        participantId: params.state.participantId,
+        missionType: "APPOINTMENT",
+        desiredOutcome: params.state.outcome,
+        status: params.state.phase,
+        graphJson,
+        alertsJson,
+        proposalsJson,
+        modulesJson,
+        correlationId: params.state.missionId,
+        inputSummary: {
+          appointmentTitle: params.request.appointment.title,
+          location: params.request.appointment.location,
+          startAt: params.request.appointment.startAt,
+        } as Prisma.InputJsonValue,
+      },
+      update: {
+        desiredOutcome: params.state.outcome,
+        status: params.state.phase,
+        graphJson,
+        alertsJson,
+        proposalsJson,
+        modulesJson,
+        stateVersion: { increment: 1 },
+      },
+    });
 
     for (const event of params.state.events) {
-      const payload = JSON.stringify(event.payload);
-      await tx.$executeRaw`
-        INSERT INTO "careos_mission_events" (
-          "id", "missionId", "participantId", "eventType", "sourceModule",
-          "sourceEntityId", "severity", "summary", "payloadJson", "createdAt"
-        ) VALUES (
-          ${event.id}, ${params.state.missionId}, ${params.state.participantId},
-          ${event.type}, ${event.source}, ${event.entityId}, ${event.severity},
-          ${event.summary}, CAST(${payload} AS JSONB), ${new Date(event.occurredAt)}
-        )
-        ON CONFLICT ("id") DO NOTHING
-      `;
+      const existing = await tx.careOSMissionEvent.findUnique({
+        where: {
+          missionId_eventKey: {
+            missionId: params.state.missionId,
+            eventKey: event.id,
+          },
+        },
+      });
+      if (existing) continue;
+      await tx.careOSMissionEvent.create({
+        data: {
+          id: event.id,
+          missionId: params.state.missionId,
+          participantId: params.state.participantId,
+          eventType: event.type,
+          sourceModule: event.source,
+          sourceEntityId: event.entityId,
+          severity: event.severity,
+          summary: event.summary,
+          payloadJson: event.payload as Prisma.InputJsonValue,
+          eventKey: event.id,
+          createdAt: new Date(event.occurredAt),
+        },
+      });
     }
 
     if (params.state.humanReviewRequired) {
-      const evidence = JSON.stringify(params.state.authority.reasons);
-      await tx.$executeRaw`
-        INSERT INTO "careos_human_reviews" (
-          "id", "missionId", "requestId", "participantId", "category",
-          "priority", "title", "summary", "assignedRole", "status", "dueAt",
-          "participantContactRequired", "evidenceJson", "createdAt", "updatedAt"
-        )
-        SELECT
-          ${randomUUID()}, ${params.state.missionId}, ${params.state.missionId},
-          ${params.state.participantId}, 'care_coordination', 'attention',
-          'Review appointment support mission',
-          'Review unresolved authority, competency, backup or continuity requirements before execution.',
-          'support_coordinator', 'open', NOW() + INTERVAL '24 hours', true,
-          CAST(${evidence} AS JSONB), NOW(), NOW()
-        WHERE NOT EXISTS (
-          SELECT 1 FROM "careos_human_reviews"
-          WHERE "missionId" = ${params.state.missionId}
-            AND "category" = 'care_coordination'
-            AND "status" IN ('open', 'assigned', 'in_progress')
-        )
-      `;
+      const open = await tx.careOSHumanReview.findFirst({
+        where: {
+          missionId: params.state.missionId,
+          category: "care_coordination",
+          status: { in: ["open", "assigned", "in_progress"] },
+        },
+        select: { id: true },
+      });
+      if (!open) {
+        await tx.careOSHumanReview.create({
+          data: {
+            id: randomUUID(),
+            missionId: params.state.missionId,
+            requestId: params.state.missionId,
+            participantId: params.state.participantId,
+            category: "care_coordination",
+            priority: "attention",
+            title: "Review appointment support mission",
+            summary:
+              "Review unresolved authority, competency, backup or continuity requirements before execution.",
+            assignedRole: "support_coordinator",
+            status: "open",
+            dueAt: new Date(Date.now() + 24 * 60 * 60_000),
+            participantContactRequired: true,
+            evidenceJson: params.state.authority
+              .reasons as unknown as Prisma.InputJsonValue,
+          },
+        });
+      }
     }
   });
 }

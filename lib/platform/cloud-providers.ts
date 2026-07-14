@@ -237,7 +237,7 @@ export class S3ObjectStorageProvider implements ObjectStorageProvider {
       {
         method: "PUT",
         headers: this.headers(input.contentType),
-        body: input.data,
+        body: Buffer.from(input.data),
       },
     );
     if (!response.ok) throw new Error(`S3_PUT_FAILED:${response.status}`);

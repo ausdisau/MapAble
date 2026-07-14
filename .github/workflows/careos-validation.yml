@@ -11,7 +11,10 @@ on:
       - "intelligence/**"
       - "prisma/**"
       - "tests/careos-*.test.ts"
+      - "tests/careos/**"
       - "tests/care-support-intelligence.test.ts"
+      - "lib/careos/**"
+      - "lib/platform/**"
       - "package.json"
       - "pnpm-lock.yaml"
       - ".github/workflows/careos-validation.yml"
@@ -34,7 +37,7 @@ jobs:
       MAPABLE_AI_APPROVAL_SECRET: ci-only-careos-approval-secret-at-least-32-characters
       MAPABLE_AI_ENABLED: "true"
       MAPABLE_CAREOS_NETWORK_ENABLED: "true"
-      MAPABLE_CAREOS_PERSISTENCE_ENABLED: "false"
+      MAPABLE_CAREOS_PERSISTENCE_ENABLED: "true"
       MAPABLE_CAREOS_EVENT_AUTOMATION_ENABLED: "false"
       MAPABLE_AI_WRITE_ACTIONS: "false"
     services:

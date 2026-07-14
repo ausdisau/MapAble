@@ -1,5 +1,11 @@
-import { randomUUID } from "node:crypto";
+import type { Prisma } from "@prisma/client";
 
+import {
+  appendMissionEvent,
+  createCanonicalMission,
+  toFabricMissionView,
+  type FabricMissionView,
+} from "@/lib/careos/canonical-mission-service";
 import { prisma } from "@/lib/prisma";
 
 import type {
@@ -8,61 +14,88 @@ import type {
   CareOSNetworkResponse,
 } from "../network/types";
 
-export type CareOSMissionSummary = {
-  id: string;
-  requestId: string;
-  participantId: string;
-  goal: string;
-  status: string;
-  modules: string[];
-  createdAt: Date;
-  updatedAt: Date;
-};
+export type CareOSMissionSummary = FabricMissionView;
 
 export async function persistCareOSMission(params: {
   participantId: string;
   request: CareOSNetworkRequest;
   response: CareOSNetworkResponse;
+  tenantId?: string;
 }): Promise<string> {
-  const missionId = randomUUID();
-  const graphJson = JSON.stringify(params.response.mission);
-  const alertsJson = JSON.stringify(params.response.continuityAlerts);
-  const proposalsJson = JSON.stringify(params.response.actionProposals);
-  await prisma.$executeRaw`
-    INSERT INTO "careos_missions" (
-      "id", "requestId", "participantId", "goal", "status", "modules",
-      "graphJson", "alertsJson", "proposalsJson", "createdAt", "updatedAt"
-    ) VALUES (
-      ${missionId}, ${params.response.requestId}, ${params.participantId},
-      ${params.response.goal}, ${params.response.status}, ${params.request.modules},
-      CAST(${graphJson} AS JSONB), CAST(${alertsJson} AS JSONB),
-      CAST(${proposalsJson} AS JSONB), NOW(), NOW()
-    )
-  `;
+  const existing = await prisma.careOSMission.findUnique({
+    where: { requestId: params.response.requestId },
+    select: { id: true },
+  });
+  if (existing) {
+    await prisma.careOSMission.update({
+      where: { id: existing.id },
+      data: {
+        desiredOutcome: params.response.goal,
+        status: params.response.status,
+        graphJson: params.response.mission as unknown as Prisma.InputJsonValue,
+        modulesJson: params.request.modules as unknown as Prisma.InputJsonValue,
+        alertsJson:
+          params.response.continuityAlerts as unknown as Prisma.InputJsonValue,
+        proposalsJson:
+          params.response.actionProposals as unknown as Prisma.InputJsonValue,
+        stateVersion: { increment: 1 },
+      },
+    });
+    for (const item of params.response.humanReviewQueue) {
+      await persistHumanReview(existing.id, item);
+    }
+    return existing.id;
+  }
+
+  const mission = await createCanonicalMission({
+    participantId: params.participantId,
+    requestId: params.response.requestId,
+    missionType: "CAREOS_NETWORK",
+    desiredOutcome: params.response.goal,
+    status: params.response.status,
+    tenantId: params.tenantId,
+    graphJson: params.response.mission as unknown as Prisma.InputJsonValue,
+    modulesJson: params.request.modules as unknown as Prisma.InputJsonValue,
+    alertsJson:
+      params.response.continuityAlerts as unknown as Prisma.InputJsonValue,
+    proposalsJson:
+      params.response.actionProposals as unknown as Prisma.InputJsonValue,
+    correlationId: params.response.requestId,
+  });
 
   for (const item of params.response.humanReviewQueue) {
-    await persistHumanReview(missionId, item);
+    await persistHumanReview(mission.id, item);
   }
-  return missionId;
+  return mission.id;
 }
 
 async function persistHumanReview(
   missionId: string,
   item: CareOSHumanReviewItem,
 ): Promise<void> {
-  const evidence = JSON.stringify(item.evidence);
-  await prisma.$executeRaw`
-    INSERT INTO "careos_human_reviews" (
-      "id", "missionId", "requestId", "participantId", "category",
-      "priority", "title", "summary", "assignedRole", "status", "dueAt",
-      "participantContactRequired", "evidenceJson", "createdAt", "updatedAt"
-    ) VALUES (
-      ${item.id}, ${missionId}, ${item.requestId}, ${item.participantId},
-      ${item.category}, ${item.priority}, ${item.title}, ${item.summary},
-      ${item.assignedRole}, ${item.status}, ${new Date(item.dueAt)},
-      ${item.participantContactRequired}, CAST(${evidence} AS JSONB), NOW(), NOW()
-    )
-  `;
+  await prisma.careOSHumanReview.upsert({
+    where: { id: item.id },
+    create: {
+      id: item.id,
+      missionId,
+      requestId: item.requestId,
+      participantId: item.participantId,
+      category: item.category,
+      priority: item.priority,
+      title: item.title,
+      summary: item.summary,
+      assignedRole: item.assignedRole,
+      status: item.status,
+      dueAt: new Date(item.dueAt),
+      participantContactRequired: item.participantContactRequired,
+      evidenceJson: item.evidence as unknown as Prisma.InputJsonValue,
+    },
+    update: {
+      status: item.status,
+      summary: item.summary,
+      evidenceJson: item.evidence as unknown as Prisma.InputJsonValue,
+    },
+  });
 }
 
 export async function recordCareOSMissionEvent(params: {
@@ -74,22 +107,22 @@ export async function recordCareOSMissionEvent(params: {
   severity?: "information" | "attention" | "urgent";
   summary: string;
   payload?: Record<string, unknown>;
+  eventKey?: string;
 }): Promise<string> {
-  const id = randomUUID();
-  const payload = params.payload ? JSON.stringify(params.payload) : null;
-  await prisma.$executeRaw`
-    INSERT INTO "careos_mission_events" (
-      "id", "missionId", "participantId", "eventType", "sourceModule",
-      "sourceEntityId", "severity", "summary", "payloadJson", "createdAt"
-    ) VALUES (
-      ${id}, ${params.missionId}, ${params.participantId}, ${params.eventType},
-      ${params.sourceModule}, ${params.sourceEntityId ?? null},
-      ${params.severity ?? "information"}, ${params.summary},
-      CASE WHEN ${payload}::TEXT IS NULL THEN NULL ELSE CAST(${payload} AS JSONB) END,
-      NOW()
-    )
-  `;
-  return id;
+  const event = await appendMissionEvent({
+    missionId: params.missionId,
+    participantId: params.participantId,
+    eventType: params.eventType,
+    sourceModule: params.sourceModule,
+    sourceEntityId: params.sourceEntityId,
+    severity: params.severity,
+    summary: params.summary,
+    payloadJson: params.payload as Prisma.InputJsonValue | undefined,
+    eventKey:
+      params.eventKey ??
+      `${params.eventType}:${params.sourceModule}:${params.sourceEntityId ?? "none"}`,
+  });
+  return event.id;
 }
 
 export async function listCareOSMissions(
@@ -97,14 +130,12 @@ export async function listCareOSMissions(
   limit = 20,
 ): Promise<CareOSMissionSummary[]> {
   const safeLimit = Math.max(1, Math.min(limit, 100));
-  return prisma.$queryRaw<CareOSMissionSummary[]>`
-    SELECT "id", "requestId", "participantId", "goal", "status", "modules",
-           "createdAt", "updatedAt"
-    FROM "careos_missions"
-    WHERE "participantId" = ${participantId}
-    ORDER BY "createdAt" DESC
-    LIMIT ${safeLimit}
-  `;
+  const rows = await prisma.careOSMission.findMany({
+    where: { participantId },
+    orderBy: { createdAt: "desc" },
+    take: safeLimit,
+  });
+  return rows.map(toFabricMissionView);
 }
 
 export async function listCareOSHumanReviews(params: {
@@ -114,32 +145,29 @@ export async function listCareOSHumanReviews(params: {
   limit?: number;
 }) {
   const safeLimit = Math.max(1, Math.min(params.limit ?? 50, 100));
-  return prisma.$queryRaw<Array<Record<string, unknown>>>`
-    SELECT "id", "missionId", "requestId", "participantId", "category",
-           "priority", "title", "summary", "assignedRole", "status", "dueAt",
-           "participantContactRequired", "evidenceJson", "resolvedAt",
-           "createdAt", "updatedAt"
-    FROM "careos_human_reviews"
-    WHERE (${params.participantId ?? null}::TEXT IS NULL OR "participantId" = ${params.participantId ?? null})
-      AND (${params.assignedRole ?? null}::TEXT IS NULL OR "assignedRole" = ${params.assignedRole ?? null})
-      AND (${params.status ?? null}::TEXT IS NULL OR "status" = ${params.status ?? null})
-    ORDER BY
-      CASE "priority" WHEN 'urgent' THEN 3 WHEN 'attention' THEN 2 ELSE 1 END DESC,
-      "dueAt" ASC
-    LIMIT ${safeLimit}
-  `;
+  return prisma.careOSHumanReview.findMany({
+    where: {
+      ...(params.participantId
+        ? { participantId: params.participantId }
+        : {}),
+      ...(params.assignedRole ? { assignedRole: params.assignedRole } : {}),
+      ...(params.status ? { status: params.status } : {}),
+    },
+    orderBy: [{ dueAt: "asc" }],
+    take: safeLimit,
+  });
 }
 
 export async function updateCareOSHumanReview(params: {
   id: string;
   status: "assigned" | "in_progress" | "resolved" | "cancelled";
 }): Promise<boolean> {
-  const changed = await prisma.$executeRaw`
-    UPDATE "careos_human_reviews"
-    SET "status" = ${params.status},
-        "resolvedAt" = CASE WHEN ${params.status} = 'resolved' THEN NOW() ELSE "resolvedAt" END,
-        "updatedAt" = NOW()
-    WHERE "id" = ${params.id}
-  `;
-  return changed === 1;
+  const result = await prisma.careOSHumanReview.updateMany({
+    where: { id: params.id },
+    data: {
+      status: params.status,
+      resolvedAt: params.status === "resolved" ? new Date() : undefined,
+    },
+  });
+  return result.count === 1;
 }

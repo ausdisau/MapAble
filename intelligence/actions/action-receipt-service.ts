@@ -1,5 +1,3 @@
-import { randomUUID } from "node:crypto";
-
 import { prisma } from "@/lib/prisma";
 
 import type { CareOSActionEnvelope } from "./action-envelope";
@@ -22,21 +20,25 @@ export type CareOSActionReceipt = {
 
 export async function claimCareOSAction(
   envelope: CareOSActionEnvelope,
+  missionId?: string,
 ): Promise<string> {
-  const receiptId = randomUUID();
-  const inserted = await prisma.$executeRaw`
-    INSERT INTO "careos_action_receipts" (
-      "id", "tokenId", "proposalId", "requestId", "participantId",
-      "actionType", "payloadHash", "status", "claimedAt"
-    ) VALUES (
-      ${receiptId}, ${envelope.tokenId}, ${envelope.proposalId},
-      ${envelope.requestId}, ${envelope.participantId}, ${envelope.actionType},
-      ${envelope.payloadHash}, 'claimed', NOW()
-    )
-    ON CONFLICT ("tokenId") DO NOTHING
-  `;
-  if (inserted !== 1) throw new Error("CAREOS_ACTION_ALREADY_USED");
-  return receiptId;
+  try {
+    const receipt = await prisma.careOSActionReceipt.create({
+      data: {
+        tokenId: envelope.tokenId,
+        proposalId: envelope.proposalId,
+        requestId: envelope.requestId,
+        participantId: envelope.participantId,
+        missionId,
+        actionType: envelope.actionType,
+        payloadHash: envelope.payloadHash,
+        status: "claimed",
+      },
+    });
+    return receipt.id;
+  } catch {
+    throw new Error("CAREOS_ACTION_ALREADY_USED");
+  }
 }
 
 export async function completeCareOSAction(params: {
@@ -44,27 +46,29 @@ export async function completeCareOSAction(params: {
   resultEntityType: string;
   resultEntityId: string;
 }): Promise<void> {
-  await prisma.$executeRaw`
-    UPDATE "careos_action_receipts"
-    SET "status" = 'completed',
-        "resultEntityType" = ${params.resultEntityType},
-        "resultEntityId" = ${params.resultEntityId},
-        "completedAt" = NOW()
-    WHERE "id" = ${params.receiptId} AND "status" = 'claimed'
-  `;
+  await prisma.careOSActionReceipt.updateMany({
+    where: { id: params.receiptId, status: "claimed" },
+    data: {
+      status: "completed",
+      resultEntityType: params.resultEntityType,
+      resultEntityId: params.resultEntityId,
+      completedAt: new Date(),
+    },
+  });
 }
 
 export async function failCareOSAction(params: {
   receiptId: string;
   errorCode: string;
 }): Promise<void> {
-  await prisma.$executeRaw`
-    UPDATE "careos_action_receipts"
-    SET "status" = 'failed',
-        "errorCode" = ${params.errorCode.slice(0, 120)},
-        "completedAt" = NOW()
-    WHERE "id" = ${params.receiptId} AND "status" = 'claimed'
-  `;
+  await prisma.careOSActionReceipt.updateMany({
+    where: { id: params.receiptId, status: "claimed" },
+    data: {
+      status: "failed",
+      errorCode: params.errorCode.slice(0, 120),
+      completedAt: new Date(),
+    },
+  });
 }
 
 export async function listCareOSActionReceipts(
@@ -72,13 +76,24 @@ export async function listCareOSActionReceipts(
   limit = 30,
 ): Promise<CareOSActionReceipt[]> {
   const safeLimit = Math.max(1, Math.min(limit, 100));
-  return prisma.$queryRaw<CareOSActionReceipt[]>`
-    SELECT "id", "tokenId", "proposalId", "requestId", "participantId",
-           "actionType", "payloadHash", "status", "resultEntityType",
-           "resultEntityId", "errorCode", "claimedAt", "completedAt"
-    FROM "careos_action_receipts"
-    WHERE "participantId" = ${participantId}
-    ORDER BY "claimedAt" DESC
-    LIMIT ${safeLimit}
-  `;
+  const rows = await prisma.careOSActionReceipt.findMany({
+    where: { participantId },
+    orderBy: { claimedAt: "desc" },
+    take: safeLimit,
+  });
+  return rows.map((row) => ({
+    id: row.id,
+    tokenId: row.tokenId,
+    proposalId: row.proposalId,
+    requestId: row.requestId,
+    participantId: row.participantId,
+    actionType: row.actionType,
+    payloadHash: row.payloadHash,
+    status: row.status as CareOSActionReceipt["status"],
+    resultEntityType: row.resultEntityType,
+    resultEntityId: row.resultEntityId,
+    errorCode: row.errorCode,
+    claimedAt: row.claimedAt,
+    completedAt: row.completedAt,
+  }));
 }

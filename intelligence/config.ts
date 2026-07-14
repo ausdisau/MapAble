@@ -43,11 +43,12 @@ export type MapAbleIntelligenceRuntimeConfig = {
 };
 
 export function getMapAbleIntelligenceConfig(): MapAbleIntelligenceRuntimeConfig {
-  const enabled = envBoolean("MAPABLE_AI_ENABLED", true);
+  // Fail-closed: AI and CareOS network capabilities default OFF unless explicitly enabled.
+  const enabled = envBoolean("MAPABLE_AI_ENABLED", false);
   const modules = Object.fromEntries(
     (Object.keys(MODULE_FLAG_NAMES) as MapAbleModule[]).map((module) => [
       module,
-      enabled && envBoolean(MODULE_FLAG_NAMES[module], MODULE_DEFAULTS[module]),
+      enabled && envBoolean(MODULE_FLAG_NAMES[module], false),
     ]),
   ) as Record<MapAbleModule, boolean>;
 
@@ -56,16 +57,16 @@ export function getMapAbleIntelligenceConfig(): MapAbleIntelligenceRuntimeConfig
     modelReasoningEnabled:
       enabled &&
       Boolean(process.env.OPENAI_API_KEY) &&
-      envBoolean("MAPABLE_AI_MODEL_REASONING_ENABLED", true),
+      envBoolean("MAPABLE_AI_MODEL_REASONING_ENABLED", false),
     writeActionsEnabled:
       enabled && envBoolean("MAPABLE_AI_WRITE_ACTIONS", false),
     participantMemoryEnabled:
       enabled && envBoolean("MAPABLE_AI_MEMORY_ENABLED", false),
     auditEnabled: envBoolean("MAPABLE_AI_AUDIT_ENABLED", true),
     careOSNetworkEnabled:
-      enabled && envBoolean("MAPABLE_CAREOS_NETWORK_ENABLED", true),
+      enabled && envBoolean("MAPABLE_CAREOS_NETWORK_ENABLED", false),
     continuityRadarEnabled:
-      enabled && envBoolean("MAPABLE_CAREOS_CONTINUITY_ENABLED", true),
+      enabled && envBoolean("MAPABLE_CAREOS_CONTINUITY_ENABLED", false),
     careOSPersistenceEnabled:
       enabled && envBoolean("MAPABLE_CAREOS_PERSISTENCE_ENABLED", false),
     careOSEventAutomationEnabled:

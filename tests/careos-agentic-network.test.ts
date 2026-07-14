@@ -34,13 +34,15 @@ describe("CareOS network request contract", () => {
 });
 
 describe("CareOS feature controls", () => {
-  it("enables the read-only network and continuity radar by default", () => {
+  it("keeps the network and continuity radar fail-closed by default", () => {
+    delete process.env.MAPABLE_AI_ENABLED;
     delete process.env.MAPABLE_CAREOS_NETWORK_ENABLED;
     delete process.env.MAPABLE_CAREOS_CONTINUITY_ENABLED;
     const config = getMapAbleIntelligenceConfig();
 
-    expect(config.careOSNetworkEnabled).toBe(true);
-    expect(config.continuityRadarEnabled).toBe(true);
+    expect(config.enabled).toBe(false);
+    expect(config.careOSNetworkEnabled).toBe(false);
+    expect(config.continuityRadarEnabled).toBe(false);
     expect(config.writeActionsEnabled).toBe(false);
   });
 
