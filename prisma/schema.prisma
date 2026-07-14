@@ -4474,6 +4474,7 @@ model Tenant {
   memberships TenantMembership[]
   enterpriseWorkspaces EnterpriseProviderWorkspace[]
   governmentWorkspaces GovernmentPartnerWorkspace[]
+  outboxEvents CloudEventOutbox[]
 }
 
 model TenantMembership {
@@ -6495,12 +6496,51 @@ model WorkflowRun {
   startedAt       DateTime @default(now())
   completedAt     DateTime?
   metadataJson    Json?
+  tenantId        String?
+  participantId   String?
+  missionId       String?
+  currentStep     String?
+  nextRunAt       DateTime?
+  attempts        Int      @default(0)
+  maximumAttempts Int      @default(5)
+  lastError       String?
 
   events    WorkflowEvent[]
   deadlines WorkflowDeadline[]
   failures  WorkflowFailure[]
 
   @@index([workflowKey, status])
+  @@index([tenantId, status, nextRunAt])
+}
+
+model CloudEventOutbox {
+  id             String   @id
+  eventType      String
+  schemaVersion  Int      @default(1)
+  topic          String
+  tenantId       String
+  tenant         Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  participantId  String?
+  missionId      String?
+  sourceModule   String
+  sourceEntityId String?
+  correlationId  String
+  causationId    String?
+  traceId        String
+  payloadJson    Json
+  occurredAt     DateTime
+  publishedAt    DateTime?
+  attempts       Int      @default(0)
+  nextAttemptAt  DateTime?
+  lastError      String?
+  deadLetteredAt DateTime?
+  createdAt      DateTime @default(now())
+
+  @@index([publishedAt, nextAttemptAt])
+  @@index([tenantId, topic, occurredAt])
+  @@index([correlationId])
+  @@index([missionId, occurredAt])
+  @@map("cloud_event_outbox")
 }
 
 model WorkflowEvent {

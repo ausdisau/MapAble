@@ -6,6 +6,9 @@ import { assertTenantAccess } from "@/lib/multi-tenant-admin/tenant-service";
 export type TenantContext = {
   tenantId: string | null;
   organisationId: string | null;
+  organisationIds: string[];
+  userId: string;
+  roles: string[];
   enabled: boolean;
 };
 
@@ -13,7 +16,14 @@ export async function resolveTenantContext(
   user: CurrentUser
 ): Promise<TenantContext> {
   if (!y2OrchestrationConfig.multiTenantWorkspaceV2Enabled) {
-    return { tenantId: null, organisationId: null, enabled: false };
+    return {
+      tenantId: null,
+      organisationId: null,
+      organisationIds: [],
+      userId: user.id,
+      roles: user.roles,
+      enabled: false,
+    };
   }
 
   const membership = await prisma.organisationMember.findFirst({
@@ -21,7 +31,14 @@ export async function resolveTenantContext(
   });
 
   if (!membership) {
-    return { tenantId: null, organisationId: null, enabled: true };
+    return {
+      tenantId: null,
+      organisationId: null,
+      organisationIds: [],
+      userId: user.id,
+      roles: user.roles,
+      enabled: true,
+    };
   }
 
   const workspace = await prisma.enterpriseProviderWorkspace.findUnique({
@@ -31,6 +48,9 @@ export async function resolveTenantContext(
 
   const tenantId = workspace?.tenantId ?? null;
   const organisationId = membership.organisationId;
+  const organisationIds = tenantId
+    ? await getOrganisationIdsForTenant(tenantId)
+    : [organisationId];
 
   if (tenantId) {
     await assertTenantAccess(user.id, tenantId);
@@ -39,6 +59,9 @@ export async function resolveTenantContext(
   return {
     tenantId,
     organisationId,
+    organisationIds,
+    userId: user.id,
+    roles: user.roles,
     enabled: true,
   };
 }
@@ -56,7 +79,7 @@ export function whereTenantOrganisations(ctx: TenantContext) {
   return {
     organisation: {
       id: {
-        in: undefined as unknown as string[],
+        in: ctx.organisationIds,
       },
     },
   };
