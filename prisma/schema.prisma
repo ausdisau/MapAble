@@ -8195,6 +8195,87 @@ enum TransportSafetyEventSeverity {
   critical
 }
 
+enum TransportTripDirection {
+  standalone
+  outbound
+  return
+}
+
+enum ReturnTripAssuranceStatus {
+  not_required
+  pending
+  assured
+  at_risk
+  missing
+}
+
+enum AccessibilityEvidenceKind {
+  ramp_measurement
+  lift_capacity
+  door_width
+  floor_height
+  restraint_system
+  boarding_angle
+  wheelchair_space
+  other
+}
+
+enum MobilityDeviceType {
+  manual_wheelchair
+  power_wheelchair
+  mobility_scooter
+  walker
+  other
+}
+
+enum RestraintType {
+  wheelchair_tie_down
+  occupant_belt
+  scooter_lock
+  other
+}
+
+enum VehicleInspectionOutcome {
+  pass
+  conditional
+  fail
+}
+
+enum TransportContinuityTrigger {
+  driver_cancel
+  vehicle_failure
+  late_pickup
+  route_disruption
+  lift_outage
+  appointment_change
+  missing_return_trip
+}
+
+enum TransportContinuityRecoveryStatus {
+  options_presented
+  awaiting_confirmation
+  confirmed
+  declined
+  expired
+  escalated
+}
+
+enum TransportDisruptionKind {
+  route_disruption
+  lift_outage
+  service_alert
+  traffic_hazard
+  appointment_change
+  missing_return_trip
+}
+
+enum TransportDisruptionStatus {
+  open
+  acknowledged
+  recovery_in_progress
+  resolved
+}
+
 model DataAccessLog {
   id           String                  @id @default(cuid())
   actorUserId  String?
@@ -8286,11 +8367,23 @@ model TransportTrip {
   booking                 Booking?         @relation("BookingTransportTrip")
   rideRunId               String?
   rideRun                 RideRun?         @relation(fields: [rideRunId], references: [id], onDelete: SetNull)
+  tripDirection           TransportTripDirection @default(standalone)
+  outboundTripId          String?          @unique
+  outboundTrip            TransportTrip?   @relation("TransportReturnLeg", fields: [outboundTripId], references: [id], onDelete: SetNull)
+  returnLeg               TransportTrip?   @relation("TransportReturnLeg")
+  returnTripId            String?
+  returnAssuranceStatus   ReturnTripAssuranceStatus @default(not_required)
+
+  returnTripAssurances    TransportReturnTripAssurance[]
+  continuityRecoveries    TransportContinuityRecoveryRequest[]
+  disruptionEvents        TransportDisruptionEvent[]
 
   @@index([participantId, status])
   @@index([providerOrganisationId, status])
   @@index([rideRunId])
   @@index([scheduledStart])
+  @@index([returnTripId])
+  @@index([returnAssuranceStatus])
   @@map("transport_trips")
 }
 
@@ -8417,6 +8510,10 @@ model TransportVehicle {
   dispatchAssignments TransportDispatchAssignment[]
   scheduleConflicts TransportScheduleConflict[] @relation("TransportScheduleConflictVehicle")
   rideRuns            RideRun[]
+  accessibilityEvidence VehicleAccessibilityEvidence[]
+  mobilityCompatibilities MobilityDeviceCompatibility[]
+  restraintCapabilities RestraintCapability[]
+  inspections         VehicleInspection[]
 
   @@index([organisationId])
   @@map("transport_vehicles")
@@ -8703,6 +8800,173 @@ model TransportIncidentLink {
   createdAt       DateTime @default(now())
 
   @@map("transport_incident_links")
+}
+
+model VehicleAccessibilityEvidence {
+  id              String                    @id @default(cuid())
+  vehicleId       String
+  vehicle         TransportVehicle          @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  kind            AccessibilityEvidenceKind
+  source          String
+  measuredValue   String?
+  unit            String?
+  verifiedAt      DateTime?
+  expiresAt       DateTime?
+  evidenceUrl     String?
+  notes           String?
+  metadata        Json?
+  createdAt       DateTime                  @default(now())
+  updatedAt       DateTime                  @updatedAt
+
+  @@index([vehicleId, kind])
+  @@index([expiresAt])
+  @@map("vehicle_accessibility_evidence")
+}
+
+model MobilityDeviceCompatibility {
+  id              String             @id @default(cuid())
+  vehicleId       String
+  vehicle         TransportVehicle   @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  deviceType      MobilityDeviceType
+  compatible      Boolean            @default(false)
+  evidenceSource  String
+  maxWeightKg     Float?
+  maxWidthMm      Int?
+  maxLengthMm     Int?
+  verifiedAt      DateTime?
+  expiresAt       DateTime?
+  notes           String?
+  metadata        Json?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  @@unique([vehicleId, deviceType])
+  @@index([vehicleId, compatible])
+  @@index([expiresAt])
+  @@map("mobility_device_compatibilities")
+}
+
+model RestraintCapability {
+  id              String        @id @default(cuid())
+  vehicleId       String
+  vehicle         TransportVehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  restraintType   RestraintType
+  quantity        Int           @default(1)
+  evidenceSource  String
+  verifiedAt      DateTime?
+  expiresAt       DateTime?
+  notes           String?
+  metadata        Json?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([vehicleId, restraintType])
+  @@index([expiresAt])
+  @@map("restraint_capabilities")
+}
+
+model VehicleInspection {
+  id              String                   @id @default(cuid())
+  vehicleId       String
+  vehicle         TransportVehicle         @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  inspectedAt     DateTime
+  outcome         VehicleInspectionOutcome
+  inspectorName   String?
+  evidenceSource  String
+  expiresAt       DateTime?
+  findings        String?
+  metadata        Json?
+  createdAt       DateTime                 @default(now())
+  updatedAt       DateTime                 @updatedAt
+
+  @@index([vehicleId, inspectedAt])
+  @@index([expiresAt])
+  @@map("vehicle_inspections")
+}
+
+model TransportReturnTripAssurance {
+  id                String                    @id @default(cuid())
+  outboundTripId    String
+  outboundTrip      TransportTrip             @relation(fields: [outboundTripId], references: [id], onDelete: Cascade)
+  returnTripId      String?
+  status            ReturnTripAssuranceStatus @default(pending)
+  assuredByUserId   String?
+  assuredAt         DateTime?
+  notes             String?
+  metadata          Json?
+  createdAt         DateTime                  @default(now())
+  updatedAt         DateTime                  @updatedAt
+
+  @@index([outboundTripId, status])
+  @@index([returnTripId])
+  @@map("transport_return_trip_assurances")
+}
+
+model TransportContinuityRecoveryRequest {
+  id                  String                          @id @default(cuid())
+  tripId              String
+  trip                TransportTrip                   @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  participantId       String
+  trigger             TransportContinuityTrigger
+  status              TransportContinuityRecoveryStatus @default(options_presented)
+  requiresConfirmation Boolean                        @default(true)
+  confirmedByUserId   String?
+  confirmedAt         DateTime?
+  expiresAt           DateTime?
+  notes               String?
+  metadata            Json?
+  createdAt           DateTime                        @default(now())
+  updatedAt           DateTime                        @updatedAt
+
+  options             TransportContinuityRecoveryOption[]
+
+  @@index([tripId, status])
+  @@index([participantId, status])
+  @@map("transport_continuity_recovery_requests")
+}
+
+model TransportContinuityRecoveryOption {
+  id                String   @id @default(cuid())
+  requestId         String
+  request           TransportContinuityRecoveryRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  optionKey         String
+  label             String
+  description       String
+  vehicleId         String?
+  driverId          String?
+  providerOrganisationId String?
+  isLiveData        Boolean  @default(false)
+  nonLiveAlternative Boolean @default(true)
+  evidenceSummary   String?
+  metadata          Json?
+  sortOrder         Int      @default(0)
+  createdAt         DateTime @default(now())
+
+  @@index([requestId, sortOrder])
+  @@map("transport_continuity_recovery_options")
+}
+
+model TransportDisruptionEvent {
+  id                String                    @id @default(cuid())
+  tripId            String?
+  trip              TransportTrip?            @relation(fields: [tripId], references: [id], onDelete: SetNull)
+  participantId     String?
+  kind              TransportDisruptionKind
+  status            TransportDisruptionStatus @default(open)
+  source            String
+  sourceFreshnessAt DateTime?
+  title             String
+  description       String?
+  metadata          Json?
+  acknowledgedAt    DateTime?
+  resolvedAt        DateTime?
+  createdAt         DateTime                  @default(now())
+  updatedAt         DateTime                  @updatedAt
+
+  @@index([tripId, status])
+  @@index([participantId, status])
+  @@index([kind, status])
+  @@map("transport_disruption_events")
 }
 
 // =========================================================================
