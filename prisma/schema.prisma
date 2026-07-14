@@ -104,6 +104,7 @@ model User {
   billingAccounts           BillingAccount[]       @relation("BillingAccounts")
   billingFundingSources     BillingFundingSource[] @relation("BillingFundingSources")
   billingInvoices           BillingInvoice[]       @relation("BillingInvoices")
+  expectedCostContexts      ExpectedCostContext[]
   billingPayments           BillingPayment[]       @relation("BillingPayments")
   billingSubscriptions      BillingSubscription[]  @relation("BillingSubscriptions")
   payoutRecipients          PayoutRecipient[]      @relation("PayoutRecipients")
@@ -114,6 +115,8 @@ model User {
   providerShortlist        ParticipantProviderShortlist[]
   hiddenProviders          ParticipantHiddenProvider[]
   providerPrivateNotes     ParticipantProviderNote[]
+  homeLivingProfile        HomeLivingProfile?
+  supportPlans             ParticipantSupportPlan[]
   ndisDeliveryAuthorizationsParticipant NdisServiceDeliveryAuthorization[] @relation("NdisDeliveryAuthParticipant")
   ndisDeliveryEventsParticipant NdisServiceDeliveryEvent[] @relation("NdisDeliveryEventParticipant")
 
@@ -950,6 +953,7 @@ model Organisation {
   shortlistedBy          ParticipantProviderShortlist[]
   hiddenByParticipants   ParticipantHiddenProvider[]
   privateParticipantNotes ParticipantProviderNote[]
+  accessibleProperties    AccessibleProperty[]
 }
 
 model OrganisationMember {
@@ -2178,6 +2182,7 @@ model WorkerProfile {
   credentialEvidence      WorkerCredentialEvidence[]
   equipmentEvidence       WorkerEquipmentEvidence[]
   shiftOffers             ShiftOffer[]
+  competencyEvidence      WorkerCompetencyEvidence[]
   organisationInvites     WorkerOrganisationInvite[]
   payoutRecipients        PayoutRecipient[] @relation("WorkerPayoutRecipients")
 
@@ -5702,6 +5707,8 @@ model BillingInvoice {
   updatedAt                DateTime               @updatedAt
 
   lineItems BillingInvoiceLineItem[]
+  reconciliations InvoiceReconciliationRecord[]
+  financialDecisions ParticipantInvoiceDecision[]
   payments  BillingPayment[]
   payoutBlocks PayoutBlock[]
 
@@ -5712,6 +5719,87 @@ model BillingInvoice {
   @@index([adminApprovalStatus])
   @@index([transferGroup])
   @@index([invoiceNumber])
+}
+
+model ExpectedCostContext {
+  id                     String   @id @default(cuid())
+  participantId          String
+  participant            User     @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  missionId              String?
+  serviceAgreementId     String
+  bookingId              String?
+  providerOrganisationId String
+  supportItemCode        String?
+  supportDescription     String
+  expectedQuantity       Decimal?
+  expectedUnit           String?
+  expectedUnitPriceCents Int?
+  expectedTotalCents     Int?
+  travelTerms            Json?
+  cancellationTerms      Json?
+  fundingCategory        String?
+  evidenceSourceIds      String[] @default([])
+  validFrom              DateTime?
+  validUntil             DateTime?
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  @@index([participantId, providerOrganisationId, validUntil])
+  @@index([missionId])
+  @@index([bookingId])
+  @@map("expected_cost_contexts")
+}
+
+model InvoiceReconciliationRecord {
+  id                  String         @id @default(cuid())
+  invoiceId           String
+  invoice             BillingInvoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  expectedCostContextId String?
+  overallStatus       String
+  lineResults         Json
+  duplicateIndicators Json
+  differences         Json
+  missingEvidence     String[]       @default([])
+  uncertainty         String[]       @default([])
+  policyVersion       String
+  createdAt           DateTime       @default(now())
+
+  @@index([invoiceId, createdAt])
+  @@index([expectedCostContextId])
+  @@map("invoice_reconciliation_records")
+}
+
+model ParticipantInvoiceDecision {
+  id            String         @id @default(cuid())
+  invoiceId     String
+  invoice       BillingInvoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  participantId String
+  actorUserId   String
+  decision      String
+  reason        String?
+  authorityGrantId String?
+  createdAt     DateTime       @default(now())
+
+  @@index([participantId, createdAt])
+  @@index([invoiceId, createdAt])
+  @@map("participant_invoice_decisions")
+}
+
+model PricingRuleSet {
+  id              String   @id @default(cuid())
+  jurisdiction    String
+  scheme          String
+  version         String
+  effectiveFrom   DateTime
+  effectiveTo     DateTime?
+  sourceReference String
+  status          String   @default("draft")
+  rulesJson       Json
+  createdAt       DateTime @default(now())
+
+  @@unique([jurisdiction, scheme, version])
+  @@index([jurisdiction, scheme, status, effectiveFrom])
+  @@map("pricing_rule_sets")
 }
 
 model BillingInvoiceLineItem {
@@ -6270,6 +6358,142 @@ model ParticipantProviderNote {
   @@unique([participantId, providerOrgId])
   @@index([participantId, updatedAt])
   @@map("participant_provider_notes")
+}
+
+model HomeLivingProfile {
+  id                             String   @id @default(cuid())
+  participantId                  String   @unique
+  participant                    User     @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  desiredLivingArrangements      String[] @default([])
+  preferredLocations             String[] @default([])
+  householdPreferences           String[] @default([])
+  privacyPreferences             String[] @default([])
+  accessibilityRequirements      String[] @default([])
+  communicationRequirements      String[] @default([])
+  personalSupportRequirements    String[] @default([])
+  overnightSupportRequirements   String[] @default([])
+  equipmentRequirements          String[] @default([])
+  environmentalRequirements      String[] @default([])
+  communityConnectionPreferences String[] @default([])
+  transportRequirements          String[] @default([])
+  dignityOfRiskChoices           String[] @default([])
+  nonNegotiables                 String[] @default([])
+  informationSharingRules        String[] @default([])
+  createdAt                      DateTime @default(now())
+  updatedAt                      DateTime @updatedAt
+
+  @@map("home_living_profiles")
+}
+
+model AccessibleProperty {
+  id                   String       @id @default(cuid())
+  providerOrganisationId String
+  providerOrganisation Organisation @relation(fields: [providerOrganisationId], references: [id], onDelete: Cascade)
+  title                String
+  addressSummary       String
+  propertyType         String
+  availabilityStatus   String       @default("unknown")
+  availableFrom        DateTime?
+  tenancyTermsSummary  String?
+  supportProviderIndependent Boolean @default(true)
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
+  deletedAt            DateTime?
+  evidence             PropertyAccessibilityEvidence[]
+
+  @@index([providerOrganisationId, availabilityStatus, availableFrom])
+  @@map("accessible_properties")
+}
+
+model PropertyAccessibilityEvidence {
+  id                 String             @id @default(cuid())
+  propertyId         String
+  property           AccessibleProperty @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  feature            String
+  value              String
+  source             String
+  verificationStatus String
+  observedAt         DateTime
+  expiresAt          DateTime?
+  disputedAt         DateTime?
+  createdAt          DateTime           @default(now())
+
+  @@index([propertyId, feature, verificationStatus])
+  @@index([expiresAt])
+  @@map("property_accessibility_evidence")
+}
+
+model ParticipantSupportPlan {
+  id            String   @id @default(cuid())
+  participantId String
+  participant   User     @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  title         String
+  status        String   @default("draft")
+  currentVersion Int?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  versions      SupportPlanVersion[]
+
+  @@index([participantId, status])
+  @@map("participant_support_plans")
+}
+
+model SupportPlanVersion {
+  id                    String                 @id @default(cuid())
+  supportPlanId         String
+  supportPlan           ParticipantSupportPlan @relation(fields: [supportPlanId], references: [id], onDelete: Cascade)
+  version               Int
+  authorUserId          String
+  authorAuthority       String
+  instructionsJson      Json
+  limitations           String[]               @default([])
+  emergencyEscalation   String?
+  effectiveAt           DateTime
+  reviewAt              DateTime?
+  supersededAt          DateTime?
+  createdAt             DateTime               @default(now())
+
+  @@unique([supportPlanId, version])
+  @@index([supportPlanId, effectiveAt, supersededAt])
+  @@map("support_plan_versions")
+}
+
+model WorkerCompetencyEvidence {
+  id                  String        @id @default(cuid())
+  workerProfileId     String
+  workerProfile       WorkerProfile @relation(fields: [workerProfileId], references: [id], onDelete: Cascade)
+  competencyType      String
+  participantId       String?
+  source              String
+  verificationStatus  String
+  verifiedByUserId    String?
+  effectiveAt         DateTime
+  expiresAt           DateTime?
+  revokedAt           DateTime?
+  limitations         String[]      @default([])
+  createdAt           DateTime      @default(now())
+
+  @@index([workerProfileId, competencyType, verificationStatus])
+  @@index([participantId, competencyType])
+  @@index([expiresAt, revokedAt])
+  @@map("worker_competency_evidence")
+}
+
+model ClinicalReviewRecord {
+  id            String   @id @default(cuid())
+  participantId String
+  supportPlanId String?
+  reviewType    String
+  status        String   @default("required")
+  assignedRole  String
+  reasonCodes   String[] @default([])
+  dueAt         DateTime?
+  resolvedById  String?
+  resolvedAt    DateTime?
+  createdAt     DateTime @default(now())
+
+  @@index([participantId, status, dueAt])
+  @@map("clinical_review_records")
 }
 
 model NdisPricingCatalogueItem {
