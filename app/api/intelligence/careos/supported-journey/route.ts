@@ -3,8 +3,9 @@ import { ZodError, z } from "zod";
 import { requireApiSession } from "@/lib/api/auth-handler";
 import { jsonError, jsonOk, zodErrorResponse } from "@/lib/api/response";
 import { careOSFeatureFlags } from "@/lib/intelligence/careos/config/feature-flags";
+import { buildCareOSContext } from "@/lib/intelligence/careos/context/context-builder";
+import { superviseSupportedJourney } from "@/lib/intelligence/careos/journey/supervisor";
 import {
-  planSupportedJourney,
   simulateJourneyConfirmation,
   supportedJourneyRequestSchema,
 } from "@/lib/intelligence/careos/journey/supported-journey";
@@ -22,9 +23,13 @@ export async function POST(request: Request) {
   }
   try {
     const body = await request.json();
-    const input = supportedJourneyRequestSchema.parse(body);
-    if (input.participantId !== user.id) return jsonError("FORBIDDEN", 403);
-    return jsonOk({ journey: planSupportedJourney(input) });
+    const input = supportedJourneyRequestSchema.parse({
+      ...body,
+      participantId: user.id,
+      tenantId: "synthetic-tenant",
+    });
+    const context = await buildCareOSContext({ user });
+    return jsonOk({ journey: await superviseSupportedJourney({ request: input, context }) });
   } catch (error) {
     if (error instanceof ZodError) return zodErrorResponse(error);
     return jsonError("JOURNEY_UNAVAILABLE", 503);

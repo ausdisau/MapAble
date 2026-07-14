@@ -4,6 +4,7 @@ import { CareOSActivity } from "./CareOSActivity";
 import { MemoryControls } from "./MemoryControls";
 import { MissionComposer } from "./MissionComposer";
 import { MyDayPanel } from "./MyDayPanel";
+import { SupportedJourneyPanel } from "./SupportedJourneyPanel";
 import { TransportSimulationPanel } from "./TransportSimulationPanel";
 
 export function CareOSPanel() {
@@ -16,6 +17,7 @@ export function CareOSPanel() {
         </p>
       </header>
       <MyDayPanel />
+      <SupportedJourneyPanel />
       <MissionComposer />
       <TransportSimulationPanel />
       <CareOSActivity />
