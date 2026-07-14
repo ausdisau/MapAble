@@ -20,6 +20,7 @@
     "test:watch": "vitest",
     "setup:cloud-agent": "bash scripts/setup-cloud-agent.sh",
     "mcp:av": "tsx mcp/av/server.ts",
+    "mcp:careos": "tsx mcp/careos/server.ts",
     "neon:configure": "python3 scripts/configure-neon-env.py",
     "seed:ndis-service-delivery": "tsx prisma/seed-ndis-service-delivery.ts",
     "import:provider-outlets-supabase": "tsx scripts/import-provider-outlets-supabase.ts",
@@ -39,6 +40,7 @@
     ]
   },
   "prisma": {
+    "schema": "prisma",
     "seed": "npx tsx prisma/seed.ts"
   },
   "keywords": [],

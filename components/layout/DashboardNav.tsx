@@ -8,6 +8,8 @@ import type { UserRole } from "@/types/mapable";
 
 const LINKS = [
   { href: "/dashboard", label: "Control panel", exact: true },
+  { href: "/careos/appointment", label: "CareOS appointment mission", matchPrefix: "/careos/appointment" },
+  { href: "/careos/missions", label: "CareOS missions", matchPrefix: "/careos/missions" },
   { href: "/dashboard/profile", label: "Profile" },
   { href: "/dashboard/accessibility", label: "Accessibility" },
   { href: "/dashboard/consent", label: "Consent" },
