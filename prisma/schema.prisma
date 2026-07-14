@@ -140,6 +140,9 @@ model User {
   caseTasksCompleted        CaseTask[]             @relation("CaseTaskCompletedBy")
   caseLinksCreated          CaseLink[]             @relation("CaseLinkCreatedBy")
   caseAiInsightsRequested   CaseAIInsight[]        @relation("CaseAIInsightRequestedBy")
+  authorityGrantsAsParticipant ParticipantAuthorityGrant[] @relation("AuthorityGrantParticipant")
+  authorityGrantsAsDelegate    ParticipantAuthorityGrant[] @relation("AuthorityGrantDelegate")
+  documentAccessGrants         DocumentAccessGrant[]
   careOSLifeTwin            ParticipantLifeTwin?
   careOSMissions            CareOSMission[]
   careOSActivityEvents      CareOSActivityEvent[]
@@ -1315,6 +1318,11 @@ model Document {
   uploadedBy      User               @relation("DocumentUploadedBy", fields: [uploadedById], references: [id])
   participantId   String?
   organisationId  String?
+  tenantId        String?
+  storageProvider String             @default("local")
+  storageVersion  String?
+  classification  String             @default("private")
+  expiresAt       DateTime?
   bookingId       String?
   booking         Booking?         @relation(fields: [bookingId], references: [id], onDelete: SetNull)
   supportTicketId String?
@@ -1325,10 +1333,69 @@ model Document {
   createdAt       DateTime           @default(now())
   updatedAt       DateTime           @updatedAt
   deletedAt       DateTime?
+  versions        DocumentVersion[]
+  accessGrants    DocumentAccessGrant[]
 
   @@index([participantId])
   @@index([organisationId])
+  @@index([tenantId, deletedAt])
   @@index([bookingId])
+}
+
+model DocumentVersion {
+  id              String   @id @default(cuid())
+  documentId      String
+  document        Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  version         Int
+  fileKey         String
+  storageVersion  String?
+  mimeType        String
+  fileSize        Int
+  scanStatus      DocumentScanStatus @default(not_configured)
+  createdById     String
+  createdAt       DateTime @default(now())
+
+  @@unique([documentId, version])
+  @@index([documentId, createdAt])
+  @@map("document_versions")
+}
+
+model DocumentAccessGrant {
+  id          String   @id @default(cuid())
+  documentId  String
+  document    Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  purpose     String
+  expiresAt   DateTime
+  revokedAt   DateTime?
+  createdById String
+  createdAt   DateTime @default(now())
+
+  @@index([documentId, userId, expiresAt])
+  @@map("document_access_grants")
+}
+
+model ParticipantAuthorityGrant {
+  id            String   @id @default(cuid())
+  participantId String
+  participant   User     @relation("AuthorityGrantParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  delegateId    String
+  delegate      User     @relation("AuthorityGrantDelegate", fields: [delegateId], references: [id], onDelete: Cascade)
+  tenantId      String?
+  domain        String
+  actions       String[] @default([])
+  consentScopes String[] @default([])
+  issuedAt      DateTime @default(now())
+  expiresAt     DateTime
+  revokedAt     DateTime?
+  revokedById   String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([participantId, delegateId, domain, expiresAt])
+  @@index([tenantId, revokedAt])
+  @@map("participant_authority_grants")
 }
 
 model ParticipantFundingSource {
