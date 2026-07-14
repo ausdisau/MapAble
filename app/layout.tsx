@@ -5,6 +5,10 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata } from "next";
 import { Outfit, Plus_Jakarta_Sans } from "next/font/google";
 
+import {
+  ADSENSE_CLIENT_ID,
+  GoogleAdSense,
+} from "@/components/ads/GoogleAdSense";
 import { Providers } from "@/components/providers";
 import { MAPABLE_LOGO_MARK_SRC } from "@/lib/brand/constants";
 
@@ -53,6 +57,7 @@ export const metadata: Metadata = {
   },
   other: {
     "purpleads-verification": "832ea0b13123578b63ae2fe9",
+    "google-adsense-account": ADSENSE_CLIENT_ID,
   },
 };
 
@@ -68,6 +73,7 @@ export default function RootLayout({
           name="purpleads-verification"
           content="832ea0b13123578b63ae2fe9"
         />
+        <meta name="google-adsense-account" content={ADSENSE_CLIENT_ID} />
       </head>
       <body className={plusJakarta.className}>
         <script
@@ -112,6 +118,7 @@ export default function RootLayout({
           }}
         />
         <Providers>{children}</Providers>
+        <GoogleAdSense />
         <SpeedInsights />
       </body>
     </html>
