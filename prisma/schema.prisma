@@ -91,6 +91,12 @@ model User {
   transportBookings         TransportBooking[] @relation("TransportBookingParticipant")
   jobsCreated               Job[]              @relation("JobCreatedBy")
   jobApplications           JobApplication[]   @relation("JobApplicationParticipant")
+  employmentProfile         EmploymentProfile? @relation("EmploymentProfileParticipant")
+  employmentGoals           EmploymentGoal[]   @relation("EmploymentGoalParticipant")
+  jobMatchExplanations      JobMatchExplanation[] @relation("JobMatchExplanationParticipant")
+  applicationDisclosurePreviews ApplicationDisclosurePreview[] @relation("DisclosurePreviewParticipant")
+  employerEvidenceVerified  EmployerAccessibilityEvidence[] @relation("EmployerEvidenceVerifiedBy")
+  workplaceEvidenceVerified WorkplaceAccessibilityEvidence[] @relation("WorkplaceEvidenceVerifiedBy")
   calendarEvents            CalendarEvent[]    @relation("CalendarEventParticipant")
   calendarEventsCreated     CalendarEvent[]    @relation("CalendarEventCreatedBy")
   matchRunsRequested        MatchRun[]         @relation("MatchRunRequestedBy")
@@ -993,6 +999,8 @@ model Organisation {
   accessibleProperties    AccessibleProperty[]
   coordinationCases       CoordinationCase[]
   providerEnquiries         ProviderEnquiry[]
+  employerAccessibilityEvidence EmployerAccessibilityEvidence[]
+  workplaceLocations        WorkplaceLocation[]
 }
 
 model OrganisationMember {
@@ -2650,6 +2658,8 @@ model Job {
   id                        String       @id @default(cuid())
   employerOrganisationId    String
   employerOrganisation      Organisation @relation("EmployerJobs", fields: [employerOrganisationId], references: [id])
+  workplaceLocationId       String?
+  workplaceLocation         WorkplaceLocation? @relation(fields: [workplaceLocationId], references: [id], onDelete: SetNull)
   title                     String
   description               String
   employmentType            EmploymentType
@@ -2668,9 +2678,12 @@ model Job {
 
   applications              JobApplication[]
   calendarEvents            CalendarEvent[]
+  requirements              JobRequirement[]
+  matchExplanations         JobMatchExplanation[]
 
   @@index([status])
   @@index([employerOrganisationId])
+  @@index([workplaceLocationId])
 }
 
 model JobApplication {
@@ -2692,6 +2705,7 @@ model JobApplication {
   updatedAt                 DateTime             @updatedAt
 
   calendarEvents            CalendarEvent[]
+  disclosurePreview         ApplicationDisclosurePreview?
 
   @@index([jobId])
   @@index([participantId, status])
@@ -4154,6 +4168,221 @@ model EmployerAccessibilityCommitment {
   organisationId String @unique
   statement      String
   updatedAt      DateTime @updatedAt
+}
+
+enum EmploymentGoalStatus {
+  active
+  achieved
+  paused
+  archived
+}
+
+enum EmploymentGoalCategory {
+  skills_development
+  employment_type
+  hours_and_schedule
+  location_and_access
+  disclosure_and_support
+  other
+}
+
+enum AccessibilityEvidenceSource {
+  audit
+  self_assessment
+  third_party_verification
+  participant_report
+  inspection
+}
+
+enum AccessibilityEvidenceStatus {
+  pending
+  verified
+  expired
+  disputed
+}
+
+enum JobRequirementCategory {
+  skill
+  experience
+  qualification
+  certification
+  access_need
+  schedule
+  location
+  transport
+  support
+  other
+}
+
+enum MatchRequirementStatus {
+  matched
+  not_matched
+  unknown
+  participant_decision_required
+}
+
+enum DisclosurePreviewStatus {
+  draft
+  previewed
+  confirmed
+}
+
+model EmploymentProfile {
+  id                 String   @id @default(cuid())
+  participantId      String   @unique
+  participant        User     @relation("EmploymentProfileParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  skills             String[] @default([])
+  interests          String[] @default([])
+  preferredWorkTypes String[] @default([])
+  preferredHours     String[] @default([])
+  preferredLocations String[] @default([])
+  remotePreference   String?
+  communicationPrefs Json     @default("{}")
+  adjustmentPrefs    Json     @default("{}")
+  disclosureChoices  Json     @default("{}")
+  transportDependency Boolean @default(false)
+  supportDependency   Boolean @default(false)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  goals              EmploymentGoal[]
+
+  @@map("employment_profiles")
+}
+
+model EmploymentGoal {
+  id            String                 @id @default(cuid())
+  profileId     String
+  profile       EmploymentProfile      @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  participantId String
+  participant   User                   @relation("EmploymentGoalParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  title         String
+  description   String?
+  category      EmploymentGoalCategory @default(other)
+  targetDate    DateTime?
+  status        EmploymentGoalStatus   @default(active)
+  createdAt     DateTime               @default(now())
+  updatedAt     DateTime               @updatedAt
+
+  @@index([profileId])
+  @@index([participantId, status])
+  @@map("employment_goals")
+}
+
+model EmployerAccessibilityEvidence {
+  id             String                      @id @default(cuid())
+  organisationId String
+  organisation   Organisation                @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+  evidenceType   String
+  description    String
+  source         AccessibilityEvidenceSource
+  status         AccessibilityEvidenceStatus @default(pending)
+  verifiedAt     DateTime?
+  expiresAt      DateTime?
+  verifiedById   String?
+  verifiedBy     User?                       @relation("EmployerEvidenceVerifiedBy", fields: [verifiedById], references: [id], onDelete: SetNull)
+  attachmentRef  String?
+  createdAt      DateTime                    @default(now())
+  updatedAt      DateTime                    @updatedAt
+
+  @@index([organisationId])
+  @@index([status])
+  @@map("employer_accessibility_evidence")
+}
+
+model WorkplaceLocation {
+  id             String       @id @default(cuid())
+  organisationId String
+  organisation   Organisation @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+  name           String
+  address        String?
+  suburb         String?
+  state          String?
+  postcode       String?
+  isPrimary      Boolean      @default(false)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  evidence       WorkplaceAccessibilityEvidence[]
+  jobs           Job[]
+
+  @@index([organisationId])
+  @@map("workplace_locations")
+}
+
+model WorkplaceAccessibilityEvidence {
+  id                  String                      @id @default(cuid())
+  workplaceLocationId String
+  workplaceLocation   WorkplaceLocation           @relation(fields: [workplaceLocationId], references: [id], onDelete: Cascade)
+  evidenceType        String
+  description         String
+  source              AccessibilityEvidenceSource
+  status              AccessibilityEvidenceStatus @default(pending)
+  verifiedAt          DateTime?
+  expiresAt           DateTime?
+  verifiedById        String?
+  verifiedBy          User?                       @relation("WorkplaceEvidenceVerifiedBy", fields: [verifiedById], references: [id], onDelete: SetNull)
+  createdAt           DateTime                    @default(now())
+  updatedAt           DateTime                    @updatedAt
+
+  @@index([workplaceLocationId])
+  @@index([status])
+  @@map("workplace_accessibility_evidence")
+}
+
+model JobRequirement {
+  id          String                 @id @default(cuid())
+  jobId       String
+  job         Job                    @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  category    JobRequirementCategory
+  label       String
+  description String?
+  isEssential Boolean                @default(true)
+  sortOrder   Int                    @default(0)
+  createdAt   DateTime               @default(now())
+
+  @@index([jobId])
+  @@map("job_requirements")
+}
+
+model JobMatchExplanation {
+  id                          String   @id @default(cuid())
+  jobId                       String
+  job                         Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  participantId               String
+  participant                 User     @relation("JobMatchExplanationParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  requirementsMatched         Json     @default("[]")
+  requirementsNotMatched      Json     @default("[]")
+  adjustmentsAvailable        Json     @default("[]")
+  adjustmentsUnknown          Json     @default("[]")
+  locationAccess              Json     @default("{}")
+  transportDependency         Boolean?
+  supportDependency           Boolean?
+  applicationDecisionRequired Boolean  @default(false)
+  explanationSummary          String
+  generatedAt                 DateTime @default(now())
+
+  @@unique([jobId, participantId])
+  @@index([participantId])
+  @@map("job_match_explanations")
+}
+
+model ApplicationDisclosurePreview {
+  id              String                  @id @default(cuid())
+  applicationId   String                  @unique
+  application     JobApplication          @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  participantId   String
+  participant     User                    @relation("DisclosurePreviewParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  fieldsToDisclose Json                   @default("{}")
+  fieldsWithheld   Json                   @default("{}")
+  employerVisible  Json                   @default("{}")
+  status          DisclosurePreviewStatus @default(draft)
+  confirmedAt     DateTime?
+  createdAt       DateTime                @default(now())
+  updatedAt       DateTime                @updatedAt
+
+  @@index([participantId])
+  @@map("application_disclosure_previews")
 }
 
 // --- Reporting ---
