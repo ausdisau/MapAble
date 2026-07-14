@@ -110,6 +110,10 @@ model User {
   ndisClaimLinesParticipant NdisClaimLine[]        @relation("NdisClaimLinesParticipant")
   ndisInvoicesParticipant   NdisInvoice[]          @relation("NdisInvoicesParticipant")
   participantProviderRelationships ParticipantProviderRelationship[] @relation("ParticipantProviderRelationships")
+  participantGoals         ParticipantGoal[]
+  providerShortlist        ParticipantProviderShortlist[]
+  hiddenProviders          ParticipantHiddenProvider[]
+  providerPrivateNotes     ParticipantProviderNote[]
   ndisDeliveryAuthorizationsParticipant NdisServiceDeliveryAuthorization[] @relation("NdisDeliveryAuthParticipant")
   ndisDeliveryEventsParticipant NdisServiceDeliveryEvent[] @relation("NdisDeliveryEventParticipant")
 
@@ -943,6 +947,9 @@ model Organisation {
   workerTrainingModules  WorkerTrainingModule[]
   providerCapabilityEvidence ProviderCapabilityEvidence[]
   serviceOfferings       ProviderServiceOffering[]
+  shortlistedBy          ParticipantProviderShortlist[]
+  hiddenByParticipants   ParticipantHiddenProvider[]
+  privateParticipantNotes ParticipantProviderNote[]
 }
 
 model OrganisationMember {
@@ -6202,6 +6209,67 @@ model ParticipantProviderRelationship {
 
   @@unique([participantId, providerOrgId])
   @@index([providerOrgId, status])
+}
+
+model ParticipantGoal {
+  id                  String   @id @default(cuid())
+  participantId       String
+  participant         User     @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  title               String
+  description         String
+  category            String
+  desiredBy           DateTime?
+  importance          String?
+  participantLanguage String
+  status              String   @default("active")
+  revision            Int      @default(1)
+  supersedesGoalId    String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@index([participantId, status, updatedAt])
+  @@map("participant_goals")
+}
+
+model ParticipantProviderShortlist {
+  id            String       @id @default(cuid())
+  participantId String
+  participant   User         @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  providerOrgId String
+  providerOrg   Organisation @relation(fields: [providerOrgId], references: [id], onDelete: Cascade)
+  createdAt     DateTime     @default(now())
+
+  @@unique([participantId, providerOrgId])
+  @@index([participantId, createdAt])
+  @@map("participant_provider_shortlists")
+}
+
+model ParticipantHiddenProvider {
+  id            String       @id @default(cuid())
+  participantId String
+  participant   User         @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  providerOrgId String
+  providerOrg   Organisation @relation(fields: [providerOrgId], references: [id], onDelete: Cascade)
+  createdAt     DateTime     @default(now())
+
+  @@unique([participantId, providerOrgId])
+  @@index([participantId, createdAt])
+  @@map("participant_hidden_providers")
+}
+
+model ParticipantProviderNote {
+  id            String       @id @default(cuid())
+  participantId String
+  participant   User         @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  providerOrgId String
+  providerOrg   Organisation @relation(fields: [providerOrgId], references: [id], onDelete: Cascade)
+  note          String
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  @@unique([participantId, providerOrgId])
+  @@index([participantId, updatedAt])
+  @@map("participant_provider_notes")
 }
 
 model NdisPricingCatalogueItem {
