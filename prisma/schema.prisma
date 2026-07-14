@@ -11713,3 +11713,125 @@ model RestoreDrillRecord {
   @@index([outcome])
   @@map("restore_drill_records")
 }
+
+// --- CareOS top-ten opportunity MVPs (prepare / authority / continuity) ---
+
+/// Human registration evidence pack for NDIS digital platform providers (O2).
+/// Never automates claims, eligibility, or Commission submission.
+model PlatformRegistrationPack {
+  id                     String   @id @default(cuid())
+  organisationId         String?
+  tenantId               String?
+  title                  String
+  status                 String   @default("draft")
+  notes                  String?
+  /// Hard safety: live claim submission must remain false on every pack.
+  claimSubmissionEnabled Boolean  @default(false)
+  createdById            String
+  exportedAt             DateTime?
+  exportJson             Json?
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+  items                  PlatformRegistrationChecklistItem[]
+
+  @@index([organisationId, status])
+  @@index([tenantId, status])
+  @@map("platform_registration_packs")
+}
+
+model PlatformRegistrationChecklistItem {
+  id            String                   @id @default(cuid())
+  packId        String
+  pack          PlatformRegistrationPack @relation(fields: [packId], references: [id], onDelete: Cascade)
+  standardKey   String
+  label         String
+  status        String                   @default("not_started")
+  evidenceRefs  String[]                 @default([])
+  notes         String?
+  completedAt   DateTime?
+  completedById String?
+  createdAt     DateTime                 @default(now())
+  updatedAt     DateTime                 @updatedAt
+
+  @@unique([packId, standardKey])
+  @@index([packId, status])
+  @@map("platform_registration_checklist_items")
+}
+
+/// Academy → Passport competency proposal — always starts pending; humans verify (O8).
+model AcademyCompetencyProposal {
+  id                   String    @id @default(cuid())
+  workerProfileId      String
+  courseId             String?
+  trainingCompletionId String?
+  competencyType       String
+  evidenceId           String?
+  status               String    @default("pending")
+  proposedByUserId     String
+  verifiedByUserId     String?
+  verifiedAt           DateTime?
+  rejectionReason      String?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  @@index([workerProfileId, status])
+  @@index([status, createdAt])
+  @@map("academy_competency_proposals")
+}
+
+/// Thin-market capacity signal — Available/Limited/Unknown/Escalate only (O7).
+/// Forbidden: participant risk, worthiness, or provider “best match” scores.
+model ThinMarketContinuitySignal {
+  id                        String   @id @default(cuid())
+  regionKey                 String
+  serviceCategory           String
+  capacityStatus            String
+  notes                     String?
+  observedAt                DateTime @default(now())
+  requiresHumanConfirmation Boolean  @default(true)
+  confirmedAt               DateTime?
+  confirmedByUserId         String?
+  tenantId                  String?
+  createdById               String
+  createdAt                 DateTime @default(now())
+  updatedAt                 DateTime @updatedAt
+
+  @@index([regionKey, serviceCategory])
+  @@index([capacityStatus, observedAt])
+  @@map("thin_market_continuity_signals")
+}
+
+/// Lifespan / Support at Home liaison brief — navigation only; no eligibility (O10).
+model LifespanLiaisonBrief {
+  id                  String   @id @default(cuid())
+  participantId       String
+  missionId           String?
+  schemeFrom          String
+  schemeTo            String
+  summary             String
+  ypiracCautionShown  Boolean  @default(true)
+  authorityDecisionId String?
+  createdById         String
+  tenantId            String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@index([participantId, createdAt])
+  @@index([missionId])
+  @@map("lifespan_liaison_briefs")
+}
+
+/// Tenant isolation denial audit for white-label / enterprise enforcement (O12).
+model TenantAccessDenial {
+  id                String   @id @default(cuid())
+  actorUserId       String
+  attemptedTenantId String
+  resourceType      String
+  resourceId        String?
+  reason            String
+  createdAt         DateTime @default(now())
+
+  @@index([actorUserId, createdAt])
+  @@index([attemptedTenantId, createdAt])
+  @@map("tenant_access_denials")
+}

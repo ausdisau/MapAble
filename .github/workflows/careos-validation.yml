@@ -15,6 +15,9 @@ on:
       - "tests/care-support-intelligence.test.ts"
       - "lib/careos/**"
       - "lib/platform/**"
+      - "lib/intelligence/evaluation/**"
+      - "tests/ai-evaluation/**"
+      - "tests/careos/opportunities/**"
       - "package.json"
       - "pnpm-lock.yaml"
       - ".github/workflows/careos-validation.yml"
@@ -40,6 +43,8 @@ jobs:
       MAPABLE_CAREOS_PERSISTENCE_ENABLED: "true"
       MAPABLE_CAREOS_EVENT_AUTOMATION_ENABLED: "false"
       MAPABLE_AI_WRITE_ACTIONS: "false"
+      MAPABLE_AI_EVALUATION_HARNESS_ENABLED: "true"
+      MAPABLE_CAREOS_SAFETY_GATE_ENABLED: "true"
     services:
       postgres:
         image: postgres:16
@@ -115,6 +120,14 @@ jobs:
           tests/care-support-intelligence.test.ts
           tests/careos-kernel-v1.test.ts
           tests/careos-kernel-v1-appointment.test.ts
+          tests/careos/canonical-mission.test.ts
+          tests/careos/opportunities/top-ten-opportunities.test.ts
+
+      - name: CareOS AI safety evaluation gate
+        run: >-
+          pnpm vitest run
+          tests/careos/opportunities/top-ten-opportunities.test.ts
+          -t "O6 safety gate"
 
       - name: Lint CareOS implementation
         run: >-

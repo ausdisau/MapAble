@@ -31,7 +31,12 @@ export function ensureResearchGovernanceEnabled() {
 }
 
 export function ensureAiEvaluationHarnessEnabled() {
-  if (!analyticsResearchConfig.aiEvaluationHarnessEnabled) {
+  // Re-read env so CI safety gate can enable harness for the process without
+  // requiring module re-import (CareOS O6).
+  const enabledNow =
+    process.env.MAPABLE_AI_EVALUATION_HARNESS_ENABLED === "true" ||
+    analyticsResearchConfig.aiEvaluationHarnessEnabled;
+  if (!enabledNow) {
     throw new Error("AI_EVALUATION_HARNESS_DISABLED");
   }
 }

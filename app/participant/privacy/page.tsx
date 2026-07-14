@@ -1,22 +1,32 @@
 import { AuthoritySummary } from "@/components/authority/AuthoritySummary";
 import { PeopleWithAccess } from "@/components/authority/PeopleWithAccess";
+import { ConsentWalletPanel } from "@/components/consent-wallet/ConsentWalletPanel";
 import { ConsentTimeline } from "@/components/privacy/ConsentTimeline";
 import { requireAuth } from "@/lib/auth/guards";
 import {
   listAuthorityDecisionsForParticipant,
   listPeopleWithAccess,
 } from "@/lib/authority/authority-decision-service";
+import { listWalletCredentials } from "@/lib/careos/opportunities/consent-wallet";
 import { listConsentTimeline } from "@/lib/consent/consent-receipt-service";
+import { careosOpportunitiesConfig } from "@/lib/config/careos-opportunities";
 
 export const metadata = { title: "Privacy & access | Participant" };
 
 export default async function ParticipantPrivacyPage() {
   const participant = await requireAuth();
 
-  const [grants, consentReceipts, decisions] = await Promise.all([
+  const [grants, consentReceipts, decisions, wallet] = await Promise.all([
     listPeopleWithAccess(participant.id),
     listConsentTimeline(participant.id, participant.id),
     listAuthorityDecisionsForParticipant(participant.id, participant.id),
+    careosOpportunitiesConfig.consentWalletEnabled
+      ? listWalletCredentials(participant.id)
+      : Promise.resolve({
+          authority: [],
+          documents: [],
+          preferentialReceipts: [],
+        }),
   ]);
 
   const serializedGrants = grants.map((grant: (typeof grants)[number]) => ({
@@ -71,6 +81,41 @@ export default async function ParticipantPrivacyPage() {
           at any time.
         </p>
       </header>
+
+      {careosOpportunitiesConfig.consentWalletEnabled ? (
+        <section aria-labelledby="consent-wallet-heading">
+          <h2 id="consent-wallet-heading" className="text-lg font-semibold">
+            Consent and credential wallet
+          </h2>
+          <div className="mt-4">
+            <ConsentWalletPanel
+              authority={wallet.authority.map((grant) => ({
+                id: grant.id,
+                domain: grant.domain,
+                actions: grant.actions,
+                purpose: grant.purpose,
+                expiresAt: grant.expiresAt.toISOString(),
+                delegate: grant.delegate,
+              }))}
+              documents={wallet.documents.map((doc) => ({
+                id: doc.id,
+                documentId: doc.documentId,
+                purpose: doc.purpose,
+                expiresAt: doc.expiresAt.toISOString(),
+              }))}
+              preferentialReceipts={wallet.preferentialReceipts.map(
+                (receipt) => ({
+                  id: receipt.id,
+                  scope: receipt.scope,
+                  purpose: receipt.purpose,
+                  action: receipt.action,
+                  createdAt: receipt.createdAt.toISOString(),
+                }),
+              )}
+            />
+          </div>
+        </section>
+      ) : null}
 
       <section aria-labelledby="people-with-access-heading">
         <h2 id="people-with-access-heading" className="text-lg font-semibold">
