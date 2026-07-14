@@ -1,0 +1,100 @@
+openapi: 3.1.0
+info:
+  title: CareOS Open API
+  version: "1.0.0"
+  description: |
+    CareOS Phase 12 versioned REST API. Requires MAPABLE_DEVELOPER_PLATFORM_ENABLED=true.
+    Partner access requires participant authority via x-participant-id header.
+servers:
+  - url: https://api.careos.example/api/v1
+    description: Production
+  - url: https://sandbox.careos.example/api/v1
+    description: Sandbox (synthetic data)
+security:
+  - ApiKeyAuth: []
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-Api-Key
+  schemas:
+    StructuredError:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              enum:
+                - unauthorized
+                - forbidden
+                - not_found
+                - validation_error
+                - rate_limited
+                - platform_disabled
+                - scope_denied
+                - participant_authority_required
+            message:
+              type: string
+    CursorPage:
+      type: object
+      properties:
+        nextCursor:
+          type: string
+          nullable: true
+        hasMore:
+          type: boolean
+paths:
+  /participants:
+    get:
+      summary: List participant authority context
+      parameters:
+        - name: X-Participant-Id
+          in: header
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 25
+        - name: cursor
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Participant authority summary
+        "403":
+          description: Missing participant authority
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StructuredError"
+  /care:
+    get:
+      summary: List care shifts for participant
+      parameters:
+        - name: X-Participant-Id
+          in: header
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Care shifts
+  /access:
+    get:
+      summary: List accessible places
+      responses:
+        "200":
+          description: Accessible places
+  /webhooks:
+    get:
+      summary: List webhook subscriptions
+      responses:
+        "200":
+          description: Active subscriptions
