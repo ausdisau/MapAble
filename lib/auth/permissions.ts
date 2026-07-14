@@ -44,6 +44,14 @@ export type Permission =
   | "invoice:read:self"
   | "invoice:read:org"
   | "invoice:manage:any"
+  | "finance:view"
+  | "finance:review"
+  | "finance:request_clarification"
+  | "finance:dispute"
+  | "finance:approve_for_processing"
+  | "finance:prepare_payment"
+  | "finance:execute_payment"
+  | "finance:export_claim"
   | "provider:booking:respond"
   | "admin:operations"
   | "care:read:self"
@@ -201,6 +209,11 @@ const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     "document:upload",
     "funding:manage:self",
     "invoice:read:self",
+    "finance:view",
+    "finance:review",
+    "finance:request_clarification",
+    "finance:dispute",
+    "finance:approve_for_processing",
     "profile:write:self",
     "accessibility:read:self",
     "accessibility:write:self",
@@ -322,6 +335,11 @@ const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
   plan_manager: [
     "plan_manager:portal",
     "invoice:read:self",
+    "finance:view",
+    "finance:review",
+    "finance:request_clarification",
+    "finance:prepare_payment",
+    "finance:export_claim",
     "booking:read:any",
     "notification:read:self",
     "case:read:any",

@@ -104,6 +104,7 @@ model User {
   billingAccounts           BillingAccount[]       @relation("BillingAccounts")
   billingFundingSources     BillingFundingSource[] @relation("BillingFundingSources")
   billingInvoices           BillingInvoice[]       @relation("BillingInvoices")
+  expectedCostContexts      ExpectedCostContext[]
   billingPayments           BillingPayment[]       @relation("BillingPayments")
   billingSubscriptions      BillingSubscription[]  @relation("BillingSubscriptions")
   payoutRecipients          PayoutRecipient[]      @relation("PayoutRecipients")
@@ -5702,6 +5703,8 @@ model BillingInvoice {
   updatedAt                DateTime               @updatedAt
 
   lineItems BillingInvoiceLineItem[]
+  reconciliations InvoiceReconciliationRecord[]
+  financialDecisions ParticipantInvoiceDecision[]
   payments  BillingPayment[]
   payoutBlocks PayoutBlock[]
 
@@ -5712,6 +5715,87 @@ model BillingInvoice {
   @@index([adminApprovalStatus])
   @@index([transferGroup])
   @@index([invoiceNumber])
+}
+
+model ExpectedCostContext {
+  id                     String   @id @default(cuid())
+  participantId          String
+  participant            User     @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  missionId              String?
+  serviceAgreementId     String
+  bookingId              String?
+  providerOrganisationId String
+  supportItemCode        String?
+  supportDescription     String
+  expectedQuantity       Decimal?
+  expectedUnit           String?
+  expectedUnitPriceCents Int?
+  expectedTotalCents     Int?
+  travelTerms            Json?
+  cancellationTerms      Json?
+  fundingCategory        String?
+  evidenceSourceIds      String[] @default([])
+  validFrom              DateTime?
+  validUntil             DateTime?
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  @@index([participantId, providerOrganisationId, validUntil])
+  @@index([missionId])
+  @@index([bookingId])
+  @@map("expected_cost_contexts")
+}
+
+model InvoiceReconciliationRecord {
+  id                  String         @id @default(cuid())
+  invoiceId           String
+  invoice             BillingInvoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  expectedCostContextId String?
+  overallStatus       String
+  lineResults         Json
+  duplicateIndicators Json
+  differences         Json
+  missingEvidence     String[]       @default([])
+  uncertainty         String[]       @default([])
+  policyVersion       String
+  createdAt           DateTime       @default(now())
+
+  @@index([invoiceId, createdAt])
+  @@index([expectedCostContextId])
+  @@map("invoice_reconciliation_records")
+}
+
+model ParticipantInvoiceDecision {
+  id            String         @id @default(cuid())
+  invoiceId     String
+  invoice       BillingInvoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  participantId String
+  actorUserId   String
+  decision      String
+  reason        String?
+  authorityGrantId String?
+  createdAt     DateTime       @default(now())
+
+  @@index([participantId, createdAt])
+  @@index([invoiceId, createdAt])
+  @@map("participant_invoice_decisions")
+}
+
+model PricingRuleSet {
+  id              String   @id @default(cuid())
+  jurisdiction    String
+  scheme          String
+  version         String
+  effectiveFrom   DateTime
+  effectiveTo     DateTime?
+  sourceReference String
+  status          String   @default("draft")
+  rulesJson       Json
+  createdAt       DateTime @default(now())
+
+  @@unique([jurisdiction, scheme, version])
+  @@index([jurisdiction, scheme, status, effectiveFrom])
+  @@map("pricing_rule_sets")
 }
 
 model BillingInvoiceLineItem {
