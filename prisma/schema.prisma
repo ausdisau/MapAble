@@ -224,6 +224,9 @@ model User {
   analyticsExportsApproved        AnalyticsExport[]            @relation("AnalyticsExportApprover")
   researchExportsRequested        ResearchExport[]             @relation("ResearchExportRequester")
   researchExportsApproved         ResearchExport[]             @relation("ResearchExportApprover")
+
+  // CareOS Phase 15 — National Infrastructure
+  restoreDrillsConducted          RestoreDrillRecord[]         @relation("RestoreDrillConductor")
 }
 
 model PasskeyCredential {
@@ -1042,6 +1045,9 @@ model Organisation {
   // CareOS Phase 14 — Analytics, Research and Evaluation Cloud
   analyticsExports AnalyticsExport[]
   researchProjects ResearchProject[]
+
+  // CareOS Phase 15 — National Infrastructure
+  regionalOrganisations RegionalOrganisation[]
 }
 
 model OrganisationMember {
@@ -11480,4 +11486,119 @@ model PublicationRecord {
 
   @@index([projectId])
   @@map("publication_records")
+}
+
+// --- CareOS Phase 15 — National Infrastructure, Federation and Resilience ---
+
+enum FederationTrustStatus {
+  pending
+  active
+  suspended
+  revoked
+}
+
+enum FederationProtocol {
+  oidc
+  saml
+}
+
+enum RegionalOrganisationStatus {
+  draft
+  active
+  suspended
+  archived
+}
+
+enum PlatformHealthStatus {
+  ok
+  degraded
+  critical
+  unknown
+}
+
+enum RestoreDrillOutcome {
+  passed
+  failed
+  partial
+  not_run
+}
+
+/// Trusted federation partner (OIDC/SAML) — identity only; no automatic participant authority.
+model FederationTrust {
+  id                String               @id @default(cuid())
+  partnerName       String
+  protocol          FederationProtocol
+  issuerUrl         String
+  clientId          String?
+  metadataUrl       String?
+  status            FederationTrustStatus @default(pending)
+  scopesAllowed     String[]             @default([])
+  participantAuthorityBlocked Boolean      @default(true)
+  notes             String?
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+
+  regionalOrganisations RegionalOrganisation[]
+
+  @@index([status])
+  @@index([protocol])
+  @@map("federation_trusts")
+}
+
+/// Regional organisation linked to a federation trust or national directory.
+model RegionalOrganisation {
+  id                String                     @id @default(cuid())
+  organisationId    String?
+  organisation      Organisation?              @relation(fields: [organisationId], references: [id], onDelete: SetNull)
+  federationTrustId String?
+  federationTrust   FederationTrust?           @relation(fields: [federationTrustId], references: [id], onDelete: SetNull)
+  regionCode        String
+  displayName       String
+  status            RegionalOrganisationStatus @default(draft)
+  directoryRef      String?
+  createdAt         DateTime                   @default(now())
+  updatedAt         DateTime                   @updatedAt
+
+  @@index([regionCode])
+  @@index([organisationId])
+  @@index([federationTrustId])
+  @@map("regional_organisations")
+}
+
+/// National platform health check snapshot (redacted for admin dashboard).
+model PlatformHealthCheck {
+  id          String               @id @default(cuid())
+  component   String
+  region      String               @default("ap-southeast-2")
+  status      PlatformHealthStatus @default(unknown)
+  message     String?
+  latencyMs   Int?
+  redacted    Boolean              @default(true)
+  checkedAt   DateTime             @default(now())
+  createdAt   DateTime             @default(now())
+
+  @@index([component, checkedAt])
+  @@index([region, status])
+  @@map("platform_health_checks")
+}
+
+/// Restore drill record — evidence of tested recovery (not checklist theatre).
+model RestoreDrillRecord {
+  id              String              @id @default(cuid())
+  title           String
+  environment     String              @default("staging")
+  outcome         RestoreDrillOutcome @default(not_run)
+  rpoAchievedMin  Int?
+  rtoAchievedMin  Int?
+  testedAt        DateTime?
+  evidenceJson    Json?
+  notes           String?
+  conductedById   String?
+  conductedBy     User?               @relation("RestoreDrillConductor", fields: [conductedById], references: [id], onDelete: SetNull)
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+
+  @@index([environment, testedAt])
+  @@index([outcome])
+  @@map("restore_drill_records")
 }
