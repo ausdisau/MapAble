@@ -213,6 +213,9 @@ model User {
   providerAccreditationDecisions   ProviderAccreditationDecision[] @relation("ProviderAccreditationDecider")
   providerAccreditationAppeals     ProviderAccreditationAppealRecord[] @relation("ProviderAccreditationAppellant")
   providerAccreditationAppealDecisions ProviderAccreditationAppealRecord[] @relation("ProviderAccreditationAppealDecider")
+
+  // CareOS Phase 13 — Mobile, Voice and Communication Access
+  communicationPassports CommunicationPassport[] @relation("CommunicationPassportParticipant")
 }
 
 model PasskeyCredential {
@@ -11045,4 +11048,110 @@ model WebhookDeliveryLog {
   @@index([subscriptionId, createdAt])
   @@index([status, nextRetryAt])
   @@map("webhook_delivery_logs")
+}
+
+// --- CareOS Phase 13: Mobile, Voice and Communication Access ---
+
+enum CommunicationPassportStatus {
+  draft
+  published
+  archived
+}
+
+enum AacMethodType {
+  text_to_speech
+  picture_board
+  sign_language_interpreter
+  written
+  gesture
+  device
+  other
+}
+
+/// Participant-authored communication passport. Speech difficulty is never
+/// treated as reduced capacity — capacityNotes are participant-authored only.
+model CommunicationPassport {
+  id              String                      @id @default(cuid())
+  participantId   String
+  participant     User                        @relation("CommunicationPassportParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  title           String                      @default("My communication passport")
+  status          CommunicationPassportStatus @default(draft)
+  aboutMe         String?
+  howICommunicate String?
+  pleaseDo        String?
+  pleaseDont      String?
+  capacityNotes   String?
+  shareScope      String[]                    @default([])
+  publishedAt     DateTime?
+  createdAt       DateTime                    @default(now())
+  updatedAt       DateTime                    @updatedAt
+
+  preferredQuestions   PreferredQuestion[]
+  savedPhrases         SavedPhrase[]
+  aacMethodPreferences AacMethodPreference[]
+  emergencyCard        EmergencyCommunicationCard?
+
+  @@index([participantId])
+  @@map("communication_passports")
+}
+
+model PreferredQuestion {
+  id           String                @id @default(cuid())
+  passportId   String
+  passport     CommunicationPassport @relation(fields: [passportId], references: [id], onDelete: Cascade)
+  prompt       String
+  responseHint String?
+  sortOrder    Int                   @default(0)
+  createdAt    DateTime              @default(now())
+  updatedAt    DateTime              @updatedAt
+
+  @@index([passportId])
+  @@map("preferred_questions")
+}
+
+model SavedPhrase {
+  id         String                @id @default(cuid())
+  passportId String
+  passport   CommunicationPassport @relation(fields: [passportId], references: [id], onDelete: Cascade)
+  label      String
+  text       String
+  category   String?
+  sortOrder  Int                   @default(0)
+  createdAt  DateTime              @default(now())
+  updatedAt  DateTime              @updatedAt
+
+  @@index([passportId])
+  @@map("saved_phrases")
+}
+
+model AacMethodPreference {
+  id         String                @id @default(cuid())
+  passportId String
+  passport   CommunicationPassport @relation(fields: [passportId], references: [id], onDelete: Cascade)
+  method     AacMethodType
+  label      String?
+  preferred  Boolean               @default(false)
+  notes      String?
+  sortOrder  Int                   @default(0)
+  createdAt  DateTime              @default(now())
+  updatedAt  DateTime              @updatedAt
+
+  @@index([passportId])
+  @@map("aac_method_preferences")
+}
+
+model EmergencyCommunicationCard {
+  id                    String                @id @default(cuid())
+  passportId            String                @unique
+  passport              CommunicationPassport @relation(fields: [passportId], references: [id], onDelete: Cascade)
+  emergencyContactName  String?
+  emergencyContactPhone String?
+  medicalNotes          String?
+  communicationNeeds    String?
+  accessInstructions    String?
+  lastReviewedAt        DateTime?
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
+
+  @@map("emergency_communication_cards")
 }
