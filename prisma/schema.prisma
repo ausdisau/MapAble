@@ -151,6 +151,20 @@ model User {
   authorityGrantsAsParticipant ParticipantAuthorityGrant[] @relation("AuthorityGrantParticipant")
   authorityGrantsAsDelegate    ParticipantAuthorityGrant[] @relation("AuthorityGrantDelegate")
   documentAccessGrants         DocumentAccessGrant[]
+  mfaEnrolments                MfaEnrolment[]
+  trustedDevices               TrustedDevice[]
+  authSessionRecords            AuthSessionRecord[]
+  loginAuditEvents             LoginAuditEvent[]
+  stepUpChallenges             StepUpChallenge[]
+  authorityDecisionsAsParticipant AuthorityDecision[] @relation("AuthorityDecisionParticipant")
+  authorityDecisionsAsActor       AuthorityDecision[] @relation("AuthorityDecisionActor")
+  consentReceiptsAsParticipant ConsentReceipt[] @relation("ConsentReceiptParticipant")
+  consentReceiptsAsActor       ConsentReceipt[] @relation("ConsentReceiptActor")
+  delegateInvitationsSent      DelegateInvitation[] @relation("DelegateInvitationParticipant")
+  delegateInvitationsReceived  DelegateInvitation[] @relation("DelegateInvitationInvitee")
+  emergencyAccessRequestsAsParticipant EmergencyAccessRequest[] @relation("EmergencyAccessParticipant")
+  emergencyAccessRequestsAsRequester   EmergencyAccessRequest[] @relation("EmergencyAccessRequester")
+  emergencyAccessReviews       EmergencyAccessReview[] @relation("EmergencyAccessReviewer")
   careOSLifeTwin            ParticipantLifeTwin?
   careOSMissions            CareOSMission[]
   careOSActivityEvents      CareOSActivityEvent[]
@@ -1425,16 +1439,214 @@ model ParticipantAuthorityGrant {
   domain        String
   actions       String[] @default([])
   consentScopes String[] @default([])
+  purpose       String?
+  recipientRole String?
+  evidenceRef   String?
+  decisionLimitJson Json?
   issuedAt      DateTime @default(now())
   expiresAt     DateTime
   revokedAt     DateTime?
   revokedById   String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+  decisions     AuthorityDecision[]
+  invitations   DelegateInvitation[]
 
   @@index([participantId, delegateId, domain, expiresAt])
   @@index([tenantId, revokedAt])
   @@map("participant_authority_grants")
+}
+
+enum DelegateInvitationStatus {
+  pending
+  accepted
+  declined
+  expired
+  revoked
+}
+
+enum EmergencyAccessStatus {
+  requested
+  under_review
+  approved
+  denied
+  expired
+  revoked
+}
+
+model MfaEnrolment {
+  id         String    @id @default(cuid())
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  method     String
+  status     String    @default("pending")
+  enrolledAt DateTime?
+  disabledAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@unique([userId, method])
+  @@index([userId, status])
+  @@map("mfa_enrolments")
+}
+
+model TrustedDevice {
+  id                    String    @id @default(cuid())
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deviceLabel           String
+  deviceFingerprintHash String
+  lastSeenAt            DateTime  @default(now())
+  revokedAt             DateTime?
+  createdAt             DateTime  @default(now())
+
+  @@index([userId, revokedAt])
+  @@map("trusted_devices")
+}
+
+model AuthSessionRecord {
+  id               String    @id @default(cuid())
+  userId           String
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionTokenHash String    @unique
+  userAgent        String?
+  ipHash           String?
+  createdAt        DateTime  @default(now())
+  lastSeenAt       DateTime  @default(now())
+  expiresAt        DateTime
+  revokedAt        DateTime?
+  revokedReason    String?
+
+  @@index([userId, revokedAt])
+  @@map("auth_session_records")
+}
+
+model LoginAuditEvent {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  emailHash String?
+  eventType String
+  method    String?
+  metadata  Json     @default("{}")
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([eventType, createdAt])
+  @@map("login_audit_events")
+}
+
+model StepUpChallenge {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  purpose     String
+  status      String    @default("pending")
+  expiresAt   DateTime
+  satisfiedAt DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@index([userId, status, expiresAt])
+  @@map("step_up_challenges")
+}
+
+model AuthorityDecision {
+  id            String   @id @default(cuid())
+  grantId       String?
+  grant         ParticipantAuthorityGrant? @relation(fields: [grantId], references: [id], onDelete: SetNull)
+  participantId String
+  participant   User     @relation("AuthorityDecisionParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  actorUserId   String
+  actor         User     @relation("AuthorityDecisionActor", fields: [actorUserId], references: [id], onDelete: Cascade)
+  domain        String
+  action        String
+  decision      String
+  reason        String
+  purpose       String?
+  createdAt     DateTime @default(now())
+
+  @@index([participantId, createdAt])
+  @@index([actorUserId, createdAt])
+  @@map("authority_decisions")
+}
+
+model ConsentReceipt {
+  id              String   @id @default(cuid())
+  consentRecordId String?
+  participantId   String
+  participant     User     @relation("ConsentReceiptParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  actorUserId     String
+  actor           User     @relation("ConsentReceiptActor", fields: [actorUserId], references: [id], onDelete: Cascade)
+  scope           String
+  purpose         String
+  recipientType   String?
+  recipientId     String?
+  action          String
+  createdAt       DateTime @default(now())
+
+  @@index([participantId, createdAt])
+  @@map("consent_receipts")
+}
+
+model DelegateInvitation {
+  id                     String                   @id @default(cuid())
+  participantId          String
+  participant            User                     @relation("DelegateInvitationParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  inviteeEmail           String
+  inviteeUserId          String?
+  invitee                User?                    @relation("DelegateInvitationInvitee", fields: [inviteeUserId], references: [id], onDelete: SetNull)
+  roleType               String
+  proposedDomain         String
+  proposedActions        String[]                 @default([])
+  proposedConsentScopes  String[]                 @default([])
+  status                 DelegateInvitationStatus @default(pending)
+  message                String?
+  expiresAt              DateTime
+  acceptedAt             DateTime?
+  declinedAt             DateTime?
+  revokedAt              DateTime?
+  resultingGrantId       String?
+  resultingGrant         ParticipantAuthorityGrant? @relation(fields: [resultingGrantId], references: [id], onDelete: SetNull)
+  createdAt              DateTime                 @default(now())
+  updatedAt              DateTime                 @updatedAt
+
+  @@index([participantId, status])
+  @@index([inviteeEmail, status])
+  @@map("delegate_invitations")
+}
+
+model EmergencyAccessRequest {
+  id              String                @id @default(cuid())
+  participantId   String
+  participant     User                  @relation("EmergencyAccessParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  requesterId     String
+  requester       User                  @relation("EmergencyAccessRequester", fields: [requesterId], references: [id], onDelete: Cascade)
+  purpose         String
+  justification   String
+  requestedScopes String[]              @default([])
+  status          EmergencyAccessStatus @default(requested)
+  expiresAt       DateTime?
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+  reviews         EmergencyAccessReview[]
+
+  @@index([participantId, status])
+  @@index([requesterId, status])
+  @@map("emergency_access_requests")
+}
+
+model EmergencyAccessReview {
+  id         String                 @id @default(cuid())
+  requestId  String
+  request    EmergencyAccessRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  reviewerId String
+  reviewer   User                   @relation("EmergencyAccessReviewer", fields: [reviewerId], references: [id], onDelete: Cascade)
+  decision   String
+  notes      String?
+  createdAt  DateTime               @default(now())
+
+  @@index([requestId])
+  @@map("emergency_access_reviews")
 }
 
 model ParticipantFundingSource {
