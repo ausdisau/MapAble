@@ -216,6 +216,14 @@ model User {
 
   // CareOS Phase 13 — Mobile, Voice and Communication Access
   communicationPassports CommunicationPassport[] @relation("CommunicationPassportParticipant")
+
+  // CareOS Phase 14 — Analytics, Research and Evaluation Cloud
+  participantResearchConsents ParticipantResearchConsent[] @relation("ResearchConsentParticipant")
+  researchWithdrawals           ResearchWithdrawal[]         @relation("ResearchWithdrawalParticipant")
+  analyticsExportsRequested       AnalyticsExport[]            @relation("AnalyticsExportRequester")
+  analyticsExportsApproved        AnalyticsExport[]            @relation("AnalyticsExportApprover")
+  researchExportsRequested        ResearchExport[]             @relation("ResearchExportRequester")
+  researchExportsApproved         ResearchExport[]             @relation("ResearchExportApprover")
 }
 
 model PasskeyCredential {
@@ -1030,6 +1038,10 @@ model Organisation {
   policyDocuments           PolicyDocument[]
   trainingRequirements      TrainingRequirement[]
   providerAccreditationApplications ProviderAccreditationApplication[]
+
+  // CareOS Phase 14 — Analytics, Research and Evaluation Cloud
+  analyticsExports AnalyticsExport[]
+  researchProjects ResearchProject[]
 }
 
 model OrganisationMember {
@@ -11154,4 +11166,318 @@ model EmergencyCommunicationCard {
   updatedAt             DateTime              @updatedAt
 
   @@map("emergency_communication_cards")
+}
+
+// --- CareOS Phase 14: Analytics, Research and Evaluation Cloud ---
+
+enum MetricDefinitionStatus {
+  draft
+  published
+  deprecated
+}
+
+enum AnalyticsEventStatus {
+  received
+  processed
+  suppressed
+}
+
+enum AnalyticsExportStatus {
+  draft
+  pending_approval
+  approved
+  rejected
+  completed
+  withdrawn
+}
+
+enum ResearchProjectStatus {
+  draft
+  ethics_review
+  active
+  paused
+  completed
+  archived
+}
+
+enum EthicsApprovalStatus {
+  pending
+  approved
+  rejected
+  expired
+}
+
+enum DataUseAgreementStatus {
+  draft
+  pending
+  active
+  revoked
+}
+
+enum ResearchConsentStatus {
+  invited
+  granted
+  declined
+  withdrawn
+}
+
+enum ResearchExportStatus {
+  draft
+  pending_approval
+  approved
+  rejected
+  completed
+  blocked_withdrawal
+}
+
+enum PublicationRecordStatus {
+  draft
+  submitted
+  published
+  retracted
+}
+
+/// Registered metric definitions for the analytics cloud.
+model MetricDefinition {
+  id          String                 @id @default(cuid())
+  key         String                 @unique
+  name        String
+  description String?
+  unit        String?
+  module      String
+  status      MetricDefinitionStatus @default(draft)
+  formula     String?
+  createdAt   DateTime               @default(now())
+  updatedAt   DateTime               @updatedAt
+
+  dimensions MetricDimension[]
+  snapshots  MetricSnapshot[]
+  events     AnalyticsEvent[]
+
+  @@index([module, status])
+  @@map("metric_definitions")
+}
+
+model MetricDimension {
+  id                 String           @id @default(cuid())
+  metricDefinitionId String
+  metricDefinition   MetricDefinition @relation(fields: [metricDefinitionId], references: [id], onDelete: Cascade)
+  key                String
+  label              String
+  dataType           String           @default("string")
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+
+  @@unique([metricDefinitionId, key])
+  @@index([metricDefinitionId])
+  @@map("metric_dimensions")
+}
+
+/// Raw analytics events — participant identifiers stored as pseudonyms only.
+model AnalyticsEvent {
+  id                   String               @id @default(cuid())
+  metricDefinitionId   String?
+  metricDefinition     MetricDefinition?    @relation(fields: [metricDefinitionId], references: [id], onDelete: SetNull)
+  eventType            String
+  organisationId       String?
+  participantPseudonym String?
+  payloadJson          Json
+  status               AnalyticsEventStatus @default(received)
+  occurredAt           DateTime
+  createdAt            DateTime             @default(now())
+
+  @@index([eventType, occurredAt])
+  @@index([organisationId])
+  @@map("analytics_events")
+}
+
+/// Aggregated metric snapshots with small-cell suppression metadata.
+model MetricSnapshot {
+  id                    String           @id @default(cuid())
+  metricDefinitionId    String
+  metricDefinition      MetricDefinition @relation(fields: [metricDefinitionId], references: [id], onDelete: Cascade)
+  periodStart           DateTime
+  periodEnd             DateTime
+  value                 Float?
+  dimensionsJson        Json?
+  cohortSize            Int              @default(0)
+  suppressed            Boolean          @default(false)
+  suppressionReason     String?
+  /// aggregated | pseudonymised | de-identified — never "anonymous" without basis
+  deidentificationLevel String           @default("aggregated")
+  createdAt             DateTime         @default(now())
+
+  @@index([metricDefinitionId, periodStart])
+  @@map("metric_snapshots")
+}
+
+/// Governed analytics export with approval workflow.
+model AnalyticsExport {
+  id                    String                @id @default(cuid())
+  requestedById         String
+  requestedBy           User                  @relation("AnalyticsExportRequester", fields: [requestedById], references: [id], onDelete: Cascade)
+  organisationId        String?
+  organisation          Organisation?         @relation(fields: [organisationId], references: [id], onDelete: SetNull)
+  exportLabel           String
+  status                AnalyticsExportStatus @default(draft)
+  deidentificationLevel String                @default("pseudonymised")
+  suppressedFields      String[]              @default([])
+  smallCellApplied      Boolean               @default(false)
+  approvedById          String?
+  approvedBy            User?                 @relation("AnalyticsExportApprover", fields: [approvedById], references: [id], onDelete: SetNull)
+  approvedAt            DateTime?
+  rejectionReason       String?
+  bundleJson            Json?
+  completedAt           DateTime?
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
+
+  @@index([status])
+  @@index([organisationId])
+  @@map("analytics_exports")
+}
+
+/// Research project with ethics and consent governance.
+model ResearchProject {
+  id                    String                @id @default(cuid())
+  title                 String
+  description           String?
+  status                ResearchProjectStatus @default(draft)
+  organisationId        String?
+  organisation          Organisation?         @relation(fields: [organisationId], references: [id], onDelete: SetNull)
+  principalInvestigator String?
+  syntheticDataOnly     Boolean               @default(true)
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
+
+  ethicsApprovals     EthicsApproval[]
+  dataUseAgreements   DataUseAgreement[]
+  consents            ParticipantResearchConsent[]
+  cohorts             ResearchCohort[]
+  exports             ResearchExport[]
+  withdrawals         ResearchWithdrawal[]
+  publications        PublicationRecord[]
+
+  @@index([status])
+  @@index([organisationId])
+  @@map("research_projects")
+}
+
+model EthicsApproval {
+  id             String               @id @default(cuid())
+  projectId      String
+  project        ResearchProject      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  approvalNumber String?
+  status         EthicsApprovalStatus @default(pending)
+  approvedAt     DateTime?
+  expiresAt      DateTime?
+  conditions     String?
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+
+  @@index([projectId])
+  @@map("ethics_approvals")
+}
+
+model DataUseAgreement {
+  id          String                 @id @default(cuid())
+  projectId   String
+  project     ResearchProject        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  partnerName String
+  scope       String
+  status      DataUseAgreementStatus @default(draft)
+  approvedAt  DateTime?
+  revokedAt   DateTime?
+  createdAt   DateTime               @default(now())
+  updatedAt   DateTime               @updatedAt
+
+  @@index([projectId])
+  @@map("data_use_agreements")
+}
+
+model ParticipantResearchConsent {
+  id            String                @id @default(cuid())
+  projectId     String
+  project       ResearchProject       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  participantId String
+  participant   User                  @relation("ResearchConsentParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  status        ResearchConsentStatus @default(invited)
+  grantedAt     DateTime?
+  withdrawnAt   DateTime?
+  consentNotes  String?
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @updatedAt
+
+  @@unique([projectId, participantId])
+  @@index([participantId])
+  @@map("participant_research_consents")
+}
+
+model ResearchCohort {
+  id               String          @id @default(cuid())
+  projectId        String
+  project          ResearchProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  name             String
+  criteriaJson     Json?
+  participantCount Int             @default(0)
+  suppressed       Boolean         @default(false)
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+
+  @@index([projectId])
+  @@map("research_cohorts")
+}
+
+model ResearchExport {
+  id                    String               @id @default(cuid())
+  projectId             String
+  project               ResearchProject      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  requestedById         String
+  requestedBy           User                 @relation("ResearchExportRequester", fields: [requestedById], references: [id], onDelete: Cascade)
+  exportLabel           String
+  status                ResearchExportStatus @default(draft)
+  deidentificationLevel String               @default("pseudonymised")
+  ethicsChecked         Boolean              @default(false)
+  approvedById          String?
+  approvedBy            User?                @relation("ResearchExportApprover", fields: [approvedById], references: [id], onDelete: SetNull)
+  approvedAt            DateTime?
+  bundleJson            Json?
+  createdAt             DateTime             @default(now())
+  updatedAt             DateTime             @updatedAt
+
+  @@index([projectId, status])
+  @@map("research_exports")
+}
+
+/// Participant withdrawal from research — blocks future exports and flags purge.
+model ResearchWithdrawal {
+  id            String          @id @default(cuid())
+  projectId     String
+  project       ResearchProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  participantId String
+  participant   User            @relation("ResearchWithdrawalParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  reason        String?
+  effectiveAt   DateTime        @default(now())
+  exportBlocked Boolean         @default(true)
+  dataPurged    Boolean         @default(false)
+  createdAt     DateTime        @default(now())
+
+  @@index([projectId, participantId])
+  @@map("research_withdrawals")
+}
+
+model PublicationRecord {
+  id              String                  @id @default(cuid())
+  projectId       String
+  project         ResearchProject         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  title           String
+  doi             String?
+  status          PublicationRecordStatus @default(draft)
+  publishedAt     DateTime?
+  acknowledgement String?
+  createdAt       DateTime                @default(now())
+  updatedAt       DateTime                @updatedAt
+
+  @@index([projectId])
+  @@map("publication_records")
 }

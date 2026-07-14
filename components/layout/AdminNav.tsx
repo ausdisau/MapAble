@@ -44,6 +44,8 @@ const LEGACY_LINKS = [
   { href: "/admin/provider-capacity", label: "Capacity" },
   { href: "/admin/matching", label: "Matching" },
   { href: "/admin/analytics", label: "Analytics" },
+  { href: "/admin/ai-evaluation", label: "AI evaluation" },
+  { href: "/research", label: "Research gov" },
   { href: "/admin/incidents", label: "Incidents" },
   { href: "/admin/contracts", label: "Contracts" },
   { href: "/admin/ai-matching", label: "AI matching" },

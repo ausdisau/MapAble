@@ -22,6 +22,7 @@ export const PROVIDER_CLAIMING_LINKS: SectionNavLink[] = [
 
 export const PROVIDER_INSIGHTS_LINKS: SectionNavLink[] = [
   { href: "/provider/benchmarks", label: "Benchmarks" },
+  { href: "/provider/analytics", label: "Analytics" },
   { href: "/provider/reports", label: "Reports" },
   { href: "/provider/capacity", label: "Capacity" },
   { href: "/provider/engagement", label: "Engagement" },
