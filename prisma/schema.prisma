@@ -196,6 +196,26 @@ model User {
   telehealthSessionsAsParticipant  TelehealthSessionRecord[] @relation("TelehealthSessionParticipant")
   telehealthSessionsAsClinician    TelehealthSessionRecord[] @relation("TelehealthSessionClinician")
   healthDeviceImports              HealthDeviceImport[] @relation("HealthDeviceImportParticipant")
+
+  // CareOS Phase 11 — Quality, Accreditation and Compliance
+  complianceEvidenceSubmitted      ComplianceEvidence[] @relation("ComplianceEvidenceSubmittedBy")
+  evidenceAssessmentsAuthored      EvidenceAssessment[] @relation("EvidenceAssessmentAssessor")
+  qualityAuditPlansCreated         QualityAuditPlan[] @relation("QualityAuditPlanCreator")
+  qualityAuditFindingsAssigned     QualityAuditFinding[] @relation("QualityAuditFindingAssignee")
+  correctiveActionsAssigned        CorrectiveAction[] @relation("CorrectiveActionAssignee")
+  correctiveActionHistory          CorrectiveActionHistory[] @relation("CorrectiveActionHistoryActor")
+  improvementActionHistory         ImprovementActionHistory[] @relation("ImprovementActionHistoryActor")
+  policyAcknowledgements           PolicyAcknowledgement[] @relation("PolicyAcknowledgementUser")
+  trainingCompletionRecords        TrainingCompletionRecord[] @relation("TrainingCompletionUser")
+  providerAccreditationApplicationsSubmitted ProviderAccreditationApplication[] @relation("ProviderAccreditationApplicant")
+  providerAccreditationAssessments ProviderAccreditationAssessment[] @relation("ProviderAccreditationAssessor")
+  providerAccreditationClarifications ProviderAccreditationClarification[] @relation("ProviderAccreditationClarificationRequester")
+  providerAccreditationDecisions   ProviderAccreditationDecision[] @relation("ProviderAccreditationDecider")
+  providerAccreditationAppeals     ProviderAccreditationAppealRecord[] @relation("ProviderAccreditationAppellant")
+  providerAccreditationAppealDecisions ProviderAccreditationAppealRecord[] @relation("ProviderAccreditationAppealDecider")
+
+  // CareOS Phase 13 — Mobile, Voice and Communication Access
+  communicationPassports CommunicationPassport[] @relation("CommunicationPassportParticipant")
 }
 
 model PasskeyCredential {
@@ -1001,6 +1021,15 @@ model Organisation {
   providerEnquiries         ProviderEnquiry[]
   employerAccessibilityEvidence EmployerAccessibilityEvidence[]
   workplaceLocations        WorkplaceLocation[]
+
+  // CareOS Phase 11 — Quality, Accreditation and Compliance
+  complianceEvidence        ComplianceEvidence[]
+  qualityAuditPlans         QualityAuditPlan[]
+  qualityAuditFindings      QualityAuditFinding[]
+  improvementActions        ImprovementAction[]
+  policyDocuments           PolicyDocument[]
+  trainingRequirements      TrainingRequirement[]
+  providerAccreditationApplications ProviderAccreditationApplication[]
 }
 
 model OrganisationMember {
@@ -8206,6 +8235,7 @@ model AccessAccreditationAssessment {
   scores      AccessAccreditationScore[]
   evidence    AccessAccreditationEvidence[]
   events      AccessAccreditationEvent[]
+  providerAccreditationApplications ProviderAccreditationApplication[]
 
   @@index([placeId, status])
   @@map("access_accreditation_assessments")
@@ -10286,4 +10316,842 @@ model HealthDeviceImport {
   @@index([participantId])
   @@index([sourceLabel])
   @@map("health_device_imports")
+}
+
+// ---------------------------------------------------------------------------
+// CareOS Phase 11 — Quality, Accreditation and Compliance Cloud
+// Provider QMS with versioned standards, audits, policies/training, and
+// human-assessor-only provider accreditation (distinct from Access Mark).
+// ---------------------------------------------------------------------------
+
+enum StandardFrameworkStatus {
+  draft
+  published
+  archived
+}
+
+enum ComplianceEvidenceSource {
+  self_submitted
+  audit
+  third_party
+  access_mark
+  incident_record
+  policy_record
+  training_record
+  system_import
+}
+
+enum EvidenceAssessmentStatus {
+  pending
+  met
+  partially_met
+  not_met
+  requires_clarification
+}
+
+enum QualityAuditPlanStatus {
+  draft
+  scheduled
+  in_progress
+  completed
+  cancelled
+}
+
+enum QualityAuditFindingSeverity {
+  minor
+  major
+  critical
+}
+
+enum QualityAuditFindingStatus {
+  open
+  action_required
+  closed
+}
+
+enum CorrectiveActionStatus {
+  open
+  in_progress
+  verification_pending
+  closed
+}
+
+enum ImprovementActionStatus {
+  planned
+  in_progress
+  completed
+  cancelled
+}
+
+enum PolicyDocumentStatus {
+  draft
+  published
+  archived
+}
+
+enum TrainingRequirementStatus {
+  active
+  archived
+}
+
+enum ProviderAccreditationApplicationStatus {
+  draft
+  submitted
+  under_review
+  clarification_requested
+  assessment_in_progress
+  pending_decision
+  approved
+  conditionally_approved
+  rejected
+  suspended
+  expired
+  renewal_due
+  appealed
+  withdrawn
+}
+
+enum ProviderAccreditationDecisionOutcome {
+  approved
+  conditionally_approved
+  rejected
+  suspended
+}
+
+enum ProviderAccreditationClarificationStatus {
+  open
+  responded
+  closed
+}
+
+enum ProviderAccreditationAppealStatus {
+  submitted
+  under_review
+  upheld
+  dismissed
+}
+
+model StandardFramework {
+  id          String                  @id @default(cuid())
+  code        String
+  name        String
+  version     String
+  description String?
+  status      StandardFrameworkStatus @default(draft)
+  publishedAt DateTime?
+  sourceRef   String?
+  createdAt   DateTime                @default(now())
+  updatedAt   DateTime                @updatedAt
+
+  outcomes    StandardOutcome[]
+  applications ProviderAccreditationApplication[]
+
+  @@unique([code, version])
+  @@index([status])
+  @@map("standard_frameworks")
+}
+
+model StandardOutcome {
+  id          String            @id @default(cuid())
+  frameworkId String
+  framework   StandardFramework @relation(fields: [frameworkId], references: [id], onDelete: Cascade)
+  code        String
+  title       String
+  description String?
+  sortOrder   Int               @default(0)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  indicators  StandardIndicator[]
+
+  @@unique([frameworkId, code])
+  @@index([frameworkId])
+  @@map("standard_outcomes")
+}
+
+model StandardIndicator {
+  id          String          @id @default(cuid())
+  outcomeId   String
+  outcome     StandardOutcome @relation(fields: [outcomeId], references: [id], onDelete: Cascade)
+  code        String
+  title       String
+  description String?
+  sortOrder   Int             @default(0)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  evidenceRequirements EvidenceRequirement[]
+  auditFindings        QualityAuditFinding[]
+
+  @@unique([outcomeId, code])
+  @@index([outcomeId])
+  @@map("standard_indicators")
+}
+
+model EvidenceRequirement {
+  id           String            @id @default(cuid())
+  indicatorId  String
+  indicator    StandardIndicator @relation(fields: [indicatorId], references: [id], onDelete: Cascade)
+  code         String
+  description  String
+  evidenceType String
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+
+  complianceEvidence ComplianceEvidence[]
+  applicationEvidence ProviderAccreditationApplicationEvidence[]
+
+  @@unique([indicatorId, code])
+  @@index([indicatorId])
+  @@map("evidence_requirements")
+}
+
+model ComplianceEvidence {
+  id             String                   @id @default(cuid())
+  organisationId String
+  organisation   Organisation             @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+  requirementId  String
+  requirement    EvidenceRequirement      @relation(fields: [requirementId], references: [id], onDelete: Cascade)
+  version        Int                      @default(1)
+  sourceType     ComplianceEvidenceSource
+  sourceRef      String?
+  storagePath    String?
+  caption        String?
+  submittedById  String
+  submittedBy    User                     @relation("ComplianceEvidenceSubmittedBy", fields: [submittedById], references: [id])
+  supersededById String?
+  supersededBy   ComplianceEvidence?      @relation("ComplianceEvidenceSupersession", fields: [supersededById], references: [id], onDelete: SetNull)
+  supersedes     ComplianceEvidence[]     @relation("ComplianceEvidenceSupersession")
+  createdAt      DateTime                 @default(now())
+
+  assessments EvidenceAssessment[]
+
+  @@index([organisationId, requirementId])
+  @@index([submittedById])
+  @@map("compliance_evidence")
+}
+
+model EvidenceAssessment {
+  id          String                   @id @default(cuid())
+  evidenceId  String
+  evidence    ComplianceEvidence       @relation(fields: [evidenceId], references: [id], onDelete: Cascade)
+  assessorId  String
+  assessor    User                     @relation("EvidenceAssessmentAssessor", fields: [assessorId], references: [id])
+  status      EvidenceAssessmentStatus @default(pending)
+  notes       String?
+  assessedAt  DateTime                 @default(now())
+
+  @@index([evidenceId])
+  @@index([assessorId])
+  @@map("evidence_assessments")
+}
+
+model QualityAuditPlan {
+  id             String                 @id @default(cuid())
+  organisationId String
+  organisation   Organisation           @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+  title          String
+  scope          String?
+  scheduledAt    DateTime?
+  status         QualityAuditPlanStatus @default(draft)
+  createdById    String
+  createdBy      User                   @relation("QualityAuditPlanCreator", fields: [createdById], references: [id])
+  createdAt      DateTime               @default(now())
+  updatedAt      DateTime               @updatedAt
+
+  findings QualityAuditFinding[]
+
+  @@index([organisationId, status])
+  @@index([createdById])
+  @@map("quality_audit_plans")
+}
+
+model QualityAuditFinding {
+  id             String                      @id @default(cuid())
+  auditPlanId    String
+  auditPlan      QualityAuditPlan            @relation(fields: [auditPlanId], references: [id], onDelete: Cascade)
+  organisationId String
+  organisation   Organisation                @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+  indicatorId    String?
+  indicator      StandardIndicator?          @relation(fields: [indicatorId], references: [id], onDelete: SetNull)
+  title          String
+  description    String
+  severity       QualityAuditFindingSeverity @default(minor)
+  status         QualityAuditFindingStatus   @default(open)
+  assignedToId   String?
+  assignedTo     User?                       @relation("QualityAuditFindingAssignee", fields: [assignedToId], references: [id], onDelete: SetNull)
+  createdAt      DateTime                    @default(now())
+  updatedAt      DateTime                    @updatedAt
+
+  correctiveActions CorrectiveAction[]
+  history           QualityAuditFindingHistory[]
+
+  @@index([auditPlanId])
+  @@index([organisationId, status])
+  @@map("quality_audit_findings")
+}
+
+model QualityAuditFindingHistory {
+  id         String                      @id @default(cuid())
+  findingId  String
+  finding    QualityAuditFinding         @relation(fields: [findingId], references: [id], onDelete: Cascade)
+  actorId    String?
+  fromStatus QualityAuditFindingStatus?
+  toStatus   QualityAuditFindingStatus
+  notes      String?
+  createdAt  DateTime                    @default(now())
+
+  @@index([findingId, createdAt])
+  @@map("quality_audit_finding_history")
+}
+
+model CorrectiveAction {
+  id           String                 @id @default(cuid())
+  findingId    String
+  finding      QualityAuditFinding    @relation(fields: [findingId], references: [id], onDelete: Cascade)
+  title        String
+  description  String?
+  dueDate      DateTime?
+  status       CorrectiveActionStatus @default(open)
+  assignedToId String?
+  assignedTo   User?                  @relation("CorrectiveActionAssignee", fields: [assignedToId], references: [id], onDelete: SetNull)
+  createdAt    DateTime               @default(now())
+  updatedAt    DateTime               @updatedAt
+
+  history CorrectiveActionHistory[]
+
+  @@index([findingId])
+  @@index([status])
+  @@map("corrective_actions")
+}
+
+model CorrectiveActionHistory {
+  id         String                  @id @default(cuid())
+  actionId   String
+  action     CorrectiveAction        @relation(fields: [actionId], references: [id], onDelete: Cascade)
+  actorId    String?
+  actor      User?                   @relation("CorrectiveActionHistoryActor", fields: [actorId], references: [id], onDelete: SetNull)
+  fromStatus CorrectiveActionStatus?
+  toStatus   CorrectiveActionStatus
+  notes      String?
+  createdAt  DateTime                @default(now())
+
+  @@index([actionId, createdAt])
+  @@map("corrective_action_history")
+}
+
+model ImprovementAction {
+  id             String                  @id @default(cuid())
+  organisationId String
+  organisation   Organisation            @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+  sourceFindingId String?
+  title          String
+  description    String?
+  status         ImprovementActionStatus @default(planned)
+  targetDate     DateTime?
+  createdAt      DateTime                @default(now())
+  updatedAt      DateTime                @updatedAt
+
+  history ImprovementActionHistory[]
+
+  @@index([organisationId, status])
+  @@map("improvement_actions")
+}
+
+model ImprovementActionHistory {
+  id         String                   @id @default(cuid())
+  actionId   String
+  action     ImprovementAction        @relation(fields: [actionId], references: [id], onDelete: Cascade)
+  actorId    String?
+  actor      User?                    @relation("ImprovementActionHistoryActor", fields: [actorId], references: [id], onDelete: SetNull)
+  fromStatus ImprovementActionStatus?
+  toStatus   ImprovementActionStatus
+  notes      String?
+  createdAt  DateTime                 @default(now())
+
+  @@index([actionId, createdAt])
+  @@map("improvement_action_history")
+}
+
+model PolicyDocument {
+  id             String               @id @default(cuid())
+  organisationId String
+  organisation   Organisation         @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+  title          String
+  version        String
+  storagePath    String?
+  contentSummary String?
+  status         PolicyDocumentStatus @default(draft)
+  publishedAt    DateTime?
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+
+  acknowledgements PolicyAcknowledgement[]
+
+  @@unique([organisationId, title, version])
+  @@index([organisationId, status])
+  @@map("policy_documents")
+}
+
+model PolicyAcknowledgement {
+  id                  String         @id @default(cuid())
+  policyDocumentId    String
+  policyDocument      PolicyDocument @relation(fields: [policyDocumentId], references: [id], onDelete: Cascade)
+  userId              String
+  user                User           @relation("PolicyAcknowledgementUser", fields: [userId], references: [id], onDelete: Cascade)
+  versionAcknowledged String
+  acknowledgedAt      DateTime       @default(now())
+
+  @@unique([policyDocumentId, userId, versionAcknowledged])
+  @@index([userId])
+  @@map("policy_acknowledgements")
+}
+
+model TrainingRequirement {
+  id             String                    @id @default(cuid())
+  organisationId String
+  organisation   Organisation              @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+  title          String
+  description    String?
+  renewalDays    Int?
+  requiredRoles  String[]                  @default([])
+  status         TrainingRequirementStatus @default(active)
+  createdAt      DateTime                  @default(now())
+  updatedAt      DateTime                  @updatedAt
+
+  completions TrainingCompletionRecord[]
+
+  @@index([organisationId, status])
+  @@map("training_requirements")
+}
+
+model TrainingCompletionRecord {
+  id            String              @id @default(cuid())
+  requirementId String
+  requirement   TrainingRequirement @relation(fields: [requirementId], references: [id], onDelete: Cascade)
+  userId        String
+  user          User                @relation("TrainingCompletionUser", fields: [userId], references: [id], onDelete: Cascade)
+  completedAt   DateTime            @default(now())
+  expiresAt     DateTime?
+  evidenceRef   String?
+  notes         String?
+
+  @@index([requirementId])
+  @@index([userId])
+  @@map("training_completion_records")
+}
+
+model ProviderAccreditationApplication {
+  id                             String                               @id @default(cuid())
+  organisationId                 String
+  organisation                   Organisation                         @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+  frameworkId                    String
+  framework                      StandardFramework                    @relation(fields: [frameworkId], references: [id])
+  status                         ProviderAccreditationApplicationStatus @default(draft)
+  submittedById                  String?
+  submittedBy                    User?                                @relation("ProviderAccreditationApplicant", fields: [submittedById], references: [id], onDelete: SetNull)
+  submittedAt                    DateTime?
+  accessAccreditationAssessmentId String?
+  accessAccreditationAssessment  AccessAccreditationAssessment?       @relation(fields: [accessAccreditationAssessmentId], references: [id], onDelete: SetNull)
+  expiresAt                      DateTime?
+  renewalDueAt                   DateTime?
+  suspendedAt                    DateTime?
+  createdAt                      DateTime                             @default(now())
+  updatedAt                      DateTime                             @updatedAt
+
+  evidence        ProviderAccreditationApplicationEvidence[]
+  assessments     ProviderAccreditationAssessment[]
+  clarifications  ProviderAccreditationClarification[]
+  decisions       ProviderAccreditationDecision[]
+  appeals         ProviderAccreditationAppealRecord[]
+  events          ProviderAccreditationApplicationEvent[]
+
+  @@index([organisationId, status])
+  @@index([frameworkId])
+  @@index([accessAccreditationAssessmentId])
+  @@map("provider_accreditation_applications")
+}
+
+model ProviderAccreditationApplicationEvidence {
+  id            String                           @id @default(cuid())
+  applicationId String
+  application   ProviderAccreditationApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  requirementId String?
+  requirement   EvidenceRequirement?             @relation(fields: [requirementId], references: [id], onDelete: SetNull)
+  storagePath   String?
+  caption       String?
+  sourceRef     String?
+  createdAt     DateTime                         @default(now())
+
+  @@index([applicationId])
+  @@map("provider_accreditation_application_evidence")
+}
+
+model ProviderAccreditationAssessment {
+  id            String                           @id @default(cuid())
+  applicationId String
+  application   ProviderAccreditationApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  assessorId    String
+  assessor      User                             @relation("ProviderAccreditationAssessor", fields: [assessorId], references: [id])
+  status        String                           @default("draft")
+  evidenceIndex Json                             @default("[]")
+  notes         String?
+  preparedAt    DateTime?
+  createdAt     DateTime                         @default(now())
+
+  @@index([applicationId])
+  @@index([assessorId])
+  @@map("provider_accreditation_assessments")
+}
+
+model ProviderAccreditationClarification {
+  id            String                                   @id @default(cuid())
+  applicationId String
+  application   ProviderAccreditationApplication       @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  requestedById String
+  requestedBy   User                                     @relation("ProviderAccreditationClarificationRequester", fields: [requestedById], references: [id])
+  question      String
+  response      String?
+  status        ProviderAccreditationClarificationStatus @default(open)
+  createdAt     DateTime                                 @default(now())
+  respondedAt   DateTime?
+
+  @@index([applicationId])
+  @@map("provider_accreditation_clarifications")
+}
+
+model ProviderAccreditationDecision {
+  id            String                               @id @default(cuid())
+  applicationId String
+  application   ProviderAccreditationApplication   @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  deciderId     String
+  decider       User                                 @relation("ProviderAccreditationDecider", fields: [deciderId], references: [id])
+  outcome       ProviderAccreditationDecisionOutcome
+  conditions    String?
+  effectiveAt   DateTime?
+  expiresAt     DateTime?
+  notes         String?
+  decidedAt     DateTime                             @default(now())
+
+  @@index([applicationId])
+  @@index([deciderId])
+  @@map("provider_accreditation_decisions")
+}
+
+model ProviderAccreditationAppealRecord {
+  id            String                               @id @default(cuid())
+  applicationId String
+  application   ProviderAccreditationApplication   @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  appellantId   String
+  appellant     User                                 @relation("ProviderAccreditationAppellant", fields: [appellantId], references: [id])
+  reason        String
+  status        ProviderAccreditationAppealStatus    @default(submitted)
+  decidedById   String?
+  decidedBy     User?                                @relation("ProviderAccreditationAppealDecider", fields: [decidedById], references: [id], onDelete: SetNull)
+  decisionNotes String?
+  submittedAt   DateTime                             @default(now())
+  decidedAt     DateTime?
+
+  @@index([applicationId])
+  @@map("provider_accreditation_appeal_records")
+}
+
+model ProviderAccreditationApplicationEvent {
+  id            String                           @id @default(cuid())
+  applicationId String
+  application   ProviderAccreditationApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  actorId       String?
+  action        String
+  metadata      Json?
+  createdAt     DateTime                         @default(now())
+
+  @@index([applicationId, createdAt])
+  @@map("provider_accreditation_application_events")
+}
+
+// --- CareOS Phase 12: Developer Platform & Partner Ecosystem ---
+
+enum ApiClientStatus {
+  draft
+  pending_review
+  active
+  suspended
+  revoked
+}
+
+enum ApiClientEnvironment {
+  sandbox
+  production
+}
+
+enum WebhookDeliveryStatus {
+  pending
+  delivered
+  failed
+  dead_letter
+}
+
+model ApiClient {
+  id                  String               @id @default(cuid())
+  organisationId      String?
+  developerAppId      String?
+  partnerSandboxAppId String?
+  name                String
+  status              ApiClientStatus      @default(draft)
+  environment         ApiClientEnvironment @default(sandbox)
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+
+  apiKeys               ApiKey[]
+  oauthClients          OAuthClient[]
+  serviceAccounts       ServiceAccount[]
+  accessLogs            ApiAccessLog[]
+  webhookSubscriptions  WebhookSubscription[]
+
+  @@index([organisationId])
+  @@index([status])
+  @@map("api_clients")
+}
+
+model ApiKey {
+  id         String     @id @default(cuid())
+  clientId   String
+  client     ApiClient  @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  keyHash    String
+  keyPrefix  String
+  scopes     ApiScope[]
+  lastUsedAt DateTime?
+  revokedAt  DateTime?
+  createdAt  DateTime   @default(now())
+
+  accessLogs ApiAccessLog[]
+
+  @@index([keyHash])
+  @@index([clientId])
+  @@map("api_keys")
+}
+
+model OAuthClient {
+  id                 String    @id @default(cuid())
+  apiClientId        String
+  apiClient          ApiClient @relation(fields: [apiClientId], references: [id], onDelete: Cascade)
+  clientId           String    @unique
+  clientSecretHash   String
+  clientSecretPrefix String
+  redirectUris       String[]  @default([])
+  grantTypes         String[]  @default(["authorization_code", "refresh_token"])
+  scopes             ApiScope[]
+  active             Boolean   @default(true)
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  grants OAuthGrant[]
+
+  @@index([apiClientId])
+  @@map("oauth_clients")
+}
+
+model OAuthGrant {
+  id               String      @id @default(cuid())
+  oauthClientId    String
+  oauthClient      OAuthClient @relation(fields: [oauthClientId], references: [id], onDelete: Cascade)
+  participantId    String?
+  userId           String?
+  scopes           ApiScope[]
+  accessTokenHash  String?
+  refreshTokenHash String?
+  expiresAt        DateTime
+  revokedAt        DateTime?
+  createdAt        DateTime    @default(now())
+
+  @@index([oauthClientId])
+  @@index([participantId])
+  @@map("oauth_grants")
+}
+
+model ServiceAccount {
+  id                          String    @id @default(cuid())
+  apiClientId                 String
+  apiClient                   ApiClient @relation(fields: [apiClientId], references: [id], onDelete: Cascade)
+  name                        String
+  scopes                      ApiScope[]
+  active                      Boolean   @default(true)
+  participantAuthorityBlocked Boolean   @default(true)
+  createdAt                   DateTime  @default(now())
+  updatedAt                   DateTime  @updatedAt
+
+  accessLogs ApiAccessLog[]
+
+  @@index([apiClientId])
+  @@map("service_accounts")
+}
+
+model ApiAccessLog {
+  id               String          @id @default(cuid())
+  apiClientId      String
+  apiClient        ApiClient       @relation(fields: [apiClientId], references: [id], onDelete: Cascade)
+  apiKeyId         String?
+  apiKey           ApiKey?         @relation(fields: [apiKeyId], references: [id], onDelete: SetNull)
+  serviceAccountId String?
+  serviceAccount   ServiceAccount? @relation(fields: [serviceAccountId], references: [id], onDelete: SetNull)
+  path             String
+  method           String
+  statusCode       Int
+  durationMs       Int?
+  ipAddress        String?
+  userAgent        String?
+  participantId    String?
+  createdAt        DateTime        @default(now())
+
+  @@index([apiClientId, createdAt])
+  @@map("api_access_logs")
+}
+
+model WebhookSubscription {
+  id                      String    @id @default(cuid())
+  apiClientId             String
+  apiClient               ApiClient @relation(fields: [apiClientId], references: [id], onDelete: Cascade)
+  url                     String
+  eventTypes              String[]
+  secretHash              String
+  secretPrefix            String
+  signingVersion          Int       @default(1)
+  active                  Boolean   @default(true)
+  previousSecretHash      String?
+  previousSecretExpiresAt DateTime?
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+
+  deliveries WebhookDeliveryLog[]
+
+  @@index([apiClientId])
+  @@map("webhook_subscriptions")
+}
+
+model WebhookDeliveryLog {
+  id             String                @id @default(cuid())
+  subscriptionId String
+  subscription   WebhookSubscription   @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  eventId        String                @unique
+  eventType      String
+  payloadHash    String
+  timestampSent  DateTime
+  status         WebhookDeliveryStatus @default(pending)
+  attemptCount   Int                   @default(0)
+  maxAttempts    Int                   @default(5)
+  nextRetryAt    DateTime?
+  lastError      String?
+  responseStatus Int?
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+
+  @@index([subscriptionId, createdAt])
+  @@index([status, nextRetryAt])
+  @@map("webhook_delivery_logs")
+}
+
+// --- CareOS Phase 13: Mobile, Voice and Communication Access ---
+
+enum CommunicationPassportStatus {
+  draft
+  published
+  archived
+}
+
+enum AacMethodType {
+  text_to_speech
+  picture_board
+  sign_language_interpreter
+  written
+  gesture
+  device
+  other
+}
+
+/// Participant-authored communication passport. Speech difficulty is never
+/// treated as reduced capacity — capacityNotes are participant-authored only.
+model CommunicationPassport {
+  id              String                      @id @default(cuid())
+  participantId   String
+  participant     User                        @relation("CommunicationPassportParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  title           String                      @default("My communication passport")
+  status          CommunicationPassportStatus @default(draft)
+  aboutMe         String?
+  howICommunicate String?
+  pleaseDo        String?
+  pleaseDont      String?
+  capacityNotes   String?
+  shareScope      String[]                    @default([])
+  publishedAt     DateTime?
+  createdAt       DateTime                    @default(now())
+  updatedAt       DateTime                    @updatedAt
+
+  preferredQuestions   PreferredQuestion[]
+  savedPhrases         SavedPhrase[]
+  aacMethodPreferences AacMethodPreference[]
+  emergencyCard        EmergencyCommunicationCard?
+
+  @@index([participantId])
+  @@map("communication_passports")
+}
+
+model PreferredQuestion {
+  id           String                @id @default(cuid())
+  passportId   String
+  passport     CommunicationPassport @relation(fields: [passportId], references: [id], onDelete: Cascade)
+  prompt       String
+  responseHint String?
+  sortOrder    Int                   @default(0)
+  createdAt    DateTime              @default(now())
+  updatedAt    DateTime              @updatedAt
+
+  @@index([passportId])
+  @@map("preferred_questions")
+}
+
+model SavedPhrase {
+  id         String                @id @default(cuid())
+  passportId String
+  passport   CommunicationPassport @relation(fields: [passportId], references: [id], onDelete: Cascade)
+  label      String
+  text       String
+  category   String?
+  sortOrder  Int                   @default(0)
+  createdAt  DateTime              @default(now())
+  updatedAt  DateTime              @updatedAt
+
+  @@index([passportId])
+  @@map("saved_phrases")
+}
+
+model AacMethodPreference {
+  id         String                @id @default(cuid())
+  passportId String
+  passport   CommunicationPassport @relation(fields: [passportId], references: [id], onDelete: Cascade)
+  method     AacMethodType
+  label      String?
+  preferred  Boolean               @default(false)
+  notes      String?
+  sortOrder  Int                   @default(0)
+  createdAt  DateTime              @default(now())
+  updatedAt  DateTime              @updatedAt
+
+  @@index([passportId])
+  @@map("aac_method_preferences")
+}
+
+model EmergencyCommunicationCard {
+  id                    String                @id @default(cuid())
+  passportId            String                @unique
+  passport              CommunicationPassport @relation(fields: [passportId], references: [id], onDelete: Cascade)
+  emergencyContactName  String?
+  emergencyContactPhone String?
+  medicalNotes          String?
+  communicationNeeds    String?
+  accessInstructions    String?
+  lastReviewedAt        DateTime?
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
+
+  @@map("emergency_communication_cards")
 }
