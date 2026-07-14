@@ -4,14 +4,19 @@ import type { ApiScope } from "@prisma/client";
 
 import { createAuditEvent } from "@/lib/audit/audit-event-service";
 import { phase5Config } from "@/lib/config/phase5";
+import { developerPlatformConfig } from "@/lib/config/developer-platform";
 import { prisma } from "@/lib/prisma";
 import { hashApiKey } from "@/lib/stripe-billing/checkout-service";
+import {
+  createApiClient,
+  issueApiKey as issuePlatformApiKey,
+} from "@/lib/platform/developer-auth/api-client-service";
 
 export async function createDeveloperApp(
   developerOrganisationId: string,
   name: string
 ) {
-  if (!phase5Config.developerApiEnabled) {
+  if (!phase5Config.developerApiEnabled && !developerPlatformConfig.enabled) {
     throw new Error("DEVELOPER_API_DISABLED");
   }
   return prisma.developerApp.create({
@@ -46,6 +51,43 @@ export async function generateApiKey(appId: string, scopes: ApiScope[]) {
   });
 
   return { apiKey: raw, keyPrefix, message: "Store this key securely — it cannot be shown again." };
+}
+
+/** Bridge legacy DeveloperApp to Phase 12 ApiClient + platform key. */
+export async function provisionPlatformClientFromDeveloperApp(
+  appId: string,
+  actorUserId: string,
+) {
+  const app = await prisma.developerApp.findUnique({
+    where: { id: appId },
+    include: { developerOrganisation: true },
+  });
+  if (!app || app.status !== "approved") throw new Error("APP_NOT_APPROVED");
+
+  const existing = await prisma.apiClient.findFirst({
+    where: { developerAppId: appId },
+  });
+  if (existing) return existing;
+
+  const client = await createApiClient({
+    name: app.name,
+    developerAppId: appId,
+    environment: "sandbox",
+    actorUserId,
+  });
+  await prisma.apiClient.update({
+    where: { id: client.id },
+    data: { status: "active" },
+  });
+  return client;
+}
+
+export async function generatePlatformApiKey(
+  clientId: string,
+  scopes: ApiScope[],
+  actorUserId?: string,
+) {
+  return issuePlatformApiKey(clientId, scopes, actorUserId);
 }
 
 export function scopesAllow(

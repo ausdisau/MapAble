@@ -10865,3 +10865,184 @@ model ProviderAccreditationApplicationEvent {
   @@index([applicationId, createdAt])
   @@map("provider_accreditation_application_events")
 }
+
+// --- CareOS Phase 12: Developer Platform & Partner Ecosystem ---
+
+enum ApiClientStatus {
+  draft
+  pending_review
+  active
+  suspended
+  revoked
+}
+
+enum ApiClientEnvironment {
+  sandbox
+  production
+}
+
+enum WebhookDeliveryStatus {
+  pending
+  delivered
+  failed
+  dead_letter
+}
+
+model ApiClient {
+  id                  String               @id @default(cuid())
+  organisationId      String?
+  developerAppId      String?
+  partnerSandboxAppId String?
+  name                String
+  status              ApiClientStatus      @default(draft)
+  environment         ApiClientEnvironment @default(sandbox)
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+
+  apiKeys               ApiKey[]
+  oauthClients          OAuthClient[]
+  serviceAccounts       ServiceAccount[]
+  accessLogs            ApiAccessLog[]
+  webhookSubscriptions  WebhookSubscription[]
+
+  @@index([organisationId])
+  @@index([status])
+  @@map("api_clients")
+}
+
+model ApiKey {
+  id         String     @id @default(cuid())
+  clientId   String
+  client     ApiClient  @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  keyHash    String
+  keyPrefix  String
+  scopes     ApiScope[]
+  lastUsedAt DateTime?
+  revokedAt  DateTime?
+  createdAt  DateTime   @default(now())
+
+  accessLogs ApiAccessLog[]
+
+  @@index([keyHash])
+  @@index([clientId])
+  @@map("api_keys")
+}
+
+model OAuthClient {
+  id                 String    @id @default(cuid())
+  apiClientId        String
+  apiClient          ApiClient @relation(fields: [apiClientId], references: [id], onDelete: Cascade)
+  clientId           String    @unique
+  clientSecretHash   String
+  clientSecretPrefix String
+  redirectUris       String[]  @default([])
+  grantTypes         String[]  @default(["authorization_code", "refresh_token"])
+  scopes             ApiScope[]
+  active             Boolean   @default(true)
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  grants OAuthGrant[]
+
+  @@index([apiClientId])
+  @@map("oauth_clients")
+}
+
+model OAuthGrant {
+  id               String      @id @default(cuid())
+  oauthClientId    String
+  oauthClient      OAuthClient @relation(fields: [oauthClientId], references: [id], onDelete: Cascade)
+  participantId    String?
+  userId           String?
+  scopes           ApiScope[]
+  accessTokenHash  String?
+  refreshTokenHash String?
+  expiresAt        DateTime
+  revokedAt        DateTime?
+  createdAt        DateTime    @default(now())
+
+  @@index([oauthClientId])
+  @@index([participantId])
+  @@map("oauth_grants")
+}
+
+model ServiceAccount {
+  id                          String    @id @default(cuid())
+  apiClientId                 String
+  apiClient                   ApiClient @relation(fields: [apiClientId], references: [id], onDelete: Cascade)
+  name                        String
+  scopes                      ApiScope[]
+  active                      Boolean   @default(true)
+  participantAuthorityBlocked Boolean   @default(true)
+  createdAt                   DateTime  @default(now())
+  updatedAt                   DateTime  @updatedAt
+
+  accessLogs ApiAccessLog[]
+
+  @@index([apiClientId])
+  @@map("service_accounts")
+}
+
+model ApiAccessLog {
+  id               String          @id @default(cuid())
+  apiClientId      String
+  apiClient        ApiClient       @relation(fields: [apiClientId], references: [id], onDelete: Cascade)
+  apiKeyId         String?
+  apiKey           ApiKey?         @relation(fields: [apiKeyId], references: [id], onDelete: SetNull)
+  serviceAccountId String?
+  serviceAccount   ServiceAccount? @relation(fields: [serviceAccountId], references: [id], onDelete: SetNull)
+  path             String
+  method           String
+  statusCode       Int
+  durationMs       Int?
+  ipAddress        String?
+  userAgent        String?
+  participantId    String?
+  createdAt        DateTime        @default(now())
+
+  @@index([apiClientId, createdAt])
+  @@map("api_access_logs")
+}
+
+model WebhookSubscription {
+  id                      String    @id @default(cuid())
+  apiClientId             String
+  apiClient               ApiClient @relation(fields: [apiClientId], references: [id], onDelete: Cascade)
+  url                     String
+  eventTypes              String[]
+  secretHash              String
+  secretPrefix            String
+  signingVersion          Int       @default(1)
+  active                  Boolean   @default(true)
+  previousSecretHash      String?
+  previousSecretExpiresAt DateTime?
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+
+  deliveries WebhookDeliveryLog[]
+
+  @@index([apiClientId])
+  @@map("webhook_subscriptions")
+}
+
+model WebhookDeliveryLog {
+  id             String                @id @default(cuid())
+  subscriptionId String
+  subscription   WebhookSubscription   @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  eventId        String                @unique
+  eventType      String
+  payloadHash    String
+  timestampSent  DateTime
+  status         WebhookDeliveryStatus @default(pending)
+  attemptCount   Int                   @default(0)
+  maxAttempts    Int                   @default(5)
+  nextRetryAt    DateTime?
+  lastError      String?
+  responseStatus Int?
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+
+  @@index([subscriptionId, createdAt])
+  @@index([status, nextRetryAt])
+  @@map("webhook_delivery_logs")
+}
