@@ -1,5 +1,7 @@
 import { requireApiSession } from "@/lib/api/auth-handler";
 import { jsonError, jsonOk } from "@/lib/api/response";
+import { jobsParticipationConfig } from "@/lib/config/jobs-participation";
+import { listEmployerEvidence } from "@/lib/jobs/evidence/employer-evidence-service";
 import { prisma } from "@/lib/prisma";
 
 export async function GET(
@@ -11,10 +13,26 @@ export async function GET(
   const { jobId } = await params;
   const job = await prisma.job.findUnique({
     where: { id: jobId },
-    include: { employerOrganisation: { select: { name: true } } },
+    include: {
+      employerOrganisation: { select: { id: true, name: true } },
+      requirements: jobsParticipationConfig.enabled
+        ? { orderBy: { sortOrder: "asc" } }
+        : false,
+      workplaceLocation: jobsParticipationConfig.enabled
+        ? { include: { evidence: true } }
+        : false,
+    },
   });
   if (!job) return jsonError("Not found", 404);
-  return jsonOk({ job });
+
+  const payload: Record<string, unknown> = { job };
+  if (jobsParticipationConfig.enabled) {
+    payload.accessibilityEvidence = await listEmployerEvidence(
+      job.employerOrganisationId,
+    );
+  }
+
+  return jsonOk(payload);
 }
 
 export async function PATCH(
