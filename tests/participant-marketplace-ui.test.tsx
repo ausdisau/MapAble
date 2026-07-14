@@ -29,11 +29,15 @@ describe("participant marketplace accessibility", () => {
         ]}
       />,
     );
-    expect(screen.getByRole("heading", { name: "Find support providers" })).toBeTruthy();
+    expect(
+      screen.getByRole("heading", { name: "Find support providers" }),
+    ).toBeTruthy();
     expect(screen.getByLabelText("Service type")).toBeTruthy();
     expect(screen.getByLabelText("Service area")).toBeTruthy();
     expect(screen.getByText(/unverified \(provider\)/)).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Add to shortlist" })).toBeTruthy();
+    expect(
+      screen.getByRole("button", { name: "Add to shortlist" }),
+    ).toBeTruthy();
     expect(screen.getByRole("button", { name: "Hide provider" })).toBeTruthy();
     expect(screen.getByRole("status")).toBeTruthy();
   });

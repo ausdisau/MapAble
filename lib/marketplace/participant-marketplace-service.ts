@@ -86,7 +86,9 @@ export async function discoverProviders(input: {
           deletedAt: null,
           status: "active",
           ...(input.serviceType ? { serviceType: input.serviceType } : {}),
-          ...(input.serviceArea ? { serviceAreas: { has: input.serviceArea } } : {}),
+          ...(input.serviceArea
+            ? { serviceAreas: { has: input.serviceArea } }
+            : {}),
           ...(input.deliveryMode
             ? { deliveryModes: { has: input.deliveryMode } }
             : {}),
@@ -141,10 +143,10 @@ export async function discoverProviders(input: {
             organisation.capacityBlocks[0].totalCapacity -
               organisation.capacityBlocks[0].bookedCapacity,
           ),
-          observedAt: organisation.capacityBlocks[0].updatedAt.toISOString(),
+          observedAt: organisation.capacityBlocks[0].createdAt.toISOString(),
         }
       : null,
-    sponsored: false,
+    sponsored: false as const,
   }));
 }
 

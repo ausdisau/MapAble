@@ -60,9 +60,7 @@ describe("participant marketplace", () => {
       category: "community",
       participantLanguage: "I want to join my local art group.",
     });
-    expect(goal.participantLanguage).toBe(
-      "I want to join my local art group.",
-    );
+    expect(goal.participantLanguage).toBe("I want to join my local art group.");
   });
 
   it("excludes hidden providers before discovery results are returned", async () => {
@@ -91,7 +89,9 @@ describe("participant marketplace", () => {
         capacityBlocks: [],
       },
     ] as never);
-    const providers = await discoverProviders({ participantId: "participant-1" });
+    const providers = await discoverProviders({
+      participantId: "participant-1",
+    });
     const comparison = compareProviderEvidence(providers);
     expect(comparison[0]?.eligibility).toBe("missing_information");
     expect(comparison[0]).not.toHaveProperty("score");
