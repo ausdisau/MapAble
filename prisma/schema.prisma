@@ -178,6 +178,18 @@ model User {
   coordinationSupervisionGiven   CoordinationSupervisionRecord[] @relation("CoordinationSupervisor")
   providerEnquiriesAsParticipant ProviderEnquiry[] @relation("ProviderEnquiryParticipant")
   evidenceRequestsAsParticipant  EvidenceRequest[] @relation("EvidenceRequestParticipant")
+
+  // MapAble Moves — rehabilitation coordination (Phase 9)
+  rehabilitationPlansAsParticipant RehabilitationPlan[] @relation("RehabilitationPlanParticipant")
+  rehabilitationPlansAuthored      RehabilitationPlan[] @relation("RehabilitationPlanClinicianAuthor")
+  rehabilitationPlanVersionsAuthored RehabilitationPlanVersion[] @relation("RehabilitationPlanVersionAuthor")
+  rehabilitationGoalsAsParticipant RehabilitationGoal[] @relation("RehabilitationGoalParticipant")
+  clinicalAuthorProfile            ClinicalAuthor?
+  planAcknowledgements             PlanAcknowledgement[] @relation("PlanAcknowledgementParticipant")
+  planReviewsAuthored              PlanReview[] @relation("PlanReviewReviewer")
+  telehealthSessionsAsParticipant  TelehealthSessionRecord[] @relation("TelehealthSessionParticipant")
+  telehealthSessionsAsClinician    TelehealthSessionRecord[] @relation("TelehealthSessionClinician")
+  healthDeviceImports              HealthDeviceImport[] @relation("HealthDeviceImportParticipant")
 }
 
 model PasskeyCredential {
@@ -9849,4 +9861,200 @@ model EvidencePack {
 
   @@index([caseId])
   @@map("evidence_packs")
+}
+
+// ---------------------------------------------------------------------------
+// MapAble Moves — rehabilitation coordination (Phase 9)
+// Non-prescriptive: plans, activities, telehealth records, optional device data.
+// CareOS must NOT diagnose, prescribe, or alter treatment autonomously.
+// ---------------------------------------------------------------------------
+
+enum RehabilitationPlanStatus {
+  draft
+  active
+  paused
+  archived
+}
+
+enum RehabilitationGoalStatus {
+  active
+  achieved
+  paused
+  archived
+}
+
+enum PlanReviewStatus {
+  pending
+  approved
+  changes_requested
+  rejected
+}
+
+enum RehabilitationActivityStatus {
+  scheduled
+  completed
+  missed
+  cancelled
+}
+
+enum TelehealthSessionRecordStatus {
+  scheduled
+  in_progress
+  completed
+  cancelled
+  no_show
+}
+
+model RehabilitationPlan {
+  id                 String                   @id @default(cuid())
+  participantId      String
+  participant        User                     @relation("RehabilitationPlanParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  clinicianAuthorId  String
+  clinicianAuthor    User                     @relation("RehabilitationPlanClinicianAuthor", fields: [clinicianAuthorId], references: [id])
+  status             RehabilitationPlanStatus @default(draft)
+  title              String
+  createdAt          DateTime                 @default(now())
+  updatedAt          DateTime                 @updatedAt
+  versions           RehabilitationPlanVersion[]
+  goals              RehabilitationGoal[]
+  reviews            PlanReview[]
+  activities         RehabilitationActivity[]
+  telehealthSessions TelehealthSessionRecord[]
+
+  @@index([participantId])
+  @@index([clinicianAuthorId])
+  @@index([status])
+  @@map("rehabilitation_plans")
+}
+
+model RehabilitationPlanVersion {
+  id               String             @id @default(cuid())
+  planId           String
+  plan             RehabilitationPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+  version          Int
+  instructionsJson Json               @default("{}")
+  changeSummary    String
+  authoredById     String
+  authoredBy       User               @relation("RehabilitationPlanVersionAuthor", fields: [authoredById], references: [id])
+  approvedAt       DateTime?
+  createdAt        DateTime           @default(now())
+  acknowledgements PlanAcknowledgement[]
+
+  @@unique([planId, version])
+  @@index([planId])
+  @@index([authoredById])
+  @@map("rehabilitation_plan_versions")
+}
+
+model RehabilitationGoal {
+  id            String                   @id @default(cuid())
+  planId        String
+  plan          RehabilitationPlan       @relation(fields: [planId], references: [id], onDelete: Cascade)
+  participantId String
+  participant   User                     @relation("RehabilitationGoalParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  title         String
+  status        RehabilitationGoalStatus @default(active)
+  createdAt     DateTime                 @default(now())
+
+  @@index([planId])
+  @@index([participantId])
+  @@index([status])
+  @@map("rehabilitation_goals")
+}
+
+model ClinicalAuthor {
+  id              String    @id @default(cuid())
+  userId          String    @unique
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  profession      String
+  registrationRef String?
+  verifiedAt      DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@map("clinical_authors")
+}
+
+model PlanAcknowledgement {
+  id             String                    @id @default(cuid())
+  planVersionId  String
+  planVersion    RehabilitationPlanVersion @relation(fields: [planVersionId], references: [id], onDelete: Cascade)
+  participantId  String
+  participant    User                      @relation("PlanAcknowledgementParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  acknowledgedAt DateTime                  @default(now())
+
+  @@unique([planVersionId, participantId])
+  @@index([participantId])
+  @@map("plan_acknowledgements")
+}
+
+model PlanReview {
+  id         String             @id @default(cuid())
+  planId     String
+  plan       RehabilitationPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+  reviewerId String
+  reviewer   User               @relation("PlanReviewReviewer", fields: [reviewerId], references: [id])
+  status     PlanReviewStatus   @default(pending)
+  notes      String             @default("")
+  createdAt  DateTime           @default(now())
+
+  @@index([planId])
+  @@index([reviewerId])
+  @@index([status])
+  @@map("plan_reviews")
+}
+
+model RehabilitationActivity {
+  id                     String                       @id @default(cuid())
+  planId                 String
+  plan                   RehabilitationPlan           @relation(fields: [planId], references: [id], onDelete: Cascade)
+  title                  String
+  scheduledAt            DateTime?
+  instructionsAccessible String
+  equipmentJson          Json                         @default("[]")
+  status                 RehabilitationActivityStatus @default(scheduled)
+  completionNote         String?
+  participantFeedback    String?
+  completedAt            DateTime?
+  createdAt              DateTime                     @default(now())
+  updatedAt              DateTime                     @updatedAt
+
+  @@index([planId])
+  @@index([status])
+  @@index([scheduledAt])
+  @@map("rehabilitation_activities")
+}
+
+model TelehealthSessionRecord {
+  id            String                        @id @default(cuid())
+  planId        String?
+  plan          RehabilitationPlan?           @relation(fields: [planId], references: [id], onDelete: SetNull)
+  participantId String
+  participant   User                          @relation("TelehealthSessionParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  clinicianId   String?
+  clinician     User?                         @relation("TelehealthSessionClinician", fields: [clinicianId], references: [id], onDelete: SetNull)
+  scheduledAt   DateTime
+  joinUrl       String?
+  status        TelehealthSessionRecordStatus @default(scheduled)
+  createdAt     DateTime                      @default(now())
+
+  @@index([planId])
+  @@index([participantId])
+  @@index([clinicianId])
+  @@index([status])
+  @@map("telehealth_session_records")
+}
+
+model HealthDeviceImport {
+  id            String    @id @default(cuid())
+  participantId String
+  participant   User      @relation("HealthDeviceImportParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  sourceLabel   String
+  payloadJson   Json      @default("{}")
+  importedAt    DateTime  @default(now())
+  revokedAt     DateTime?
+
+  @@index([participantId])
+  @@index([sourceLabel])
+  @@map("health_device_imports")
 }
