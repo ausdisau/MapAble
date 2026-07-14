@@ -168,6 +168,16 @@ model User {
   careOSLifeTwin            ParticipantLifeTwin?
   careOSMissions            CareOSMission[]
   careOSActivityEvents      CareOSActivityEvent[]
+  coordinationCasesAsCoordinator CoordinationCase[] @relation("CoordinationCaseCoordinator")
+  coordinationCasesAsParticipant CoordinationCase[] @relation("CoordinationCaseParticipant")
+  coordinationTasksCreated       CoordinationTask[] @relation("CoordinationTaskCreator")
+  coordinationTasksAssigned      CoordinationTask[] @relation("CoordinationTaskAssignee")
+  coordinationCaseAssignments    CoordinationCaseAssignment[] @relation("CoordinationCaseAssignmentAssignee")
+  coordinationCaseNotesAuthored  CoordinationCaseNote[] @relation("CoordinationCaseNoteAuthor")
+  participantContacts            ParticipantContact[] @relation("ParticipantContactOwner")
+  coordinationSupervisionGiven   CoordinationSupervisionRecord[] @relation("CoordinationSupervisor")
+  providerEnquiriesAsParticipant ProviderEnquiry[] @relation("ProviderEnquiryParticipant")
+  evidenceRequestsAsParticipant  EvidenceRequest[] @relation("EvidenceRequestParticipant")
 }
 
 model PasskeyCredential {
@@ -849,6 +859,7 @@ model CareOSMission {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   recommendations CareOSRecommendation[]
+  linkedCoordinationCases CoordinationCase[] @relation("CoordinationCaseLinkedMission")
 
   @@index([participantId, createdAt])
   @@map("careos_missions")
@@ -968,6 +979,8 @@ model Organisation {
   hiddenByParticipants   ParticipantHiddenProvider[]
   privateParticipantNotes ParticipantProviderNote[]
   accessibleProperties    AccessibleProperty[]
+  coordinationCases       CoordinationCase[]
+  providerEnquiries         ProviderEnquiry[]
 }
 
 model OrganisationMember {
@@ -8799,6 +8812,7 @@ model Case {
   tasks             CaseTask[]
   links             CaseLink[]
   insights          CaseAIInsight[]
+  linkedCoordinationCases CoordinationCase[] @relation("CoordinationCaseLinkedCase")
 
   @@index([participantId])
   @@index([assignedToId])
@@ -9333,4 +9347,242 @@ model WorkerTrainingCompletion {
   @@unique([moduleId, userId])
   @@index([userId])
   @@map("worker_training_completions")
+}
+
+// --- Support Coordination OS (CareOS Phase 7) ---
+
+enum CoordinationOperationalPriority {
+  low
+  medium
+  high
+  urgent
+}
+
+enum CoordinationCaseStatus {
+  open
+  active
+  on_hold
+  closed
+}
+
+enum CoordinationTaskStatus {
+  open
+  done
+  cancelled
+}
+
+enum CoordinationNoteVisibility {
+  participant_visible
+  internal
+}
+
+enum ProviderEnquiryStatus {
+  draft
+  sent
+  responded
+  withdrawn
+  expired
+}
+
+enum EvidenceRequestPurpose {
+  plan_review
+  change_of_circumstances
+  home_living
+  assistive_technology
+  service_continuity
+  participant_outcomes
+}
+
+enum EvidenceRequestStatus {
+  draft
+  requested
+  partially_fulfilled
+  fulfilled
+  cancelled
+}
+
+enum CoordinationMilestoneStatus {
+  pending
+  completed
+  cancelled
+}
+
+model CoordinationCase {
+  id                  String                        @id @default(cuid())
+  participantId       String
+  participant         User                          @relation("CoordinationCaseParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  organisationId      String?
+  organisation        Organisation?                 @relation(fields: [organisationId], references: [id], onDelete: SetNull)
+  coordinatorId       String
+  coordinator         User                          @relation("CoordinationCaseCoordinator", fields: [coordinatorId], references: [id], onDelete: Cascade)
+  title               String
+  status              CoordinationCaseStatus        @default(open)
+  operationalPriority CoordinationOperationalPriority @default(medium)
+  linkedCaseId        String?
+  linkedCase          Case?                         @relation("CoordinationCaseLinkedCase", fields: [linkedCaseId], references: [id], onDelete: SetNull)
+  linkedMissionId     String?
+  linkedMission       CareOSMission?                @relation("CoordinationCaseLinkedMission", fields: [linkedMissionId], references: [id], onDelete: SetNull)
+  openedAt            DateTime                      @default(now())
+  closedAt            DateTime?
+  createdAt           DateTime                      @default(now())
+  updatedAt           DateTime                      @updatedAt
+
+  tasks               CoordinationTask[]
+  assignments         CoordinationCaseAssignment[]
+  notes               CoordinationCaseNote[]
+  enquiries           ProviderEnquiry[]
+  evidenceRequests    EvidenceRequest[]
+  milestones          CoordinationMilestone[]
+  supervisionRecords  CoordinationSupervisionRecord[]
+  evidencePacks       EvidencePack[]
+
+  @@index([participantId])
+  @@index([coordinatorId])
+  @@index([organisationId])
+  @@index([status])
+  @@index([operationalPriority])
+  @@map("coordination_cases")
+}
+
+model CoordinationTask {
+  id          String                 @id @default(cuid())
+  caseId      String
+  case        CoordinationCase       @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  title       String
+  status      CoordinationTaskStatus @default(open)
+  waitingOn   String?
+  dueAt       DateTime?
+  createdById String
+  createdBy   User                   @relation("CoordinationTaskCreator", fields: [createdById], references: [id])
+  assigneeId  String?
+  assignee    User?                  @relation("CoordinationTaskAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
+  createdAt   DateTime               @default(now())
+
+  @@index([caseId])
+  @@index([assigneeId])
+  @@index([status])
+  @@map("coordination_tasks")
+}
+
+model CoordinationCaseAssignment {
+  id         String           @id @default(cuid())
+  caseId     String
+  case       CoordinationCase @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  assigneeId String
+  assignee   User             @relation("CoordinationCaseAssignmentAssignee", fields: [assigneeId], references: [id], onDelete: Cascade)
+  role       String
+  assignedAt DateTime         @default(now())
+  endsAt     DateTime?
+
+  @@index([caseId])
+  @@index([assigneeId])
+  @@map("coordination_case_assignments")
+}
+
+model CoordinationCaseNote {
+  id         String                     @id @default(cuid())
+  caseId     String
+  case       CoordinationCase           @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  authorId   String
+  author     User                       @relation("CoordinationCaseNoteAuthor", fields: [authorId], references: [id])
+  body       String
+  visibility CoordinationNoteVisibility @default(internal)
+  createdAt  DateTime                   @default(now())
+
+  @@index([caseId])
+  @@index([authorId])
+  @@map("coordination_case_notes")
+}
+
+model ParticipantContact {
+  id            String   @id @default(cuid())
+  participantId String
+  participant   User     @relation("ParticipantContactOwner", fields: [participantId], references: [id], onDelete: Cascade)
+  label         String
+  channel       String
+  value         String
+  preferred     Boolean  @default(false)
+  createdAt     DateTime @default(now())
+
+  @@index([participantId])
+  @@map("participant_contacts")
+}
+
+model ProviderEnquiry {
+  id                 String                @id @default(cuid())
+  caseId             String
+  case               CoordinationCase      @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  participantId      String
+  participant        User                  @relation("ProviderEnquiryParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  organisationId     String?
+  organisation       Organisation?         @relation(fields: [organisationId], references: [id], onDelete: SetNull)
+  providerName       String
+  disclosurePreview  String
+  status             ProviderEnquiryStatus @default(draft)
+  responseDeadline   DateTime?
+  responseJson       Json?
+  createdAt          DateTime              @default(now())
+  withdrawnAt        DateTime?
+
+  @@index([caseId])
+  @@index([participantId])
+  @@index([status])
+  @@map("provider_enquiries")
+}
+
+model EvidenceRequest {
+  id             String                 @id @default(cuid())
+  caseId         String
+  case           CoordinationCase       @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  participantId  String
+  participant    User                   @relation("EvidenceRequestParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  purpose        EvidenceRequestPurpose
+  status         EvidenceRequestStatus  @default(draft)
+  dueAt          DateTime?
+  provenanceJson Json                   @default("[]")
+  createdAt      DateTime               @default(now())
+
+  @@index([caseId])
+  @@index([participantId])
+  @@index([status])
+  @@map("evidence_requests")
+}
+
+model CoordinationMilestone {
+  id          String                    @id @default(cuid())
+  caseId      String
+  case        CoordinationCase          @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  title       String
+  status      CoordinationMilestoneStatus @default(pending)
+  dueAt       DateTime?
+  completedAt DateTime?
+
+  @@index([caseId])
+  @@map("coordination_milestones")
+}
+
+model CoordinationSupervisionRecord {
+  id           String           @id @default(cuid())
+  caseId       String
+  case         CoordinationCase @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  supervisorId String
+  supervisor   User             @relation("CoordinationSupervisor", fields: [supervisorId], references: [id])
+  notes        String
+  createdAt    DateTime         @default(now())
+
+  @@index([caseId])
+  @@index([supervisorId])
+  @@map("coordination_supervision_records")
+}
+
+model EvidencePack {
+  id         String           @id @default(cuid())
+  caseId     String
+  case       CoordinationCase @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  packType   String
+  claimsJson Json             @default("[]")
+  createdAt  DateTime         @default(now())
+
+  @@index([caseId])
+  @@map("evidence_packs")
 }
