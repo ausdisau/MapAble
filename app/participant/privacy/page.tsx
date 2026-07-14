@@ -1,11 +1,11 @@
 import { AuthoritySummary } from "@/components/authority/AuthoritySummary";
 import { PeopleWithAccess } from "@/components/authority/PeopleWithAccess";
 import { ConsentTimeline } from "@/components/privacy/ConsentTimeline";
+import { requireAuth } from "@/lib/auth/guards";
 import {
   listAuthorityDecisionsForParticipant,
   listPeopleWithAccess,
 } from "@/lib/authority/authority-decision-service";
-import { requireAuth } from "@/lib/auth/guards";
 import { listConsentTimeline } from "@/lib/consent/consent-receipt-service";
 
 export const metadata = { title: "Privacy & access | Participant" };

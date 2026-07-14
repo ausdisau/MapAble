@@ -67,7 +67,10 @@ export function DelegateInviteForm() {
   }
 
   return (
-    <form onSubmit={(e) => void onSubmit(e)} className="space-y-4 rounded-lg border p-4">
+    <form
+      onSubmit={(e) => void onSubmit(e)}
+      className="space-y-4 rounded-lg border p-4"
+    >
       <h2 className="text-lg font-semibold">Invite someone to help</h2>
       <p className="text-sm text-muted-foreground">
         Financial and clinical domains cannot be delegated through this form.
@@ -204,7 +207,10 @@ export function DelegateInvitationList({
 }) {
   const [loadingId, setLoadingId] = useState<string | null>(null);
 
-  async function respond(invitationId: string, response: "accepted" | "declined") {
+  async function respond(
+    invitationId: string,
+    response: "accepted" | "declined",
+  ) {
     setLoadingId(`${invitationId}-${response}`);
     try {
       await fetch("/api/delegates", {
@@ -232,7 +238,10 @@ export function DelegateInvitationList({
     }
   }
 
-  function renderInvitation(invitation: InvitationRow, mode: "sent" | "received") {
+  function renderInvitation(
+    invitation: InvitationRow,
+    mode: "sent" | "received",
+  ) {
     return (
       <li
         key={invitation.id}
@@ -244,8 +253,7 @@ export function DelegateInvitationList({
           </p>
           <p className="text-sm text-muted-foreground">
             {invitation.roleType.replace(/_/g, " ")} ·{" "}
-            {invitation.proposedDomain.replace(/_/g, " ")} ·{" "}
-            {invitation.status}
+            {invitation.proposedDomain.replace(/_/g, " ")} · {invitation.status}
           </p>
           <p className="text-xs text-muted-foreground">
             Expires {new Date(invitation.expiresAt).toLocaleDateString("en-AU")}
@@ -275,7 +283,8 @@ export function DelegateInvitationList({
             </>
           ) : null}
           {mode === "sent" &&
-          (invitation.status === "pending" || invitation.status === "accepted") ? (
+          (invitation.status === "pending" ||
+            invitation.status === "accepted") ? (
             <Button
               type="button"
               size="sm"
@@ -318,7 +327,9 @@ export function DelegateInvitationList({
           </p>
         ) : (
           <ul className="mt-4 divide-y rounded-lg border">
-            {received.map((invitation) => renderInvitation(invitation, "received"))}
+            {received.map((invitation) =>
+              renderInvitation(invitation, "received"),
+            )}
           </ul>
         )}
       </section>

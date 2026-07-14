@@ -55,7 +55,9 @@ export function PeopleWithAccess({ grants }: { grants: GrantRow[] }) {
             <p className="font-medium">
               {grant.delegate.name ?? grant.delegate.email}
             </p>
-            <p className="text-sm text-muted-foreground">{grant.delegate.email}</p>
+            <p className="text-sm text-muted-foreground">
+              {grant.delegate.email}
+            </p>
             <dl className="mt-2 space-y-1 text-xs text-muted-foreground">
               <div>
                 <dt className="inline font-medium">Domain: </dt>

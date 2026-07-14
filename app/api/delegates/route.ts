@@ -81,10 +81,16 @@ export async function POST(request: Request) {
       return jsonError("Delegate invitations are not enabled", 404);
     }
     if (message === "FINANCIAL_AUTHORITY_REQUIRES_EXPLICIT_GRANT") {
-      return jsonError("Financial domains cannot be invited via delegate flow", 403);
+      return jsonError(
+        "Financial domains cannot be invited via delegate flow",
+        403,
+      );
     }
     if (message === "CLINICAL_AUTHORITY_REQUIRES_EXPLICIT_GRANT") {
-      return jsonError("Clinical domains cannot be invited via delegate flow", 403);
+      return jsonError(
+        "Clinical domains cannot be invited via delegate flow",
+        403,
+      );
     }
     if (message === "DELEGATE_ACTION_NOT_PERMITTED") {
       return jsonError("One or more proposed actions are not permitted", 403);

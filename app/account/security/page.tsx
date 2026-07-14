@@ -67,7 +67,10 @@ export default async function AccountSecurityPage() {
         {mfaEnrolments.length === 0 ? (
           <p className="mt-3 text-sm text-muted-foreground">
             No MFA methods enrolled. Add a passkey from your{" "}
-            <Link href="/dashboard/profile" className="text-primary hover:underline">
+            <Link
+              href="/dashboard/profile"
+              className="text-primary hover:underline"
+            >
               profile page
             </Link>
             .

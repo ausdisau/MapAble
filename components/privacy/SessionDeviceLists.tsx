@@ -72,7 +72,9 @@ export function SessionDeviceLists({
               disabled={revokingAll}
               onClick={() => void revokeAllSessions()}
             >
-              {revokingAll ? "Signing out everywhere…" : "Sign out all sessions"}
+              {revokingAll
+                ? "Signing out everywhere…"
+                : "Sign out all sessions"}
             </Button>
           ) : null}
         </div>
@@ -80,7 +82,9 @@ export function SessionDeviceLists({
           Devices and browsers where you are currently signed in.
         </p>
         {sessions.length === 0 ? (
-          <p className="mt-3 text-sm text-muted-foreground">No active sessions.</p>
+          <p className="mt-3 text-sm text-muted-foreground">
+            No active sessions.
+          </p>
         ) : (
           <ul className="mt-4 divide-y rounded-lg border">
             {sessions.map((session) => (

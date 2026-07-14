@@ -1,3 +1,5 @@
+import type { Prisma } from "@prisma/client";
+
 import { createAuditEvent } from "@/lib/audit/audit-event-service";
 import { prisma } from "@/lib/prisma";
 
@@ -10,6 +12,10 @@ export async function grantParticipantAuthority(input: {
   consentScopes: string[];
   expiresAt: Date;
   actorUserId: string;
+  purpose?: string;
+  recipientRole?: string;
+  evidenceRef?: string;
+  decisionLimitJson?: Prisma.InputJsonValue;
 }) {
   if (input.participantId !== input.actorUserId) {
     throw new Error("PARTICIPANT_AUTHORITY_REQUIRED");
@@ -24,6 +30,10 @@ export async function grantParticipantAuthority(input: {
       domain: input.domain,
       actions: input.actions,
       consentScopes: input.consentScopes,
+      purpose: input.purpose,
+      recipientRole: input.recipientRole,
+      evidenceRef: input.evidenceRef,
+      decisionLimitJson: input.decisionLimitJson,
       expiresAt: input.expiresAt,
     },
   });
@@ -37,10 +47,22 @@ export async function grantParticipantAuthority(input: {
       delegateId: input.delegateId,
       domain: input.domain,
       actions: input.actions,
+      purpose: input.purpose,
+      recipientRole: input.recipientRole,
       expiresAt: input.expiresAt.toISOString(),
     },
   });
   return grant;
+}
+
+export async function listParticipantAuthorityGrants(participantId: string) {
+  return prisma.participantAuthorityGrant.findMany({
+    where: { participantId },
+    include: {
+      delegate: { select: { id: true, name: true, email: true } },
+    },
+    orderBy: { createdAt: "desc" },
+  });
 }
 
 export async function revokeParticipantAuthority(input: {

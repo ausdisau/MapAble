@@ -59,7 +59,10 @@ export async function POST(request: Request) {
   } catch (error) {
     const message = error instanceof Error ? error.message : "Evaluate failed";
     if (message === "SERVICE_ACCOUNT_PARTICIPANT_AUTHORITY_DENIED") {
-      return jsonError("Service accounts cannot evaluate participant authority", 403);
+      return jsonError(
+        "Service accounts cannot evaluate participant authority",
+        403,
+      );
     }
     return jsonError(message, 400);
   }

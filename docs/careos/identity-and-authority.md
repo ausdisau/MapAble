@@ -16,7 +16,7 @@ NextAuth (email/password, OAuth, or passkey). Identity services track:
 - Login audit history
 - Step-up challenges for sensitive actions
 
-Identity answers: *“Is this really you, and is your session still valid?”*
+Identity answers: _“Is this really you, and is your session still valid?”_
 
 NextAuth is **retained** as the session provider. CareOS does not replace
 NextAuth; it extends it with explicit session records, device trust, and
@@ -30,7 +30,7 @@ coordinator, plan manager, or platform admin. Membership determines navigation
 and coarse permissions; it does **not** automatically grant access to a
 participant’s personal data or decision rights.
 
-Membership answers: *“What kind of user are you in this organisation?”*
+Membership answers: _“What kind of user are you in this organisation?”_
 
 ## Authority
 
@@ -47,8 +47,8 @@ specific **domain** (e.g. bookings, engagement) for defined **actions** and
 - Service accounts cannot hold participant authority.
 - Every evaluation produces an **AuthorityDecision** audit record (allow/deny).
 
-Authority answers: *“May this person perform this action for this participant
-right now?”*
+Authority answers: _“May this person perform this action for this participant
+right now?”_
 
 ## Consent receipts
 
@@ -81,31 +81,31 @@ review — no AI or automated approval path.
 
 ## Feature flags
 
-| Flag | Purpose |
-| --- | --- |
+| Flag                                 | Purpose                                       |
+| ------------------------------------ | --------------------------------------------- |
 | `MAPABLE_IDENTITY_AUTHORITY_ENABLED` | Master switch for identity/authority features |
-| `MAPABLE_STEP_UP_AUTH_ENABLED` | Step-up challenges for sensitive operations |
-| `MAPABLE_EMERGENCY_ACCESS_ENABLED` | Emergency access request/review flow |
-| `MAPABLE_DELEGATE_INVITES_ENABLED` | Participant delegate invitation UI and API |
+| `MAPABLE_STEP_UP_AUTH_ENABLED`       | Step-up challenges for sensitive operations   |
+| `MAPABLE_EMERGENCY_ACCESS_ENABLED`   | Emergency access request/review flow          |
+| `MAPABLE_DELEGATE_INVITES_ENABLED`   | Participant delegate invitation UI and API    |
 
 ## API surface (Phase 6)
 
-| Route | Methods | Purpose |
-| --- | --- | --- |
-| `/api/auth/sessions` | GET, DELETE | List/revoke sessions |
-| `/api/auth/step-up` | POST, PUT | Create/satisfy step-up challenge |
-| `/api/participant-authority` | GET, POST, DELETE | List/grant/revoke authority |
-| `/api/participant-authority/decisions` | GET, POST | History and evaluate |
-| `/api/delegates` | GET, POST, PATCH, DELETE | Invitations lifecycle |
-| `/api/emergency-access` | GET, POST, PATCH | Requests and admin review |
+| Route                                  | Methods                  | Purpose                          |
+| -------------------------------------- | ------------------------ | -------------------------------- |
+| `/api/auth/sessions`                   | GET, DELETE              | List/revoke sessions             |
+| `/api/auth/step-up`                    | POST, PUT                | Create/satisfy step-up challenge |
+| `/api/participant-authority`           | GET, POST, DELETE        | List/grant/revoke authority      |
+| `/api/participant-authority/decisions` | GET, POST                | History and evaluate             |
+| `/api/delegates`                       | GET, POST, PATCH, DELETE | Invitations lifecycle            |
+| `/api/emergency-access`                | GET, POST, PATCH         | Requests and admin review        |
 
 ## UI pages
 
-| Page | Purpose |
-| --- | --- |
-| `/account/security` | MFA, devices, sessions, login history |
-| `/participant/privacy` | People with access, consent timeline, decisions |
-| `/participant/delegates` | Invite and manage delegates |
+| Page                     | Purpose                                         |
+| ------------------------ | ----------------------------------------------- |
+| `/account/security`      | MFA, devices, sessions, login history           |
+| `/participant/privacy`   | People with access, consent timeline, decisions |
+| `/participant/delegates` | Invite and manage delegates                     |
 
 ## Design principles
 
