@@ -24,7 +24,9 @@ const schema = z.object({
 export async function GET(request: Request) {
   const actor = await requireApiSession();
   if (actor instanceof Response) return actor;
-  const organisationId = new URL(request.url).searchParams.get("organisationId");
+  const organisationId = new URL(request.url).searchParams.get(
+    "organisationId",
+  );
   if (!organisationId) return jsonError("organisationId is required", 400);
   try {
     return jsonOk({

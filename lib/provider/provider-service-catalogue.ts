@@ -1,5 +1,5 @@
-import { createAuditEvent } from "@/lib/audit/audit-event-service";
 import { assertOrganisationAccess } from "@/lib/api/phase3-scope";
+import { createAuditEvent } from "@/lib/audit/audit-event-service";
 import type { CurrentUser } from "@/lib/auth/current-user";
 import { providerWorkforceConfig } from "@/lib/config/provider-workforce";
 import { prisma } from "@/lib/prisma";
@@ -21,7 +21,11 @@ export async function createProviderServiceOffering(input: {
   if (!providerWorkforceConfig.providerCloudEnabled) {
     throw new Error("PROVIDER_CLOUD_DISABLED");
   }
-  await assertOrganisationAccess(input.actor, input.organisationId, "care:manage:org");
+  await assertOrganisationAccess(
+    input.actor,
+    input.organisationId,
+    "care:manage:org",
+  );
   const offering = await prisma.providerServiceOffering.create({
     data: {
       organisationId: input.organisationId,
@@ -55,7 +59,11 @@ export async function listProviderServiceOfferings(input: {
   if (!providerWorkforceConfig.providerCloudEnabled) {
     throw new Error("PROVIDER_CLOUD_DISABLED");
   }
-  await assertOrganisationAccess(input.actor, input.organisationId, "care:manage:org");
+  await assertOrganisationAccess(
+    input.actor,
+    input.organisationId,
+    "care:manage:org",
+  );
   return prisma.providerServiceOffering.findMany({
     where: {
       organisationId: input.organisationId,

@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
-import React from "react";
 import { render, screen } from "@testing-library/react";
+import React from "react";
 import { describe, expect, it, vi } from "vitest";
 
 import { ParticipantShiftOffers } from "@/components/care/ParticipantShiftOffers";
@@ -23,8 +23,12 @@ describe("provider workforce accessible UI", () => {
         ]}
       />,
     );
-    expect(screen.getByRole("heading", { name: "Worker options" })).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Confirm this worker" })).toBeTruthy();
+    expect(
+      screen.getByRole("heading", { name: "Worker options" }),
+    ).toBeTruthy();
+    expect(
+      screen.getByRole("button", { name: "Confirm this worker" }),
+    ).toBeTruthy();
     expect(screen.getByRole("status")).toBeTruthy();
   });
 

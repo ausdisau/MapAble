@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 
@@ -63,7 +63,9 @@ export function WorkerShiftOffers({
           ))}
         </ul>
       ) : (
-        <p className="text-sm text-muted-foreground">No shift offers waiting.</p>
+        <p className="text-sm text-muted-foreground">
+          No shift offers waiting.
+        </p>
       )}
     </section>
   );

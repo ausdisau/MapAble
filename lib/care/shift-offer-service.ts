@@ -1,8 +1,8 @@
 import { createHash } from "crypto";
 
-import type { CurrentUser } from "@/lib/auth/current-user";
 import { assertOrganisationAccess } from "@/lib/api/phase3-scope";
 import { createAuditEvent } from "@/lib/audit/audit-event-service";
+import type { CurrentUser } from "@/lib/auth/current-user";
 import { assertWorkerEvidenceEligible } from "@/lib/care/worker-eligibility";
 import { providerWorkforceConfig } from "@/lib/config/provider-workforce";
 import { prisma } from "@/lib/prisma";
@@ -88,7 +88,11 @@ export async function createShiftOffer(input: {
     where: { id: input.careShiftId },
   });
   if (!shift) throw new Error("SHIFT_NOT_FOUND");
-  await assertOrganisationAccess(input.actor, shift.organisationId, "care:manage:org");
+  await assertOrganisationAccess(
+    input.actor,
+    shift.organisationId,
+    "care:manage:org",
+  );
   await assertWorkerEvidenceEligible(
     input.workerProfileId,
     input.requiredCredentialTypes,
@@ -133,7 +137,10 @@ export async function createShiftOffer(input: {
     action: "care.shift_offer.created",
     entityType: "ShiftOffer",
     entityId: offer.id,
-    metadata: { missionId: shift.missionId, workerProfileId: input.workerProfileId },
+    metadata: {
+      missionId: shift.missionId,
+      workerProfileId: input.workerProfileId,
+    },
   });
   return offer;
 }
