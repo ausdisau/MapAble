@@ -6,9 +6,9 @@ import { assertTenantAccess } from "@/lib/multi-tenant-admin/tenant-service";
 export type TenantContext = {
   tenantId: string | null;
   organisationId: string | null;
-  organisationIds: string[];
-  userId: string;
-  roles: string[];
+  organisationIds?: string[];
+  userId?: string;
+  roles?: string[];
   enabled: boolean;
 };
 
@@ -79,7 +79,7 @@ export function whereTenantOrganisations(ctx: TenantContext) {
   return {
     organisation: {
       id: {
-        in: ctx.organisationIds,
+        in: ctx.organisationIds ?? (ctx.organisationId ? [ctx.organisationId] : []),
       },
     },
   };
