@@ -52,6 +52,8 @@
     "@chat-adapter/slack": "^4.30.0",
     "@chat-adapter/state-memory": "^4.30.0",
     "@mapable/domain-transport": "workspace:*",
+    "@mapable/domain-provider": "workspace:*",
+    "@mapable/domain-workforce": "workspace:*",
     "@openai/agents": "^0.13.2",
     "@prisma/client": "6.19.2",
     "@pusher/push-notifications-web": "^1.1.0",

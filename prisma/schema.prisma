@@ -717,6 +717,76 @@ model LifeTwinDomainRecord {
   @@map("life_twin_domain_records")
 }
 
+model ProviderCapabilityEvidence {
+  id                  String       @id @default(cuid())
+  organisationId      String
+  organisation        Organisation @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+  serviceType         String
+  geography           String?
+  capability          String
+  communicationSupport String[]   @default([])
+  mobilityFeatures    String[]    @default([])
+  assistanceAnimalSupported Boolean @default(false)
+  source              String
+  verificationStatus  String
+  permittedPurposes   String[]    @default([])
+  effectiveAt         DateTime    @default(now())
+  expiresAt           DateTime?
+  revokedAt           DateTime?
+  disputedAt          DateTime?
+  evidenceSummary     String?
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
+
+  @@index([organisationId, serviceType, verificationStatus])
+  @@index([expiresAt, revokedAt])
+  @@map("provider_capability_evidence")
+}
+
+model WorkerCredentialEvidence {
+  id                  String        @id @default(cuid())
+  workerProfileId     String
+  workerProfile       WorkerProfile @relation(fields: [workerProfileId], references: [id], onDelete: Cascade)
+  credentialType      String
+  jurisdiction        String        @default("AU")
+  issuer              String?
+  identifierMasked    String?
+  verificationStatus  String
+  issuedAt            DateTime?
+  expiresAt           DateTime?
+  revokedAt           DateTime?
+  renewalRequiredAt   DateTime?
+  source              String
+  evidenceSummary     String?
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+
+  @@index([workerProfileId, credentialType, verificationStatus])
+  @@index([expiresAt, revokedAt])
+  @@map("worker_credential_evidence")
+}
+
+model WorkerEquipmentEvidence {
+  id                  String        @id @default(cuid())
+  workerProfileId     String
+  workerProfile       WorkerProfile @relation(fields: [workerProfileId], references: [id], onDelete: Cascade)
+  equipmentType       String
+  compatibilityTags   String[]      @default([])
+  verificationStatus  String
+  inspectedAt         DateTime?
+  maintenanceDueAt    DateTime?
+  expiresAt           DateTime?
+  revokedAt           DateTime?
+  source              String
+  evidenceSummary     String?
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+
+  @@index([workerProfileId, equipmentType, verificationStatus])
+  @@index([expiresAt, revokedAt])
+  @@map("worker_equipment_evidence")
+}
+
 model CareOSMission {
   id            String   @id @default(cuid())
   participantId String
@@ -841,6 +911,7 @@ model Organisation {
   engagementImprovementActions EngagementImprovementAction[]
   engagementNpsResponses EngagementNpsResponse[]
   workerTrainingModules  WorkerTrainingModule[]
+  providerCapabilityEvidence ProviderCapabilityEvidence[]
 }
 
 model OrganisationMember {
@@ -1972,6 +2043,8 @@ model WorkerProfile {
   availabilityWindows     AvailabilityWindow[]
   onboardingProfile       OnboardingProfile?
   trustCredentials        WorkerTrustCredential[]
+  credentialEvidence      WorkerCredentialEvidence[]
+  equipmentEvidence       WorkerEquipmentEvidence[]
   organisationInvites     WorkerOrganisationInvite[]
   payoutRecipients        PayoutRecipient[] @relation("WorkerPayoutRecipients")
 

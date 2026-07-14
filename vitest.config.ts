@@ -21,6 +21,14 @@ export default defineConfig({
         __dirname,
         "packages/domain-transport/src/index.ts"
       ),
+      "@mapable/domain-provider": path.resolve(
+        __dirname,
+        "packages/domain-provider/src/index.ts"
+      ),
+      "@mapable/domain-workforce": path.resolve(
+        __dirname,
+        "packages/domain-workforce/src/index.ts"
+      ),
     },
   },
 });
