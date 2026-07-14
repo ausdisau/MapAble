@@ -2,8 +2,12 @@ import { describe, expect, it } from "vitest";
 
 import { getCloudConfig } from "@/lib/platform/cloud-config";
 import {
+  ManagedQueueProvider,
   MemoryCacheProvider,
   RecordingQueueProvider,
+  createMemoryCacheProvider,
+  createQueueProvider,
+  createRecordingQueueProvider,
 } from "@/lib/platform/cloud-providers";
 import { cloudEventEnvelopeSchema } from "@/lib/platform/event-outbox-service";
 
@@ -56,5 +60,16 @@ describe("CareOS cloud platform foundation", () => {
         payload: {},
       }).tenantId,
     ).toBe("tenant-1");
+  });
+
+  it("exposes dev recording factories and managed queue without webhook", async () => {
+    const queue = createRecordingQueueProvider();
+    expect(queue).toBeInstanceOf(RecordingQueueProvider);
+    const managed = createQueueProvider({
+      CLOUD_QUEUE_PROVIDER: "managed",
+    }) as ManagedQueueProvider;
+    await managed.publish("careos.events", { test: true });
+    expect(managed.recordedMessages).toHaveLength(1);
+    expect(createMemoryCacheProvider()).toBeInstanceOf(MemoryCacheProvider);
   });
 });
