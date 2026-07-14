@@ -68,3 +68,32 @@ export function evaluateCapacity(snapshot: z.infer<typeof capacitySnapshotSchema
     hasCapacity: parsed.bookedCapacity < parsed.totalCapacity,
   };
 }
+
+export type ParticipantControlledCandidate = {
+  id: string;
+  providerId: string;
+  verified: boolean;
+  capabilities: string[];
+  communicationSupport: string[];
+};
+
+export function filterParticipantControlledCandidates(params: {
+  candidates: ParticipantControlledCandidate[];
+  blockedWorkerIds: string[];
+  blockedProviderIds: string[];
+  requiredCapabilities: string[];
+  requiredCommunicationSupport: string[];
+}) {
+  return params.candidates.filter(
+    (candidate) =>
+      candidate.verified &&
+      !params.blockedWorkerIds.includes(candidate.id) &&
+      !params.blockedProviderIds.includes(candidate.providerId) &&
+      params.requiredCapabilities.every((capability) =>
+        candidate.capabilities.includes(capability)
+      ) &&
+      params.requiredCommunicationSupport.every((capability) =>
+        candidate.communicationSupport.includes(capability)
+      )
+  );
+}

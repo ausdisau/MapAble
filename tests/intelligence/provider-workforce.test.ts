@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   evaluateCapacity,
+  filterParticipantControlledCandidates,
   evaluateProviderCapability,
 } from "@mapable/domain-provider";
 import { evaluateWorkforceEvidence } from "@mapable/domain-workforce";
@@ -45,5 +46,19 @@ describe("provider and workforce evidence policies", () => {
     });
     expect(result.eligible).toBe(false);
     expect(result.reasonCodes).toContain("CREDENTIAL_EXPIRED_OR_REVOKED:wwcc");
+  });
+
+  it("excludes participant-blocked candidates before options are shown", () => {
+    const candidates = filterParticipantControlledCandidates({
+      candidates: [
+        { id: "blocked", providerId: "provider-a", verified: true, capabilities: ["personal_care"], communicationSupport: ["plain_language"] },
+        { id: "eligible", providerId: "provider-b", verified: true, capabilities: ["personal_care"], communicationSupport: ["plain_language"] },
+      ],
+      blockedWorkerIds: ["blocked"],
+      blockedProviderIds: [],
+      requiredCapabilities: ["personal_care"],
+      requiredCommunicationSupport: ["plain_language"],
+    });
+    expect(candidates.map((candidate) => candidate.id)).toEqual(["eligible"]);
   });
 });
