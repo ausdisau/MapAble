@@ -80,8 +80,8 @@ export function planSupportedJourney(input: z.infer<typeof supportedJourneyReque
     const reasons = [
       ...(request.excludedWorkerIds.includes(candidate.workerId) ? ["PARTICIPANT_EXCLUDED_WORKER"] : []),
       ...(request.excludedProviderIds.includes(candidate.providerId) ? ["PARTICIPANT_EXCLUDED_PROVIDER"] : []),
-      ...(!request.requirements.workerCredentials.every((credential) => candidate.credentials.includes(credential)) ? ["WORKER_CREDENTIAL_MISSING"] : []),
-      ...(!request.requirements.communicationSupport.every((support) => candidate.communication.includes(support)) ? ["COMMUNICATION_SUPPORT_MISSING"] : []),
+      ...(!request.requirements.workerCredentials.every((credential) => (candidate.credentials as readonly string[]).includes(credential)) ? ["WORKER_CREDENTIAL_MISSING"] : []),
+      ...(!request.requirements.communicationSupport.every((support) => (candidate.communication as readonly string[]).includes(support)) ? ["COMMUNICATION_SUPPORT_MISSING"] : []),
       ...(request.requirements.wheelchairAccessible && !candidate.wheelchairAccessible ? ["WHEELCHAIR_ACCESS_REQUIRED"] : []),
       ...(request.requirements.requiresRamp && !candidate.ramp ? ["RAMP_REQUIRED"] : []),
       ...(request.requirements.assistanceAnimal && !candidate.assistanceAnimal ? ["ASSISTANCE_ANIMAL_SUPPORT_REQUIRED"] : []),
