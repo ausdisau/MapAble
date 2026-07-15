@@ -4,7 +4,7 @@ import { listPublishedPlaces } from "@/lib/access-map/access-place-service";
 export const metadata = {
   title: "MapAble Access | Accessibility map",
   description:
-    "Learn how MapAble Access will separate community accessibility reviews from formal accreditation claims.",
+    "Search accessible places with community reviews, confidence labels, and MapAble accreditation. List view works without map scripts.",
 };
 
 export default async function AccessPage() {

@@ -132,6 +132,19 @@ export function MapAbleAccessShell({
         </div>
 
         <p className="text-sm text-muted-foreground">{ACCESS_DISCLAIMER}</p>
+        <noscript>
+          <p className="text-sm text-slate-700">
+            List view and place links work without interactive map scripts. Map view is an
+            optional enhancement.
+          </p>
+        </noscript>
+        <p className="text-sm">
+          Prefer the competitor map landing?{" "}
+          <a href="/accessibility-map" className="font-semibold text-[#005B7F] underline">
+            Open Accessibility Map
+          </a>
+          .
+        </p>
       </div>
     </MobileAccessMapShell>
   );
