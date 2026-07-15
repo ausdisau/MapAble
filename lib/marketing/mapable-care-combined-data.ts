@@ -88,7 +88,7 @@ export const logoMenuItems: MenuItem[] = [
   },
   {
     label: "Accessible places",
-    href: "/access",
+    href: "/accessibility-map",
     description: "Explore venues with access notes, quiet spaces and community guidance.",
   },
   {
@@ -104,19 +104,26 @@ export const logoMenuItems: MenuItem[] = [
 ];
 
 export const homepageHeroCopy = {
-  headline: "Care, transport and opportunity, connected.",
+  headline: "Find accessible places, supports, and journeys you can actually use.",
   subheading:
-    "MapAble brings care, accessible transport, NDIS guidance, inclusive jobs and everyday access into one guided ecosystem — so you can compare options, plan next steps and connect with support that fits your life.",
-  primaryCta: "Start guided search",
-  secondaryCta: "Explore MapAble",
+    "MapAble connects verified accessibility information, NDIS-aware providers, accessible transport, employment pathways, and support coordination into one practical platform.",
+  primaryCta: "Find accessible places",
+  secondaryCta: "Request support",
 };
+
+export const homepageHeroCtas = [
+  { label: "Find accessible places", href: "/accessibility-map" },
+  { label: "Request support", href: "/care/request" },
+  { label: "Plan accessible transport", href: "/journey-planner" },
+  { label: "Verify my venue", href: "/verify-my-venue" },
+] as const;
 
 export const homepageCategoryChips = [
   { label: "Care", href: "/provider-finder?area=Care" },
   { label: "Transport", href: "/provider-finder?area=Transport" },
   { label: "NDIS Guidance", href: "/ask" },
   { label: "Jobs", href: "/provider-finder?area=Jobs" },
-  { label: "Access", href: "/access" },
+  { label: "Access", href: "/accessibility-map" },
 ];
 
 export const homepageTrustStripItems = [
@@ -125,6 +132,105 @@ export const homepageTrustStripItems = [
   "NDIS-aware workflows",
   "Built with lived experience",
 ];
+
+export const homepageProofMetrics: TrustMetric[] = [
+  { value: "Pilot target", label: "Places mapped" },
+  { value: "Coming soon", label: "Access details verified" },
+  { value: "Demo", label: "Providers accepting enquiries" },
+  { value: "Coming soon", label: "Transport-ready journeys" },
+];
+
+export const competitorContrastCards: DifferenceCard[] = [
+  {
+    title: "More than a directory",
+    body: "Find providers alongside availability signals, access-readiness, and practical next steps.",
+    badge: "Beyond listings",
+  },
+  {
+    title: "More detailed than traffic-light ratings",
+    body: "See measurements, confidence, last checked dates, and evidence sources — not only a colour.",
+    badge: "Evidence-based",
+  },
+  {
+    title: "More practical than static place reviews",
+    body: "Plan routes, book transport or support, and update access info when things change.",
+    badge: "Journey-ready",
+  },
+  {
+    title: "Built for care + transport + support coordination",
+    body: "MapAble connects access information with providers, journeys, and coordination workflows.",
+    badge: "Connected support",
+  },
+];
+
+export const homepageMapPreviewFilters = [
+  "Step-free entry",
+  "Accessible toilet",
+  "Accessible parking",
+  "Quiet/sensory-friendly",
+  "Assistance animal welcome",
+  "Public transport nearby",
+  "MapAble verified",
+  "Transport bookable",
+] as const;
+
+export const homepageSupportJourneySteps: JourneyStep[] = [
+  {
+    number: "01",
+    title: "Search place",
+    body: "Find venues and services with access notes that matter to you.",
+  },
+  {
+    number: "02",
+    title: "Check access",
+    body: "Review measurements, confidence, and what still needs confirming.",
+  },
+  {
+    number: "03",
+    title: "Plan route",
+    body: "See transport assumptions, buffers, and meeting options.",
+  },
+  {
+    number: "04",
+    title: "Book transport/support",
+    body: "Request accessible transport or a support worker when you need one.",
+  },
+  {
+    number: "05",
+    title: "Confirm visit",
+    body: "Share access notes with your coordinator, driver, or carer.",
+  },
+  {
+    number: "06",
+    title: "Update access info",
+    body: "Report changes so the next person has better information.",
+  },
+];
+
+export const homepageProviderPitch = {
+  headline: "Grow by being useful, trusted, and accessible.",
+  body: "Providers on MapAble can show live availability, verified access-readiness, NDIS-aware enquiry flows, response-time badges, and venue or clinic access profiles — so participants can choose with clearer evidence.",
+  points: [
+    "Live availability",
+    "Verified access-readiness",
+    "NDIS-aware enquiry flow",
+    "Response-time badge",
+    "Venue/provider access profile",
+  ],
+  ctaLabel: "Explore provider tools",
+  ctaHref: "/provider-growth",
+};
+
+export const homepageFinalCta = {
+  headline: "Help build Australia’s access layer.",
+  body: "Map places, verify venues, join a mapping day, or share Access-Fit needs on your terms.",
+  ctas: [
+    { label: "Join a mapping day", href: "/mapping-days" },
+    { label: "Add access info", href: "/add-access-info" },
+    { label: "Verify my venue", href: "/verify-my-venue" },
+    { label: "Compare MapAble", href: "/compare" },
+  ],
+};
 
 export const guidedSearchPanelCopy = {
   eyebrow: "Guided support search",
@@ -260,51 +366,15 @@ export const sampleResults: SearchResult[] = [
     description:
       "Discover cafes, venues and everyday places with access notes, quiet spaces and wheelchair-friendly details.",
     action: "Open places",
-    href: "/access",
+    href: "/accessibility-map",
   },
 ];
 
-export const trustMetrics: TrustMetric[] = [
-  { value: "1", label: "guided place to compare care, transport and support" },
-  { value: "5", label: "support pathways: care, transport, NDIS help, jobs and places" },
-  { value: "0", label: "confusing hand-offs when care and transport belong together" },
-];
+export const trustMetrics: TrustMetric[] = homepageProofMetrics;
 
-export const differenceCards: DifferenceCard[] = [
-  {
-    title: "Beyond care-only matching",
-    body: "Mable-style marketplace clarity, but extended into transport, jobs, places and practical support guidance.",
-    badge: "Care + transport",
-  },
-  {
-    title: "Beyond worker profiles",
-    body: "Hireup-style confidence around profiles and support management, with MapAble’s access-first journey planning layered in.",
-    badge: "Access-first",
-  },
-  {
-    title: "Beyond directories",
-    body: "Search results become guided next steps: compare options, ask questions, save a pathway or talk to support.",
-    badge: "Guided support",
-  },
-];
+export const differenceCards: DifferenceCard[] = competitorContrastCards;
 
-export const journeySteps: JourneyStep[] = [
-  {
-    number: "01",
-    title: "Tell us what you need",
-    body: "Search naturally, choose a support area, or start with a guided prompt.",
-  },
-  {
-    number: "02",
-    title: "Compare matched options",
-    body: "See care, transport, jobs, places and guidance together instead of hunting across separate tabs.",
-  },
-  {
-    number: "03",
-    title: "Connect with confidence",
-    body: "Move to booking, enquiry, saved plan or human support when you are ready.",
-  },
-];
+export const journeySteps: JourneyStep[] = homepageSupportJourneySteps;
 
 export const marketplaceCards: MarketplaceCard[] = [
   {
@@ -340,7 +410,7 @@ export const marketplaceCards: MarketplaceCard[] = [
     eyebrow: "Access notes",
     body: "Discover everyday venues with wheelchair-friendly details, quiet spaces and community notes.",
     icon: "📍",
-    href: "/access",
+    href: "/accessibility-map",
   },
 ];
 
@@ -349,7 +419,7 @@ export const footerPlatformLinks: FooterLink[] = [
   { label: "Transport", href: "/transport" },
   { label: "Employment", href: "/employment" },
   { label: "Providers", href: "/providers" },
-  { label: "Accessible places", href: "/access" },
+  { label: "Accessible places", href: "/accessibility-map" },
   { label: "Provider finder", href: "/provider-finder" },
 ];
 
@@ -412,7 +482,8 @@ export const mapAbleCareCombinedDesignTests = [
   },
   {
     name: "positioning uses combined care language",
-    expectedHeadline: "Care, transport and opportunity, connected.",
+    expectedHeadline:
+      "Find accessible places, supports, and journeys you can actually use.",
   },
   {
     name: "support selector uses user-facing areas instead of agents",
@@ -446,13 +517,13 @@ export const mapAbleCareCombinedDesignTests = [
     name: "guided landing includes primary homepage sections",
     expectedSections: [
       "HeroSection",
+      "HomepageProofStrip",
+      "CompetitorContrastStrip",
+      "HomepageMapPreview",
+      "HomepageSupportJourney",
+      "HomepageProviderPitch",
+      "HomepageFinalCta",
       "GuidedSearchPanel",
-      "PersonaEntrySection",
-      "MarketplaceGrid",
-      "StrategicContrast",
-      "CanvasBlockGrid",
-      "JourneyTimeline",
-      "TrustAndSafetyBand",
       "BoundaryNotice",
     ],
   },

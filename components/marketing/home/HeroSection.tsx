@@ -1,7 +1,5 @@
-"use client";
-
-import Link from "next/link";
 import React from "react";
+import Link from "next/link";
 
 import { ArrowIcon } from "@/components/marketing/mapable-care-icons";
 import { TrustStrip } from "@/components/marketing/home/TrustStrip";
@@ -9,6 +7,7 @@ import { WavyText } from "@/components/marketing/MapAbleCareTypography";
 import {
   homepageCategoryChips,
   homepageHeroCopy,
+  homepageHeroCtas,
 } from "@/lib/marketing/mapable-care-combined-data";
 import { mapableCareFocusRing } from "@/lib/marketing/mapable-care-tokens";
 
@@ -34,25 +33,27 @@ export function HeroSection() {
             <AreaPill key={chip.label} label={chip.label} href={chip.href} />
           ))}
         </div>
-        <h1 className="max-w-4xl text-5xl font-black leading-[0.96] tracking-[-0.045em] text-[#0C1833] md:text-7xl">
+        <h1 className="max-w-5xl text-4xl font-black leading-[0.98] tracking-[-0.045em] text-[#0C1833] md:text-6xl lg:text-7xl">
           <WavyText text={homepageHeroCopy.headline} />
         </h1>
-        <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600">
+        <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-600">
           {homepageHeroCopy.subheading}
         </p>
-        <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-          <a
-            href="#guided-search-panel"
-            className={`inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-[#005B7F] px-6 py-4 text-base font-black text-white shadow-sm transition hover:bg-[#004766] ${mapableCareFocusRing}`}
-          >
-            {homepageHeroCopy.primaryCta} <ArrowIcon />
-          </a>
-          <a
-            href="#explore"
-            className={`inline-flex min-h-12 items-center justify-center rounded-2xl border-2 border-[#0C1833] px-6 py-4 text-base font-black text-[#0C1833] transition hover:bg-white ${mapableCareFocusRing}`}
-          >
-            {homepageHeroCopy.secondaryCta}
-          </a>
+        <div className="mt-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {homepageHeroCtas.map((cta, index) => (
+            <Link
+              key={cta.href}
+              href={cta.href}
+              className={
+                index === 0
+                  ? `inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-[#005B7F] px-5 py-4 text-center text-sm font-black text-white shadow-sm transition hover:bg-[#004766] ${mapableCareFocusRing}`
+                  : `inline-flex min-h-12 items-center justify-center rounded-2xl border-2 border-[#0C1833] bg-white/70 px-5 py-4 text-center text-sm font-black text-[#0C1833] transition hover:bg-white ${mapableCareFocusRing}`
+              }
+            >
+              {cta.label}
+              {index === 0 ? <ArrowIcon /> : null}
+            </Link>
+          ))}
         </div>
         <TrustStrip />
       </div>

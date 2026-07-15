@@ -113,7 +113,35 @@ export function AccessPlaceProfile({
         >
           Claim as venue owner
         </Link>
+        <Link
+          href="/journey-planner"
+          className="min-h-11 inline-flex items-center rounded-lg border border-border px-4"
+        >
+          Plan accessible trip
+        </Link>
+        <Link
+          href="/transport"
+          className="min-h-11 inline-flex items-center rounded-lg border border-border px-4"
+        >
+          Book transport
+        </Link>
+        <Link
+          href="/care/request"
+          className="min-h-11 inline-flex items-center rounded-lg border border-border px-4"
+        >
+          Request support worker
+        </Link>
+        <Link
+          href="/add-access-info"
+          className="min-h-11 inline-flex items-center rounded-lg border border-border px-4"
+        >
+          Report outdated info
+        </Link>
       </div>
+
+      <p className="text-sm text-muted-foreground" role="note">
+        MapAble verification provides access information, not legal certification.
+      </p>
 
       <AccessibilityDisclaimerPanel />
     </div>

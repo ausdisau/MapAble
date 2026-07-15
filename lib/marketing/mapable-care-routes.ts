@@ -8,7 +8,7 @@ export const supportAreaLandingRoutes: Record<SupportArea, string> = {
   Transport: "/provider-finder?area=Transport",
   "NDIS Help": "/ask",
   Jobs: "/provider-finder?area=Jobs",
-  Places: "/access",
+  Places: "/accessibility-map",
 };
 
 /** Maps marketing `area` query param to provider finder support type filter. */

@@ -53,8 +53,8 @@ describe("homepage guided landing", () => {
     const nav = screen.getByRole("navigation", { name: "Primary" });
     expect(nav).toBeTruthy();
     expect(nav.querySelector('a[href="#guided-search-panel"]')?.textContent).toBe("Search");
-    expect(nav.querySelector('a[href="#explore"]')?.textContent).toBe("Explore");
-    expect(nav.querySelector('a[href="/provider-finder"]')?.textContent).toBe("Providers");
+    expect(nav.querySelector('a[href="#map-preview"]')?.textContent).toBe("Places");
+    expect(nav.querySelector('a[href="/providers"]')?.textContent).toBe("Providers");
     expect(nav.querySelector('a[href="/ask"]')?.textContent).toBe("NDIS Guidance");
   });
 
@@ -63,13 +63,13 @@ describe("homepage guided landing", () => {
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
   });
 
-  it("renders hero CTAs targeting guided search and explore", () => {
-    expect(screen.getByRole("link", { name: /Start guided search/i }).getAttribute("href")).toBe(
-      "#guided-search-panel",
-    );
+  it("renders hero CTAs targeting access journeys", () => {
+    expect(
+      screen.getByRole("link", { name: /Find accessible places/i }).getAttribute("href"),
+    ).toBe("/accessibility-map");
     expect(
       screen.getByRole("link", { name: homepageHeroCopy.secondaryCta }).getAttribute("href"),
-    ).toBe("#explore");
+    ).toBe("/care/request");
   });
 
   it("renders guided search panel with labeled input", () => {
@@ -79,18 +79,13 @@ describe("homepage guided landing", () => {
     expect(screen.getByRole("heading", { name: "Build your support pathway" })).toBeTruthy();
   });
 
-  it("renders persona entry cards", () => {
-    expect(screen.getByRole("heading", { name: "Choose the pathway that fits you" })).toBeTruthy();
-    expect(
-      screen.getByRole("link", { name: /I'm looking for support/i }).getAttribute("href"),
-    ).toBe("/provider-finder");
-    expect(
-      screen.getByRole("link", { name: /I'm a support coordinator/i }).getAttribute("href"),
-    ).toBe("/support-coordinator");
+  it("renders accessibility map preview and final CTA", () => {
+    expect(document.getElementById("map-preview")).toBeTruthy();
+    expect(screen.getByRole("heading", { name: /Help build Australia/i })).toBeTruthy();
   });
 
-  it("renders explore marketplace anchor", () => {
-    expect(document.getElementById("explore")).toBeTruthy();
+  it("renders map preview sample places", () => {
+    expect(screen.getByRole("heading", { name: /Know before you go/i })).toBeTruthy();
   });
 });
 

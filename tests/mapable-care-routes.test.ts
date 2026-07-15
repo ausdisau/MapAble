@@ -9,7 +9,7 @@ import {
 
 describe("mapable-care-routes", () => {
   it("maps support areas to public discovery routes", () => {
-    expect(supportAreaLandingRoutes.Places).toBe("/access");
+    expect(supportAreaLandingRoutes.Places).toBe("/accessibility-map");
     expect(supportAreaLandingRoutes["NDIS Help"]).toBe("/ask");
     expect(supportAreaLandingRoutes.Care).toBe("/provider-finder?area=Care");
   });
@@ -29,7 +29,7 @@ describe("mapable-care-routes", () => {
   });
 
   it("maps search result categories to feature routes", () => {
-    expect(getSearchResultHref("Places")).toBe("/access");
+    expect(getSearchResultHref("Places")).toBe("/accessibility-map");
     expect(getSearchResultHref("NDIS Help")).toBe("/ask");
     expect(getSearchResultHref("Care")).toBe("/provider-finder?area=Care");
   });
