@@ -134,13 +134,13 @@ describe("mapAbleCareCombinedDesignTests", () => {
     );
     expect(spec?.expectedSections).toEqual([
       "HeroSection",
+      "HomepageProofStrip",
+      "CompetitorContrastStrip",
+      "HomepageMapPreview",
+      "HomepageSupportJourney",
+      "HomepageProviderPitch",
+      "HomepageFinalCta",
       "GuidedSearchPanel",
-      "PersonaEntrySection",
-      "MarketplaceGrid",
-      "StrategicContrast",
-      "CanvasBlockGrid",
-      "JourneyTimeline",
-      "TrustAndSafetyBand",
       "BoundaryNotice",
     ]);
     for (const section of spec?.expectedSections ?? []) {
@@ -178,9 +178,10 @@ describe("MapAbleCareCombinedHomepage", () => {
 
   it("renders category chips and marketplace section", () => {
     expect(screen.getAllByRole("link", { name: "NDIS Guidance" }).length).toBeGreaterThan(0);
-    expect(screen.getByLabelText("More than a care marketplace.")).toBeTruthy();
-    expect(document.getElementById("explore")).toBeTruthy();
+    expect(screen.getByRole("heading", { name: /Help build Australia/i })).toBeTruthy();
+    expect(document.getElementById("map-preview")).toBeTruthy();
   });
+
 
   it("renders footer contact and registration details", () => {
     expect(screen.getByText("0434 083 624")).toBeTruthy();
@@ -188,9 +189,9 @@ describe("MapAbleCareCombinedHomepage", () => {
     expect(screen.getByText("To be confirmed")).toBeTruthy();
   });
 
-  it("renders sponsored partner labels", () => {
-    expect(screen.getAllByText("Sponsored partner").length).toBeGreaterThan(0);
-    expect(screen.getByText("Community partners")).toBeTruthy();
+  it("renders competitor final CTA instead of sponsored home band", () => {
+    expect(screen.getByRole("heading", { name: /Help build Australia/i })).toBeTruthy();
+    expect(screen.getAllByRole("link", { name: "Verify my venue" }).length).toBeGreaterThan(0);
   });
 
   it("opens guided chat on panel search submit", () => {

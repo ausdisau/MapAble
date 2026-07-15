@@ -84,8 +84,8 @@ export function MarketingPrimaryNav() {
 
   const primaryLinks = [
     { label: "Search", href: searchHref },
-    { label: "Explore", href: isHome ? "#explore" : `${marketingFeatureRoutes.home}#explore` },
-    { label: "Providers", href: marketingFeatureRoutes.providerFinder },
+    { label: "Places", href: isHome ? "#map-preview" : "/accessibility-map" },
+    { label: "Providers", href: "/providers" },
     { label: "NDIS Guidance", href: marketingFeatureRoutes.ask },
   ];
 
