@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { AccessFitBadge } from "@/components/access-fit/AccessFitBadge";
 import { AccessNeedsTogglePanel } from "@/components/access-fit/AccessNeedsTogglePanel";
+import { OpenStreetMapView } from "@/components/accessibility-map/OpenStreetMapView";
 import { calculateAccessFit } from "@/lib/access-fit/calculate-access-fit";
 import { DEMO_ACCESS_NEEDS, EMPTY_ACCESS_NEEDS } from "@/lib/access-fit/types";
 import {
@@ -15,6 +16,8 @@ import {
 } from "@/lib/demo/accessibility-places";
 import { ACCESS_DISCLAIMER } from "@/lib/access-map/copy";
 import { mapableCareFocusRing } from "@/lib/marketing/mapable-care-tokens";
+
+const VIEW_STORAGE_KEY = "mapable-accessibility-map-view";
 
 export function AccessibilityMapLanding({
   initialPlaces = DEMO_ACCESS_PLACES,
@@ -28,8 +31,30 @@ export function AccessibilityMapLanding({
   const [query, setQuery] = useState("");
   const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
   const [view, setView] = useState<"list" | "map">("list");
+  const [selectedId, setSelectedId] = useState<string | undefined>();
   const [needs, setNeeds] = useState(EMPTY_ACCESS_NEEDS);
   const [useDemoNeeds, setUseDemoNeeds] = useState(false);
+  const cardRefs = useRef<Record<string, HTMLElement | null>>({});
+
+  useEffect(() => {
+    try {
+      const stored = sessionStorage.getItem(VIEW_STORAGE_KEY);
+      if (stored === "list" || stored === "map") {
+        setView(stored);
+      }
+    } catch {
+      // sessionStorage unavailable
+    }
+  }, []);
+
+  const handleViewChange = useCallback((next: "list" | "map") => {
+    setView(next);
+    try {
+      sessionStorage.setItem(VIEW_STORAGE_KEY, next);
+    } catch {
+      // sessionStorage unavailable
+    }
+  }, []);
 
   const places = useMemo(() => {
     const filters = [...selectedFilters];
@@ -53,6 +78,23 @@ export function AccessibilityMapLanding({
   ]);
 
   const activeNeeds = useDemoNeeds ? DEMO_ACCESS_NEEDS : needs;
+
+  const handleSelectPlace = useCallback((id: string | undefined) => {
+    setSelectedId(id);
+  }, []);
+
+  const handleCardSelect = useCallback(
+    (id: string) => {
+      setSelectedId(id);
+      if (view === "map") return;
+      // Subtle scroll into view when selecting from list — avoid aggressive auto-scroll
+      const el = cardRefs.current[id];
+      if (el && typeof el.scrollIntoView === "function") {
+        el.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
+    },
+    [view],
+  );
 
   function toggleFilter(id: string) {
     setSelectedFilters((current) =>
@@ -193,7 +235,7 @@ export function AccessibilityMapLanding({
 
         <div className="space-y-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <p className="text-sm text-slate-600" role="status">
+            <p className="text-sm text-slate-600" role="status" aria-live="polite">
               Showing {places.length} place{places.length === 1 ? "" : "s"}
             </p>
             <div
@@ -203,17 +245,17 @@ export function AccessibilityMapLanding({
             >
               <button
                 type="button"
-                className={`min-h-11 rounded-lg px-4 text-sm font-bold ${view === "list" ? "bg-[#005B7F] text-white" : ""}`}
+                className={`min-h-11 rounded-lg px-4 text-sm font-bold ${view === "list" ? "bg-[#005B7F] text-white" : ""} ${mapableCareFocusRing}`}
                 aria-pressed={view === "list"}
-                onClick={() => setView("list")}
+                onClick={() => handleViewChange("list")}
               >
                 List
               </button>
               <button
                 type="button"
-                className={`min-h-11 rounded-lg px-4 text-sm font-bold ${view === "map" ? "bg-[#005B7F] text-white" : ""}`}
+                className={`min-h-11 rounded-lg px-4 text-sm font-bold ${view === "map" ? "bg-[#005B7F] text-white" : ""} ${mapableCareFocusRing}`}
                 aria-pressed={view === "map"}
-                onClick={() => setView("map")}
+                onClick={() => handleViewChange("map")}
               >
                 Map
               </button>
@@ -221,32 +263,33 @@ export function AccessibilityMapLanding({
           </div>
 
           {view === "map" ? (
-            <div
-              className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-8"
-              role="region"
-              aria-label="Map placeholder"
-            >
-              <p className="font-semibold">Map preview placeholder</p>
-              <p className="mt-2 text-sm text-slate-600">
-                Interactive map scripts are optional. The list view below remains the
-                accessible, keyboard-friendly source of truth.
-              </p>
-              <ul className="mt-4 list-disc space-y-1 pl-5 text-sm">
-                {places.map((place) => (
-                  <li key={place.id}>
-                    {place.name} ({place.suburb}) — {place.tier}, score {place.accessScore}
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <OpenStreetMapView
+              places={places}
+              selectedId={selectedId}
+              onSelect={handleSelectPlace}
+              activeNeeds={activeNeeds}
+              onSwitchToList={() => handleViewChange("list")}
+            />
           ) : null}
 
+          {view === "list" ? (
           <ul className="space-y-4" aria-label="Accessible places">
             {places.map((place) => {
               const fit = calculateAccessFit(activeNeeds, place.profile);
+              const isSelected = selectedId === place.id;
               return (
                 <li key={place.id}>
-                  <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                  <article
+                    ref={(el) => {
+                      cardRefs.current[place.id] = el;
+                    }}
+                    className={`rounded-2xl border bg-white p-5 shadow-sm transition ${
+                      isSelected
+                        ? "border-[#005B7F] ring-2 ring-[#005B7F]/30"
+                        : "border-slate-200"
+                    }`}
+                    aria-current={isSelected ? "true" : undefined}
+                  >
                     <div className="flex flex-wrap items-start justify-between gap-3">
                       <div>
                         <h2 className="text-xl font-black">{place.name}</h2>
@@ -289,6 +332,17 @@ export function AccessibilityMapLanding({
                       >
                         View access details
                       </Link>
+                      <button
+                        type="button"
+                        className={`inline-flex min-h-11 items-center rounded-xl border border-slate-300 px-4 text-sm font-black ${mapableCareFocusRing}`}
+                        onClick={() => {
+                          handleCardSelect(place.id);
+                          handleViewChange("map");
+                        }}
+                        aria-label={`Show ${place.name} on map`}
+                      >
+                        Show on map
+                      </button>
                       <Link
                         href={`/journey-planner?destination=${encodeURIComponent(place.name)}`}
                         className={`inline-flex min-h-11 items-center rounded-xl border border-slate-300 px-4 text-sm font-black ${mapableCareFocusRing}`}
@@ -307,6 +361,7 @@ export function AccessibilityMapLanding({
               );
             })}
           </ul>
+          ) : null}
 
           <section
             aria-labelledby="help-map-heading"

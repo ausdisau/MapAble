@@ -113,4 +113,182 @@
     border-width: 3px;
     box-shadow: 0 2px 6px rgb(0 0 0 / 0.35);
   }
+
+  /* Accessibility map markers */
+  .access-map-leaflet {
+    width: 100%;
+    z-index: 0;
+  }
+
+  .access-map-leaflet .leaflet-container {
+    height: 100%;
+    min-height: inherit;
+    font-family: inherit;
+  }
+
+  .access-map-marker {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border: 2px solid white;
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    box-shadow: 0 2px 6px rgb(0 0 0 / 0.35);
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .access-map-marker--legend {
+    width: 32px;
+    height: 32px;
+    transform: rotate(-45deg);
+    flex-shrink: 0;
+  }
+
+  .access-map-marker__icon,
+  .access-map-marker__tier,
+  .access-map-marker__category {
+    transform: rotate(45deg);
+    line-height: 1;
+  }
+
+  .access-map-marker__icon {
+    font-size: 12px;
+  }
+
+  .access-map-marker__tier {
+    font-size: 10px;
+    font-weight: 900;
+    margin-top: 1px;
+  }
+
+  .access-map-marker__category {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    transform: rotate(45deg);
+    font-size: 8px;
+    font-weight: 800;
+    background: white;
+    color: #0C1833;
+    border-radius: 50%;
+    width: 14px;
+    height: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #0C1833;
+  }
+
+  .access-map-marker--gold {
+    background: #005B7F;
+    color: white;
+  }
+
+  .access-map-marker--silver {
+    background: #00A979;
+    color: white;
+  }
+
+  .access-map-marker--bronze {
+    background: #0C1833;
+    color: white;
+  }
+
+  .access-map-marker--unverified {
+    background: #64748b;
+    color: white;
+    border-style: dashed;
+  }
+
+  .access-map-marker--default {
+    background: #005B7F;
+    color: white;
+  }
+
+  .access-map-marker--selected {
+    border-color: #F8C51C;
+    border-width: 3px;
+    box-shadow: 0 0 0 3px rgb(248 197 28 / 0.5), 0 2px 8px rgb(0 0 0 / 0.4);
+    transform: rotate(-45deg) scale(1.1);
+  }
+
+  .access-map-marker:focus-visible {
+    outline: 3px solid #F8C51C;
+    outline-offset: 2px;
+  }
+
+  .access-map-user-marker {
+    position: relative;
+    width: 24px;
+    height: 24px;
+  }
+
+  .access-map-user-marker__dot {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 14px;
+    height: 14px;
+    background: #005B7F;
+    border: 3px solid white;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgb(0 0 0 / 0.3);
+  }
+
+  .access-map-user-marker__pulse {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 24px;
+    height: 24px;
+    background: rgb(0 91 127 / 0.25);
+    border-radius: 50%;
+    animation: access-map-pulse 2s ease-out infinite;
+  }
+
+  @keyframes access-map-pulse {
+    0% {
+      transform: translate(-50%, -50%) scale(0.5);
+      opacity: 1;
+    }
+    100% {
+      transform: translate(-50%, -50%) scale(1.5);
+      opacity: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .access-map-user-marker__pulse {
+      animation: none;
+      opacity: 0.5;
+    }
+
+    .access-map-marker {
+      transition: none;
+    }
+  }
+
+  .access-map-popup {
+    font-family: inherit;
+  }
+
+  .access-map-popup .leaflet-popup-content-wrapper {
+    border-radius: 12px;
+  }
+
+  .access-map-controls {
+    pointer-events: none;
+  }
+
+  .access-map-control:focus-visible {
+    outline: 3px solid #F8C51C;
+    outline-offset: 2px;
+  }
 }
