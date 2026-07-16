@@ -1,9 +1,9 @@
 import { z } from "zod";
 
-export const normalizedPointSchema = z.object({
-  x: z.number().min(0).max(1),
-  y: z.number().min(0).max(1),
-});
+import { indoorRouteGraphSchema } from "@/lib/indoor-accessibility/schemas/core";
+import { normalizedPointSchema, type NormalizedPoint } from "@/lib/floor-plan/normalized-point";
+
+export { normalizedPointSchema, type NormalizedPoint };
 
 export const floorPlanFeatureTypeSchema = z.enum([
   "accessible_entrance",
@@ -142,6 +142,7 @@ export const floorPlanDocumentSchema = z.object({
   zones: z.array(floorPlanZoneSchema),
   routes: z.array(floorPlanRouteSchema),
   connectors: z.array(floorConnectorSchema),
+  routeGraph: indoorRouteGraphSchema.optional(),
 });
 
 export const floorPlanAssetSchema = z.object({
@@ -170,6 +171,7 @@ export const floorPlanDetailSchema = z.object({
   zones: z.array(floorPlanZoneSchema),
   routes: z.array(floorPlanRouteSchema),
   connectors: z.array(floorConnectorSchema),
+  routeGraph: indoorRouteGraphSchema.optional(),
   sourceName: z.string().optional(),
   sourceUrl: z.string().optional(),
   licenceOrPermission: z.string().optional(),
@@ -196,7 +198,6 @@ export const venueFloorPlanDetailResponseSchema = z.object({
   plan: floorPlanDetailSchema,
 });
 
-export type NormalizedPoint = z.infer<typeof normalizedPointSchema>;
 export type FloorPlanFeatureType = z.infer<typeof floorPlanFeatureTypeSchema>;
 export type FloorPlanFeature = z.infer<typeof floorPlanFeatureSchema>;
 export type FloorPlanZone = z.infer<typeof floorPlanZoneSchema>;

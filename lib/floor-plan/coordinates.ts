@@ -1,4 +1,4 @@
-import type { NormalizedPoint } from "@/lib/floor-plan/schemas";
+import type { NormalizedPoint } from "@/lib/floor-plan/normalized-point";
 
 /** Convert normalized 0–1 coordinates to CSS percentage strings. */
 export function normalizedToPercent(point: NormalizedPoint): { left: string; top: string } {

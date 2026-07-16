@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 import { FloorPlanCanvas } from "@/components/accessibility-map/floor-plan/FloorPlanCanvas";
 import { FloorPlanEmptyState } from "@/components/accessibility-map/floor-plan/FloorPlanEmptyState";
@@ -19,7 +20,20 @@ import {
   FloorPlanTextAlternative,
 } from "@/components/accessibility-map/floor-plan/FloorPlanTextAlternative";
 import { FloorSelector } from "@/components/accessibility-map/floor-plan/FloorSelector";
+import { CheckpointResolver } from "@/components/indoor-accessibility/CheckpointResolver";
+import { CommunityCorrectionForm } from "@/components/indoor-accessibility/CommunityCorrectionForm";
+import { IndoorRoutePanel } from "@/components/indoor-accessibility/IndoorRoutePanel";
+import {
+  guidanceModeClassName,
+  MultimodalModeToggle,
+  type GuidanceMode,
+} from "@/components/indoor-accessibility/MultimodalModeToggle";
+import { OfflinePackPanel } from "@/components/indoor-accessibility/OfflinePackPanel";
+import { OperationalStatusPanel } from "@/components/indoor-accessibility/OperationalStatusPanel";
+import { PersonalFitPanel } from "@/components/indoor-accessibility/PersonalFitPanel";
+import { TrustFreshnessBadge } from "@/components/indoor-accessibility/TrustFreshnessBadge";
 import { useFloorPlanPanZoom } from "@/hooks/useFloorPlanPanZoom";
+import { useIndoorFeatureEnabled } from "@/hooks/useIndoorFeatureFlags";
 import {
   useVenueFloorPlanDetail,
   useVenueFloorPlanSummaries,
@@ -64,6 +78,8 @@ export function FloorPlanViewer({
   const [canvasFocused, setCanvasFocused] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [guidanceMode, setGuidanceMode] = useState<GuidanceMode>("standard");
+  const operationalStatusEnabled = useIndoorFeatureEnabled("operationalStatus");
   const liveRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const panZoom = useFloorPlanPanZoom(containerRef);
@@ -80,6 +96,35 @@ export function FloorPlanViewer({
   }, [floors, activeFloorId, initialFloorId]);
 
   const detailQuery = useVenueFloorPlanDetail(venueId, activeFloorId, Boolean(activeFloorId));
+
+  const incidentsQuery = useQuery({
+    queryKey: ["indoor-incidents", venueId],
+    queryFn: async () => {
+      const res = await fetch(`/api/indoor/incidents?placeId=${encodeURIComponent(venueId)}`);
+      if (!res.ok) return [];
+      const data = (await res.json()) as { incidents: Array<Record<string, string>> };
+      return data.incidents;
+    },
+    enabled: operationalStatusEnabled && Boolean(venueId) && !venueId.startsWith("demo-"),
+    staleTime: 60_000,
+  });
+
+  const demoIncidents = useMemo(() => {
+    if (venueId !== "demo-parramatta-library") return [];
+    return [
+      {
+        id: "demo-incident-lift",
+        incidentType: "lift_under_maintenance",
+        description: "Main lift reported under maintenance until 3 pm (demo incident).",
+        trustLevel: "venue_supplied",
+        featureId: "feat-ground-lift",
+        reportedAt: new Date().toISOString(),
+        moderationState: "verified",
+      },
+    ];
+  }, [venueId]);
+
+  const incidents = venueId.startsWith("demo-") ? demoIncidents : (incidentsQuery.data ?? []);
 
   const announce = useCallback((message: string) => {
     if (liveRef.current) liveRef.current.textContent = message;
@@ -170,7 +215,7 @@ export function FloorPlanViewer({
 
   return (
     <div
-      className={`fp-viewer flex flex-col gap-4 ${isFullscreen ? "fixed inset-0 z-[60] overflow-y-auto bg-white p-4" : ""} ${embedded ? "" : ""}`}
+      className={`fp-viewer flex flex-col gap-4 ${guidanceModeClassName(guidanceMode)} ${isFullscreen ? "fixed inset-0 z-[60] overflow-y-auto bg-white p-4" : ""} ${embedded ? "" : ""}`}
       role="region"
       aria-label={`Floor plan viewer for ${venueName}`}
     >
@@ -226,6 +271,8 @@ export function FloorPlanViewer({
       />
 
       <FloorPlanKeyboardHelp visible={showKeyboardHelp} />
+
+      <MultimodalModeToggle mode={guidanceMode} onChange={setGuidanceMode} />
 
       <div className="grid gap-4 lg:grid-cols-[16rem_1fr_18rem]">
         <aside className="hidden space-y-4 lg:block">
@@ -307,14 +354,17 @@ export function FloorPlanViewer({
 
         <aside className="space-y-4">
           {selectedFeature && plan ? (
-            <FloorPlanFeatureDetails
-              feature={selectedFeature}
-              floorName={plan.floorName}
-              connector={selectedConnector}
-              onViewConnectorFloor={handleViewConnectorFloor}
-              reportHref={reportHref}
-              onClose={() => setSelectedFeatureId(undefined)}
-            />
+            <>
+              <FloorPlanFeatureDetails
+                feature={selectedFeature}
+                floorName={plan.floorName}
+                connector={selectedConnector}
+                onViewConnectorFloor={handleViewConnectorFloor}
+                reportHref={reportHref}
+                onClose={() => setSelectedFeatureId(undefined)}
+              />
+              <TrustFreshnessBadge feature={selectedFeature} />
+            </>
           ) : (
             <div className="rounded-2xl border border-dashed border-slate-300 p-4 text-sm text-slate-600">
               Select a feature on the plan or in Text view to see details.
@@ -352,6 +402,62 @@ export function FloorPlanViewer({
               Source: {plan.sourceName}
               {plan.licenceOrPermission ? ` · ${plan.licenceOrPermission}` : ""}
             </p>
+          ) : null}
+
+          <PersonalFitPanel
+            features={plan?.features ?? []}
+            incidents={incidents.map((i) => ({
+              featureId: i.featureId,
+              operationalStatus: "unavailable",
+            }))}
+          />
+
+          <IndoorRoutePanel
+            routeGraph={plan?.routeGraph}
+            features={plan?.features ?? []}
+          />
+
+          <OperationalStatusPanel
+            placeId={venueId}
+            venueName={venueName}
+            incidents={incidents as Array<{
+              id: string;
+              incidentType: string;
+              description: string;
+              trustLevel: string;
+              featureId?: string | null;
+              reportedAt: string;
+              moderationState: string;
+            }>}
+          />
+
+          <CheckpointResolver
+            onResolved={(cp) => {
+              announce(`Checkpoint confirmed: ${cp.publicLabel}`);
+              if (cp.floorPlanId !== activeFloorId) {
+                handleSelectFloor(cp.floorPlanId);
+              }
+            }}
+          />
+
+          <CommunityCorrectionForm
+            placeId={venueId}
+            floorPlanId={activeFloorId}
+            featureId={selectedFeatureId}
+          />
+
+          {plan ? (
+            <OfflinePackPanel
+              venueId={venueId}
+              venueName={venueName}
+              packData={{
+                venueId,
+                venueName,
+                version: String(plan.version),
+                floorPlanSummaries: floors,
+                textAlternative: visibleFeatures,
+              }}
+            />
           ) : null}
 
           <FloorPlanStatusNotice />

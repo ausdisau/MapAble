@@ -194,6 +194,71 @@ const GROUND_FLOOR: FloorPlanDetail = {
       operationalStatus: "available",
     },
   ],
+  routeGraph: {
+    schemaVersion: 1,
+    nodes: [
+      {
+        id: "node-entrance",
+        floorPlanId: "demo-parramatta-ground",
+        type: "entrance",
+        position: { x: 0.5, y: 0.88 },
+        featureId: "feat-south-entrance",
+      },
+      {
+        id: "node-junction-lift",
+        floorPlanId: "demo-parramatta-ground",
+        type: "junction",
+        position: { x: 0.72, y: 0.65 },
+      },
+      {
+        id: "node-lift",
+        floorPlanId: "demo-parramatta-ground",
+        type: "lift",
+        position: { x: 0.72, y: 0.45 },
+        featureId: "feat-ground-lift",
+      },
+      {
+        id: "node-toilet",
+        floorPlanId: "demo-parramatta-ground",
+        type: "destination",
+        position: { x: 0.82, y: 0.35 },
+        featureId: "feat-ground-toilet",
+      },
+    ],
+    edges: [
+      {
+        id: "edge-entrance-junction",
+        fromNodeId: "node-entrance",
+        toNodeId: "node-junction-lift",
+        bidirectional: true,
+        stepFree: true,
+        distanceMetres: 14,
+        trustLevel: "mapable_verified",
+        restricted: false,
+      },
+      {
+        id: "edge-junction-lift",
+        fromNodeId: "node-junction-lift",
+        toNodeId: "node-lift",
+        bidirectional: true,
+        stepFree: true,
+        distanceMetres: 5,
+        trustLevel: "mapable_verified",
+        restricted: false,
+      },
+      {
+        id: "edge-lift-toilet",
+        fromNodeId: "node-lift",
+        toNodeId: "node-toilet",
+        bidirectional: true,
+        stepFree: true,
+        distanceMetres: 8,
+        minimumWidthMm: 900,
+        trustLevel: "mapable_verified",
+        restricted: false,
+      },
+    ],
+  },
 };
 
 const LEVEL_ONE: FloorPlanDetail = {

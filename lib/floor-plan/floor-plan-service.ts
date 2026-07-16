@@ -128,6 +128,7 @@ export async function getVenueFloorPlanDetail(
       zones: doc.zones,
       routes: doc.routes,
       connectors: doc.connectors,
+      routeGraph: doc.routeGraph,
       sourceName: row.sourceName ?? undefined,
       sourceUrl: row.sourceUrl ?? undefined,
       licenceOrPermission: row.licenceOrPermission ?? undefined,
