@@ -25,4 +25,19 @@ describe("convergenceOsConfig", () => {
     expect(mod.isConvergenceDomainRegistryEnabled()).toBe(true);
     expect(mod.convergenceOsConfig.autoMergeEnabled).toBe(false);
   });
+
+  it("defaults Iteration 2 flags to disabled", async () => {
+    vi.stubEnv("MAPABLE_CONVERGENCE_OS_ENABLED", "true");
+    const mod = await import("@/lib/config/convergence-os");
+    expect(mod.isConvergenceTwinEnabled()).toBe(false);
+    expect(mod.isConvergenceConstitutionEnabled()).toBe(false);
+    expect(mod.isConvergenceFederationEnabled()).toBe(false);
+  });
+
+  it("enables twin only when both master and twin flags are true", async () => {
+    vi.stubEnv("MAPABLE_CONVERGENCE_OS_ENABLED", "true");
+    vi.stubEnv("MAPABLE_CONVERGENCE_TWIN_ENABLED", "true");
+    const mod = await import("@/lib/config/convergence-os");
+    expect(mod.isConvergenceTwinEnabled()).toBe(true);
+  });
 });

@@ -13,7 +13,7 @@ ConvergenceOS is the architecture, schema, capability, branch, migration and rel
 
 Not a business vertical, not a Git/GitHub/Prisma/CI replacement, not an automatic merge bot, not an automatic migration executor, and not an AI system with authority to change canonical domains.
 
-## Wave 0 scope (this implementation)
+## Wave 0 scope
 
 Read-only registries:
 
@@ -26,6 +26,23 @@ Read-only registries:
 - Admin UI under `/admin/convergence`
 - APIs under `/api/convergence/*`
 - Advisory CI workflow (warnings; no hard fail unless enforced mode)
+
+## Iteration 2 scope (Waves 9–17, advisory)
+
+Stacked on Wave 0. Still **AUDIT/ADVISORY** — no auto source rewrite, no auto-merge, no real product-branch merges from rehearsals.
+
+| Surface | Docs / entry |
+|---------|----------------|
+| Architecture Constitution C-001…C-025 | [CONSTITUTION.md](./CONSTITUTION.md), `/admin/convergence/constitution` |
+| Repository Digital Twin | [REPOSITORY_TWIN.md](./REPOSITORY_TWIN.md), `/admin/convergence/repository-twin` |
+| Semantic domain resolver | `/admin/convergence/semantic` |
+| Data + authority lineage (synthetic) | `/admin/convergence/lineage` |
+| Blast-radius + counterfactuals | `/admin/convergence/blast-radius` |
+| Merge/migration rehearsal lab | `/admin/convergence/rehearsal` |
+| Agent preflight gateway | `/admin/convergence/agent-preflight` |
+| Drift / parity / supply / ownership / journeys / federation | `/admin/convergence/ops` |
+
+Seed: `POST /api/convergence/seed/iteration2` (admin; ConvergenceOS enabled).
 
 ## Feature flags
 
@@ -51,12 +68,27 @@ MAPABLE_CONVERGENCE_CAPABILITY_CATALOGUE_ENABLED=true
 MAPABLE_CONVERGENCE_BRANCH_GRAPH_ENABLED=true
 MAPABLE_CONVERGENCE_SCHEMA_SCAN_ENABLED=true
 MAPABLE_CONVERGENCE_MERGE_TRAIN_ENABLED=true
+# Iteration 2 (optional, still advisory)
+MAPABLE_CONVERGENCE_CONSTITUTION_ENABLED=true
+MAPABLE_CONVERGENCE_TWIN_ENABLED=true
+MAPABLE_CONVERGENCE_SEMANTIC_RESOLVER_ENABLED=true
+MAPABLE_CONVERGENCE_LINEAGE_ENABLED=true
+MAPABLE_CONVERGENCE_BLAST_RADIUS_ENABLED=true
+MAPABLE_CONVERGENCE_REHEARSAL_ENABLED=true
+MAPABLE_CONVERGENCE_AGENT_PREFLIGHT_ENABLED=true
+MAPABLE_CONVERGENCE_DRIFT_ENABLED=true
+MAPABLE_CONVERGENCE_ENV_PARITY_ENABLED=true
+MAPABLE_CONVERGENCE_SUPPLY_CHAIN_ENABLED=true
+MAPABLE_CONVERGENCE_OWNERSHIP_ENABLED=true
+MAPABLE_CONVERGENCE_GOLDEN_JOURNEY_ENABLED=true
+MAPABLE_CONVERGENCE_FEDERATION_ENABLED=true
 ```
 
 3. Sign in as admin → `/admin/convergence` → **Run repository scan**
-4. Review Domains, PRs, Dependencies, Collisions, Merge trains
-5. Download plain-text report from the overview page
-6. Disable flags to hide UI (data retained)
+4. Optionally seed Iteration 2 from Ops / federation, or twin/constitution pages
+5. Review Domains, Twin, Constitution, Lineage, Blast radius, Rehearsal, Agent preflight
+6. Download plain-text report from the overview page
+7. Disable flags to hide UI (data retained)
 
 ## Advisory CI
 

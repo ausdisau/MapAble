@@ -11,6 +11,14 @@ const LINKS = [
   { href: "/admin/convergence/capabilities", label: "Capabilities" },
   { href: "/admin/convergence/merge-trains", label: "Merge trains" },
   { href: "/admin/convergence/decisions", label: "Decisions" },
+  { href: "/admin/convergence/repository-twin", label: "Twin" },
+  { href: "/admin/convergence/constitution", label: "Constitution" },
+  { href: "/admin/convergence/semantic", label: "Semantic" },
+  { href: "/admin/convergence/lineage", label: "Lineage" },
+  { href: "/admin/convergence/blast-radius", label: "Blast radius" },
+  { href: "/admin/convergence/rehearsal", label: "Rehearsal" },
+  { href: "/admin/convergence/agent-preflight", label: "Agent preflight" },
+  { href: "/admin/convergence/ops", label: "Ops / federation" },
 ] as const;
 
 export function ConvergenceShell({

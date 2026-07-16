@@ -27,7 +27,7 @@ export default async function ConvergenceOverviewPage() {
   return (
     <ConvergenceShell
       title="ConvergenceOS"
-      description="Platform governance control plane: canonical domains, PR dependency graph, schema collisions, and advisory merge trains. Cursor may propose; humans approve; GitHub executes."
+      description="Platform governance control plane: Wave 0 registries plus Iteration 2 twin, constitution, lineage, blast-radius, rehearsal, and agent preflight — all advisory. Cursor may propose; humans approve; GitHub executes."
     >
       <section
         aria-labelledby="conv-status"
@@ -50,6 +50,13 @@ export default async function ConvergenceOverviewPage() {
           </li>
         </ul>
         <RunScanButton />
+        <p className="text-sm text-muted-foreground">
+          Iteration 2: enable twin/constitution/… flags, then use{" "}
+          <Link className="underline underline-offset-2" href="/admin/convergence/ops">
+            Ops / federation
+          </Link>{" "}
+          to seed registries, or open Twin / Constitution / Lineage sections.
+        </p>
         {latest ? (
           <p className="text-sm">
             <Link
