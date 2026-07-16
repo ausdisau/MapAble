@@ -3,6 +3,7 @@
 import Link from "next/link";
 
 import { AccessFitBadge } from "@/components/access-fit/AccessFitBadge";
+import { ViewFloorPlanButton } from "@/components/accessibility-map/floor-plan/ViewFloorPlanButton";
 import { calculateAccessFit } from "@/lib/access-fit/calculate-access-fit";
 import type { AccessNeed } from "@/lib/access-fit/types";
 import type { DemoAccessPlace } from "@/lib/demo/accessibility-places";
@@ -72,7 +73,7 @@ export function AccessibilityMapPopup({
         <AccessFitBadge score={fit.score} label={fit.label} />
       </div>
 
-      <div className="mt-3">
+      <div className="mt-3 space-y-2">
         <Link
           href={`/accessibility-map/${place.slug}`}
           className={`inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-[#005B7F] px-3 text-xs font-black text-white ${mapableCareFocusRing}`}
@@ -80,6 +81,12 @@ export function AccessibilityMapPopup({
         >
           View accessibility details
         </Link>
+        <ViewFloorPlanButton
+          venueId={place.id}
+          venueName={place.name}
+          venueSlug={place.slug}
+          className="w-full justify-center text-xs"
+        />
       </div>
     </div>
   );

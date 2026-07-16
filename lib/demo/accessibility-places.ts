@@ -13,6 +13,9 @@ export type DemoAccessPlace = {
   latitude?: number | null;
   /** Venue longitude (WGS84). Optional — places without coordinates appear in list view only. */
   longitude?: number | null;
+  /** Lightweight summary — whether a published floor plan exists (avoid fetching full document). */
+  hasFloorPlan?: boolean;
+  floorPlanCount?: number;
   accessScore: number;
   tier: DemoAccessTier;
   confidence: "high" | "medium" | "low" | "unknown";
@@ -37,6 +40,8 @@ export const DEMO_ACCESS_PLACES: DemoAccessPlace[] = [
     state: "NSW",
     latitude: -33.8155,
     longitude: 151.0031,
+    hasFloorPlan: true,
+    floorPlanCount: 2,
     accessScore: 82,
     tier: "Silver",
     confidence: "high",

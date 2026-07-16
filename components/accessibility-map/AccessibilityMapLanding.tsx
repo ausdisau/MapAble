@@ -4,6 +4,7 @@ import Link from "next/link";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { AccessFitBadge } from "@/components/access-fit/AccessFitBadge";
+import { ViewFloorPlanButton } from "@/components/accessibility-map/floor-plan/ViewFloorPlanButton";
 import { AccessNeedsTogglePanel } from "@/components/access-fit/AccessNeedsTogglePanel";
 import { OpenStreetMapView } from "@/components/accessibility-map/OpenStreetMapView";
 import { calculateAccessFit } from "@/lib/access-fit/calculate-access-fit";
@@ -332,6 +333,13 @@ export function AccessibilityMapLanding({
                       >
                         View access details
                       </Link>
+                      {place.hasFloorPlan ? (
+                        <ViewFloorPlanButton
+                          venueId={place.id}
+                          venueName={place.name}
+                          venueSlug={place.slug}
+                        />
+                      ) : null}
                       <button
                         type="button"
                         className={`inline-flex min-h-11 items-center rounded-xl border border-slate-300 px-4 text-sm font-black ${mapableCareFocusRing}`}

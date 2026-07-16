@@ -6842,6 +6842,7 @@ model AccessPlace {
   venueClaims      AccessVenueClaim[]
   venueProfile     AccessVenueProfile?
   importItems      AccessImportItem[]
+  floorPlans       AccessFloorPlan[]
 
   @@index([status])
   @@index([suburb, stateOrRegion])
@@ -6914,6 +6915,54 @@ model AccessPlaceEvent {
   metadata  Json?
   createdAt DateTime @default(now()) @map("created_at")
   @@map("access_place_events")
+}
+
+enum AccessFloorPlanStatus {
+  draft
+  published
+  superseded
+  archived
+}
+
+enum AccessFloorPlanVisibility {
+  public
+  authenticated
+  restricted
+  staffOnly
+}
+
+model AccessFloorPlan {
+  id                  String                    @id @default(cuid())
+  placeId             String                    @map("place_id")
+  place               AccessPlace               @relation(fields: [placeId], references: [id], onDelete: Cascade)
+  schemaVersion       Int                       @default(1) @map("schema_version")
+  floorCode           String                    @map("floor_code")
+  floorName           String                    @map("floor_name")
+  sortOrder           Int                       @default(0) @map("sort_order")
+  planAssetUrl        String                    @map("plan_asset_url")
+  planAssetType       String                    @map("plan_asset_type")
+  originalWidth       Int                       @map("original_width")
+  originalHeight      Int                       @map("original_height")
+  altText             String?                   @map("alt_text")
+  orientationLabel    String?                   @map("orientation_label")
+  isToScale           Boolean                   @default(false) @map("is_to_scale")
+  metresPerPlanUnit   Float?                    @map("metres_per_plan_unit")
+  publicationStatus   AccessFloorPlanStatus     @default(draft) @map("publication_status")
+  visibility          AccessFloorPlanVisibility @default(public)
+  sourceName          String?                   @map("source_name")
+  sourceUrl           String?                   @map("source_url")
+  licenceOrPermission String?                   @map("licence_or_permission")
+  version             Int                       @default(1)
+  verifiedAt          DateTime?                 @map("verified_at")
+  verifiedByType      String?                   @map("verified_by_type")
+  publishedAt         DateTime?                 @map("published_at")
+  supersededAt        DateTime?                 @map("superseded_at")
+  structuredData      Json                      @map("structured_data")
+  createdAt           DateTime                  @default(now()) @map("created_at")
+  updatedAt           DateTime                  @updatedAt @map("updated_at")
+
+  @@index([placeId, publicationStatus])
+  @@map("access_floor_plans")
 }
 
 model AccessPlaceReview {
