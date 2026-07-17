@@ -44,7 +44,7 @@ describe("Productisation Wave 0 registries", () => {
 
   it("enforces stack depth policy and train heads ≤ 3", () => {
     expect(MAX_UNMERGED_STACK_DEPTH).toBe(3);
-    expect(PRODUCTISATION_TRAIN_HEADS).toEqual([312, 313, 314]);
+    expect(PRODUCTISATION_TRAIN_HEADS).toEqual([331, 328, 329]);
     expect(() => assertStackDepthPolicy()).not.toThrow();
     expect(() => assertProductisationTrainDepth()).not.toThrow();
     for (const entry of PR_ACTION_LEDGER) {

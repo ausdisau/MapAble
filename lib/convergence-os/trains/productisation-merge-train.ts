@@ -10,7 +10,7 @@ export const PRODUCTISATION_MERGE_TRAIN: MergeTrainSeed = {
   name: "PRODUCTISATION + CONNECTED SERVICE",
   trainType: "PRODUCTISATION",
   summary:
-    "Wave 0 reconciliation (#312) → close superseded (incl. AccessCast duplicates after #324) → security (#313) → Communication–Workforce (#314) → split Companion/Ops/Starting Work onto main → Care/Transport/Billing loops → controlled pilot. Max stack depth 3.",
+    "Wave 0 (#312–#314) and productisation #327 on main. Leadership train: strategy #331 → Trust Fabric #328 → Access Evidence #329 → queue Starting Work #330; close/recreate colliding Transport/Care tips #332–#335. Max stack depth 3. Mega-branches extract-only.",
   riskSummary:
     "Critical: dual SoTs (TransportBooking/Trip, Invoice/BillingInvoice); mega RC #323; CareOS parallel writers; encryption fail-open until #313; AI authority creep. No automated merge.",
   rollbackNotes:
@@ -144,6 +144,43 @@ export const PRODUCTISATION_MERGE_TRAIN: MergeTrainSeed = {
         "After each human merge: rebase dependents; rerun remediation CI; refresh PR action ledger",
       humanOwner: "release_manager",
       rollback: "Disable MAPABLE_CONVERGENCE_OS_ENABLED",
+    },
+    {
+      stepOrder: 15,
+      action: "merge_docs_registries",
+      prNumber: 331,
+      branchName: "cursor/strategic-opportunity-reconciliation-e909",
+      evidence:
+        "Leadership train: operating lanes + capability honesty; no product schema",
+      humanOwner: "release_manager",
+      rollback: "Revert #331 docs/seeds",
+    },
+    {
+      stepOrder: 16,
+      action: "rebase_then_merge",
+      prNumber: 328,
+      branchName: "cursor/participant-access-receipts-a2fa",
+      evidence: "Trust Fabric receipts; MIG 20260717120000; RightsOS extract-only",
+      humanOwner: "security_reviewer",
+      rollback: "Revert migration + flag off",
+    },
+    {
+      stepOrder: 17,
+      action: "rebase_then_merge",
+      prNumber: 329,
+      branchName: "cursor/access-evidence-envelope-a2fa",
+      evidence: "Persistent access evidence envelopes; MIG 20260717130000",
+      humanOwner: "architecture_reviewer",
+      rollback: "Revert migration + flag off",
+    },
+    {
+      stepOrder: 18,
+      action: "close_superseded",
+      prNumber: 332,
+      evidence:
+        "Close #332–#335 colliding/overflow Opportunity tips; recreate Transport/Care after #330",
+      humanOwner: "release_manager",
+      rollback: "N/A — close only",
     },
   ],
 };

@@ -14,18 +14,17 @@ Machine seed: `lib/convergence-os/trains/productisation-merge-train.ts` (`PRODUC
 
 ## Order (summary)
 
-1. Close superseded: #289, #290, #291, #264, #287, #288, AccessCast duplicates #320–#322/#325, #202
-2. Split / do not merge #323 RC1
-3. Merge Wave 0 registries **#312**
-4. Rebase/merge security **#313**
-5. Rebase/merge Communication–Workforce **#314**
-6. Split Companion #315 / Provider Ops #316 / Starting Work #317 onto main
-7. Archive/defer CareOS parallel platform (#231+)
-8. NDIS domain #286 after security — adapters off
-9. Consolidate AI Expansion #273 with AI Next (refuse AiAccessPlace)
-10. Retire TransportBooking / legacy Invoice writers after migration
-11. Controlled pilot (Starting Work)
-12. Rescan ConvergenceOS after each merge
+**Completed on main (`fb80bc83`):** Wave 0 #312/#313/#314; AccessCast #324; productisation #327 (Companion/Ops/Care–Transport–Billing/synthetic Starting Work).
+
+**Active leadership train (depth ≤ 3)** — see [LEADERSHIP_TRAIN_RECONCILIATION.md](../remediation/LEADERSHIP_TRAIN_RECONCILIATION.md):
+
+1. Merge strategy **#331** (no product migration)
+2. Rebase/merge Trust Fabric **#328** (`20260717120000`)
+3. Rebase/merge Access Evidence **#329** (`20260717130000`)
+4. Queue Starting Work DB **#330** (`20260717140000`)
+5. Close colliding Opportunity tips **#332–#335**; recreate Transport quotes / Recurring Care with `…150000` / `…160000`
+6. Defer mega-branches (#301 Continuity, #309 AccessOps, #319 Replay Lab, RightsOS #280, AI giants) — extract only
+7. Rescan ConvergenceOS after each merge
 
 ## Canonical conflicts to refuse
 

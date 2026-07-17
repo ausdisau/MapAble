@@ -64,7 +64,13 @@ function main(): void {
   }
 
   // Fail on empty-string secret coalescing in auth/crypto/env
-  const scanRoots = ["lib/auth", "lib/crypto", "lib/security", "lib/env.ts", "lib/config"];
+  const scanRoots = [
+    "lib/auth",
+    "lib/crypto",
+    "lib/security",
+    "lib/env.ts",
+    "lib/config",
+  ];
   const files: string[] = [];
   for (const rel of scanRoots) {
     const abs = path.join(ROOT, rel);

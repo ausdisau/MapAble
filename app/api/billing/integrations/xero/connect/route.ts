@@ -18,12 +18,13 @@ export async function POST(req: Request) {
   const body = await req.json().catch(() => ({}));
   const parsed = xeroConnectSchema.safeParse(body);
   if (!parsed.success) return zodErrorResponse(parsed.error);
+  if (!parsed.data.organisationId) {
+    return jsonError("organisationId required", 400);
+  }
+  const organisationId = parsed.data.organisationId;
 
   try {
-    const organisationId = parsed.data.organisationId;
-    if (organisationId) {
-      await assertCanAccessBillingOrganisation(user, organisationId);
-    }
+    await assertCanAccessBillingOrganisation(user, organisationId);
     const result = await connectXero({
       organisationId,
       actorId: user.id,
