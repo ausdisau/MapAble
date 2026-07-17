@@ -1644,11 +1644,15 @@ model CareShift {
   careServiceLog          CareServiceLog?
   shiftCancellations      CareShiftCancellation[]
   backupRecovery          BackupShiftRecovery?
+  recurringScheduleId     String?
+  recurringSchedule       CareRecurringSchedule? @relation(fields: [recurringScheduleId], references: [id], onDelete: SetNull)
+  occurrenceDate          DateTime?
 
   @@index([participantId, status])
   @@index([organisationId])
   @@index([workerProfileId])
   @@index([careBookingId])
+  @@index([recurringScheduleId, occurrenceDate])
 }
 
 model CareBooking {
@@ -1679,10 +1683,66 @@ model CareBooking {
   recoveryLinks     CareServiceRecoveryLink[]
   invoiceLinks      CareInvoiceLink[]
   ndisDeliveryAuthorizations NdisServiceDeliveryAuthorization[]
+  recurringSchedules CareRecurringSchedule[]
 
   @@index([participantId, status])
   @@index([organisationId, status])
   @@map("care_bookings")
+}
+
+enum CareRecurringScheduleStatus {
+  draft
+  active
+  paused
+  ended
+}
+
+enum CareScheduleExceptionType {
+  skip
+  reschedule
+}
+
+/// Recurring Care cadence for a booking. Agreement SoT remains CareServiceAgreement.
+model CareRecurringSchedule {
+  id             String                      @id @default(cuid())
+  careBookingId  String
+  careBooking    CareBooking                 @relation(fields: [careBookingId], references: [id], onDelete: Cascade)
+  participantId  String
+  organisationId String
+  /// weekly | fortnightly
+  frequency      String
+  /// ISO weekdays 1=Mon .. 7=Sun
+  byWeekday      Int[]
+  startTimeLocal String
+  endTimeLocal   String
+  timezone       String                      @default("Australia/Sydney")
+  effectiveFrom  DateTime
+  effectiveTo    DateTime?
+  status         CareRecurringScheduleStatus @default(draft)
+  createdAt      DateTime                    @default(now())
+  updatedAt      DateTime                    @updatedAt
+
+  exceptions CareRecurringScheduleException[]
+  shifts     CareShift[]
+
+  @@index([careBookingId, status])
+  @@index([participantId])
+  @@map("care_recurring_schedules")
+}
+
+model CareRecurringScheduleException {
+  id             String                    @id @default(cuid())
+  scheduleId     String
+  schedule       CareRecurringSchedule     @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+  occurrenceDate DateTime                  @db.Date
+  type           CareScheduleExceptionType
+  newStartAt     DateTime?
+  newEndAt       DateTime?
+  reason         String?
+  createdAt      DateTime                  @default(now())
+
+  @@unique([scheduleId, occurrenceDate])
+  @@map("care_recurring_schedule_exceptions")
 }
 
 model CareBookingEvent {
