@@ -1,4 +1,7 @@
-# Care module (MapAble Care MVP)
+# Care module (MapAble Care)
+
+**Maturity:** merged_but_flagged / controlled_pilot grade — not production_supported.  
+**Lane:** MapAble Network (facilitation) — not Managed Support unless a separately registered entity delivers.
 
 ## Built
 
@@ -8,11 +11,15 @@
 - Manual worker assignment with eligibility and high-intensity competency gates
 - Worker portal: `/worker/today`, `/worker/shifts/[id]` with shift status stepper
 - Access needs and support tasks summaries
-- Service agreement placeholder per booking
+- **Accessible service agreements** (versioned, plain-language, participant acceptance) via
+  `GET/POST /api/care/bookings/[id]/agreement` — see `docs/productisation/CARE_TRANSPORT_BILLING_SLICE.md`
 - Service log create/submit, participant confirm/dispute
-- Invoice placeholder (requires confirmed service log; pricing stub only)
+- **Evidence billing handoff** — confirmed service log → `BillingServiceRecord` via
+  `POST /api/care/bookings/[id]/billing-handoff` (idempotent)
+- Legacy `invoice-placeholder` retained for compatibility (pricing stub; not funding approval)
 - Incident/concern report with optional Quality & Safeguards Centre escalation
 - Role-aware and consent-aware access control with audit events on status changes
+- Backup shift recovery links (Care-local; mission Continuity is a later programme wave)
 
 ## Routes
 
@@ -28,17 +35,24 @@ Legacy redirects: `/dashboard/care/*` → `/care/*`
 
 - `GET/POST /api/care/bookings`, `GET /api/care/bookings/[id]`
 - `POST /api/care/bookings/[id]/accept|decline|assign-worker|invoice-placeholder`
+- `GET/POST /api/care/bookings/[id]/agreement` — versioned accessible agreement + participant acceptance
+- `POST /api/care/bookings/[id]/billing-handoff` — evidence → `BillingServiceRecord`
 - `GET/POST /api/care/service-logs`, `POST .../confirm`, `POST .../dispute`
 - `POST /api/care/incidents`, `POST /api/care/incidents/[id]/escalate-qsc`
-- Existing: `/api/care/requests`, `/api/care/shifts`
+- Existing: `/api/care/requests`, `/api/care/shifts`, recovery routes under `/api/care/recovery`
 
 ## Database tables
 
-Prisma models mapped with `@@map` to: `care_requests`, `care_bookings`, `care_booking_events`, `care_booking_workers`, `care_roster_assignments`, `care_service_agreements`, `care_service_logs`, `care_progress_notes`, `care_participant_preferences`, `care_worker_preferences`, `care_access_needs`, `care_risk_flags`, `care_living_alone_safeguards`, `care_shift_cancellations`, `care_service_recovery_links`, `care_invoice_links`.
+Prisma models mapped with `@@map` to: `care_requests`, `care_bookings`, `care_booking_events`,
+`care_booking_workers`, `care_roster_assignments`, `care_service_agreements`, `care_service_logs`,
+`care_progress_notes`, `care_participant_preferences`, `care_worker_preferences`, `care_access_needs`,
+`care_risk_flags`, `care_living_alone_safeguards`, `care_shift_cancellations`,
+`care_service_recovery_links`, `care_invoice_links`, backup shift recovery models.
 
 ## Privacy
 
-Accessibility details require consent (`care.accessibility_share`), including organisation-scoped checks for providers.
+Accessibility details require consent (`care.accessibility_share`), including organisation-scoped
+checks for providers. GPS check-in is never required for agreements.
 
 ## Discovery → care request
 
@@ -49,12 +63,21 @@ NDIS Provider Finder outlets can link to a platform `Organisation` when:
 
 When linked, profile and finder cards show **Request care** → `/care/request?organisationId=…&providerName=…` with wizard prefill banner.
 
-## Limitations
+## Limitations / honesty
 
-- No AI matching, GPS check-in, or recurring bookings
-- NDIS pricing is placeholder only — no funding approval claims
-- Invoice generation is a stub until NDIS Pricing Intelligence is wired
+- No AI matching or automatic worker assignment
+- Recurring bookings / schedule exceptions — **not complete** (programme PR 3)
+- NDIS pricing is unresolved until versioned pricing policy — no funding approval claims
+- Billing handoff creates `BillingServiceRecord`; it does not submit to NDIA
+- Cancel Care must not silently cancel connected Transport (Continuity PR 5)
 
 ## Tests
 
-`tests/care-mvp.test.ts` — permissions, worker eligibility, participant access helpers.
+`tests/care-mvp.test.ts` — permissions, worker eligibility, participant access helpers.  
+Care↔Billing adapters under `tests/**/care-transport-billing*`.
+
+## Related
+
+- `docs/productisation/CARE_TRANSPORT_BILLING_SLICE.md`
+- `docs/productisation/CAPABILITY_REGISTRY.md`
+- `docs/strategy/OPERATING_LANES.md`

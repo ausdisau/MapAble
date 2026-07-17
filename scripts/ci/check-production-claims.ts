@@ -13,6 +13,8 @@ const SCAN_DIRS = [
   "app/(core)",
   "docs/operations",
   "docs/remediation",
+  "docs/strategy",
+  "docs/productisation",
   "README.md",
 ];
 
@@ -37,6 +39,10 @@ const FORBIDDEN: Array<{ re: RegExp; reason: string }> = [
   {
     re: /\bMapAble\s+is\s+an?\s+NDIS[- ]registered\b/i,
     reason: "MapAble NDIS registration claim",
+  },
+  {
+    re: /\bMapAble\s+Managed\s+Support\s+is\s+live\b/i,
+    reason: "Managed Support live claim without registration evidence",
   },
   {
     re: /\bproduction[_ ]ready\b(?![^.\n]{0,40}(not|never|until|unless|false))/i,
@@ -107,6 +113,19 @@ function main(): void {
   const inv = path.join(ROOT, "docs/remediation/CAPABILITY_INVENTORY.md");
   if (!fs.existsSync(inv)) {
     errors.push("docs/remediation/CAPABILITY_INVENTORY.md missing");
+  }
+
+  const strategyRequired = [
+    "docs/strategy/OPERATING_LANES.md",
+    "docs/strategy/COMPETITIVE_POSITION.md",
+    "docs/strategy/BUILD_PARTNER_DEFER.md",
+    "docs/strategy/STRATEGIC_OPPORTUNITIES.md",
+    "docs/productisation/CAPABILITY_REGISTRY.md",
+  ];
+  for (const rel of strategyRequired) {
+    if (!fs.existsSync(path.join(ROOT, rel))) {
+      errors.push(`${rel} missing`);
+    }
   }
 
   if (errors.length > 0) {
