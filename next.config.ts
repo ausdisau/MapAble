@@ -2,6 +2,11 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true, // Enables additional React checks in dev
+  // Vercel default build machines are 8 GB; leave headroom so lint+tsc
+  // workers are not SIGKILL'd (OOM) during production deploys of main.
+  experimental: {
+    cpus: 1,
+  },
   // todo: check where this is applied and how it works
   async headers() {
     return [
