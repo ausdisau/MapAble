@@ -6,6 +6,7 @@ import { hasPermission } from "@/lib/auth/permissions";
 import { isAdminRole } from "@/lib/auth/roles";
 import { hasBillingPermission } from "@/lib/billing/permissions";
 import { prisma } from "@/lib/prisma";
+import { assertAdminTenantAccess } from "@/lib/security/break-glass";
 
 export class BillingAccessError extends Error {
   readonly status: number;
@@ -60,7 +61,11 @@ export async function assertCanAccessBillingOrganisation(
   user: CurrentUser,
   organisationId: string
 ): Promise<void> {
-  if (isAdminRole(user.primaryRole) || hasBillingPermission(user.primaryRole, "billing:view_all")) {
+  if (isAdminRole(user.primaryRole)) {
+    assertAdminTenantAccess(user, organisationId);
+    return;
+  }
+  if (hasBillingPermission(user.primaryRole, "billing:view_all")) {
     return;
   }
 

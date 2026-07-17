@@ -1,20 +1,21 @@
 #!/usr/bin/env tsx
 /**
  * Detects known-unsafe secret fallback patterns.
- * PR 1: fail on NEW patterns; NDIS fallback is tracked but still present until PR 2.
- * Set STRICT_UNSAFE_ENV=1 to fail on NDIS fallbacks (enabled after PR 2).
+ * After productisation security hardening: NDIS encryption must not fall back
+ * to NEXTAUTH_SECRET or a hardcoded production-looking default.
  */
 import fs from "node:fs";
 import path from "node:path";
 
 const ROOT = process.cwd();
 
-const TRACKED_UNTIL_PR2 = [
+const FORBIDDEN_IN_NDIS_CRYPTO = [
   {
     file: "lib/crypto/ndis.ts",
     needles: [
       "mapable-dev-only-key-change-in-production",
       "process.env.NEXTAUTH_SECRET",
+      "process.env.SESSION_SECRET",
     ],
   },
 ];
@@ -33,23 +34,37 @@ function walkTs(dir: string, out: string[] = []): string[] {
 
 function main(): void {
   const errors: string[] = [];
-  const strict = process.env.STRICT_UNSAFE_ENV === "1";
 
-  for (const tracked of TRACKED_UNTIL_PR2) {
+  for (const tracked of FORBIDDEN_IN_NDIS_CRYPTO) {
     const abs = path.join(ROOT, tracked.file);
     if (!fs.existsSync(abs)) continue;
     const text = fs.readFileSync(abs, "utf8");
     for (const needle of tracked.needles) {
       if (text.includes(needle)) {
-        const msg = `${tracked.file} contains insecure fallback marker: ${needle}`;
-        if (strict) errors.push(msg);
-        else console.warn(`WARN (tracked until PR 2): ${msg}`);
+        errors.push(
+          `${tracked.file} contains insecure fallback marker: ${needle}`,
+        );
+      }
+    }
+  }
+
+  const encryptionKeys = path.join(ROOT, "lib/security/encryption-keys.ts");
+  if (fs.existsSync(encryptionKeys)) {
+    const text = fs.readFileSync(encryptionKeys, "utf8");
+    for (const needle of [
+      "process.env.NEXTAUTH_SECRET",
+      "process.env.SESSION_SECRET",
+    ]) {
+      if (text.includes(needle)) {
+        errors.push(
+          `lib/security/encryption-keys.ts must not use ${needle} for field encryption`,
+        );
       }
     }
   }
 
   // Fail on empty-string secret coalescing in auth/crypto/env
-  const scanRoots = ["lib/auth", "lib/crypto", "lib/env.ts", "lib/config"];
+  const scanRoots = ["lib/auth", "lib/crypto", "lib/security", "lib/env.ts", "lib/config"];
   const files: string[] = [];
   for (const rel of scanRoots) {
     const abs = path.join(ROOT, rel);

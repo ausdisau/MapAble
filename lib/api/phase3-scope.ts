@@ -1,7 +1,12 @@
 import type { CurrentUser } from "@/lib/auth/current-user";
-import { hasPermission } from "@/lib/auth/permissions";
+import { hasPermission, type Permission } from "@/lib/auth/permissions";
 import { isAdminRole } from "@/lib/auth/roles";
 import { prisma } from "@/lib/prisma";
+import {
+  assertAdminTenantAccess,
+  getActiveBreakGlass,
+  isAdminBreakGlassRequired,
+} from "@/lib/security/break-glass";
 
 export async function getUserOrganisationIds(userId: string): Promise<string[]> {
   const memberships = await prisma.organisationMember.findMany({
@@ -32,9 +37,16 @@ export class OrganisationAccessError extends Error {
 export async function assertOrganisationAccess(
   user: CurrentUser,
   organisationId: string,
-  permission: "worker:manage:org" | "care:manage:org" = "worker:manage:org"
+  permission: Permission = "worker:manage:org",
 ): Promise<void> {
-  if (isAdminRole(user.primaryRole)) return;
+  if (!organisationId || typeof organisationId !== "string") {
+    throw new OrganisationAccessError("organisationId required");
+  }
+  if (isAdminRole(user.primaryRole)) {
+    // Ambient admin org access requires break-glass when enforced.
+    assertAdminTenantAccess(user, organisationId);
+    return;
+  }
   if (!hasPermission(user.primaryRole, permission)) {
     throw new OrganisationAccessError();
   }
@@ -42,6 +54,28 @@ export async function assertOrganisationAccess(
   if (!orgIds.includes(organisationId)) {
     throw new OrganisationAccessError();
   }
+}
+
+/**
+ * Organisation IDs the user may list for a given manage permission.
+ * Admins never receive a global unscoped list when break-glass is enforced.
+ */
+export async function organisationScopedIds(
+  user: CurrentUser,
+  permission: Permission,
+): Promise<string[] | "admin_unscoped"> {
+  if (isAdminRole(user.primaryRole)) {
+    if (isAdminBreakGlassRequired()) {
+      const active = getActiveBreakGlass(user.id);
+      if (!active?.organisationId) return [];
+      return [active.organisationId];
+    }
+    return "admin_unscoped";
+  }
+  if (!hasPermission(user.primaryRole, permission)) {
+    return [];
+  }
+  return getUserOrganisationIds(user.id);
 }
 
 export type WorkerProfileAccess = {
