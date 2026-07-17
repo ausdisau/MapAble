@@ -238,7 +238,7 @@ export async function refundPaymentStub(
   });
 
   const from = normalizeLegacyStatus(invoice.status);
-  if (from === "paid" || from === "partially_paid") {
+  if (from === "paid") {
     await transitionInvoice({
       invoiceId: invoice.id,
       to: "refunded",
@@ -248,6 +248,8 @@ export async function refundPaymentStub(
       organisationId: input.organisationId,
     });
   }
+  // partially_paid → refunded is not in the state machine; amountPaidCents
+  // was already reduced above. Prefer credit notes for partial refunds.
 
   await writeFinancialAudit({
     organisationId: input.organisationId ?? invoice.providerId,

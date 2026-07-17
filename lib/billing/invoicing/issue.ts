@@ -308,6 +308,10 @@ export async function approveInvoice(
   });
   const from = normalizeLegacyStatus(invoice.status);
 
+  if (from === "approved") {
+    return invoice;
+  }
+
   let to: BillingInvoiceState = "approved";
   if (from === "participant_review") {
     // Prefer provider review next when provider approval still pending
@@ -321,6 +325,10 @@ export async function approveInvoice(
     to = providerPending ? "provider_review" : "approved";
   } else if (from === "provider_review") {
     to = "approved";
+  } else {
+    throw new Error(
+      `Cannot approve invoice from status ${from}; expected participant_review or provider_review`
+    );
   }
 
   const { invoice: updated } = await transitionInvoice({
