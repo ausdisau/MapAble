@@ -32,6 +32,7 @@ describe("AI platform capability registry", () => {
         "billing.copilot",
         "matching.care_rules",
         "matching.ai_overlay",
+        "mission.copilot",
         "accesscast.forecast",
         "access_intelligence_next.preflight",
       ])
