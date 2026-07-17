@@ -22,8 +22,13 @@ describe("Phase 5 config", () => {
 
 describe("AI matching safety", () => {
   it("marks low confidence for participant summary", () => {
-    const s = participantSafeAiSummary({ combinedScore: 0.4, lowConfidence: true });
+    const s = participantSafeAiSummary({
+      combinedScore: 0.4,
+      lowConfidence: true,
+      modelCommentaryScore: null,
+    });
     expect(s.fit).toContain("review");
+    expect(s.modelRan).toBe(false);
   });
 });
 
