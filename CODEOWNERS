@@ -58,6 +58,7 @@
 /lib/access-intelligence-next/ @ausdisau/mapable-maintainers @ausdisau/mapable-privacy
 /app/api/access-intelligence-next/ @ausdisau/mapable-maintainers @ausdisau/mapable-privacy
 /app/access-intelligence/living-graph/ @ausdisau/mapable-maintainers
+/app/access-intelligence/journey-preflight/ @ausdisau/mapable-maintainers
 /docs/access-intelligence-next/ @ausdisau/mapable-maintainers
 /components/access-intelligence-next/ @ausdisau/mapable-maintainers
 /tests/access-intelligence-next/ @ausdisau/mapable-maintainers
