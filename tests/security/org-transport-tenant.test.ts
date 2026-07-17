@@ -58,7 +58,7 @@ describe("org-scoped transport mutations", () => {
     expect(
       createAvailabilityBodySchema.safeParse({
         organisationId: "org-a",
-        dayOfWeek: 1,
+        dayOfWeek: "MONDAY",
         startTime: "09:00",
         endTime: "17:00",
         role: "admin",
@@ -67,14 +67,14 @@ describe("org-scoped transport mutations", () => {
   });
 
   it("allows organisation members and denies cross-tenant organisationId", async () => {
-    vi.mocked(prisma.organisationMember.findMany).mockImplementation(
-      async ({ where }: { where: { userId: string } }) => {
-        if (where.userId === "user-member") {
-          return [{ organisationId: "org-a" }];
-        }
-        return [{ organisationId: "org-b" }];
-      },
-    );
+    vi.mocked(prisma.organisationMember.findMany).mockImplementation(((
+      args?: { where?: { userId?: string } },
+    ) => {
+      const userId = args?.where?.userId;
+      const organisationId =
+        userId === "user-member" ? "org-a" : "org-b";
+      return Promise.resolve([{ organisationId }]);
+    }) as unknown as typeof prisma.organisationMember.findMany);
 
     await expect(
       assertOrganisationAccess(memberUser, "org-a", "driver:manage:org"),
@@ -97,7 +97,7 @@ describe("org-scoped transport mutations", () => {
     vi.mocked(prisma.organisationMember.findMany).mockResolvedValue([
       { organisationId: "org-a" },
       { organisationId: "org-c" },
-    ]);
+    ] as Awaited<ReturnType<typeof prisma.organisationMember.findMany>>);
     const scope = await organisationScopedIds(memberUser, "driver:manage:org");
     expect(scope).toEqual(["org-a", "org-c"]);
   });

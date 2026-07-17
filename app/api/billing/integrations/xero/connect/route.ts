@@ -20,9 +20,12 @@ export async function POST(req: Request) {
   if (!parsed.success) return zodErrorResponse(parsed.error);
 
   try {
-    await assertCanAccessBillingOrganisation(user, parsed.data.organisationId);
+    const organisationId = parsed.data.organisationId;
+    if (organisationId) {
+      await assertCanAccessBillingOrganisation(user, organisationId);
+    }
     const result = await connectXero({
-      organisationId: parsed.data.organisationId,
+      organisationId,
       actorId: user.id,
       actorRole: user.primaryRole,
     });

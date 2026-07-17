@@ -32,7 +32,10 @@ describe("dedicated encryption keys", () => {
     delete process.env.MAPABLE_DATA_ENCRYPTION_KEY;
     process.env.MAPABLE_ALLOW_DEV_ENCRYPTION_FALLBACK = "false";
     process.env.NEXTAUTH_SECRET = "session-secret-must-not-work";
-    process.env.NODE_ENV = "production";
+    Object.defineProperty(process.env, "NODE_ENV", {
+      value: "production",
+      configurable: true,
+    });
     expect(() => resolveDataEncryptionKey(process.env)).toThrow(
       EncryptionKeyUnavailableError,
     );

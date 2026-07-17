@@ -179,7 +179,7 @@ export function forecastHarbourPlaceOutlook(
   const generatedAt = nowIso;
   const horizon = resolveHorizon(intended, nowIso);
 
-  let liftStatus: "unknown" | "outage" | "ok" | "stale" | "conflicting" = "unknown";
+  let liftStatus: "unknown" | "outage" | "ok" | "conflicting" = "unknown";
   let vision = false;
   let construction = true;
 
@@ -222,12 +222,6 @@ export function forecastHarbourPlaceOutlook(
   const fallback = harbourFallback(false);
   const confirmationTasks = harbourConfirmationTasks(false);
   const timeline = harbourPlaceTimeline();
-
-  // Mark lift segment stale freshness for stale scenario
-  if (liftStatus === "stale") {
-    const lift = segments.find((s) => s.segmentId === "seg-lift");
-    if (lift) lift.freshness = "stale";
-  }
 
   const state = calculateForecastState({
     requirements,

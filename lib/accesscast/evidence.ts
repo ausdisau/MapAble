@@ -27,7 +27,9 @@ export function isEvidenceStale(
   nowIso: string,
 ): boolean {
   const ttlDays =
-    (ontologyConceptId && DEFAULT_TEMPORAL_TTL_DAYS[ontologyConceptId]) ?? 30;
+    (ontologyConceptId
+      ? DEFAULT_TEMPORAL_TTL_DAYS[ontologyConceptId]
+      : undefined) ?? 30;
   const observed = new Date(observedAt).getTime();
   const now = new Date(nowIso).getTime();
   const ageDays = (now - observed) / (24 * 60 * 60 * 1000);

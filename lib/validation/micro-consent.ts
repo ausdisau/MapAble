@@ -19,7 +19,7 @@ export const microConsentGrantSchema = z
     purpose: z.string().min(3).max(500).optional(),
     grantedToUserId: z.string().min(1).optional(),
     grantedToOrganisationId: z.string().min(1).optional(),
-    shareMode: z.string().max(64).optional(),
+    shareMode: z.enum(["once", "always_for_service"]).optional(),
   })
   .strict();
 
