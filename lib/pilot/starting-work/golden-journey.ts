@@ -1,9 +1,16 @@
 import { issueOutcomeReceipt } from "@/lib/outcomes/ledger";
+import {
+  buildStartingWorkDependencyGraph,
+  buildStateHonesty,
+  type JourneyDependencyGraph,
+  type StateHonestyMap,
+} from "@/lib/pilot/starting-work/dependency-graph";
 import type { AssignmentReadinessResult } from "@/lib/workforce-readiness/evaluate";
 
 /**
  * Taylor @ Harbour Civic Centre — Starting Work golden journey state machine.
  * Synthetic / controlled-pilot only. No live NDIA. No AI decisions.
+ * Projection-only persistence via StartingWorkJourneyProjection (not CareOSMission).
  */
 
 export type JourneyStepId =
@@ -46,6 +53,7 @@ export type GoldenJourneyState = {
   journeyId: string;
   participantLabel: "Taylor";
   venueLabel: "Harbour Civic Centre";
+  participantGoal: string;
   stepsCompleted: JourneyStepId[];
   blocked: boolean;
   blockReason?: string;
@@ -55,6 +63,10 @@ export type GoldenJourneyState = {
   regionalCandidates: string[];
   regionalConfirmed: string[];
   notices: string[];
+  dependencyGraph: JourneyDependencyGraph;
+  stateHonesty: StateHonestyMap;
+  productionClaim: "none";
+  autoAssignment: false;
 };
 
 const NORMAL_FLOW: JourneyStepId[] = [
@@ -79,11 +91,13 @@ const NORMAL_FLOW: JourneyStepId[] = [
 ];
 
 export function createStartingWorkJourney(): GoldenJourneyState {
+  const stepsCompleted: JourneyStepId[] = [];
   return {
     journeyId: `starting_work_${Date.now()}`,
     participantLabel: "Taylor",
     venueLabel: "Harbour Civic Centre",
-    stepsCompleted: [],
+    participantGoal: "Start new job at Harbour Civic Centre with accessible support",
+    stepsCompleted,
     blocked: false,
     regionalCandidates: [],
     regionalConfirmed: [],
@@ -94,7 +108,15 @@ export function createStartingWorkJourney(): GoldenJourneyState {
       "Academy completion ≠ competency",
       "candidate ≠ confirmed capacity",
       "unknown lift evidence remains unknown",
+      "CareOSMission not SoR on main — StartingWorkJourneyProjection is temporary",
     ],
+    dependencyGraph: buildStartingWorkDependencyGraph({
+      blocked: false,
+      stepsCompleted,
+    }),
+    stateHonesty: buildStateHonesty({ blocked: false, stepsCompleted }),
+    productionClaim: "none",
+    autoAssignment: false,
   };
 }
 
@@ -158,12 +180,55 @@ export function runGoldenJourney(input: {
       state.failureMode = "inaccessible_vehicle";
       break;
     }
+    if (input.failureMode === "worker_cancellation" && step === "care_authorised") {
+      state.blocked = true;
+      state.blockReason =
+        "Worker cancellation — care not silently cancelling linked transport; recovery required";
+      state.failureMode = "worker_cancellation";
+      state.notices.push(
+        "Linked transport remains requested until participant-controlled recovery",
+      );
+      break;
+    }
+    if (input.failureMode === "equipment_breakdown" && step === "equipment_checked") {
+      state.blocked = true;
+      state.blockReason = "Required equipment unavailable";
+      state.failureMode = "equipment_breakdown";
+      break;
+    }
+    if (input.failureMode === "external_timeout" && step === "transport_authorised") {
+      state.blocked = true;
+      state.blockReason = "External quote/routing timeout — no false confirmation";
+      state.failureMode = "external_timeout";
+      break;
+    }
+    if (input.failureMode === "duplicated_request" && step === "care_authorised") {
+      state.failureMode = "duplicated_request";
+      state.stepsCompleted.push(step);
+      state.notices.push(
+        "Duplicated request detected — idempotent projection; no double booking claimed",
+      );
+      continue;
+    }
+    if (
+      input.failureMode === "provider_disputes_evidence" &&
+      step === "service_events_recorded"
+    ) {
+      state.failureMode = "provider_disputes_evidence";
+      state.stepsCompleted.push(step);
+      state.notices.push(
+        "Provider disputes evidence — service delivered ≠ undisputed billing",
+      );
+      continue;
+    }
     if (input.failureMode === "lift_outage" && step === "door_to_room_preflight") {
+      state.failureMode = "lift_outage";
       state.stepsCompleted.push(step);
       state.notices.push("Lift evidence unknown/outage — route not claimed safe");
       continue;
     }
     if (input.failureMode === "lost_phone" && step === "visit_pack_compiled") {
+      state.failureMode = "lost_phone";
       state.stepsCompleted.push(step);
       state.notices.push(
         "Device revoked — Visit Pack cleared; web / human assistance pathway remains",
@@ -174,6 +239,7 @@ export function runGoldenJourney(input: {
       input.failureMode === "participant_declines_outcome_review" &&
       step === "outcome_reviewed"
     ) {
+      state.failureMode = "participant_declines_outcome_review";
       const receipt = issueOutcomeReceipt({
         participantId: "taylor-synthetic",
         goalStatement: "Start new job at Harbour Civic Centre with accessible support",
@@ -185,6 +251,7 @@ export function runGoldenJourney(input: {
       continue;
     }
     if (input.failureMode === "rejected_invoice" && step === "invoice_created") {
+      state.failureMode = "rejected_invoice";
       state.stepsCompleted.push(step);
       state.notices.push("Invoice rejected — Provider Ops attention item");
       continue;
@@ -226,6 +293,8 @@ export function runGoldenJourney(input: {
     state.outcomeReceiptId = receipt.receiptId;
   }
 
+  state.dependencyGraph = buildStartingWorkDependencyGraph(state);
+  state.stateHonesty = buildStateHonesty(state);
   return state;
 }
 

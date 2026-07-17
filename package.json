@@ -21,6 +21,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:a11y": "playwright test",
+    "test:e2e:starting-work": "playwright test -c playwright.e2e.config.ts",
     "ci:migration-order": "tsx scripts/ci/check-migration-order.ts",
     "ci:migration-integrity": "tsx scripts/ci/check-migration-integrity.ts",
     "ci:domain-ownership": "tsx scripts/ci/check-domain-ownership.ts",
