@@ -9182,3 +9182,1048 @@ model BillingSafeguardAlert {
   @@index([ruleCode, createdAt])
   @@index([resolvedAt])
 }
+
+
+// =============================================================================
+// ConvergenceOS — platform governance registries (Wave 0+)
+// Read-only control plane. Does not replace Git, GitHub, Prisma, or CI.
+// =============================================================================
+
+enum ConvergenceDomainStatus {
+  canonical
+  extension
+  projection
+  adapter
+  read_model
+  duplicate
+  deprecated
+  experimental
+  fixture_only
+  interim
+  target
+}
+
+enum ConvergenceCapabilityMaturity {
+  concept
+  documented
+  scaffolded
+  fixture_only
+  shadow
+  pilot
+  production_gated
+  production_available
+  deprecated
+  retired
+}
+
+enum ConvergenceDependencyEdgeType {
+  based_on
+  depends_on
+  supersedes
+  duplicates
+  conflicts_with
+  extends
+  blocks
+  should_merge_before
+  should_rebase_after
+  makes_obsolete
+  requires_migration
+  requires_flag
+  requires_manual_review
+}
+
+enum ConvergenceDecisionStatus {
+  proposal
+  approved
+  rejected
+  superseded
+}
+
+enum ConvergenceCollisionSeverity {
+  info
+  warning
+  high
+  critical
+}
+
+enum ConvergenceMergeTrainStatus {
+  draft
+  proposed
+  accepted
+  deferred
+  superseded
+}
+
+model RepositorySnapshot {
+  id              String   @id @default(cuid())
+  baseBranch      String   @default("main")
+  baseCommitSha   String
+  scannedAt       DateTime @default(now())
+  source          String   @default("fixture_pilot")
+  snapshotKind    String   @default("main")
+  summaryJson     Json?
+  contentHash     String
+  schemaHash      String?
+  packageGraphHash String?
+  routeGraphHash  String?
+  flagManifestHash String?
+  capabilityManifestHash String?
+  createdAt       DateTime @default(now())
+
+  branches        RepositoryBranch[]
+  pullRequests    RepositoryPullRequest[]
+  dependencies    RepositoryDependency[]
+  schemaSnapshots SchemaSnapshot[]
+  collisions      MigrationCollision[]
+  mergeTrains     MergeTrain[]
+  twinPackages    TwinPackage[]
+  twinModules     TwinModule[]
+  twinRoutes      TwinRoute[]
+  flagManifestEntries FeatureFlagManifestEntry[]
+  graphEdges      RepositoryGraphEdge[]
+  rehearsals      RehearsalRun[]
+  blastSims       BlastRadiusSimulation[]
+  driftFindings   DriftFinding[]
+
+  @@index([scannedAt])
+  @@index([baseCommitSha])
+  @@index([snapshotKind])
+  @@map("convergence_repository_snapshots")
+}
+
+model CanonicalDomain {
+  id                    String                  @id @default(cuid())
+  domainKey             String                  @unique
+  name                  String
+  purpose               String
+  canonicalModel        String?
+  canonicalService      String?
+  canonicalApi          String?
+  canonicalEventOwner   String?
+  owningProgramme       String?
+  authoritativePath     String?
+  acceptedDecisionId    String?
+  status                ConvergenceDomainStatus @default(interim)
+  compatibilityAliases  Json?
+  duplicateImplementations Json?
+  migrationState        String?
+  deprecationState      String?
+  reviewDate            DateTime?
+  notes                 String?
+  createdAt             DateTime                @default(now())
+  updatedAt             DateTime                @updatedAt
+
+  versions              CanonicalDomainVersion[]
+
+  @@index([status])
+  @@index([owningProgramme])
+  @@map("convergence_canonical_domains")
+}
+
+model CanonicalDomainVersion {
+  id              String                  @id @default(cuid())
+  domainId        String
+  domain          CanonicalDomain         @relation(fields: [domainId], references: [id], onDelete: Cascade)
+  version         Int
+  status          ConvergenceDomainStatus
+  canonicalModel  String?
+  evidenceJson    Json?
+  changeSummary   String?
+  createdAt       DateTime                @default(now())
+
+  @@unique([domainId, version])
+  @@index([domainId])
+  @@map("convergence_canonical_domain_versions")
+}
+
+model RepositoryBranch {
+  id              String   @id @default(cuid())
+  snapshotId      String
+  snapshot        RepositorySnapshot @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
+  name            String
+  tipCommitSha    String?
+  aheadOfMain     Int?
+  behindMain      Int?
+  mergeBaseSha    String?
+  dropsIndoor     Boolean  @default(false)
+  schemaChanged   Boolean  @default(false)
+  notes           String?
+  metadataJson    Json?
+  createdAt       DateTime @default(now())
+
+  pullRequests    RepositoryPullRequest[] @relation("PrHeadBranch")
+
+  @@unique([snapshotId, name])
+  @@index([snapshotId])
+  @@index([name])
+  @@map("convergence_repository_branches")
+}
+
+model RepositoryPullRequest {
+  id              String   @id @default(cuid())
+  snapshotId      String
+  snapshot        RepositorySnapshot @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
+  number          Int
+  title           String
+  state           String
+  isDraft         Boolean  @default(true)
+  baseBranch      String
+  headBranch      String
+  headBranchId    String?
+  headBranchRef   RepositoryBranch? @relation("PrHeadBranch", fields: [headBranchId], references: [id], onDelete: SetNull)
+  baseCommitSha   String?
+  headCommitSha   String?
+  mergeable       String?
+  changedFiles    Int?
+  additions       Int?
+  deletions       Int?
+  url             String?
+  classLabel      String?
+  collisionRisk   String?
+  domainsAffected Json?
+  prismaModelsAdded Json?
+  migrationsAdded Json?
+  featureFlagsAdded Json?
+  knownLimitations String?
+  explicitNonGoals String?
+  recommendedMergeOrder Int?
+  warningLabels   Json?
+  metadataJson    Json?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  dependenciesFrom RepositoryDependency[] @relation("DepFromPr")
+  dependenciesTo   RepositoryDependency[] @relation("DepToPr")
+
+  @@unique([snapshotId, number])
+  @@index([snapshotId])
+  @@index([number])
+  @@index([headBranch])
+  @@map("convergence_repository_pull_requests")
+}
+
+model RepositoryDependency {
+  id              String                       @id @default(cuid())
+  snapshotId      String
+  snapshot        RepositorySnapshot           @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
+  edgeType        ConvergenceDependencyEdgeType
+  fromPrId        String?
+  fromPr          RepositoryPullRequest?       @relation("DepFromPr", fields: [fromPrId], references: [id], onDelete: Cascade)
+  toPrId          String?
+  toPr            RepositoryPullRequest?       @relation("DepToPr", fields: [toPrId], references: [id], onDelete: Cascade)
+  fromRef         String?
+  toRef           String?
+  evidence        String?
+  createdAt       DateTime                     @default(now())
+
+  @@index([snapshotId])
+  @@index([edgeType])
+  @@index([fromPrId])
+  @@index([toPrId])
+  @@map("convergence_repository_dependencies")
+}
+
+model PlatformCapability {
+  id                    String                         @id @default(cuid())
+  capabilityKey         String                         @unique
+  name                  String
+  programme             String?
+  userValue             String?
+  canonicalOwner        String?
+  implementationPaths   Json?
+  authorityLevel        String?
+  readWrite             String?
+  externalSideEffects   Boolean                        @default(false)
+  participantApprovalRequired Boolean                  @default(false)
+  featureFlags          Json?
+  dataDomains           Json?
+  maturity              ConvergenceCapabilityMaturity  @default(concept)
+  persistenceType       String?
+  runtimeMode           String?
+  productionClaimStatus String?
+  rollbackNotes         String?
+  owner                 String?
+  honestyJson           Json?
+  createdAt             DateTime                       @default(now())
+  updatedAt             DateTime                       @updatedAt
+
+  @@index([maturity])
+  @@index([programme])
+  @@map("convergence_platform_capabilities")
+}
+
+model ArchitectureDecision {
+  id              String                     @id @default(cuid())
+  decisionKey     String                     @unique
+  title           String
+  decisionType    String
+  context         String?
+  alternativesJson Json?
+  selectedOption  String?
+  rationale       String?
+  evidenceJson    Json?
+  consequences    String?
+  affectedPaths   Json?
+  affectedPrs     Json?
+  status          ConvergenceDecisionStatus  @default(proposal)
+  isAiProposal    Boolean                    @default(false)
+  owner           String?
+  approver        String?
+  decidedAt       DateTime?
+  reviewDate      DateTime?
+  supersededById  String?
+  createdAt       DateTime                   @default(now())
+  updatedAt       DateTime                   @updatedAt
+
+  @@index([status])
+  @@index([decisionType])
+  @@map("convergence_architecture_decisions")
+}
+
+model SchemaSnapshot {
+  id              String   @id @default(cuid())
+  snapshotId      String
+  snapshot        RepositorySnapshot @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
+  refLabel        String
+  refName         String
+  modelCount      Int
+  modelNamesJson  Json
+  migrationDirsJson Json?
+  contentHash     String?
+  createdAt       DateTime @default(now())
+
+  @@unique([snapshotId, refLabel])
+  @@index([snapshotId])
+  @@map("convergence_schema_snapshots")
+}
+
+model MigrationCollision {
+  id              String                       @id @default(cuid())
+  snapshotId      String
+  snapshot        RepositorySnapshot           @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
+  collisionKey    String
+  severity        ConvergenceCollisionSeverity @default(warning)
+  category        String
+  title           String
+  affectedModels  Json?
+  affectedBranches Json?
+  exactDifference String?
+  semanticInterpretation String?
+  canonicalRecommendation String?
+  migrationStrategy String?
+  dataPreservationRisk String?
+  rollbackNotes   String?
+  manualDecisionRequired Boolean               @default(true)
+  evidenceJson    Json?
+  createdAt       DateTime                     @default(now())
+
+  @@unique([snapshotId, collisionKey])
+  @@index([snapshotId])
+  @@index([severity])
+  @@index([category])
+  @@map("convergence_migration_collisions")
+}
+
+model MergeTrain {
+  id              String                     @id @default(cuid())
+  snapshotId      String
+  snapshot        RepositorySnapshot         @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
+  trainKey        String
+  name            String
+  trainType       String
+  status          ConvergenceMergeTrainStatus @default(draft)
+  summary         String?
+  riskSummary     String?
+  rollbackNotes   String?
+  createdAt       DateTime                   @default(now())
+  updatedAt       DateTime                   @updatedAt
+
+  steps           MergeTrainStep[]
+
+  @@unique([snapshotId, trainKey])
+  @@index([snapshotId])
+  @@index([status])
+  @@map("convergence_merge_trains")
+}
+
+model MergeTrainStep {
+  id              String    @id @default(cuid())
+  trainId         String
+  train           MergeTrain @relation(fields: [trainId], references: [id], onDelete: Cascade)
+  stepOrder       Int
+  action          String
+  prNumber        Int?
+  branchName      String?
+  evidence        String?
+  humanOwner      String?
+  rollback        String?
+  createdAt       DateTime  @default(now())
+
+  @@unique([trainId, stepOrder])
+  @@index([trainId])
+  @@map("convergence_merge_train_steps")
+}
+
+// =============================================================================
+// ConvergenceOS Iteration 2 — Digital Twin, Constitution, Lineage, etc.
+// =============================================================================
+
+enum ConstitutionRuleClass {
+  constitutional_rule
+  architectural_preference
+  programme_convention
+  temporary_exception
+  experimental_rule
+  deprecated_rule
+}
+
+enum ConstitutionExceptionStatus {
+  draft
+  submitted
+  architecture_review
+  security_review
+  privacy_review
+  accessibility_review
+  approved
+  approved_with_conditions
+  rejected
+  expired
+  revoked
+  closed
+}
+
+enum SemanticOverlapClass {
+  identical_concept
+  overlapping_concept
+  extension
+  projection
+  legacy_alias
+  adapter
+  separate_concept
+  uncertain
+  human_review_required
+}
+
+enum BlastRadiusSeverity {
+  local
+  module
+  programme
+  cross_programme
+  platform
+  participant_authority
+  financial
+  safety_critical
+}
+
+enum RehearsalStatus {
+  pending
+  running
+  pass
+  blocked
+  human_review
+  failed
+}
+
+enum DriftSeverity {
+  info
+  warning
+  high
+  critical
+}
+
+enum CompatibilityMatrixState {
+  old_code_old_schema
+  old_code_new_schema
+  new_code_old_schema
+  new_code_new_schema
+}
+
+enum CompatibilitySupportLevel {
+  supported
+  temporarily_supported
+  unsupported
+  unknown
+  human_review_required
+}
+
+model TwinPackage {
+  id              String   @id @default(cuid())
+  snapshotId      String
+  snapshot        RepositorySnapshot @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
+  name            String
+  version         String?
+  path            String?
+  kind            String   @default("workspace")
+  metadataJson    Json?
+  createdAt       DateTime @default(now())
+
+  @@unique([snapshotId, name])
+  @@index([snapshotId])
+  @@map("convergence_twin_packages")
+}
+
+model TwinModule {
+  id              String   @id @default(cuid())
+  snapshotId      String
+  snapshot        RepositorySnapshot @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
+  moduleKey       String
+  path            String
+  programme       String?
+  canonicalDomainKeys Json?
+  description     String?
+  writerCount     Int      @default(0)
+  routeCount      Int      @default(0)
+  metadataJson    Json?
+  createdAt       DateTime @default(now())
+
+  @@unique([snapshotId, moduleKey])
+  @@index([snapshotId])
+  @@index([path])
+  @@map("convergence_twin_modules")
+}
+
+model TwinRoute {
+  id              String   @id @default(cuid())
+  snapshotId      String
+  snapshot        RepositorySnapshot @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
+  method          String   @default("ANY")
+  path            String
+  filePath        String?
+  moduleKey       String?
+  sideEffects     Boolean  @default(false)
+  metadataJson    Json?
+  createdAt       DateTime @default(now())
+
+  @@unique([snapshotId, method, path])
+  @@index([snapshotId])
+  @@index([moduleKey])
+  @@map("convergence_twin_routes")
+}
+
+model FeatureFlagManifestEntry {
+  id              String   @id @default(cuid())
+  snapshotId      String
+  snapshot        RepositorySnapshot @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
+  flagName        String
+  defaultValue    String?
+  owner           String?
+  purpose         String?
+  sourceFile      String?
+  category        String?
+  retirementCondition String?
+  metadataJson    Json?
+  createdAt       DateTime @default(now())
+
+  @@unique([snapshotId, flagName])
+  @@index([snapshotId])
+  @@map("convergence_feature_flag_manifest")
+}
+
+model RepositoryGraphEdge {
+  id              String   @id @default(cuid())
+  snapshotId      String
+  snapshot        RepositorySnapshot @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
+  edgeType        String
+  fromNodeType    String
+  fromNodeKey     String
+  toNodeType      String
+  toNodeKey       String
+  evidence        String?
+  createdAt       DateTime @default(now())
+
+  @@index([snapshotId])
+  @@index([edgeType])
+  @@index([fromNodeKey])
+  @@index([toNodeKey])
+  @@map("convergence_repository_graph_edges")
+}
+
+model ArchitectureConstitution {
+  id              String   @id @default(cuid())
+  constitutionKey String   @unique @default("mapable_architecture_constitution")
+  title           String
+  status          String   @default("active")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  versions        ArchitectureConstitutionVersion[]
+  rules           ArchitectureRule[]
+
+  @@map("convergence_architecture_constitutions")
+}
+
+model ArchitectureConstitutionVersion {
+  id              String   @id @default(cuid())
+  constitutionId  String
+  constitution    ArchitectureConstitution @relation(fields: [constitutionId], references: [id], onDelete: Cascade)
+  version         Int
+  summary         String?
+  effectiveAt     DateTime @default(now())
+  approvedBy      String?
+  createdAt       DateTime @default(now())
+
+  @@unique([constitutionId, version])
+  @@index([constitutionId])
+  @@map("convergence_architecture_constitution_versions")
+}
+
+model ArchitectureRule {
+  id              String   @id @default(cuid())
+  constitutionId  String
+  constitution    ArchitectureConstitution @relation(fields: [constitutionId], references: [id], onDelete: Cascade)
+  ruleKey         String   @unique
+  title           String
+  ruleClass       ConstitutionRuleClass @default(constitutional_rule)
+  plainLanguage   String
+  rationale       String?
+  severity        String   @default("high")
+  detectionMethod String?
+  owner           String?
+  approver        String?
+  effectiveAt     DateTime @default(now())
+  reviewDate      DateTime?
+  supersededByKey String?
+  affectedDomains Json?
+  affectedPaths   Json?
+  prohibitedPatterns Json?
+  requiredConditions Json?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  exceptions      ArchitectureRuleException[]
+  violations      ArchitectureRuleViolation[]
+
+  @@index([constitutionId])
+  @@index([ruleClass])
+  @@map("convergence_architecture_rules")
+}
+
+model ArchitectureRuleException {
+  id              String   @id @default(cuid())
+  ruleId          String
+  rule            ArchitectureRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+  status          ConstitutionExceptionStatus @default(draft)
+  businessReason  String
+  technicalReason String?
+  affectedCapability String?
+  affectedParticipants String?
+  durationDays    Int?
+  expiresAt       DateTime?
+  risk            String?
+  compensatingControls String?
+  monitoring      String?
+  rollback        String?
+  removalPlan     String?
+  owner           String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([ruleId])
+  @@index([status])
+  @@index([expiresAt])
+  @@map("convergence_architecture_rule_exceptions")
+}
+
+model ArchitectureRuleViolation {
+  id              String   @id @default(cuid())
+  ruleId          String
+  rule            ArchitectureRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+  title           String
+  evidence        String?
+  affectedPaths   Json?
+  severity        String   @default("warning")
+  status          String   @default("open")
+  createdAt       DateTime @default(now())
+
+  @@index([ruleId])
+  @@index([status])
+  @@map("convergence_architecture_rule_violations")
+}
+
+model SemanticOverlapCandidate {
+  id              String   @id @default(cuid())
+  candidateKey    String   @unique
+  leftName        String
+  rightName       String
+  leftPath        String?
+  rightPath       String?
+  classification  SemanticOverlapClass @default(uncertain)
+  confidence      Float    @default(0.5)
+  unresolvedDifferences String?
+  recommendedReviewers Json?
+  evidenceJson    Json?
+  humanDecision   String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([classification])
+  @@map("convergence_semantic_overlap_candidates")
+}
+
+model DataLineageNode {
+  id              String   @id @default(cuid())
+  nodeKey         String   @unique
+  label           String
+  dataClass       String
+  fieldPath       String?
+  domainKey       String?
+  synthetic       Boolean  @default(true)
+  metadataJson    Json?
+  createdAt       DateTime @default(now())
+
+  @@index([dataClass])
+  @@map("convergence_data_lineage_nodes")
+}
+
+model DataLineageEdge {
+  id              String   @id @default(cuid())
+  edgeKey         String   @unique
+  fromNodeKey     String
+  toNodeKey       String
+  transformation  String?
+  policyRef       String?
+  createdAt       DateTime @default(now())
+
+  @@index([fromNodeKey])
+  @@index([toNodeKey])
+  @@map("convergence_data_lineage_edges")
+}
+
+model AuthorityChain {
+  id              String   @id @default(cuid())
+  chainKey        String   @unique
+  title           String
+  participantSyntheticId String?
+  purpose         String?
+  status          String   @default("complete")
+  gapFindingsJson Json?
+  createdAt       DateTime @default(now())
+
+  steps           AuthorityChainStep[]
+
+  @@map("convergence_authority_chains")
+}
+
+model AuthorityChainStep {
+  id              String   @id @default(cuid())
+  chainId         String
+  chain           AuthorityChain @relation(fields: [chainId], references: [id], onDelete: Cascade)
+  stepOrder       Int
+  stepType        String
+  actor           String?
+  scope           String?
+  expiresAt       DateTime?
+  outcome         String?
+  evidence        String?
+  createdAt       DateTime @default(now())
+
+  @@unique([chainId, stepOrder])
+  @@index([chainId])
+  @@map("convergence_authority_chain_steps")
+}
+
+model BlastRadiusSimulation {
+  id              String   @id @default(cuid())
+  snapshotId      String?
+  snapshot        RepositorySnapshot? @relation(fields: [snapshotId], references: [id], onDelete: SetNull)
+  simulationKey   String   @unique
+  changeType      String
+  changeSummary   String
+  severity        BlastRadiusSeverity @default(module)
+  aiExplainedSeverity BlastRadiusSeverity?
+  finalSeverity   BlastRadiusSeverity
+  rollbackDifficulty String?
+  impactsJson     Json?
+  counterfactual  Boolean  @default(false)
+  createdAt       DateTime @default(now())
+
+  @@index([severity])
+  @@index([snapshotId])
+  @@map("convergence_blast_radius_simulations")
+}
+
+model RehearsalRun {
+  id              String   @id @default(cuid())
+  snapshotId      String?
+  snapshot        RepositorySnapshot? @relation(fields: [snapshotId], references: [id], onDelete: SetNull)
+  rehearsalKey    String   @unique
+  rehearsalType   String
+  status          RehearsalStatus @default(pending)
+  trainKey        String?
+  summary         String?
+  mutatesRealBranches Boolean @default(false)
+  stepsJson       Json?
+  compatibilityJson Json?
+  createdAt       DateTime @default(now())
+  completedAt     DateTime?
+
+  @@index([status])
+  @@index([snapshotId])
+  @@map("convergence_rehearsal_runs")
+}
+
+model AgentImplementationContract {
+  id              String   @id @default(cuid())
+  contractKey     String   @unique
+  objective       String
+  nonGoals        String?
+  canonicalModels Json?
+  reusableServices Json?
+  prohibitedConcepts Json?
+  allowedPaths    Json?
+  protectedPaths  Json?
+  migrationsPermitted Boolean @default(false)
+  testsRequired   Json?
+  authorityCeiling String?
+  releaseMode     String   @default("audit")
+  rollbackExpectation String?
+  stopConditions  Json?
+  status          String   @default("draft")
+  markdownExport  String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  reviews         AgentPostImplementationReview[]
+
+  @@index([status])
+  @@map("convergence_agent_implementation_contracts")
+}
+
+model AgentPostImplementationReview {
+  id              String   @id @default(cuid())
+  contractId      String
+  contract        AgentImplementationContract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  classification  String
+  findingsJson    Json?
+  createdAt       DateTime @default(now())
+
+  @@index([contractId])
+  @@map("convergence_agent_post_implementation_reviews")
+}
+
+model DriftFinding {
+  id              String   @id @default(cuid())
+  snapshotId      String?
+  snapshot        RepositorySnapshot? @relation(fields: [snapshotId], references: [id], onDelete: SetNull)
+  findingKey      String   @unique
+  layer           String
+  title           String
+  expectedState   String?
+  observedState   String?
+  severity        DriftSeverity @default(warning)
+  owner           String?
+  suggestedAction String?
+  deadline        DateTime?
+  evidenceJson    Json?
+  status          String   @default("open")
+  createdAt       DateTime @default(now())
+
+  @@index([layer])
+  @@index([severity])
+  @@index([snapshotId])
+  @@map("convergence_drift_findings")
+}
+
+model EnvironmentParityRecord {
+  id              String   @id @default(cuid())
+  environmentKey  String   @unique
+  label           String
+  appVersion      String?
+  schemaVersion   String?
+  featureFlagsJson Json?
+  integrationsJson Json?
+  secretsPresentJson Json?
+  dataClassification String?
+  syntheticData   Boolean  @default(true)
+  unsafeDifferences Json?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("convergence_environment_parity_records")
+}
+
+model SecretContract {
+  id              String   @id @default(cuid())
+  secretName      String   @unique
+  owner           String?
+  purpose         String?
+  environmentsJson Json?
+  expectedFormat  String?
+  rotationPolicy  String?
+  required        Boolean  @default(false)
+  associatedIntegration String?
+  fallback        String?
+  affectedCapability String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("convergence_secret_contracts")
+}
+
+model SupplyChainDependency {
+  id              String   @id @default(cuid())
+  packageName     String
+  version         String?
+  ecosystem       String   @default("npm")
+  licence         String?
+  purpose         String?
+  owner           String?
+  direct          Boolean  @default(true)
+  affectedCapabilities Json?
+  securityStatus  String   @default("unknown")
+  upgradePolicy   String?
+  replacementOption String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([packageName, ecosystem])
+  @@index([ecosystem])
+  @@map("convergence_supply_chain_dependencies")
+}
+
+model OwnershipRecord {
+  id              String   @id @default(cuid())
+  subjectType     String
+  subjectKey      String
+  primaryOwner    String?
+  secondaryOwner  String?
+  reviewer        String?
+  organisation    String?
+  knowledgeLocation String?
+  successionState String   @default("ok")
+  lastReviewAt    DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([subjectType, subjectKey])
+  @@index([successionState])
+  @@map("convergence_ownership_records")
+}
+
+model OwnershipGapFinding {
+  id              String   @id @default(cuid())
+  findingKey      String   @unique
+  title           String
+  subjectType     String?
+  subjectKey      String?
+  severity        String   @default("warning")
+  evidence        String?
+  createdAt       DateTime @default(now())
+
+  @@map("convergence_ownership_gap_findings")
+}
+
+model ArchitectureFitnessFunction {
+  id              String   @id @default(cuid())
+  fitnessKey      String   @unique
+  title           String
+  description     String?
+  advisoryOnly    Boolean  @default(true)
+  createdAt       DateTime @default(now())
+
+  results         FitnessFunctionResult[]
+
+  @@map("convergence_architecture_fitness_functions")
+}
+
+model FitnessFunctionResult {
+  id              String   @id @default(cuid())
+  fitnessId       String
+  fitness         ArchitectureFitnessFunction @relation(fields: [fitnessId], references: [id], onDelete: Cascade)
+  passed          Boolean
+  details         String?
+  createdAt       DateTime @default(now())
+
+  @@index([fitnessId])
+  @@map("convergence_fitness_function_results")
+}
+
+model GoldenJourney {
+  id              String   @id @default(cuid())
+  journeyKey      String   @unique
+  title           String
+  description     String?
+  domainsJson     Json?
+  apisJson        Json?
+  modelsJson      Json?
+  flagsJson       Json?
+  rollbackNotes   String?
+  createdAt       DateTime @default(now())
+
+  steps           GoldenJourneyStep[]
+
+  @@map("convergence_golden_journeys")
+}
+
+model GoldenJourneyStep {
+  id              String   @id @default(cuid())
+  journeyId       String
+  journey         GoldenJourney @relation(fields: [journeyId], references: [id], onDelete: Cascade)
+  stepOrder       Int
+  title           String
+  expectation     String?
+  createdAt       DateTime @default(now())
+
+  @@unique([journeyId, stepOrder])
+  @@index([journeyId])
+  @@map("convergence_golden_journey_steps")
+}
+
+model FederatedRepository {
+  id              String   @id @default(cuid())
+  repoKey         String   @unique
+  name            String
+  url             String?
+  role            String   @default("related")
+  createdAt       DateTime @default(now())
+
+  contracts       FederatedContract[]
+
+  @@map("convergence_federated_repositories")
+}
+
+model FederatedContract {
+  id              String   @id @default(cuid())
+  repoId          String
+  repo            FederatedRepository @relation(fields: [repoId], references: [id], onDelete: Cascade)
+  contractKey     String
+  domain          String
+  version         String?
+  status          String   @default("draft")
+  notes           String?
+  createdAt       DateTime @default(now())
+
+  @@unique([repoId, contractKey])
+  @@index([repoId])
+  @@map("convergence_federated_contracts")
+}
+
+model ComplexityBudgetSnapshot {
+  id              String   @id @default(cuid())
+  snapshotKey     String   @unique
+  dimensionsJson  Json
+  breachesJson    Json?
+  createdAt       DateTime @default(now())
+
+  @@map("convergence_complexity_budget_snapshots")
+}
+
+model RuntimeComponent {
+  id              String   @id @default(cuid())
+  componentKey    String   @unique
+  name            String
+  environment     String
+  owner           String?
+  region          String?
+  dataClassification String?
+  healthCheck     String?
+  fallback        String?
+  deploymentVersion String?
+  credentialsPresent Boolean @default(false)
+  metadataJson    Json?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([environment])
+  @@map("convergence_runtime_components")
+}

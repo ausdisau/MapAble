@@ -117,6 +117,7 @@ const LEGACY_LINKS = [
   { href: "/admin/certified-api-ecosystem", label: "API ecosystem" },
   { href: "/admin/research-federation-nodes", label: "Fed research" },
   { href: "/admin/institutional-continuity", label: "Continuity" },
+  { href: "/admin/convergence", label: "ConvergenceOS" },
   { href: "/admin/civic-audit-index", label: "Civic audit" },
   { href: "/admin/federated-accountability", label: "Fed partners" },
   { href: "/admin/institutional-permanence", label: "Permanence" },

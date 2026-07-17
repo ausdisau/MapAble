@@ -113,6 +113,7 @@ Detailed guides live under `docs/`. This file is the only project README at the 
 | [docs/mapable/core-phases.md](docs/mapable/core-phases.md)                                 | Phases 1–12 — routes, models, deploy  |
 | [docs/mapable/cursor-prompts-phases-6-10.md](docs/mapable/cursor-prompts-phases-6-10.md)   | Cursor prompt packs (phases 6–10)     |
 | [docs/mapable/cursor-five-year-masterplan.md](docs/mapable/cursor-five-year-masterplan.md) | Cursor five-year strategic masterplan |
+| [docs/convergence-os/README.md](docs/convergence-os/README.md) | ConvergenceOS governance control plane (audit/advisory) |
 
 ### Modules
 

@@ -1,0 +1,33 @@
+name: ConvergenceOS advisory
+
+on:
+  pull_request:
+  workflow_dispatch: {}
+
+jobs:
+  convergence-advisory:
+    name: convergence-os/advisory
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.12.1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Run ConvergenceOS advisory scan
+        env:
+          # Warnings only unless explicitly enforced in repo secrets/vars later.
+          MAPABLE_CONVERGENCE_OS_ENABLED: ${{ vars.MAPABLE_CONVERGENCE_OS_ENABLED || 'false' }}
+          MAPABLE_CONVERGENCE_MODE: ${{ vars.MAPABLE_CONVERGENCE_MODE || 'audit' }}
+          MAPABLE_CONVERGENCE_CI_GATE_ENABLED: ${{ vars.MAPABLE_CONVERGENCE_CI_GATE_ENABLED || 'false' }}
+          # Hard safety — never enable auto mutation in CI
+          MAPABLE_CONVERGENCE_AUTO_MERGE_ENABLED: "false"
+          MAPABLE_CONVERGENCE_AUTO_MIGRATION_ENABLED: "false"
+        run: pnpm check:convergence-advisory
