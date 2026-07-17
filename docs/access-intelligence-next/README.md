@@ -2,15 +2,16 @@
 
 Programme name: **MapAble Living Access Fabric**.
 
-This package delivers **Wave 0–2 foundation** contracts:
+This package delivers **Wave 0–5 foundation** contracts across three stacked PRs:
 
 - Versioned accessibility ontology
 - Typed Access Query Language (AQL) AST + validation + fixture execution
 - Personal Access Compiler interfaces
 - Evidence envelopes and proof-carrying results
-- Temporal vocabulary
+- Temporal vocabulary + Temporal Access Engine (shadow)
+- Change detection reviews (auto-overwrite blocked)
 - Synthetic Harbour Living Access Graph
-- Synthetic journey preflight
+- Proof-carrying door-to-room journey preflight with segment list
 
 ## Operating mode
 

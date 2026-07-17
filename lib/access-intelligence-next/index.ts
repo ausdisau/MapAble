@@ -9,5 +9,6 @@ export * from "./compiler";
 export * from "./evidence";
 export * from "./results";
 export * from "./temporal";
+export * from "./change-detection";
 export * from "./graph";
 export * from "./journey";
