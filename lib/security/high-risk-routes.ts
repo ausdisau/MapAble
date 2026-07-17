@@ -153,7 +153,7 @@ export const HIGH_RISK_ROUTES: HighRiskRoute[] = [
   },
   {
     method: "POST",
-    path: "/api/transport/trips/[id]/billing-handoff",
+    path: "/api/transport/trips/[tripId]/billing-handoff",
     consequence: "financial",
     zodRequired: false,
     tenantAssertRequired: true,

@@ -13,7 +13,7 @@ Flags remain default **off** for pilots; these APIs are available behind auth.
 - `POST /api/transport/quotes` — first-class versioned quote (process-local until Prisma Prompt 2)
 - `POST /api/transport/quotes/[id]/accept` — participant acceptance
 - `lib/transport/privacy/location-disclosure.ts` — staged exact-address disclosure
-- `POST /api/transport/trips/[id]/billing-handoff` — completed trip → `BillingServiceRecord`
+- `POST /api/transport/trips/[tripId]/billing-handoff` — completed trip → `BillingServiceRecord`
 
 ## Hard rules
 

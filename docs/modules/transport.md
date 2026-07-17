@@ -16,7 +16,7 @@
   (`lib/transport/quotes/quote-service.ts` uses an in-process `Map`; clears on restart)
 - **Staged location disclosure** — `lib/transport/privacy/location-disclosure.ts`
   (exact address only after acceptance / authorised window)
-- Completed trip → `BillingServiceRecord` via `POST /api/transport/trips/[id]/billing-handoff`
+- Completed trip → `BillingServiceRecord` via `POST /api/transport/trips/[tripId]/billing-handoff`
 - Funding disclaimer on quotes — quote ≠ NDIS funding approval
 - Pricing components may be zero until versioned pricing policy applied
 

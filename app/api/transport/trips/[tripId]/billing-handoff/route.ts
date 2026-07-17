@@ -4,14 +4,14 @@ import { createBillableItemFromTransportEvidence } from "@/lib/billing/adapters/
 
 export async function POST(
   _req: Request,
-  { params }: { params: Promise<{ id: string }> },
+  { params }: { params: Promise<{ tripId: string }> },
 ) {
   const user = await requireApiPermission("transport:manage:org");
   if (user instanceof Response) return user;
-  const { id } = await params;
+  const { tripId } = await params;
   try {
     const result = await createBillableItemFromTransportEvidence({
-      tripId: id,
+      tripId,
       actor: user,
     });
     return jsonOk(result, 201);
