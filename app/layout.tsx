@@ -5,6 +5,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata } from "next";
 import { Outfit, Plus_Jakarta_Sans } from "next/font/google";
 
+import { AccessiBeWidget } from "@/components/accessibility/AccessiBeWidget";
 import {
   ADSENSE_CLIENT_ID,
   GoogleAdSense,
@@ -118,6 +119,7 @@ export default function RootLayout({
           }}
         />
         <Providers>{children}</Providers>
+        <AccessiBeWidget />
         <GoogleAdSense />
         <SpeedInsights />
       </body>
