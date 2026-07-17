@@ -55,7 +55,7 @@ export const MAX_UNMERGED_STACK_DEPTH = 3;
  * Strategy #331 → Trust Fabric #328 → Access Evidence #329.
  * #330 Starting Work DB queues when a slot frees; Transport/Care recreate after #330.
  */
-export const PRODUCTISATION_TRAIN_HEADS: number[] = [331, 328, 329];
+export const PRODUCTISATION_TRAIN_HEADS: number[] = [330, 341, 340];
 
 export const PR_ACTION_LEDGER: PrActionLedgerEntry[] = [
   {
@@ -296,13 +296,13 @@ export const PR_ACTION_LEDGER: PrActionLedgerEntry[] = [
   {
     number: 331,
     title: "Strategy — capabilities, documentation and operating lanes",
-    state: "OPEN",
-    isDraft: true,
+    state: "MERGED",
+    isDraft: false,
     baseBranch: "main",
     mergeable: "MERGEABLE",
     schemaImpact: "none",
     canonicalDomains: ["convergence.control_plane"],
-    action: "merge",
+    action: "retain_as_reference",
     reason: "Leadership train slot 1 — docs/strategy + capability honesty; no product migration.",
     dependencies: [327],
     operatingModeNote: "documentation / claim discipline",
@@ -312,13 +312,13 @@ export const PR_ACTION_LEDGER: PrActionLedgerEntry[] = [
   {
     number: 328,
     title: "Trust Fabric — Participant Access Receipts and Trust History",
-    state: "OPEN",
-    isDraft: true,
+    state: "MERGED",
+    isDraft: false,
     baseBranch: "main",
     mergeable: "MERGEABLE",
     schemaImpact: "medium",
     canonicalDomains: ["trust.fabric", "rights.access_receipts"],
-    action: "merge",
+    action: "retain_as_reference",
     reason:
       "Leadership train slot 2 — rebase after #331; keeps MIG 20260717120000; RightsOS #280 extract-only.",
     dependencies: [331],
@@ -329,13 +329,13 @@ export const PR_ACTION_LEDGER: PrActionLedgerEntry[] = [
   {
     number: 329,
     title: "Persistent Access Evidence Envelope and Human Change Review",
-    state: "OPEN",
-    isDraft: true,
+    state: "MERGED",
+    isDraft: false,
     baseBranch: "main",
     mergeable: "MERGEABLE",
     schemaImpact: "medium",
     canonicalDomains: ["access.intelligence_next", "access.evidence"],
-    action: "merge",
+    action: "retain_as_reference",
     reason:
       "Leadership train slot 3 — rebase after #331; keeps MIG 20260717130000; do not merge #308 wholesale.",
     dependencies: [331],
@@ -347,22 +347,23 @@ export const PR_ACTION_LEDGER: PrActionLedgerEntry[] = [
     number: 330,
     title: "Database-Backed Starting Work Golden Journey",
     state: "OPEN",
-    isDraft: true,
+    isDraft: false,
     baseBranch: "main",
     mergeable: "MERGEABLE",
     schemaImpact: "medium",
     canonicalDomains: ["journeys.starting_work"],
-    action: "rebase",
+    action: "merge",
     reason:
-      "Queued after #328/#329 capacity frees; MIG 20260717140000; temporary projection only — no CareOSMission.",
+      "Leadership train slot 1 — MIG 20260717140000; temporary projection only — no CareOSMission.",
     dependencies: [328, 329, 327],
     operatingModeNote: "controlled_pilot projection — flags default off",
     productionClaimAllowed: false,
+    stackDepth: 1,
   },
   {
     number: 332,
     title: "Persistent TransportQuote (colliding migration tip)",
-    state: "OPEN",
+    state: "CLOSED",
     isDraft: true,
     baseBranch: "cursor/strategic-opportunity-reconciliation-e909",
     mergeable: "MERGEABLE",
@@ -380,7 +381,7 @@ export const PR_ACTION_LEDGER: PrActionLedgerEntry[] = [
   {
     number: 333,
     title: "Recurring Care schedules (colliding migration tip)",
-    state: "OPEN",
+    state: "CLOSED",
     isDraft: true,
     baseBranch: "cursor/persistent-transport-quotes-e909",
     mergeable: "MERGEABLE",
@@ -397,7 +398,7 @@ export const PR_ACTION_LEDGER: PrActionLedgerEntry[] = [
   {
     number: 334,
     title: "Starting Work DB duplicate Opportunity-train tip",
-    state: "OPEN",
+    state: "CLOSED",
     isDraft: true,
     baseBranch: "cursor/recurring-care-agreements-e909",
     mergeable: "MERGEABLE",
@@ -414,7 +415,7 @@ export const PR_ACTION_LEDGER: PrActionLedgerEntry[] = [
   {
     number: 335,
     title: "Worker cancel recovery (premature Opportunity tip)",
-    state: "OPEN",
+    state: "CLOSED",
     isDraft: true,
     baseBranch: "cursor/starting-work-db-journey-e909",
     mergeable: "MERGEABLE",
@@ -427,6 +428,43 @@ export const PR_ACTION_LEDGER: PrActionLedgerEntry[] = [
     operatingModeNote: "deferred Prompt 3",
     productionClaimAllowed: false,
     stackDepth: 5,
+  },
+
+  {
+    number: 341,
+    title: "Persistent TransportQuote recreate (unique migration)",
+    state: "OPEN",
+    isDraft: true,
+    baseBranch: "main",
+    mergeable: "MERGEABLE",
+    schemaImpact: "medium",
+    canonicalDomains: ["transport.quotes"],
+    action: "merge",
+    reason:
+      "Recreates closed #332 with MIG 20260717150000 after Trust Fabric; merge after #330.",
+    supersedes: [332],
+    dependencies: [330],
+    operatingModeNote: "internal_alpha — flags default off",
+    productionClaimAllowed: false,
+    stackDepth: 1,
+  },
+  {
+    number: 340,
+    title: "Recurring Care schedules recreate (unique migration)",
+    state: "OPEN",
+    isDraft: true,
+    baseBranch: "cursor/transport-persistent-quotes-b3d4",
+    mergeable: "MERGEABLE",
+    schemaImpact: "medium",
+    canonicalDomains: ["care.recurring"],
+    action: "merge",
+    reason:
+      "Recreates closed #333 with MIG 20260717160000 after Access Evidence; stack on #341.",
+    supersedes: [333],
+    dependencies: [341],
+    operatingModeNote: "internal_alpha — flags default off",
+    productionClaimAllowed: false,
+    stackDepth: 2,
   },
   {
     number: 319,
