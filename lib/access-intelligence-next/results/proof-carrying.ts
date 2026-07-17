@@ -1,4 +1,5 @@
 import type { AccessEvidenceReference } from "../evidence/envelope";
+
 import type { AccessConclusionState } from "./states";
 
 export type AccessResultConstraint = {

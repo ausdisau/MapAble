@@ -1,10 +1,9 @@
 import { assertNoAutoMutation } from "@/lib/config/convergence-os";
+import { createAgentPreflightContract } from "@/lib/convergence-os/agent/preflight";
+import { seedCounterfactualSimulations } from "@/lib/convergence-os/blast/simulator";
 import { seedArchitectureConstitution } from "@/lib/convergence-os/constitution/seed";
 import { validateConstitutionAdvisory } from "@/lib/convergence-os/constitution/validate";
-import { seedSemanticCandidates } from "@/lib/convergence-os/semantic/resolver";
 import { seedSyntheticPassportDoorwayLineage } from "@/lib/convergence-os/lineage/seed";
-import { seedCounterfactualSimulations } from "@/lib/convergence-os/blast/simulator";
-import { runFoundationTrainRehearsal } from "@/lib/convergence-os/rehearsal/lab";
 import {
   seedDriftFindings,
   seedEnvironmentParity,
@@ -16,8 +15,9 @@ import {
   seedGoldenJourneys,
   seedFederation,
 } from "@/lib/convergence-os/ops/ownership-fitness-federation";
+import { runFoundationTrainRehearsal } from "@/lib/convergence-os/rehearsal/lab";
 import { runTwinScan } from "@/lib/convergence-os/scans/twin-scan";
-import { createAgentPreflightContract } from "@/lib/convergence-os/agent/preflight";
+import { seedSemanticCandidates } from "@/lib/convergence-os/semantic/resolver";
 
 /**
  * Seed Iteration 2 registries (advisory / fixture-backed).

@@ -1,6 +1,7 @@
 import type { CompatibilitySupportLevel, RehearsalStatus } from "@prisma/client";
-import { prisma } from "@/lib/prisma";
+
 import { FOUNDATION_MERGE_TRAIN } from "@/lib/convergence-os/trains/foundation-merge-train";
+import { prisma } from "@/lib/prisma";
 
 export type RehearsalStep = {
   name: string;

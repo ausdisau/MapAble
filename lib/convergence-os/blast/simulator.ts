@@ -1,4 +1,5 @@
 import type { BlastRadiusSeverity } from "@prisma/client";
+
 import { prisma } from "@/lib/prisma";
 
 export type BlastSimulationInput = {

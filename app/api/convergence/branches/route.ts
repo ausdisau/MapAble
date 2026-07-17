@@ -1,7 +1,7 @@
 import { requireApiAdmin } from "@/lib/api/auth-handler";
 import { jsonOk } from "@/lib/api/response";
-import { getLatestSnapshotId } from "@/lib/convergence-os/scans/repository-scan";
 import { requireConvergenceFeature } from "@/lib/convergence-os/gates";
+import { getLatestSnapshotId } from "@/lib/convergence-os/scans/repository-scan";
 import { prisma } from "@/lib/prisma";
 
 export async function GET(req: Request) {

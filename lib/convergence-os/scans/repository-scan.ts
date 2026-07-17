@@ -4,20 +4,20 @@ import type { Prisma } from "@prisma/client";
 
 import { createAuditEvent } from "@/lib/audit/audit-event-service";
 import { assertNoAutoMutation } from "@/lib/config/convergence-os";
-import { prisma } from "@/lib/prisma";
-import { CAPABILITY_SEEDS } from "@/lib/convergence-os/seed/capabilities";
+import {
+  analyseSchemaCollisions,
+  SCHEMA_REF_FIXTURES,
+} from "@/lib/convergence-os/schema/collision-engine";
 import { CANONICAL_DOMAIN_SEEDS } from "@/lib/convergence-os/seed/canonical-domains";
+import { CAPABILITY_SEEDS } from "@/lib/convergence-os/seed/capabilities";
 import { DECISION_PROPOSAL_SEEDS } from "@/lib/convergence-os/seed/decisions";
 import {
   PILOT_DEPENDENCY_SEEDS,
   PILOT_PR_SEEDS,
 } from "@/lib/convergence-os/seed/pilot-prs";
-import {
-  analyseSchemaCollisions,
-  SCHEMA_REF_FIXTURES,
-} from "@/lib/convergence-os/schema/collision-engine";
-import { FOUNDATION_MERGE_TRAIN } from "@/lib/convergence-os/trains/foundation-merge-train";
 import { buildConvergenceTextReport } from "@/lib/convergence-os/text-report";
+import { FOUNDATION_MERGE_TRAIN } from "@/lib/convergence-os/trains/foundation-merge-train";
+import { prisma } from "@/lib/prisma";
 
 export type RepositoryScanResult = {
   snapshotId: string;

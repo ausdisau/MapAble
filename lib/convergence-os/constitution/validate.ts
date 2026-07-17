@@ -1,6 +1,6 @@
-import { prisma } from "@/lib/prisma";
-import { analyseSchemaCollisions } from "@/lib/convergence-os/schema/collision-engine";
 import { CONSTITUTION_RULES } from "@/lib/convergence-os/constitution/rules";
+import { analyseSchemaCollisions } from "@/lib/convergence-os/schema/collision-engine";
+import { prisma } from "@/lib/prisma";
 
 export type ConstitutionViolationFinding = {
   ruleKey: string;

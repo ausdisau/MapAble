@@ -1,4 +1,5 @@
 import { getOntologyConcept } from "../ontology/seed-v1";
+
 import type { AccessQueryAst, AccessQueryConstraint } from "./ast";
 import { ACCESS_QUERY_AST_VERSION } from "./ast";
 

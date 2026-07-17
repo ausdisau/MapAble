@@ -1,6 +1,7 @@
 import type { Prisma, SemanticOverlapClass } from "@prisma/client";
-import { prisma } from "@/lib/prisma";
+
 import { isRelatedProjectionPair } from "@/lib/convergence-os/schema/collision-engine";
+import { prisma } from "@/lib/prisma";
 
 export type SemanticCandidateSeed = {
   candidateKey: string;

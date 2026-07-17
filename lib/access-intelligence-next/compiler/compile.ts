@@ -1,4 +1,5 @@
 import type { AccessQueryConstraint } from "../query/ast";
+
 import type {
   CompiledAccessRequirement,
   ParticipantRequirement,

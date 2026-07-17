@@ -1,4 +1,5 @@
 import type { ConstitutionExceptionStatus } from "@prisma/client";
+
 import { prisma } from "@/lib/prisma";
 
 const TERMINAL: ConstitutionExceptionStatus[] = [

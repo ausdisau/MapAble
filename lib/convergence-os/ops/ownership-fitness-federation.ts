@@ -1,6 +1,6 @@
-import { prisma } from "@/lib/prisma";
 import { CANONICAL_DOMAIN_SEEDS } from "@/lib/convergence-os/seed/canonical-domains";
 import { CAPABILITY_SEEDS } from "@/lib/convergence-os/seed/capabilities";
+import { prisma } from "@/lib/prisma";
 
 export async function seedOwnershipRegistry() {
   let upserted = 0;

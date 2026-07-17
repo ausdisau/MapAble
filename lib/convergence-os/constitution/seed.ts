@@ -1,5 +1,5 @@
-import { prisma } from "@/lib/prisma";
 import { CONSTITUTION_RULES } from "@/lib/convergence-os/constitution/rules";
+import { prisma } from "@/lib/prisma";
 
 export async function seedArchitectureConstitution(): Promise<{
   constitutionId: string;

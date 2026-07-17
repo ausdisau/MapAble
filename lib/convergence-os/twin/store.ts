@@ -1,6 +1,6 @@
-import { prisma } from "@/lib/prisma";
-import { buildTwinInventory } from "@/lib/convergence-os/twin/inventory";
 import { runTwinScan } from "@/lib/convergence-os/scans/twin-scan";
+import { buildTwinInventory } from "@/lib/convergence-os/twin/inventory";
+import { prisma } from "@/lib/prisma";
 
 export type TwinOverview = {
   snapshotId: string | null;

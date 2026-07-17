@@ -1,8 +1,8 @@
 import { createAuditEvent } from "@/lib/audit/audit-event-service";
 import { assertNoAutoMutation } from "@/lib/config/convergence-os";
-import { prisma } from "@/lib/prisma";
 import { getLatestSnapshotId } from "@/lib/convergence-os/scans/repository-scan";
 import { buildTwinInventory } from "@/lib/convergence-os/twin/inventory";
+import { prisma } from "@/lib/prisma";
 
 export type TwinScanResult = {
   snapshotId: string;

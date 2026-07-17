@@ -1,12 +1,12 @@
 import { requireApiAdmin } from "@/lib/api/auth-handler";
 import { jsonError, jsonOk } from "@/lib/api/response";
-import { requireConvergenceFeature } from "@/lib/convergence-os/gates";
-import { seedArchitectureConstitution } from "@/lib/convergence-os/constitution/seed";
-import { validateConstitutionAdvisory } from "@/lib/convergence-os/constitution/validate";
 import {
   createExceptionDraft,
   transitionException,
 } from "@/lib/convergence-os/constitution/exceptions";
+import { seedArchitectureConstitution } from "@/lib/convergence-os/constitution/seed";
+import { validateConstitutionAdvisory } from "@/lib/convergence-os/constitution/validate";
+import { requireConvergenceFeature } from "@/lib/convergence-os/gates";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {

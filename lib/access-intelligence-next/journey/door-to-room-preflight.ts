@@ -1,11 +1,12 @@
-import { createProofCarryingResult, type ProofCarryingAccessResult } from "../results";
 import type { AccessQueryAst } from "../query/ast";
-import { runSyntheticJourneyPreflight } from "./synthetic-preflight";
+import { createProofCarryingResult, type ProofCarryingAccessResult } from "../results";
+
 import type {
   DoorToRoomPreflight,
   JourneyDependencyGraph,
   JourneySegment,
 } from "./segments";
+import { runSyntheticJourneyPreflight } from "./synthetic-preflight";
 
 /**
  * Proof-carrying door-to-room journey preflight for Harbour Room 3.12.

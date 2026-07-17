@@ -1,8 +1,8 @@
+import { jsonError } from "@/lib/api/response";
 import {
   convergenceOsConfig,
   isConvergenceOsEnabled,
 } from "@/lib/config/convergence-os";
-import { jsonError } from "@/lib/api/response";
 
 export function convergenceDisabledResponse(): Response {
   return jsonError(

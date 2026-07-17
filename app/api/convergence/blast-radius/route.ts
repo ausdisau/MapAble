@@ -1,11 +1,11 @@
 import { requireApiAdmin } from "@/lib/api/auth-handler";
 import { jsonError, jsonOk } from "@/lib/api/response";
-import { requireConvergenceFeature } from "@/lib/convergence-os/gates";
 import {
   runBlastSimulation,
   seedCounterfactualSimulations,
   type BlastSimulationInput,
 } from "@/lib/convergence-os/blast/simulator";
+import { requireConvergenceFeature } from "@/lib/convergence-os/gates";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {

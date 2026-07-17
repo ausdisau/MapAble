@@ -1,9 +1,10 @@
 import { compileParticipantRequirements } from "../compiler/compile";
 import type { ParticipantRequirementSet } from "../compiler/types";
+import { accessIntelligenceNextFlags } from "../flags";
 import { getHarbourGraph, projectGraphToList } from "../graph";
 import { runSyntheticJourneyPreflight } from "../journey/synthetic-preflight";
 import type { ProofCarryingAccessResult } from "../results";
-import { accessIntelligenceNextFlags } from "../flags";
+
 import type { AccessQueryAst } from "./ast";
 import { validateAccessQuery } from "./validate";
 

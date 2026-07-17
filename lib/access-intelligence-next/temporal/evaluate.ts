@@ -1,5 +1,6 @@
-import { getOntologyConcept } from "../ontology/seed-v1";
 import type { AccessEvidenceReference } from "../evidence/envelope";
+import { getOntologyConcept } from "../ontology/seed-v1";
+
 import {
   DEFAULT_TEMPORAL_TTL_DAYS,
   type TemporalAccessState,

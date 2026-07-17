@@ -1,6 +1,6 @@
 import type { AccessEvidenceClass } from "../evidence/classes";
-import type { TemporalAccessState } from "../temporal/vocabulary";
 import type { AccessConclusionState } from "../results/states";
+import type { TemporalAccessState } from "../temporal/vocabulary";
 
 export type JourneySegmentKind =
   | "origin"
