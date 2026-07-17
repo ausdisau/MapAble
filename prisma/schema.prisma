@@ -143,6 +143,12 @@ model User {
   billingServiceRecords     BillingServiceRecord[] @relation("BillingServiceRecordParticipant")
   billingDisputes           BillingDispute[]       @relation("BillingDisputeParticipant")
   billingDisputeMessages    BillingDisputeMessage[] @relation("BillingDisputeMessageAuthor")
+
+  // Trust Fabric — purpose-bound access receipts (participant-facing)
+  accessReceiptsAsParticipant ParticipantAccessReceipt[] @relation("AccessReceiptParticipant")
+  accessReceiptsAsActor       ParticipantAccessReceipt[] @relation("AccessReceiptActor")
+  breakGlassSessionsOpened    BreakGlassAccessSession[]  @relation("BreakGlassOpenedBy")
+  decisionNoticesOwned        DecisionNoticeRecord[]     @relation("DecisionNoticeHumanOwner")
 }
 
 model PasskeyCredential {
@@ -725,6 +731,7 @@ model Organisation {
   billingClaimBatches    BillingClaimBatch[]
   billingIntegrationConnections BillingIntegrationConnection[]
   billingReconSessions   BillingReconciliationSession[]
+  accessReceipts         ParticipantAccessReceipt[] @relation("AccessReceiptOrganisation")
 }
 
 model OrganisationMember {
@@ -812,6 +819,83 @@ model AuditEvent {
   @@index([action])
   @@index([participantId])
   @@index([createdAt])
+}
+
+/// Purpose-bound receipt for sensitive participant-data access (Trust Fabric).
+/// Categories only — never stores raw secrets or model chain-of-thought.
+model ParticipantAccessReceipt {
+  id               String   @id @default(cuid())
+  participantId    String
+  participant      User     @relation("AccessReceiptParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  actorUserId      String?
+  actorUser        User?    @relation("AccessReceiptActor", fields: [actorUserId], references: [id], onDelete: SetNull)
+  organisationId   String?
+  organisation     Organisation? @relation("AccessReceiptOrganisation", fields: [organisationId], references: [id], onDelete: SetNull)
+  purpose          String
+  fieldCategories  String[] @default([])
+  authoritySource  String
+  authorityRef     String?
+  consentRecordId  String?
+  expiresAt        DateTime?
+  correlationId    String
+  outcome          String
+  challengedAt     DateTime?
+  challengeNote    String?
+  createdAt        DateTime @default(now())
+
+  @@index([participantId, createdAt])
+  @@index([correlationId])
+  @@index([actorUserId, createdAt])
+  @@map("participant_access_receipts")
+}
+
+/// Durable break-glass session with after-action review requirement.
+model BreakGlassAccessSession {
+  id                 String    @id @default(cuid())
+  adminUserId        String
+  adminUser          User      @relation("BreakGlassOpenedBy", fields: [adminUserId], references: [id], onDelete: Cascade)
+  purpose            String
+  reason             String
+  organisationId     String?
+  participantId      String?
+  fieldCategories    String[]  @default([])
+  openedAt           DateTime  @default(now())
+  expiresAt          DateTime
+  ticketRef          String?
+  afterActionRequired Boolean  @default(true)
+  afterActionCompletedAt DateTime?
+  afterActionNote    String?
+  revokedAt          DateTime?
+  correlationId      String
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  @@index([adminUserId, expiresAt])
+  @@index([participantId])
+  @@index([correlationId])
+  @@map("break_glass_access_sessions")
+}
+
+/// Consequential deterministic decision notice (explainable, challengeable).
+model DecisionNoticeRecord {
+  id                 String   @id @default(cuid())
+  decision           String
+  responsibleSystem  String
+  reasonCodes        String[] @default([])
+  evidenceRefs       String[] @default([])
+  unknowns           String[] @default([])
+  humanOwnerUserId   String?
+  humanOwner         User?    @relation("DecisionNoticeHumanOwner", fields: [humanOwnerUserId], references: [id], onDelete: SetNull)
+  participantId      String?
+  organisationId     String?
+  reviewPath         String
+  correctionPath     String
+  correlationId      String
+  createdAt          DateTime @default(now())
+
+  @@index([participantId, createdAt])
+  @@index([correlationId])
+  @@map("decision_notice_records")
 }
 
 model Booking {

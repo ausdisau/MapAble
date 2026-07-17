@@ -9,6 +9,7 @@ import type {
 } from "@/lib/communication-passport/types";
 import { isCommunicationPassportEnabled } from "@/lib/config/communication-workforce";
 import { prisma } from "@/lib/prisma";
+import { recordDisclosureReceipt } from "@/lib/trust-fabric/receipt-service";
 
 export class CommunicationPassportError extends Error {
   readonly status: number;
@@ -124,6 +125,13 @@ export async function getWorkerFacingPassport(input: {
       version: passport.version,
       fields: passport.disclosableFieldKeys,
     },
+  });
+  await recordDisclosureReceipt({
+    actorUserId: input.workerUserId,
+    participantId: input.participantId,
+    purpose: input.purpose,
+    fieldCategories: ["communication_preferences", "cognitive_preferences"],
+    authoritySource: "consent",
   });
   return workerFacingPassportSubset(passport);
 }

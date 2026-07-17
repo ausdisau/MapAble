@@ -6,6 +6,7 @@
 ## Wave 0 deliverables (this folder + ConvergenceOS)
 
 - [PR action ledger](../remediation/PR_ACTION_LEDGER.md)
+- [Leadership train reconciliation](../remediation/LEADERSHIP_TRAIN_RECONCILIATION.md)
 - [Productisation merge train](../convergence-os/PRODUCTISATION_MERGE_TRAIN.md)
 - [Public claim registry](../convergence-os/PUBLIC_CLAIM_REGISTRY.md)
 - [Capability registry (human mirror)](./CAPABILITY_REGISTRY.md)
@@ -18,16 +19,16 @@
 2. #313 — encryption, Zod, tenant scope, IDOR
 3. #314 — Communication Passport → readiness (no assign)
 4. #327 — Care/Transport/Billing slices, Companion foundation, Provider Ops, Starting Work synthetic
+5. #331 — strategy / operating lanes / capability honesty
 
-## Next five strategic opportunity PRs
+## Active leadership train (max 3)
 
-1. `cursor/strategic-opportunity-reconciliation-e909` — capabilities, docs, operating lanes (no product migration)
-2. `cursor/persistent-transport-quotes-e909` — Prisma Transport quotes + staged location privacy
-3. `cursor/recurring-care-agreements-e909` — recurring Care schedules + agreement completion
-4. `cursor/starting-work-db-journey-e909` — database-backed Starting Work golden journey
-5. `cursor/worker-cancel-recovery-e909` — worker cancellation → participant-controlled recovery
+1. Trust Fabric — [TRUST_FABRIC.md](./TRUST_FABRIC.md) (`MAPABLE_TRUST_FABRIC_*`, default off)
+2. Persistent Access Evidence Envelope (Access Intelligence)
+3. Database-backed Starting Work projection (#330 queued)
 
-See [docs/strategy/STRATEGIC_OPPORTUNITIES.md](../strategy/STRATEGIC_OPPORTUNITIES.md).
+Transport quotes / Recurring Care recreate after Starting Work DB with unique migrations
+(`20260717150000` / `20260717160000`). See [LEADERSHIP_TRAIN_RECONCILIATION.md](../remediation/LEADERSHIP_TRAIN_RECONCILIATION.md).
 
 ## Controlled pilot
 
