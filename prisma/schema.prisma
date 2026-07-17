@@ -10376,3 +10376,50 @@ model RuntimeComponent {
   @@index([environment])
   @@map("convergence_runtime_components")
 }
+
+/// Temporary Starting Work mission projection — not CareOSMission SoR; not a Care/Transport/Billing writer.
+model StartingWorkJourneyProjection {
+  id                  String   @id @default(cuid())
+  journeyId           String   @unique @map("journey_id")
+  participantLabel    String   @map("participant_label")
+  venueLabel          String   @map("venue_label")
+  participantGoal     String   @map("participant_goal")
+  status              String
+  blocked             Boolean  @default(false)
+  blockReason         String?  @map("block_reason")
+  failureMode         String?  @map("failure_mode")
+  currentStep         String?  @map("current_step")
+  stepsCompletedJson  Json     @map("steps_completed_json")
+  dependencyGraphJson Json     @map("dependency_graph_json")
+  stateHonestyJson    Json     @map("state_honesty_json")
+  noticesJson         Json     @map("notices_json")
+  readinessJson       Json?    @map("readiness_json")
+  outcomeReceiptJson  Json?    @map("outcome_receipt_json")
+  regionalCandidatesJson Json  @map("regional_candidates_json")
+  regionalConfirmedJson  Json  @map("regional_confirmed_json")
+  entityRefsJson      Json     @map("entity_refs_json")
+  actorUserId         String?  @map("actor_user_id")
+  caseId              String?  @map("case_id")
+  synthetic           Boolean  @default(true)
+  productionClaim     String   @default("none") @map("production_claim")
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+  events              StartingWorkJourneyEvent[]
+
+  @@index([status, createdAt])
+  @@index([actorUserId])
+  @@map("starting_work_journey_projections")
+}
+
+model StartingWorkJourneyEvent {
+  id           String   @id @default(cuid())
+  projectionId String   @map("projection_id")
+  projection   StartingWorkJourneyProjection @relation(fields: [projectionId], references: [id], onDelete: Cascade)
+  eventType    String   @map("event_type")
+  stepId       String?  @map("step_id")
+  payloadJson  Json     @map("payload_json")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@index([projectionId, createdAt])
+  @@map("starting_work_journey_events")
+}
