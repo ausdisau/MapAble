@@ -20,15 +20,17 @@
 3. #314 — Communication Passport → readiness (no assign)
 4. #327 — Care/Transport/Billing slices, Companion foundation, Provider Ops, Starting Work synthetic
 5. #331 — strategy / operating lanes / capability honesty
+6. #328 — Trust Fabric access receipts
+7. #329 — Persistent Access Evidence Envelope
 
 ## Active leadership train (max 3)
 
-1. Trust Fabric — [TRUST_FABRIC.md](./TRUST_FABRIC.md) (`MAPABLE_TRUST_FABRIC_*`, default off)
-2. Persistent Access Evidence Envelope (Access Intelligence)
-3. Database-backed Starting Work projection (#330 queued)
+1. Database-backed Starting Work projection — this PR (#330)
+2. Persistent Transport quotes — recreate after #330 (`20260717150000`)
+3. Recurring Care — recreate after quotes (`20260717160000`)
 
-Transport quotes / Recurring Care recreate after Starting Work DB with unique migrations
-(`20260717150000` / `20260717160000`). See [LEADERSHIP_TRAIN_RECONCILIATION.md](../remediation/LEADERSHIP_TRAIN_RECONCILIATION.md).
+See [LEADERSHIP_TRAIN_RECONCILIATION.md](../remediation/LEADERSHIP_TRAIN_RECONCILIATION.md) and
+[MOAT_PR_RECONCILIATION.md](./MOAT_PR_RECONCILIATION.md).
 
 ## Controlled pilot
 

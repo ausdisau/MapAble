@@ -1,38 +1,38 @@
 # Moat series — PR and branch reconciliation
 
-**Baseline main:** `fb80bc83` (pre-moat).  
-**Active stacked product PRs (max 3):**
+**Baseline main tip (post-#329):** see `origin/main`.  
+**Stack policy:** max **3** unmerged product PRs.
 
-| # | Branch | Prompt | Status |
-|---|--------|--------|--------|
-| 328 | `cursor/participant-access-receipts-a2fa` | Trust Fabric — Access Receipts | Open draft |
-| 329 | `cursor/access-evidence-envelope-a2fa` | Living Access Evidence — envelopes + change review | Open draft |
-| (this) | `cursor/starting-work-db-journey-a2fa` | Whole-Journey — Starting Work DB projection | Open draft |
+## Landed
 
-Do **not** open a fourth stacked product PR until one of the above merges or closes.
+| #    | Topic                                    | Status                    |
+| ---- | ---------------------------------------- | ------------------------- |
+| #331 | Strategy / operating lanes               | Merged                    |
+| #328 | Trust Fabric — Access Receipts           | Merged (`20260717120000`) |
+| #329 | Access Evidence Envelope + Change Review | Merged (`20260717130000`) |
+
+## Active / queued
+
+| #          | Branch                                    | Prompt                      | Status                             |
+| ---------- | ----------------------------------------- | --------------------------- | ---------------------------------- |
+| #330       | `cursor/starting-work-db-journey-a2fa`    | Starting Work DB projection | Queued / rebase onto main          |
+| (recreate) | `cursor/transport-persistent-quotes-b3d4` | Persistent Transport quotes | After #330; MIG `20260717150000`   |
+| (recreate) | `cursor/care-recurring-agreements-b3d4`   | Recurring Care              | After quotes; MIG `20260717160000` |
+
+Closed colliding Opportunity tips: **#332**, **#333**, **#334**, **#335** (do not merge).
 
 ## Extract-only (do not merge wholesale)
 
-| Open PR | Topic | Action |
-|---------|--------|--------|
-| #280 | RightsOS giant | **Superseded for Prompt 1** by #328 slice — do not merge #280 unchanged |
-| #308 | AI reliability + VisionAccess | Extract later; #329 covers evidence persistence only |
-| #309 | AccessOps civic twin | Extract Harbour venue status later (Prompt 7) |
-| #301 | Continuity life events | Extract recovery kernel later (Prompt 5); no CareOSMission DDL |
-| #319 | Replay Lab | Rebase later (Prompt 12) |
-| #298 / #281 | Federation / vault | Deferred (vault-before-rights) |
-| #299 / #267 / #277 | AURA stacks | Superseded pattern; Companion Stop AURA already on main |
-| #307 / #311 / #294 | Accountability / governance / QSC | Extract appeals later (Prompt 11) |
-
-## Close or supersede-label (human ops)
-
-Recommend closing or labelling **superseded** (do not merge):
-
-- #273, #265 — legacy Access Intelligence expansion (AI Next on main)
-- #283 — parallel Transport MVP vs `TransportTrip`
-- #287, #288 — already closed Continuity duplicates
-- AccessCast duplicates #320–#322, #325 — already closed
-- #323 RC1 — already closed
+| Open PR            | Topic                             | Action                                              |
+| ------------------ | --------------------------------- | --------------------------------------------------- |
+| #280               | RightsOS giant                    | Superseded for Trust Fabric by #328                 |
+| #308               | AI reliability + VisionAccess     | Extract later; #329 covers evidence persistence     |
+| #309               | AccessOps civic twin              | Extract Harbour venue status later                  |
+| #301               | Continuity life events            | Extract recovery kernel later; no CareOSMission DDL |
+| #319               | Replay Lab                        | Rebase later after domain slices                    |
+| #298 / #281        | Federation / vault                | Deferred                                            |
+| #299 / #267 / #277 | AURA stacks                       | Extract-only                                        |
+| #307 / #311 / #294 | Accountability / governance / QSC | Extract appeals later                               |
 
 ## CareOSMission rule
 
