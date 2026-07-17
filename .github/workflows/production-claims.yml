@@ -32,5 +32,8 @@ jobs:
       - name: Feature dependency / build lint gate markers
         run: pnpm exec tsx scripts/ci/check-feature-dependencies.ts
 
+      - name: Merge-train / PR ledger integrity
+        run: pnpm exec tsx scripts/ci/check-merge-train-integrity.ts
+
       - name: Migration integrity (includes prod runbook db push ban)
         run: pnpm exec tsx scripts/ci/check-migration-integrity.ts

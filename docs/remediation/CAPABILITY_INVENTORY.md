@@ -30,6 +30,15 @@ States used here match the future registry (`concept` | `scaffold` | `demo` | `i
 | a11y.assurance             | Accessibility assurance programme | accessibility  | scaffold           | false              | verified              | Statement cautious; no axe CI before PR 1    |
 | compliance.soc2_iso        | SOC2 / ISO evidence               | compliance     | scaffold           | false              | verified              | Explicitly not certified                     |
 | ai.public_features         | Public AI features                | ai             | internal_alpha     | false              | likely                | Multiple agent routes; governance incomplete |
+| access.intelligence_next   | Living Access Fabric (AI Next)    | access         | synthetic_demo     | false              | verified              | On main; not personally usable truth         |
+| communication.passport     | Communication Passport            | access         | concept            | false              | verified              | Not on main as package yet                   |
+| workforce.readiness        | Assignment readiness (no auto)    | workforce      | concept            | false              | verified              | Package missing on main                      |
+| provider.ops_attention     | Provider Ops attention queue      | provider       | concept            | false              | verified              | Read-only projection not landed              |
+| mobile.companion           | Native Companion                  | mobile         | scaffold           | false              | verified              | Contracts only; Expo not on main             |
+| outcomes.ledger            | Outcomes and Impact Ledger        | outcomes       | concept            | false              | verified              | No immutable receipts yet                    |
+| pilot.starting_work        | Starting Work controlled pilot    | pilot          | concept            | false              | verified              | Design pending security + vertical slice     |
+
+See also ConvergenceOS `CAPABILITY_SEEDS` and [PUBLIC_CLAIM_REGISTRY](../convergence-os/PUBLIC_CLAIM_REGISTRY.md).
 
 ## Marketing language vs inventory
 

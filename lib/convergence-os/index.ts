@@ -56,12 +56,27 @@ export {
 } from "@/lib/convergence-os/schema/collision-engine";
 
 export { FOUNDATION_MERGE_TRAIN } from "@/lib/convergence-os/trains/foundation-merge-train";
+export { PRODUCTISATION_MERGE_TRAIN } from "@/lib/convergence-os/trains/productisation-merge-train";
 export { CANONICAL_DOMAIN_SEEDS } from "@/lib/convergence-os/seed/canonical-domains";
 export { CAPABILITY_SEEDS } from "@/lib/convergence-os/seed/capabilities";
 export {
   PILOT_PR_SEEDS,
   PILOT_DEPENDENCY_SEEDS,
 } from "@/lib/convergence-os/seed/pilot-prs";
+export {
+  PR_ACTION_LEDGER,
+  SUPERSEDED_CLOSE_TARGETS,
+  MAX_UNMERGED_STACK_DEPTH,
+  PRODUCTISATION_TRAIN_HEADS,
+  ledgerEntriesByAction,
+  assertSupersededCloseTargetsInLedger,
+  assertStackDepthPolicy,
+  assertProductisationTrainDepth,
+} from "@/lib/convergence-os/seed/pr-action-ledger";
+export {
+  PUBLIC_CLAIM_REGISTRY,
+  assertNoProductionClaimsWithoutEvidence,
+} from "@/lib/convergence-os/seed/public-claims";
 export { DECISION_PROPOSAL_SEEDS } from "@/lib/convergence-os/seed/decisions";
 export { seedIteration2 } from "@/lib/convergence-os/seed/iteration2";
 export { CONSTITUTION_RULES } from "@/lib/convergence-os/constitution/rules";

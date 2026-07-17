@@ -27,6 +27,17 @@ Read-only registries:
 - APIs under `/api/convergence/*`
 - Advisory CI workflow (warnings; no hard fail unless enforced mode)
 
+## Productisation Wave 0 (Connected Service Programme)
+
+Extends ConvergenceOS with honest productisation controls (still advisory; no auto-merge):
+
+- [PRODUCTISATION_MERGE_TRAIN.md](./PRODUCTISATION_MERGE_TRAIN.md) — `PRODUCTISATION_MERGE_TRAIN`
+- [PUBLIC_CLAIM_REGISTRY.md](./PUBLIC_CLAIM_REGISTRY.md) — blocks production marketing ahead of maturity
+- [PR action ledger](../remediation/PR_ACTION_LEDGER.md) — close / merge / split / consolidate actions
+- [Productisation programme README](../productisation/README.md)
+
+Seeds: `lib/convergence-os/seed/pr-action-ledger.ts`, `public-claims.ts`, `trains/productisation-merge-train.ts`.
+
 ## Iteration 2 scope (Waves 9–17, advisory)
 
 Stacked on Wave 0. Still **AUDIT/ADVISORY** — no auto source rewrite, no auto-merge, no real product-branch merges from rehearsals.

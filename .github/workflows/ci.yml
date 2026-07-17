@@ -96,6 +96,9 @@ jobs:
       - name: Feature dependencies
         run: pnpm exec tsx scripts/ci/check-feature-dependencies.ts
 
+      - name: Merge-train / PR ledger integrity
+        run: pnpm exec tsx scripts/ci/check-merge-train-integrity.ts
+
       - name: Production build
         run: pnpm build
 
