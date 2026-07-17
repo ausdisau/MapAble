@@ -99,12 +99,10 @@ stripe trigger checkout.session.completed
 
 ## UI
 
-- `/dashboard/billing` — **Invoice & billing centre** (participant control panel): overview, invoices & payments, funding sources, legacy invoice drafts
-- `/dashboard/billing/invoices` — list, pay, export (Stripe Checkout / plan manager)
-- `/dashboard/billing/invoices/[invoiceId]` — invoice detail
+- `/billing` — **Billing & Invoicing Centre** (canonical): overview, invoices, service records, claims, approvals, payments, reconciliation, provider payouts, subscriptions, disputes, credit notes, reports, policy, integrations, settings. See [billing-centre.md](./billing-centre.md).
+- `/dashboard/billing` — redirects to `/billing/overview` (compatibility)
 - `/dashboard/billing/funding` — billing-core funding sources
 - `/dashboard/billing/legacy` — Phase 2 `Invoice` drafts
-- `/billing` — redirects to `/dashboard/billing`
 - `/provider/billing` — Connect onboarding + subscription
 - `/admin/billing` — search and flagged payments
 

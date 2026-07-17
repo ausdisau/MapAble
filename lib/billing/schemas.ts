@@ -249,3 +249,66 @@ export const safeguardCheckSchema = z.object({
   serviceRecordId: z.string().cuid().optional(),
   organisationId: z.string().cuid().optional().nullable(),
 });
+
+export const sendInvoiceSchema = z.object({
+  channel: z.string().min(1).max(50).optional(),
+  recipient: z.string().max(320).optional(),
+  reason: z.string().max(1000).optional(),
+});
+
+export const voidInvoiceSchema = z.object({
+  reason: z.string().min(1).max(1000),
+});
+
+export const createCreditNoteSchema = z.object({
+  amountCents: z.number().int().positive(),
+  reason: z.string().min(1).max(1000),
+  lineItemIds: z.array(z.string().cuid()).optional(),
+  transitionInvoice: z.boolean().optional(),
+});
+
+export const allocatePaymentSchema = z.object({
+  invoiceId: z.string().cuid().optional(),
+  amountCents: z.number().int().positive().optional(),
+  source: z.string().min(1).max(200).optional(),
+});
+
+export const importPolicySchema = z.object({
+  name: z.string().min(1).max(200),
+  jurisdiction: z.string().min(1).max(10).optional(),
+  organisationId: z.string().cuid().optional().nullable(),
+  sourceUrl: z.string().url().optional().nullable(),
+  notes: z.string().max(2000).optional().nullable(),
+  version: z.string().min(1).max(50),
+  effectiveFrom: z.string().datetime(),
+  effectiveTo: z.string().datetime().optional().nullable(),
+  rules: z
+    .array(
+      z.object({
+        supportItemNumber: z.string().min(1).max(50),
+        supportItemName: z.string().min(1).max(200),
+        unit: z.string().min(1).max(40),
+        priceCapCents: z.number().int().nonnegative(),
+        supportCategory: z.string().max(100).optional().nullable(),
+        registrationGroup: z.string().max(100).optional().nullable(),
+        weekdayOrTimeBand: z.string().max(50).optional().nullable(),
+        remoteLoading: z.string().max(50).optional().nullable(),
+        providerType: z.string().max(50).optional().nullable(),
+        gstTreatment: z.string().max(50).optional(),
+        notes: z.string().max(1000).optional().nullable(),
+      })
+    )
+    .min(1),
+});
+
+export const xeroConnectSchema = z.object({
+  organisationId: z.string().cuid().optional().nullable(),
+});
+
+export const generateChargeSchema = z.object({
+  unitRateCents: z.number().int().nonnegative().optional(),
+  gstApplicable: z.boolean().optional(),
+  fundingSplit: fundingSplitSchema.optional(),
+  verticalSplit: verticalSplitSchema.optional(),
+  organisationId: z.string().cuid().optional().nullable(),
+});

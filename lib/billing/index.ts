@@ -76,6 +76,7 @@ export {
   approveInvoice,
 } from "@/lib/billing/invoicing/issue";
 export { createDraftFromServiceRecords } from "@/lib/billing/invoicing/draft";
+export { createCreditNote } from "@/lib/billing/invoicing/credit-note";
 
 // Approvals
 export {

@@ -25,6 +25,7 @@
     "import:provider-outlets-supabase": "tsx scripts/import-provider-outlets-supabase.ts",
     "fetch:ndis-list-providers": "tsx scripts/fetch-ndis-list-providers.ts",
     "seed:ndis-provider-outlets": "tsx prisma/seed-ndis-provider-outlets.ts",
+    "seed:billing-centre": "tsx prisma/seed-billing-centre.ts",
     "ingest:ndis-providers": "tsx scripts/ingest-ndis-providers.ts",
     "ingest:ndis-providers:dry": "DRY_RUN=true tsx scripts/ingest-ndis-providers.ts",
     "check:integrations-env": "npx tsx scripts/check-integrations-env.ts",
