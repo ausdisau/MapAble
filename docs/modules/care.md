@@ -63,10 +63,23 @@ NDIS Provider Finder outlets can link to a platform `Organisation` when:
 
 When linked, profile and finder cards show **Request care** → `/care/request?organisationId=…&providerName=…` with wizard prefill banner.
 
+## Recurring schedules (flagged)
+
+Flag: `MAPABLE_CARE_RECURRING_SCHEDULES_ENABLED` (default **false**).
+
+- `GET/POST /api/care/bookings/[id]/schedules` — draft weekly/fortnightly cadence
+- `POST /api/care/schedules/[scheduleId]/activate` — optional agreement amend
+- `POST /api/care/schedules/[scheduleId]/exceptions` — skip / reschedule one occurrence
+- Materialisation creates `CareShift` rows with `recurringScheduleId` + `occurrenceDate`
+- Agreement SoT remains `CareServiceAgreement` on the booking (amend bumps version)
+- `POST /api/care/bookings/[id]/agreement/amend` — version bump; participant re-accepts
+- Shift cancel via `cancelCareShiftWithRecoveryHook` records cancellation and **does not**
+  auto-cancel connected Transport
+
 ## Limitations / honesty
 
 - No AI matching or automatic worker assignment
-- Recurring bookings / schedule exceptions — **not complete** (programme PR 3)
+- Recurring schedules require the feature flag; not production_supported
 - NDIS pricing is unresolved until versioned pricing policy — no funding approval claims
 - Billing handoff creates `BillingServiceRecord`; it does not submit to NDIA
 - Cancel Care must not silently cancel connected Transport (Continuity PR 5)

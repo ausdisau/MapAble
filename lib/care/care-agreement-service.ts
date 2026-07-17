@@ -39,6 +39,7 @@ function parseAgreementMeta(summary: string | null | undefined): {
   acceptedByUserId?: string;
   expiresAt?: string;
   status?: AccessibleServiceAgreementView["status"];
+  body?: string;
 } {
   if (!summary) {
     return {
@@ -69,6 +70,7 @@ function parseAgreementMeta(summary: string | null | undefined): {
           typeof parsed.status === "string"
             ? (parsed.status as AccessibleServiceAgreementView["status"])
             : undefined,
+        body: typeof parsed.body === "string" ? parsed.body : undefined,
       };
     }
   } catch {
@@ -119,10 +121,12 @@ export async function getOrCreateAccessibleServiceAgreement(
 
   const meta = parseAgreementMeta(agreement.placeholderSummary);
   const status =
-    meta.status ??
-    (agreement.status === "placeholder"
-      ? "placeholder"
-      : (agreement.status as AccessibleServiceAgreementView["status"]));
+    meta.status === "amended"
+      ? "proposed"
+      : (meta.status ??
+        (agreement.status === "placeholder"
+          ? "placeholder"
+          : (agreement.status as AccessibleServiceAgreementView["status"])));
 
   return {
     id: agreement.id,
@@ -131,10 +135,11 @@ export async function getOrCreateAccessibleServiceAgreement(
     status,
     title: agreement.placeholderTitle,
     plainLanguageSummary:
-      typeof agreement.placeholderSummary === "string" &&
+      meta.body ??
+      (typeof agreement.placeholderSummary === "string" &&
       !agreement.placeholderSummary.startsWith("{")
         ? agreement.placeholderSummary
-        : "This agreement describes the care supports to be delivered. You can pause, ask for changes, or request a support person before accepting.",
+        : "This agreement describes the care supports to be delivered. You can pause, ask for changes, or request a support person before accepting."),
     supportedDecisionMakingOffered: meta.supportedDecisionMakingOffered,
     accessibleFormats: meta.formats,
     acceptedAt: meta.acceptedAt,
@@ -201,6 +206,72 @@ export async function acceptAccessibleServiceAgreement(input: {
     organisationId: booking.organisationId,
     participantId: booking.participantId,
     metadata: { version: nextVersion },
+  });
+
+  return getOrCreateAccessibleServiceAgreement(input.careBookingId, input.actor);
+}
+
+/**
+ * Amend agreement terms (e.g. recurring schedule change). Bumps version and
+ * returns status to proposed — participant must re-accept. GPS never required.
+ */
+export async function amendAccessibleServiceAgreement(input: {
+  careBookingId: string;
+  actor: CurrentUser;
+  reason: string;
+  plainLanguageSummary?: string;
+}): Promise<AccessibleServiceAgreementView> {
+  const reason = input.reason.trim();
+  if (reason.length < 4) throw new Error("REASON_REQUIRED");
+
+  const view = await getOrCreateAccessibleServiceAgreement(
+    input.careBookingId,
+    input.actor,
+  );
+  const booking = await prisma.careBooking.findUnique({
+    where: { id: input.careBookingId },
+  });
+  if (!booking) throw new Error("NOT_FOUND");
+  try {
+    await assertCanAccessBookingAgreement(input.actor, booking);
+  } catch (e) {
+    if (e instanceof CareAccessError) throw new Error("FORBIDDEN");
+    throw e;
+  }
+
+  const nextVersion = view.version + 1;
+  const summary =
+    input.plainLanguageSummary?.trim() ||
+    `${view.plainLanguageSummary} Updated: ${reason}`;
+  const payload = {
+    __mapableAgreement: true,
+    version: nextVersion,
+    status: "amended" as const,
+    formats: view.accessibleFormats,
+    supportedDecisionMakingOffered: true,
+    amendmentReason: reason,
+    amendedAt: new Date().toISOString(),
+    amendedByUserId: input.actor.id,
+    body: summary,
+  };
+
+  await prisma.careServiceAgreement.update({
+    where: { id: view.id },
+    data: {
+      status: "proposed",
+      placeholderTitle: view.title,
+      placeholderSummary: JSON.stringify(payload),
+    },
+  });
+
+  await createAuditEvent({
+    actorUserId: input.actor.id,
+    action: "care_agreement.amended",
+    entityType: "CareServiceAgreement",
+    entityId: view.id,
+    organisationId: booking.organisationId,
+    participantId: booking.participantId,
+    metadata: { version: nextVersion, reason },
   });
 
   return getOrCreateAccessibleServiceAgreement(input.careBookingId, input.actor);

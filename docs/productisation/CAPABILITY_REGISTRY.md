@@ -11,7 +11,8 @@ or assert registration.
 | Capability key | Title | Verified classification | Persistence | Flags (default) | Notes |
 |----------------|-------|-------------------------|-------------|-----------------|-------|
 | care.request_loop | Care request → evidence | merged_but_flagged / pilot-grade | Prisma Care* | no master care flag | Agreements + billing handoff landed (#327) |
-| care.agreements | Accessible service agreements | merged_but_flagged | Prisma `CareServiceAgreement` | — | Versioned accept APIs; not production_supported |
+| care.agreements | Accessible service agreements | merged_but_flagged | Prisma `CareServiceAgreement` | — | Versioned accept + amend APIs; not production_supported |
+| care.recurring_schedules | Recurring Care schedules | merged_but_flagged | Prisma `CareRecurringSchedule*` | `MAPABLE_CARE_RECURRING_SCHEDULES_ENABLED=false` | Weekly/fortnightly + exceptions; cancel ≠ Transport cancel |
 | transport.trip_ops | TransportTrip operations | merged_but_flagged | Prisma TransportTrip* | honesty matrix | Trip ≠ outcome |
 | transport.quotes | Transport quotes | merged_but_flagged | Prisma `TransportQuote*` | — | Durable versions; acceptance ≠ provider exact address |
 | transport.location_disclosure | Staged address disclosure | merged_but_flagged | service logic | — | Exact address after acceptance |
