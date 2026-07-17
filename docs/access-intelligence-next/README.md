@@ -15,7 +15,9 @@ This package delivers **Wave 0–5 foundation** contracts across three stacked P
 
 ## Operating mode
 
-**Synthetic / documentation only.** All feature flags default off. No Prisma migration. No live adapters. No public production claims. No AI execution authority.
+**Synthetic / documentation / shadow.** All feature flags default off. No live adapters. No public production claims. No AI execution authority.
+
+Optional durable evidence (still not production truth): see [EVIDENCE_PERSISTENCE.md](./EVIDENCE_PERSISTENCE.md) (`MAPABLE_ACCESS_EVIDENCE_PERSISTENCE_ENABLED`).
 
 ## Canonical ownership
 

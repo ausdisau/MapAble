@@ -72,6 +72,10 @@ export const accessIntelligenceNextFlags = {
   get changeDetection() {
     return envTrue("MAPABLE_ACCESS_CHANGE_DETECTION_ENABLED");
   },
+  /** Durable evidence envelopes + change reviews (default off). */
+  get evidencePersistence() {
+    return envTrue("MAPABLE_ACCESS_EVIDENCE_PERSISTENCE_ENABLED");
+  },
   get reliability() {
     return envTrue("MAPABLE_ACCESS_RELIABILITY_ENABLED");
   },

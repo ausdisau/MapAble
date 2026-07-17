@@ -7097,10 +7097,75 @@ model AccessPlace {
   indoorIncidents  IndoorAccessibilityIncident[]
   visitPlans       VisitPlan[]
   indoorCheckpoints IndoorCheckpoint[]
+  evidenceEnvelopes AccessEvidenceEnvelopeRecord[]
+  changeReviews    AccessChangeReviewRecord[]
 
   @@index([status])
   @@index([suburb, stateOrRegion])
   @@map("access_places")
+}
+
+/// Append-only living access evidence envelope (provenance). Does not replace AccessPlace.
+model AccessEvidenceEnvelopeRecord {
+  id                   String   @id @default(cuid())
+  envelopeId           String   @unique @map("envelope_id")
+  placeId              String?  @map("place_id")
+  place                AccessPlace? @relation(fields: [placeId], references: [id], onDelete: SetNull)
+  subjectCanonicalRef  String   @map("subject_canonical_ref")
+  subjectNodeId        String?  @map("subject_node_id")
+  featureKey           String?  @map("feature_key")
+  evidenceClasses      String[] @default([]) @map("evidence_classes")
+  envelopeJson         Json     @map("envelope_json")
+  conflictState        String   @default("none") @map("conflict_state")
+  verificationStatus   String   @default("unverified") @map("verification_status")
+  observedAt           DateTime? @map("observed_at")
+  effectiveFrom        DateTime? @map("effective_from")
+  effectiveTo          DateTime? @map("effective_to")
+  freshnessPolicyKey   String?  @map("freshness_policy_key")
+  expiresAt            DateTime? @map("expires_at")
+  precisionNote        String?  @map("precision_note")
+  confidenceBasis      String?  @map("confidence_basis")
+  contributorMode      String   @default("private") @map("contributor_mode")
+  createdById          String?  @map("created_by")
+  createdAt            DateTime @default(now()) @map("created_at")
+  supersededById       String?  @map("superseded_by")
+  changeReviews        AccessChangeReviewRecord[]
+
+  @@index([placeId, createdAt])
+  @@index([subjectCanonicalRef])
+  @@index([subjectNodeId])
+  @@index([expiresAt])
+  @@map("access_evidence_envelope_records")
+}
+
+/// Durable human change review — never auto-publishes to AccessPlace.
+model AccessChangeReviewRecord {
+  id                   String   @id @default(cuid())
+  reviewId             String   @unique @map("review_id")
+  placeId              String?  @map("place_id")
+  place                AccessPlace? @relation(fields: [placeId], references: [id], onDelete: SetNull)
+  evidenceEnvelopeId   String?  @map("evidence_envelope_id")
+  evidenceEnvelope     AccessEvidenceEnvelopeRecord? @relation(fields: [evidenceEnvelopeId], references: [id], onDelete: SetNull)
+  subjectCanonicalRef  String   @map("subject_canonical_ref")
+  subjectNodeId        String   @map("subject_node_id")
+  ontologyConceptId    String   @map("ontology_concept_id")
+  candidateJson        Json     @map("candidate_json")
+  outcome              String
+  oldStateSummary      String   @map("old_state_summary")
+  newCandidateSummary  String   @map("new_candidate_summary")
+  decision             String   @default("pending")
+  reviewerId           String?  @map("reviewer_id")
+  decidedAt            DateTime? @map("decided_at")
+  notesJson            Json     @default("[]") @map("notes_json")
+  autoOverwriteBlocked Boolean  @default(true) @map("auto_overwrite_blocked")
+  expiryAt             DateTime? @map("expiry_at")
+  createdAt            DateTime @default(now()) @map("created_at")
+  updatedAt            DateTime @updatedAt @map("updated_at")
+
+  @@index([placeId, createdAt])
+  @@index([subjectNodeId, decision])
+  @@index([decision, createdAt])
+  @@map("access_change_review_records")
 }
 
 model AccessPlaceLocation {

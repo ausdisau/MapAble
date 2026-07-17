@@ -10,3 +10,10 @@ export {
   listShadowChangeReviews,
   storeShadowChangeReview,
 } from "./compare";
+export {
+  AccessChangeReviewPersistError,
+  decideChangeReview,
+  listPendingChangeReviews,
+  persistChangeReview,
+} from "./persist";
+export type { PersistChangeReviewInput } from "./persist";
