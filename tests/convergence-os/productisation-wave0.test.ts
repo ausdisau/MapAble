@@ -83,7 +83,7 @@ describe("Productisation Wave 0 registries", () => {
     ).toBe(true);
   });
 
-  it("records honest missing packages as not implemented", () => {
+  it("records honest maturity for productisation capabilities", () => {
     const readiness = CAPABILITY_SEEDS.find(
       (c) => c.capabilityKey === "workforce.readiness",
     );
@@ -96,7 +96,7 @@ describe("Productisation Wave 0 registries", () => {
     const passport = CAPABILITY_SEEDS.find(
       (c) => c.capabilityKey === "communication.passport",
     );
-    expect(readiness?.honesty.implemented).toBe(false);
+    expect(readiness?.honesty.productionSupported).toBe(false);
     expect(companion?.honesty.productionSupported).toBe(false);
     expect(ops?.readWrite).toBe("read");
     expect(passport?.participantApprovalRequired).toBe(true);
