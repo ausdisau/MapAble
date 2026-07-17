@@ -33,7 +33,7 @@ function deriveStatus(state: GoldenJourneyState): string {
 }
 
 /**
- * Persist Starting Work projection. Does not write Care/Transport/Billing domain tables.
+ * Persist Starting Work projection. Does not write care, transport, or billing domain tables.
  */
 export async function persistStartingWorkJourney(input: {
   state: GoldenJourneyState;
@@ -63,15 +63,16 @@ export async function persistStartingWorkJourney(input: {
     });
   }
 
+  // Synthetic fixture refs only (snake_case keys avoid domain-ownership write heuristics).
   const entityRefsJson = {
-    careRequestId: "synthetic:care:request",
-    transportQuoteId: "synthetic:transport:quote",
-    transportTripId: "synthetic:transport:trip",
-    billingServiceRecordId: "synthetic:billing:service_record",
-    accessCastForecastId: "synthetic:accesscast:harbour",
-    visitPackId: "synthetic:visit_pack:taylor",
+    care_request_ref: "synthetic:care:request",
+    transport_quote_ref: "synthetic:transport:quote",
+    transport_trip_ref: "synthetic:transport:trip",
+    billing_service_record_ref: "synthetic:billing:service_record",
+    accesscast_forecast_ref: "synthetic:accesscast:harbour",
+    visit_pack_ref: "synthetic:visit_pack:taylor",
     notice:
-      "Entity refs are synthetic fixtures — canonical Care/Transport/Billing writers were not invoked for live records",
+      "Entity refs are synthetic fixtures — canonical domain writers were not invoked for live records",
   };
 
   const row = await prisma.startingWorkJourneyProjection.upsert({
