@@ -1,10 +1,11 @@
+import { z } from "zod";
+
 import { requireApiSession } from "@/lib/api/auth-handler";
 import { jsonError, jsonOk, zodErrorResponse } from "@/lib/api/response";
 import {
   acceptAccessibleServiceAgreement,
   getOrCreateAccessibleServiceAgreement,
 } from "@/lib/care/care-agreement-service";
-import { z } from "zod";
 
 const acceptSchema = z
   .object({

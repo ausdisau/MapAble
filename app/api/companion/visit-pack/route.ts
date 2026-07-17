@@ -6,8 +6,8 @@ import {
   compileVisitPack,
   visitPackIntegrityHash,
 } from "@/lib/companion/visit-pack-compile";
-import { isCompanionVisitPackEnabled } from "@/lib/config/companion";
 import { isCommunicationPassportEnabled } from "@/lib/config/communication-workforce";
+import { isCompanionVisitPackEnabled } from "@/lib/config/companion";
 
 const schema = z
   .object({

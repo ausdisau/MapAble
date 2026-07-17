@@ -1,11 +1,11 @@
 import { createAuditEvent } from "@/lib/audit/audit-event-service";
 import type { CurrentUser } from "@/lib/auth/current-user";
+import { isAdminRole } from "@/lib/auth/roles";
 import {
   CareAccessError,
   assertParticipantOwnsBooking,
   assertProviderOrgAccess,
 } from "@/lib/care/access-control";
-import { isAdminRole } from "@/lib/auth/roles";
 import { prisma } from "@/lib/prisma";
 
 async function assertCanAccessBookingAgreement(
