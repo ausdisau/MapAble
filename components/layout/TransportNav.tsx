@@ -6,11 +6,21 @@ import { MapAbleRoleNav } from "@/components/layout/MapAbleRoleNav";
 
 const LINKS = [
   { href: "/transport", label: "Overview", exact: true },
-  { href: "/dashboard/transport/new", label: "New trip" },
-  { href: "/dashboard/transport", label: "My trips", matchPrefix: "/dashboard/transport" },
+  { href: "/transport/request", label: "Request trip" },
+  { href: "/transport/profile", label: "Access profile" },
+  {
+    href: "/transport/dashboard",
+    label: "My trips",
+    matchPrefix: "/transport/dashboard",
+  },
   { href: "/dashboard/find-transport", label: "Find operators" },
-  { href: "/dashboard/transport/legacy", label: "Legacy bookings" },
-  { href: "/driver/trips", label: "Driver view", matchPrefix: "/driver" },
+  { href: "/transport/operator", label: "Operator", matchPrefix: "/transport/operator" },
+  { href: "/transport/driver", label: "Driver" },
+  {
+    href: "/dashboard/transport/legacy",
+    label: "Legacy bookings",
+    matchPrefix: "/dashboard/transport/legacy",
+  },
 ];
 
 export function TransportNav() {
@@ -20,7 +30,10 @@ export function TransportNav() {
       title="MapAble Transport"
       links={LINKS}
       trailing={
-        <Link href="/dashboard" className="text-sm font-black text-[#005B7F] hover:underline">
+        <Link
+          href="/dashboard"
+          className="text-sm font-black text-[#005B7F] hover:underline"
+        >
           Dashboard
         </Link>
       }
