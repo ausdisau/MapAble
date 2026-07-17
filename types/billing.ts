@@ -244,7 +244,13 @@ export type BillingCopilotSuggestion = {
     | "suggest_match"
     | "dispute_timeline"
     | "provider_query"
-    | "plan_manager_followup";
+    | "plan_manager_followup"
+    | "evidence_pack_summary"
+    | "agreement_vs_invoice"
+    | "booking_vs_line_item"
+    | "reconciliation_discrepancy"
+    | "participant_invoice_explanation"
+    | "duplicate_candidate";
   title: string;
   body: string;
   citations: { entityType: string; entityId: string; label: string }[];
