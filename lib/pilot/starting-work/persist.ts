@@ -1,12 +1,12 @@
 import { createAuditEvent } from "@/lib/audit/audit-event-service";
 import { isStartingWorkDbPersistenceEnabled } from "@/lib/config/starting-work-pilot";
-import { prisma } from "@/lib/prisma";
-import type { GoldenJourneyState } from "@/lib/pilot/starting-work/golden-journey";
+import { issueOutcomeReceipt } from "@/lib/outcomes/ledger";
 import {
   buildStartingWorkDependencyGraph,
   buildStateHonesty,
 } from "@/lib/pilot/starting-work/dependency-graph";
-import { issueOutcomeReceipt } from "@/lib/outcomes/ledger";
+import type { GoldenJourneyState } from "@/lib/pilot/starting-work/golden-journey";
+import { prisma } from "@/lib/prisma";
 
 export function isStartingWorkDbPersistEnabled(
   env: NodeJS.ProcessEnv = process.env,
