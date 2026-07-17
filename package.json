@@ -44,7 +44,8 @@
     "check:integrations-env": "npx tsx scripts/check-integrations-env.ts",
     "check:convergence-advisory": "npx tsx scripts/convergence-advisory-ci.ts",
     "sync:replit-unified": "bash scripts/sync-replit-unified.sh",
-    "check:replit-unified": "bash scripts/check-replit-unified-deployment.sh"
+    "check:replit-unified": "bash scripts/check-replit-unified-deployment.sh",
+    "test:access-intelligence-next": "vitest run tests/access-intelligence-next"
   },
   "lint-staged": {
     "*.{js,ts,tsx}": [

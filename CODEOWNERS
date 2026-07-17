@@ -53,3 +53,11 @@
 /CODEOWNERS @ausdisau/mapable-maintainers @ausdisau/mapable-security
 /.github/workflows/ @ausdisau/mapable-maintainers @ausdisau/mapable-security
 /scripts/ci/ @ausdisau/mapable-maintainers @ausdisau/mapable-security
+
+# Access Intelligence Next — Living Access Fabric (contracts / synthetic only)
+/lib/access-intelligence-next/ @ausdisau/mapable-maintainers @ausdisau/mapable-privacy
+/app/api/access-intelligence-next/ @ausdisau/mapable-maintainers @ausdisau/mapable-privacy
+/app/access-intelligence/living-graph/ @ausdisau/mapable-maintainers
+/docs/access-intelligence-next/ @ausdisau/mapable-maintainers
+/components/access-intelligence-next/ @ausdisau/mapable-maintainers
+/tests/access-intelligence-next/ @ausdisau/mapable-maintainers
