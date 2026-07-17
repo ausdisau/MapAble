@@ -1,5 +1,5 @@
-import { prisma } from "@/lib/prisma";
 import { userCanAccessConversation } from "@/lib/messages/message-service";
+import { prisma } from "@/lib/prisma";
 
 const RESTRICTED_CONVERSATION_TYPES = new Set([
   "support_ticket_thread",

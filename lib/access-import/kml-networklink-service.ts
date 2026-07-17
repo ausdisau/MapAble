@@ -1,5 +1,5 @@
-import { ACCESS_IMPORT_ALLOWLIST_URLS } from "@/lib/access-map/copy";
 import { parseKmlXml } from "@/lib/access-import/kml-parser-service";
+import { ACCESS_IMPORT_ALLOWLIST_URLS } from "@/lib/access-map/copy";
 
 export function isAllowlistedNetworkLinkUrl(url: string): boolean {
   try {

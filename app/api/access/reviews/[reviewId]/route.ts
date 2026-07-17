@@ -2,8 +2,8 @@ import { canDeleteReview, canEditReview } from "@/lib/access-reviews/review-acce
 import { recomputePlaceRatingSummaries } from "@/lib/access-reviews/review-summary-service";
 import { requireApiSession } from "@/lib/api/auth-handler";
 import { jsonError, jsonOk, zodErrorResponse } from "@/lib/api/response";
-import { updateAccessReviewSchema } from "@/lib/validation/access-review";
 import { prisma } from "@/lib/prisma";
+import { updateAccessReviewSchema } from "@/lib/validation/access-review";
 
 export async function PATCH(
   req: Request,

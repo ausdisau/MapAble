@@ -1,8 +1,8 @@
 import Link from "next/link";
 
-import { prisma } from "@/lib/prisma";
 import { listPublishedReviewsForPlace } from "@/lib/access-reviews/access-review-service";
 import { publicReviewerDisplayName } from "@/lib/access-reviews/review-access-policy";
+import { prisma } from "@/lib/prisma";
 
 export default async function PlaceReviewsPage({
   params,

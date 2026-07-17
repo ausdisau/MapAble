@@ -1,17 +1,18 @@
+import { z } from "zod";
+
 import { requireApiSession } from "@/lib/api/auth-handler";
-import { isIndoorFeatureEnabled } from "@/lib/indoor-accessibility/feature-flags";
 import { featureDisabledResponse, indoorApiError } from "@/lib/indoor-accessibility/api-errors";
+import { isIndoorFeatureEnabled } from "@/lib/indoor-accessibility/feature-flags";
 import {
   canModerateCorrection,
   canSubmitCorrection,
 } from "@/lib/indoor-accessibility/permissions";
+import { correctionTypeSchema } from "@/lib/indoor-accessibility/schemas/core";
 import {
   createCorrectionProposal,
   listPendingCorrections,
   moderateCorrectionProposal,
 } from "@/lib/indoor-accessibility/verification/correction-service";
-import { correctionTypeSchema } from "@/lib/indoor-accessibility/schemas/core";
-import { z } from "zod";
 
 const submitSchema = z.object({
   placeId: z.string(),

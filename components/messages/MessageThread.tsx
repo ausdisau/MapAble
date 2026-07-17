@@ -1,12 +1,12 @@
 "use client";
 
-import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useCallback, useState } from "react";
 
 import { MessageBubble } from "@/components/messages/MessageBubble";
 import { MessageComposer } from "@/components/messages/MessageComposer";
-import { TypingIndicator } from "@/components/messages/TypingIndicator";
 import { ReadReceipt } from "@/components/messages/ReadReceipt";
+import { TypingIndicator } from "@/components/messages/TypingIndicator";
 import { useMessageRealtime } from "@/lib/hooks/useMessageRealtime";
 import { useTypingIndicator } from "@/lib/hooks/useTypingIndicator";
 

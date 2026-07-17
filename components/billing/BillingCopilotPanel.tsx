@@ -2,9 +2,9 @@
 
 import { useId, useState } from "react";
 
+import { cn } from "@/app/lib/utils";
 import { Button } from "@/components/ui/button";
 import { mapableSectionCardClass } from "@/lib/brand/styles";
-import { cn } from "@/app/lib/utils";
 import type { BillingCopilotSuggestion } from "@/types/billing";
 
 const UNCERTAINTY_LABEL: Record<

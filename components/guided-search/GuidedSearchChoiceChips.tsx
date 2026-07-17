@@ -1,7 +1,7 @@
 import React from "react";
 
-import type { ClarificationChoice } from "@/lib/copilot/types";
 import { cn } from "@/app/lib/utils";
+import type { ClarificationChoice } from "@/lib/copilot/types";
 
 type Props = {
   choices: ClarificationChoice[];

@@ -1,9 +1,9 @@
 import { Prisma } from "@prisma/client";
 
 import { createAuditEvent } from "@/lib/audit/audit-event-service";
-import { isInstitutionalPermanenceV2Enabled } from "@/lib/config/y5-rights-infrastructure";
 import { phase12Config } from "@/lib/config/phase12";
 import { phase8Config } from "@/lib/config/phase8";
+import { isInstitutionalPermanenceV2Enabled } from "@/lib/config/y5-rights-infrastructure";
 import { prisma } from "@/lib/prisma";
 
 export async function publishCivicAuditIndex(params: {

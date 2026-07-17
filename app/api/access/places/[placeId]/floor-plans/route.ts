@@ -1,10 +1,10 @@
 import { jsonError, jsonOk } from "@/lib/api/response";
-import { listVenueFloorPlans } from "@/lib/floor-plan/floor-plan-service";
 import { getDemoPlaceBySlug } from "@/lib/demo/accessibility-places";
 import {
   demoVenueHasFloorPlan,
   getDemoFloorPlanSummaries,
 } from "@/lib/demo/floor-plan-fixture";
+import { listVenueFloorPlans } from "@/lib/floor-plan/floor-plan-service";
 
 type RouteParams = { params: Promise<{ placeId: string }> };
 

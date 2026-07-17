@@ -1,5 +1,5 @@
-import { PEERS_PRINCIPLES } from "@/lib/mapable-peers/copy";
 import { mapableSectionCardClass } from "@/lib/brand/styles";
+import { PEERS_PRINCIPLES } from "@/lib/mapable-peers/copy";
 
 export function PeersPrincipleList() {
   return (

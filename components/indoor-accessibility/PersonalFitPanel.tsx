@@ -2,13 +2,13 @@
 
 import { useMemo, useState } from "react";
 
+import { useIndoorFeatureEnabled } from "@/hooks/useIndoorFeatureFlags";
 import type { FloorPlanFeature } from "@/lib/floor-plan/schemas";
+import { evaluateIndoorFit } from "@/lib/indoor-accessibility/fit/indoor-fit-engine";
 import {
   DEFAULT_INDOOR_PREFERENCES,
   type IndoorAccessPreferences,
 } from "@/lib/indoor-accessibility/fit/types";
-import { evaluateIndoorFit } from "@/lib/indoor-accessibility/fit/indoor-fit-engine";
-import { useIndoorFeatureEnabled } from "@/hooks/useIndoorFeatureFlags";
 import { mapableCareFocusRing } from "@/lib/marketing/mapable-care-tokens";
 
 type PersonalFitPanelProps = {

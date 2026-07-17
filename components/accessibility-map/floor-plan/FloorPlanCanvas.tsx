@@ -46,7 +46,7 @@ export function FloorPlanCanvas({
       ref={containerRef}
       className="fp-canvas-container relative min-h-[420px] flex-1 overflow-hidden rounded-xl border border-slate-200 bg-slate-100 md:min-h-[50vh]"
       tabIndex={0}
-      role="application"
+      role="grid"
       aria-label={`Interactive ${plan.floorName} floor plan. Use zoom controls and arrow keys when focused.`}
       aria-describedby="fp-keyboard-help"
       onFocus={onFocus}

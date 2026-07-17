@@ -1,8 +1,8 @@
 import { createAuditEvent } from "@/lib/audit/audit-event-service";
-import { checkConsent } from "@/lib/consent/consent-service";
-import { y1WedgeConfig } from "@/lib/config/y1-wedge";
 import type { CurrentUser } from "@/lib/auth/current-user";
 import { isAdminRole } from "@/lib/auth/roles";
+import { y1WedgeConfig } from "@/lib/config/y1-wedge";
+import { checkConsent } from "@/lib/consent/consent-service";
 import { prisma } from "@/lib/prisma";
 import type { ConsentScope } from "@/types/mapable";
 

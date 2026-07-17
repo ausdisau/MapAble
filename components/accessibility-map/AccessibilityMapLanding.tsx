@@ -4,18 +4,18 @@ import Link from "next/link";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { AccessFitBadge } from "@/components/access-fit/AccessFitBadge";
-import { ViewFloorPlanButton } from "@/components/accessibility-map/floor-plan/ViewFloorPlanButton";
 import { AccessNeedsTogglePanel } from "@/components/access-fit/AccessNeedsTogglePanel";
+import { ViewFloorPlanButton } from "@/components/accessibility-map/floor-plan/ViewFloorPlanButton";
 import { OpenStreetMapView } from "@/components/accessibility-map/OpenStreetMapView";
 import { calculateAccessFit } from "@/lib/access-fit/calculate-access-fit";
 import { DEMO_ACCESS_NEEDS, EMPTY_ACCESS_NEEDS } from "@/lib/access-fit/types";
+import { ACCESS_DISCLAIMER } from "@/lib/access-map/copy";
 import {
   ACCESS_MAP_FILTERS,
   DEMO_ACCESS_PLACES,
   filterDemoPlaces,
   type DemoAccessPlace,
 } from "@/lib/demo/accessibility-places";
-import { ACCESS_DISCLAIMER } from "@/lib/access-map/copy";
 import { mapableCareFocusRing } from "@/lib/marketing/mapable-care-tokens";
 
 const VIEW_STORAGE_KEY = "mapable-accessibility-map-view";

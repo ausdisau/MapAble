@@ -1,17 +1,20 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { CurrentUser } from "@/lib/auth/current-user";
-import { mockRoutingAdapter } from "@/lib/transport-routing/mock-routing-adapter";
-import { OsrmRoutingAdapter } from "@/lib/transport-routing/osrm-routing-adapter";
-import { assertStatusTransition } from "@/lib/transport/transport-status-service";
-import { TransportApiError } from "@/lib/transport/transport-api-error";
-import { buildPermissions } from "@/lib/transport/transport-response";
 import { resolveTripAccess } from "@/lib/transport/transport-access-policy";
+import { TransportApiError } from "@/lib/transport/transport-api-error";
+import { assignDriverAndVehicle } from "@/lib/transport/transport-assignment-service";
 import {
   checkDriverEligibility,
   checkVehicleEligibility,
 } from "@/lib/transport/transport-eligibility-service";
+import { recordTripEvent } from "@/lib/transport/transport-event-service";
+import { buildPermissions } from "@/lib/transport/transport-response";
+import { reportTripSafetyIssue } from "@/lib/transport/transport-safety-service";
 import { detectScheduleConflicts } from "@/lib/transport/transport-schedule-conflict-service";
+import { assertStatusTransition } from "@/lib/transport/transport-status-service";
+import { mockRoutingAdapter } from "@/lib/transport-routing/mock-routing-adapter";
+import { OsrmRoutingAdapter } from "@/lib/transport-routing/osrm-routing-adapter";
 import { createOptimisationJob } from "@/lib/transport-routing/route-optimisation-service";
 
 const participantUser: CurrentUser = {
@@ -144,10 +147,7 @@ vi.mock("next/headers", () => ({
 
 import { prisma } from "@/lib/prisma";
 import { createTransportTrip, getTransportTripForUser } from "@/lib/transport/transport-trip-service";
-import { assignDriverAndVehicle } from "@/lib/transport/transport-assignment-service";
-import { recordTripEvent } from "@/lib/transport/transport-event-service";
 import { logDataAccess } from "@/lib/transport/data-access-log-service";
-import { reportTripSafetyIssue } from "@/lib/transport/transport-safety-service";
 import { createIncident } from "@/lib/incidents/incident-service";
 
 vi.mock("@/lib/incidents/incident-service", () => ({

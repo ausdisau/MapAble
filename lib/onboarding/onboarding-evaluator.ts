@@ -1,7 +1,7 @@
 import type { OnboardingRole } from "@prisma/client";
 
-import { isProviderEligibleForMatching } from "@/lib/provider-verification/verification-case-service";
 import { prisma } from "@/lib/prisma";
+import { isProviderEligibleForMatching } from "@/lib/provider-verification/verification-case-service";
 
 export type OnboardingChecklistItem = {
   id: string;

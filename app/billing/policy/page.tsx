@@ -1,8 +1,8 @@
-import { PolicyValidationPanel } from "@/components/billing/PolicyValidationPanel";
 import {
   BillingEmptyState,
   BillingPageHeader,
 } from "@/components/billing/BillingPageChrome";
+import { PolicyValidationPanel } from "@/components/billing/PolicyValidationPanel";
 import { requireAuth } from "@/lib/auth/guards";
 
 export default async function BillingPolicyPage() {

@@ -1,5 +1,5 @@
-import { listPublishedAnnualReports } from "@/lib/institutional-permanence/permanence-service";
 import { ACCOUNTABILITY_TRANSPARENCY_DISCLAIMER } from "@/lib/config/y5-rights-infrastructure";
+import { listPublishedAnnualReports } from "@/lib/institutional-permanence/permanence-service";
 
 export default async function DataTrustReportsPage() {
   const reports = await listPublishedAnnualReports();

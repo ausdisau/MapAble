@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
 
-import { classifySupportCategories } from "@/lib/care/support-category-classifier";
 import { detectInvoiceAnomalies } from "@/lib/billing-core/transparent-billing";
+import { classifySupportCategories } from "@/lib/care/support-category-classifier";
+import { platformPatternsConfig } from "@/lib/config/platform-patterns";
 import {
   evaluateParticipantOnboarding,
   evaluateWorkerOnboarding,
 } from "@/lib/onboarding/onboarding-evaluator";
-import { platformPatternsConfig } from "@/lib/config/platform-patterns";
 
 describe("platformPatternsConfig", () => {
   it("enables onboarding gate by default", () => {

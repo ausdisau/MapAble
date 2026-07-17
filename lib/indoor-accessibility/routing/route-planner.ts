@@ -2,7 +2,6 @@ import type {
   IndoorRouteEdge,
   IndoorRouteGraph,
   IndoorRouteNode,
-  OperationalStatus,
   RouteMode,
 } from "@/lib/indoor-accessibility/schemas/core";
 

@@ -1,4 +1,5 @@
 import React from "react";
+
 import type { AccessFitLabel } from "@/lib/access-fit/types";
 
 const LABEL_STYLES: Record<AccessFitLabel, string> = {

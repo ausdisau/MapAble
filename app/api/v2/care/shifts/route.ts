@@ -1,9 +1,9 @@
 import { requireApiSession } from "@/lib/api/auth-handler";
+import { getUserOrganisationIds } from "@/lib/api/phase3-scope";
 import { jsonError, jsonOk } from "@/lib/api/response";
 import { isPublicApiV2Enabled } from "@/lib/api-versioning/version-middleware";
-import { getUserOrganisationIds } from "@/lib/api/phase3-scope";
-import { y3NationalTrustConfig } from "@/lib/config/y3-national-trust";
 import { isAdminRole } from "@/lib/auth/roles";
+import { y3NationalTrustConfig } from "@/lib/config/y3-national-trust";
 import { prisma } from "@/lib/prisma";
 
 export async function GET(req: Request) {

@@ -1,4 +1,5 @@
 import { createAuditEvent } from "@/lib/audit/audit-event-service";
+import type { CurrentUser } from "@/lib/auth/current-user";
 import { assertProviderOrgAccess } from "@/lib/care/access-control";
 import {
   recordCareBookingEvent,
@@ -9,7 +10,6 @@ import {
   assertWorkerEligibleForBooking,
   loadWorkerForEligibility,
 } from "@/lib/care/worker-eligibility";
-import type { CurrentUser } from "@/lib/auth/current-user";
 import { prisma } from "@/lib/prisma";
 
 export async function assignWorkerToCareBooking(params: {

@@ -16,17 +16,15 @@ This reports public table count, key table presence, `_prisma_migrations` stats,
 
 Ensure `.env` `DATABASE_URL` / `DIRECT_URL` point at the intended Neon branch (production vs preview). The Neon MCP default branch may differ from your local `.env` endpoint.
 
-## Fix applied (May 2026)
+## Historical note (May 2026 — do not repeat)
 
-On branch `ep-old-wildflower` (mapableau production):
+On branch `ep-old-wildflower`, an empty/partial Neon schema was once aligned with a destructive schema sync and then baselined into `_prisma_migrations` via `prisma migrate resolve --applied`. **That path is not an approved production procedure.**
 
-1. **State:** ~31 public tables, **no** `_prisma_migrations`, schema far behind `prisma/schema.prisma`.
-2. **`npx prisma db push --accept-data-loss`** — brought the database in line with the current Prisma schema (~420 tables). Review data impact before using on production with real users; this environment had no remaining `User` rows after sync.
-3. **Baseline migration history** — for each folder under `prisma/migrations/`:
-   ```bash
-   npx prisma migrate resolve --applied "<migration_folder_name>"
-   ```
-4. **Verify:**
+Going forward:
+
+1. Prefer empty-database `prisma migrate deploy` from zero, or official [baselining](https://www.prisma.io/docs/guides/migrate/developing-with-existing-db) without data loss.
+2. **Never** run `prisma db push` (with or without `--accept-data-loss`) against production or any environment with real participant data.
+3. **Verify:**
    ```bash
    npx prisma migrate deploy   # expect: No pending migrations to apply
    npx prisma migrate status   # expect: Database schema is up to date

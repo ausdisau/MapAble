@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { transformCareSupport } from "@/server/agents/careSupportTransformer";
 import { careSupportTransformInputSchema } from "@/server/agents/care/types";
+import { transformCareSupport } from "@/server/agents/careSupportTransformer";
 
 const baseInput = {
   sessionId: "test-session-1",

@@ -1,5 +1,5 @@
-import type { AppliedSearchFields } from "@/lib/search/apply-interpretation";
 import type { CopilotAgentMeta } from "@/lib/copilot/types";
+import type { AppliedSearchFields } from "@/lib/search/apply-interpretation";
 import type { SearchInterpretation } from "@/types/search";
 
 export type ProviderFinderChatMessage = {

@@ -1,7 +1,7 @@
-import { getPlaceById, updateAccessPlace } from "@/lib/access-map/access-place-service";
-import { canEditPlace } from "@/lib/access-map/access-place-policy";
-import { confidenceLabel } from "@/lib/access-map/access-confidence-service";
 import { getAccreditationDisplayForPlace } from "@/lib/access-accreditation/accreditation-assessment-service";
+import { confidenceLabel } from "@/lib/access-map/access-confidence-service";
+import { canEditPlace } from "@/lib/access-map/access-place-policy";
+import { getPlaceById, updateAccessPlace } from "@/lib/access-map/access-place-service";
 import { requireApiSession } from "@/lib/api/auth-handler";
 import { jsonError, jsonOk, zodErrorResponse } from "@/lib/api/response";
 import { updateAccessPlaceSchema } from "@/types/access-map";

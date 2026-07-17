@@ -1,4 +1,3 @@
-import { submitVenueClaim } from "@/lib/venue-access/venue-claim-service";
 import { requireApiSession } from "@/lib/api/auth-handler";
 import {
   jsonBodyErrorResponse,
@@ -6,6 +5,7 @@ import {
 } from "@/lib/api/request-body";
 import { jsonError, jsonOk, zodErrorResponse } from "@/lib/api/response";
 import { submitVenueClaimSchema } from "@/lib/validation/access-venue-claim";
+import { submitVenueClaim } from "@/lib/venue-access/venue-claim-service";
 
 export async function POST(
   req: Request,

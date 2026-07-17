@@ -10,6 +10,7 @@ vi.mock("@/lib/search/interpreter/load-categories", async (importOriginal) => {
   };
 });
 
+import { applyInterpretationToFields } from "@/lib/search/apply-interpretation";
 import {
   filterValidAccessNeedIds,
   resolveAccessNeedIds,
@@ -26,7 +27,6 @@ import {
   SEARCH_INTERPRET_OPERATIONS,
   searchInterpretJsonError,
 } from "@/lib/search/search-interpret-api-contract";
-import { applyInterpretationToFields } from "@/lib/search/apply-interpretation";
 import type { SearchInterpretation } from "@/types/search";
 
 describe("search interpreter validation", () => {

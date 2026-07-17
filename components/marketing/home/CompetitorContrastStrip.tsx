@@ -1,4 +1,5 @@
 import React from "react";
+
 import { competitorContrastCards } from "@/lib/marketing/mapable-care-combined-data";
 
 export function CompetitorContrastStrip() {

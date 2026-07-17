@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
+import type { MapLibreProvider } from "@/components/map/MapLibreMap";
 import { MapAbleCareCombinedSections } from "@/components/marketing/MapAbleCareCombinedSections";
 import { ProviderFinderAccessLayer } from "@/components/provider-finder/ProviderFinderAccessLayer";
 import { ProviderFinderAskPanel } from "@/components/provider-finder/ProviderFinderAskPanel";
@@ -13,12 +14,18 @@ import { ProviderFinderResultCard } from "@/components/provider-finder/ProviderF
 import { ProviderFinderSidebar } from "@/components/provider-finder/ProviderFinderSidebar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { trackProductEvent } from "@/lib/analytics/product-analytics";
+import { getProviderFinderMapSourceClient } from "@/lib/config/provider-finder-map";
 import {
   distanceKm,
   getLocationAndPostcode,
   type UserPosition,
 } from "@/lib/geo";
-import { trackProductEvent } from "@/lib/analytics/product-analytics";
+import {
+  supportAreaLandingRoutes,
+  supportAreaToSupportTypeId,
+} from "@/lib/marketing/mapable-care-routes";
+import { fetchProviderMapPins } from "@/lib/provider-finder/fetch-map-pins";
 import {
   ACCESS_NEEDS,
   SUPPORT_TYPES,
@@ -29,18 +36,11 @@ import {
   buildFinderSearchParams,
 } from "@/lib/search/apply-interpretation";
 import { interpretSearchQueryClient } from "@/lib/search/interpreter-client";
-import { getProviderFinderMapSourceClient } from "@/lib/config/provider-finder-map";
-import {
-  supportAreaLandingRoutes,
-  supportAreaToSupportTypeId,
-} from "@/lib/marketing/mapable-care-routes";
-import { fetchProviderMapPins } from "@/lib/provider-finder/fetch-map-pins";
 import { useProviderOutlets } from "@/lib/use-provider-outlets";
 
 import { mapOutletsToProviders } from "./outletToProvider";
 import { type Provider } from "./providers";
 
-import type { MapLibreProvider } from "@/components/map/MapLibreMap";
 
 const MapLibreMap = dynamic(
   () =>

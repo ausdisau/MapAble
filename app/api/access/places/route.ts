@@ -1,19 +1,19 @@
-import { createAccessPlaceSchema } from "@/types/access-map";
+import {
+  canEditPlace,
+  canSuggestPlace,
+} from "@/lib/access-map/access-place-policy";
 import {
   createAccessPlace,
   listPublishedPlaces,
   placeToGeoJsonFeature,
 } from "@/lib/access-map/access-place-service";
-import {
-  canEditPlace,
-  canSuggestPlace,
-} from "@/lib/access-map/access-place-policy";
 import { requireApiSession } from "@/lib/api/auth-handler";
 import {
   jsonBodyErrorResponse,
   parseJsonRequestBody,
 } from "@/lib/api/request-body";
 import { jsonError, jsonOk, zodErrorResponse } from "@/lib/api/response";
+import { createAccessPlaceSchema } from "@/types/access-map";
 
 export async function GET(req: Request) {
   const url = new URL(req.url);

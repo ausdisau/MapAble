@@ -3,11 +3,6 @@ import { notFound } from "next/navigation";
 import React from "react";
 
 import {
-  accessGuideDownloads,
-  accessGuides,
-  getAccessGuideBySlug,
-} from "@/lib/resources/access-guides-data";
-import {
   mapablePublicCardClass,
   mapablePublicEyebrowClass,
   mapablePublicLeadClass,
@@ -15,6 +10,11 @@ import {
   mapablePublicPrimaryButtonClass,
   mapablePublicTitleClass,
 } from "@/lib/marketing/public-page-styles";
+import {
+  accessGuideDownloads,
+  accessGuides,
+  getAccessGuideBySlug,
+} from "@/lib/resources/access-guides-data";
 
 type GuidePageProps = {
   params: Promise<{ state: string; city: string }>;

@@ -1,4 +1,3 @@
-import { createAccessReviewSchema } from "@/lib/validation/access-review";
 import { createAccessReview, listPublishedReviewsForPlace } from "@/lib/access-reviews/access-review-service";
 import { publicReviewerDisplayName } from "@/lib/access-reviews/review-access-policy";
 import { requireApiSession } from "@/lib/api/auth-handler";
@@ -8,6 +7,7 @@ import {
 } from "@/lib/api/request-body";
 import { jsonError, jsonOk, zodErrorResponse } from "@/lib/api/response";
 import { prisma } from "@/lib/prisma";
+import { createAccessReviewSchema } from "@/lib/validation/access-review";
 
 export async function GET(
   _req: Request,

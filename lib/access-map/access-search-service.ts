@@ -1,6 +1,6 @@
-import { prisma } from "@/lib/prisma";
 import { buildPlaceWhere, type AccessSearchFilters } from "@/lib/access-map/access-filter-service";
 import { rankAccessPlaces } from "@/lib/access-search/access-ranking-service";
+import { prisma } from "@/lib/prisma";
 
 export async function searchAccessPlaces(filters: AccessSearchFilters) {
   const where = buildPlaceWhere(filters);

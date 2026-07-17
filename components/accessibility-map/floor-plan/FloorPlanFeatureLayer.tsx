@@ -1,9 +1,8 @@
 "use client";
 
-import { buildFeatureAccessibleName, getFeatureConfig } from "@/lib/floor-plan/feature-config";
 import { normalizedToPercent } from "@/lib/floor-plan/coordinates";
+import { buildFeatureAccessibleName, getFeatureConfig } from "@/lib/floor-plan/feature-config";
 import type { FloorPlanFeature } from "@/lib/floor-plan/schemas";
-import { operationalStatusLabel } from "@/lib/floor-plan/accessibility-utils";
 
 type FloorPlanFeatureLayerProps = {
   features: FloorPlanFeature[];

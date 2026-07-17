@@ -1,9 +1,9 @@
+import { AccessibleDataTable } from "@/components/billing/AccessibleDataTable";
 import {
   BillingEmptyState,
   BillingPageHeader,
   SimulatedIntegrationNote,
 } from "@/components/billing/BillingPageChrome";
-import { AccessibleDataTable } from "@/components/billing/AccessibleDataTable";
 import { requireAuth } from "@/lib/auth/guards";
 import { prisma } from "@/lib/prisma";
 

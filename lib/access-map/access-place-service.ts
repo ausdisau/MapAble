@@ -6,8 +6,8 @@ import type {
   Prisma,
 } from "@prisma/client";
 
-import { createAuditEvent } from "@/lib/audit/audit-event-service";
 import { confidenceFromSource } from "@/lib/access-map/access-confidence-service";
+import { createAuditEvent } from "@/lib/audit/audit-event-service";
 import { prisma } from "@/lib/prisma";
 import type { CreateAccessPlaceInput } from "@/types/access-map";
 

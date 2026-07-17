@@ -14,8 +14,8 @@ vi.mock("@/lib/prisma", () => ({
   },
 }));
 
-import { prisma } from "@/lib/prisma";
 import { validateChargeLinesAgainstPolicy } from "@/lib/billing/policy/validate";
+import { prisma } from "@/lib/prisma";
 import type { ChargeLineInput } from "@/types/billing";
 
 describe("pricing policy validation", () => {

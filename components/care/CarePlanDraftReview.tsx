@@ -3,10 +3,10 @@
 import { useState } from "react";
 
 import { AuthAlert } from "@/components/auth/AuthAlert";
+import { ParticipantConfirmationCard } from "@/components/care/ParticipantConfirmationCard";
 import { supportTypeLabel } from "@/components/care/SupportTypeChips";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ParticipantConfirmationCard } from "@/components/care/ParticipantConfirmationCard";
 import { classifySupportCategories } from "@/lib/care/support-category-classifier";
 import type { CareSupportTransformOutput } from "@/server/agents/care/types";
 

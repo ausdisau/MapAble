@@ -1,7 +1,7 @@
 import { FederationNodesAdminForm } from "@/app/admin/research-federation-nodes/FederationNodesAdminForm";
-import { listFederationNodes } from "@/lib/research-federation-at-scale/federation-node-service";
 import { requireAdmin } from "@/lib/auth/guards";
 import { isResearchFederationAtScaleV2Enabled } from "@/lib/config/y5-rights-infrastructure";
+import { listFederationNodes } from "@/lib/research-federation-at-scale/federation-node-service";
 
 export default async function ResearchFederationNodesPage() {
   await requireAdmin();

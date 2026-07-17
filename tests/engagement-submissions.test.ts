@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { consentScopeFromPrisma, consentScopeToPrisma } from "@/lib/consent/scope-map";
 import { addBusinessDays, acknowledgementDueAt } from "@/lib/engagement/acknowledgement-sla";
 import {
   buildCommissionHandoffUrl,
@@ -7,7 +8,6 @@ import {
 } from "@/lib/engagement/ndis-commission-client";
 import { calculateNpsFromScores } from "@/lib/engagement/nps-test-utils";
 import { scoreQuiz } from "@/lib/engagement/worker-training-service";
-import { consentScopeFromPrisma, consentScopeToPrisma } from "@/lib/consent/scope-map";
 
 describe("engagement acknowledgement SLA", () => {
   it("adds business days skipping weekends", () => {

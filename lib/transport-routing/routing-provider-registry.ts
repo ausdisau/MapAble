@@ -1,12 +1,12 @@
 import type { TransportRoutingProvider } from "@prisma/client";
 
 import { transportRoutingConfig } from "@/lib/config/transport-routing";
-import type { RoutingAdapter } from "@/lib/transport-routing/routing-adapter";
+import { TransportApiError } from "@/lib/transport/transport-api-error";
 import { graphhopperRoutingAdapter } from "@/lib/transport-routing/graphhopper-routing-adapter";
 import { mockRoutingAdapter } from "@/lib/transport-routing/mock-routing-adapter";
 import { openRouteServiceRoutingAdapter } from "@/lib/transport-routing/openrouteservice-routing-adapter";
 import { osrmRoutingAdapter } from "@/lib/transport-routing/osrm-routing-adapter";
-import { TransportApiError } from "@/lib/transport/transport-api-error";
+import type { RoutingAdapter } from "@/lib/transport-routing/routing-adapter";
 
 const ADAPTERS: Record<TransportRoutingProvider, RoutingAdapter> = {
   mock: mockRoutingAdapter,

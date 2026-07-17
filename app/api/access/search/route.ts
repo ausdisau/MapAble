@@ -1,6 +1,6 @@
-import { accessSearchQuerySchema } from "@/types/access-map";
 import { searchAccessPlaces } from "@/lib/access-map/access-search-service";
 import { jsonOk, zodErrorResponse } from "@/lib/api/response";
+import { accessSearchQuerySchema } from "@/types/access-map";
 
 export async function GET(req: Request) {
   const url = new URL(req.url);

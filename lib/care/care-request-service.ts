@@ -3,11 +3,11 @@ import type { CareRequestType } from "@prisma/client";
 import { createAuditEvent } from "@/lib/audit/audit-event-service";
 import { recordBookingTimelineEvent } from "@/lib/bookings/timeline-service";
 import { syncCalendarForCareRequest } from "@/lib/calendar/calendar-service";
-import { checkConsent } from "@/lib/consent/consent-service";
 import { phase4Config } from "@/lib/config/phase4";
 import { platformPatternsConfig } from "@/lib/config/platform-patterns";
-import { assertProviderReadyToServe } from "@/lib/onboarding/provider-service-ready";
+import { checkConsent } from "@/lib/consent/consent-service";
 import { notifyUser } from "@/lib/notifications/notification-service";
+import { assertProviderReadyToServe } from "@/lib/onboarding/provider-service-ready";
 import { prisma } from "@/lib/prisma";
 
 export async function createCareRequest(params: {

@@ -1,8 +1,8 @@
 import Link from "next/link";
 
-import { requirePermission } from "@/lib/auth/guards";
-import { listAssessorCasesForUser } from "@/lib/assessor-tools/assessor-service";
 import { getAssessorPilotProfile } from "@/lib/assessor-network/assessor-network-pilot-service";
+import { listAssessorCasesForUser } from "@/lib/assessor-tools/assessor-service";
+import { requirePermission } from "@/lib/auth/guards";
 
 export default async function AssessorPortalPage() {
   const user = await requirePermission("assessor:portal");

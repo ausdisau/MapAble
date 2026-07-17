@@ -1,11 +1,11 @@
 import React from "react";
 
+import { positioningLines } from "@/lib/canvas/canvas-data";
 import {
   mapablePublicEyebrowClass,
   mapablePublicLeadClass,
   mapablePublicPageContainerClass,
 } from "@/lib/marketing/public-page-styles";
-import { positioningLines } from "@/lib/canvas/canvas-data";
 
 type CanvasPositioningBannerProps = {
   variant?: "default" | "module";

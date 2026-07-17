@@ -1,7 +1,7 @@
 import React from "react";
 
-import type { ClarificationSlot } from "@/lib/copilot/types";
 import { cn } from "@/app/lib/utils";
+import type { ClarificationSlot } from "@/lib/copilot/types";
 
 const SLOT_LABELS: Record<Exclude<ClarificationSlot, "general">, string> = {
   location: "Location",

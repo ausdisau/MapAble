@@ -26,13 +26,16 @@ const publicRouteFiles = [
   "app/(marketing)/contact/page.tsx",
 ];
 
+/** Public marketing-shell modules (no auth guards in layout). */
 const publicModuleLayouts = [
   "app/care/layout.tsx",
   "app/transport/layout.tsx",
   "app/employment/layout.tsx",
-  "app/marketplace/layout.tsx",
   "app/foods/layout.tsx",
 ];
+
+/** Marketplace remains session-gated (not a marketing-shell public module). */
+const authGatedModuleLayouts = ["app/marketplace/layout.tsx"];
 
 describe("Phase 0 public route contract", () => {
   it("has a page file for every required public route", () => {
@@ -50,6 +53,14 @@ describe("Phase 0 public route contract", () => {
       expect(source).toContain("MapAbleCareMarketingShell");
       expect(source).not.toContain("requirePermission");
       expect(source).not.toContain("requireAuth");
+    }
+  });
+
+  it("keeps marketplace layout session-gated (not marketing shell)", () => {
+    for (const layoutFile of authGatedModuleLayouts) {
+      const source = readFileSync(join(process.cwd(), layoutFile), "utf8");
+      expect(source).toContain("requireAuth");
+      expect(source).not.toContain("MapAbleCareMarketingShell");
     }
   });
 

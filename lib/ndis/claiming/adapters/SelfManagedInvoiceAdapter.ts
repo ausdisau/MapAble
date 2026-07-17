@@ -55,7 +55,7 @@ export async function persistSelfManagedInvoices(batchId: string, createdById: s
 
   const invoices = [];
   for (const [participantId, lines] of byParticipant) {
-    const draft = await buildSelfManagedInvoiceDraft(batchId);
+    await buildSelfManagedInvoiceDraft(batchId);
     const totalCents = lines.reduce((s, l) => s + l.totalAmountCents, 0);
     const inv = await prisma.ndisInvoice.create({
       data: {

@@ -6,16 +6,16 @@ import {
   verifyCriteriaTotalWeight,
   weightedScoreForLevel,
 } from "@/lib/access-accreditation/accreditation-scoring-service";
-import { parseKmlXml, sanitizeKmlDescription } from "@/lib/access-import/kml-parser-service";
 import { parseAccessibleLocationsGeoJson } from "@/lib/access-import/geojson-parser-service";
 import { findDuplicatePlaceCandidates } from "@/lib/access-import/import-deduplication-service";
-import { scanReviewForModerationFlags } from "@/lib/access-moderation/content-safety-rules";
+import { parseKmlXml, sanitizeKmlDescription } from "@/lib/access-import/kml-parser-service";
+import { confidenceLabel } from "@/lib/access-map/access-confidence-service";
 import {
   canEditPlace,
   canSuggestPlace,
 } from "@/lib/access-map/access-place-policy";
+import { scanReviewForModerationFlags } from "@/lib/access-moderation/content-safety-rules";
 import { rankAccessPlaces } from "@/lib/access-search/access-ranking-service";
-import { confidenceLabel } from "@/lib/access-map/access-confidence-service";
 import { createAccessPlaceSchema } from "@/types/access-map";
 
 describe("access place validation", () => {

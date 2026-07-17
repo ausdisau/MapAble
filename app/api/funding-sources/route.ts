@@ -2,11 +2,11 @@ import { requireApiSession } from "@/lib/api/auth-handler";
 import { jsonError, jsonOk } from "@/lib/api/response";
 import { createAuditEvent } from "@/lib/audit/audit-event-service";
 import { isAdminRole } from "@/lib/auth/roles";
+import { prisma } from "@/lib/prisma";
 import {
   assertCanAccessParticipantData,
   ParticipantAccessError,
 } from "@/lib/prms/participant-access";
-import { prisma } from "@/lib/prisma";
 
 export async function GET(req: Request) {
   const user = await requireApiSession();

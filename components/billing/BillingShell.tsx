@@ -1,10 +1,10 @@
 import type { ReactNode } from "react";
 
+import { cn } from "@/app/lib/utils";
 import { SkipToContent } from "@/components/core/SkipToContent";
 import {
   mapablePageContainerClass,
 } from "@/lib/brand/styles";
-import { cn } from "@/app/lib/utils";
 
 import { BillingSidebar } from "./BillingSidebar";
 

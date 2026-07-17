@@ -1,8 +1,8 @@
+import { jsonOk } from "@/lib/api/response";
 import {
   buildCareRequestHref,
   resolvePlatformOrganisation,
 } from "@/lib/provider/platform-org-resolver";
-import { jsonOk } from "@/lib/api/response";
 
 export async function GET(req: Request) {
   const url = new URL(req.url);

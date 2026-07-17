@@ -4,6 +4,7 @@ import Link from "next/link";
 import React, { type ReactNode } from "react";
 
 import { SponsoredBadge } from "@/components/marketing/mapable-care-shared";
+import { MAPABLE_SUPPORT_EMAIL } from "@/lib/brand/constants";
 import {
   companyRegistrationDetails,
   footerPlatformLinks,
@@ -11,7 +12,6 @@ import {
   MAPABLE_CARE_COMBINED_PHONE,
   sponsoredPlacements,
 } from "@/lib/marketing/mapable-care-combined-data";
-import { MAPABLE_SUPPORT_EMAIL } from "@/lib/brand/constants";
 
 function FooterTextLink({ href, children }: { href: string; children: ReactNode }) {
   return (

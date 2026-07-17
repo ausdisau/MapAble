@@ -1,10 +1,10 @@
+import type { CurrentUser } from "@/lib/auth/current-user";
 import { y2OrchestrationConfig } from "@/lib/config/y2-orchestration";
-import { prisma } from "@/lib/prisma";
 import {
   resolveTenantContext,
   whereOrganisationScope,
 } from "@/lib/multi-tenant-admin/tenant-context";
-import type { CurrentUser } from "@/lib/auth/current-user";
+import { prisma } from "@/lib/prisma";
 
 export async function getEnterpriseWorkspaceSummaryV2(
   organisationId: string,

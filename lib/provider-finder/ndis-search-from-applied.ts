@@ -1,8 +1,8 @@
+import type { CopilotProviderResult } from "@/lib/copilot/types";
 import {
   searchNdisProviders,
   type NdisProviderSearchRow,
 } from "@/lib/ingestion/ndis-providers-search";
-import type { CopilotProviderResult } from "@/lib/copilot/types";
 import type { AppliedSearchFields } from "@/lib/search/apply-interpretation";
 import type { SearchInterpretation } from "@/types/search";
 

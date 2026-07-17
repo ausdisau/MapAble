@@ -1,6 +1,6 @@
-import type { ReactNode } from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import type { ReactNode } from "react";
 
 import { BillingShell } from "@/components/billing/BillingShell";
 import { AuthenticatedRoleAppShell } from "@/components/layout/AuthenticatedRoleAppShell";

@@ -3,17 +3,16 @@ import { prisma } from "@/lib/prisma";
 import {
   assertAssignedDriver,
   assertProviderOrgTrip,
-  getActiveAssignment,
 } from "@/lib/transport/transport-access-policy";
+import { TransportApiError } from "@/lib/transport/transport-api-error";
 import {
   assertDriverEligible,
   assertVehicleEligible,
 } from "@/lib/transport/transport-eligibility-service";
 import { recordTripEvent } from "@/lib/transport/transport-event-service";
+import { buildTripResponse } from "@/lib/transport/transport-response";
 import { assertNoScheduleConflict } from "@/lib/transport/transport-schedule-conflict-service";
 import { assertStatusTransition } from "@/lib/transport/transport-status-service";
-import { TransportApiError } from "@/lib/transport/transport-api-error";
-import { buildTripResponse } from "@/lib/transport/transport-response";
 
 function tripEnd(trip: { scheduledStart: Date; scheduledEnd: Date | null }) {
   return trip.scheduledEnd ?? new Date(trip.scheduledStart.getTime() + 3600000);

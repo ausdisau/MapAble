@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { assertTransparencyCopy } from "@/lib/algorithm-register/register-service";
 import {
   ALGORITHM_TRANSPARENCY_DISCLAIMER,
   BENCHMARK_DISCLAIMER,
@@ -7,7 +8,6 @@ import {
   PRIVACY_ANALYTICS_DISCLAIMER,
   y4CivicPlatformConfig,
 } from "@/lib/config/y4-civic-platform";
-import { assertTransparencyCopy } from "@/lib/algorithm-register/register-service";
 
 describe("Y4 civic platform config", () => {
   it("disables all Y4 features by default", () => {

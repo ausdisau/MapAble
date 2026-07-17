@@ -2,11 +2,11 @@ import { ZodError } from "zod";
 
 import { requireApiPermission, requireApiSession } from "@/lib/api/auth-handler";
 import { jsonOk } from "@/lib/api/response";
+import { handleTransportRouteError } from "@/lib/transport/transport-route-handler";
 import {
   createTransportTrip,
   listTransportTripsForUser,
 } from "@/lib/transport/transport-trip-service";
-import { handleTransportRouteError } from "@/lib/transport/transport-route-handler";
 import { createTransportTripSchema } from "@/lib/validation/transport-trip-schemas";
 
 export async function GET() {

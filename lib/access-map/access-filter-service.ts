@@ -1,5 +1,4 @@
 import type { AccessPlaceFeatureType } from "@prisma/client";
-
 import type { z } from "zod";
 
 import type { accessSearchQuerySchema } from "@/types/access-map";

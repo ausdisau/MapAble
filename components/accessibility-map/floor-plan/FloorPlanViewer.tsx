@@ -1,7 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { FloorPlanCanvas } from "@/components/accessibility-map/floor-plan/FloorPlanCanvas";
 import { FloorPlanEmptyState } from "@/components/accessibility-map/floor-plan/FloorPlanEmptyState";
@@ -12,13 +12,13 @@ import { FloorPlanLegend } from "@/components/accessibility-map/floor-plan/Floor
 import { FloorPlanLoadingState } from "@/components/accessibility-map/floor-plan/FloorPlanLoadingState";
 import { FloorPlanStatusNotice } from "@/components/accessibility-map/floor-plan/FloorPlanStatusNotice";
 import {
-  FloorPlanKeyboardHelp,
-  FloorPlanToolbar,
-} from "@/components/accessibility-map/floor-plan/FloorPlanToolbar";
-import {
   filterFeaturesForDisplay,
   FloorPlanTextAlternative,
 } from "@/components/accessibility-map/floor-plan/FloorPlanTextAlternative";
+import {
+  FloorPlanKeyboardHelp,
+  FloorPlanToolbar,
+} from "@/components/accessibility-map/floor-plan/FloorPlanToolbar";
 import { FloorSelector } from "@/components/accessibility-map/floor-plan/FloorSelector";
 import { CheckpointResolver } from "@/components/indoor-accessibility/CheckpointResolver";
 import { CommunityCorrectionForm } from "@/components/indoor-accessibility/CommunityCorrectionForm";
@@ -39,8 +39,7 @@ import {
   useVenueFloorPlanSummaries,
 } from "@/hooks/useVenueFloorPlans";
 import type { FeatureCategory } from "@/lib/floor-plan/feature-config";
-import { findConnector, isRouteAvailable } from "@/lib/floor-plan/route-utils";
-import { sortFloors } from "@/lib/floor-plan/route-utils";
+import { findConnector, isRouteAvailable , sortFloors } from "@/lib/floor-plan/route-utils";
 import { mapableCareFocusRing } from "@/lib/marketing/mapable-care-tokens";
 
 type FloorPlanViewerProps = {

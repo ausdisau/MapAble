@@ -1,9 +1,9 @@
 import type { TransportTrip, TransportDriver } from "@prisma/client";
 
-import type { CurrentUser } from "@/lib/auth/current-user";
 import { getUserOrganisationIds } from "@/lib/api/phase3-scope";
-import { isAdminRole } from "@/lib/auth/roles";
+import type { CurrentUser } from "@/lib/auth/current-user";
 import { hasPermission } from "@/lib/auth/permissions";
+import { isAdminRole } from "@/lib/auth/roles";
 import { checkConsent } from "@/lib/consent/consent-service";
 import { prisma } from "@/lib/prisma";
 import { TransportApiError } from "@/lib/transport/transport-api-error";

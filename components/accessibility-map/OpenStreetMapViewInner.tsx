@@ -3,6 +3,9 @@
 import { Crosshair, List, RotateCcw } from "lucide-react";
 import { MapContainer, Marker, Popup, TileLayer, ZoomControl } from "react-leaflet";
 
+import {
+  createUserLocationIcon,
+} from "@/components/accessibility-map/accessibilityMapIcons";
 import { AccessibilityMapMarker } from "@/components/accessibility-map/AccessibilityMapMarker";
 import { AccessibilityMapPopup } from "@/components/accessibility-map/AccessibilityMapPopup";
 import {
@@ -11,20 +14,16 @@ import {
   PanToUserLocationControl,
 } from "@/components/accessibility-map/FitBoundsControl";
 import { MapLegend } from "@/components/accessibility-map/MapLegend";
-import {
-  createUserLocationIcon,
-} from "@/components/accessibility-map/accessibilityMapIcons";
 import { UserLocationControl } from "@/components/accessibility-map/UserLocationControl";
 import type { UserLocationResult } from "@/hooks/useUserLocation";
 import type { AccessNeed } from "@/lib/access-fit/types";
 import type { DemoAccessPlace } from "@/lib/demo/accessibility-places";
 import {
-  AUSTRALIA_FALLBACK_CENTER,
   AUSTRALIA_FALLBACK_ZOOM,
   SINGLE_MARKER_ZOOM,
 } from "@/lib/map/accessibilityMapUtils";
-import { mapableCareFocusRing } from "@/lib/marketing/mapable-care-tokens";
 import type { LatLngTuple } from "@/lib/map/accessibilityMapUtils";
+import { mapableCareFocusRing } from "@/lib/marketing/mapable-care-tokens";
 
 type OpenStreetMapViewInnerProps = {
   mappable: DemoAccessPlace[];

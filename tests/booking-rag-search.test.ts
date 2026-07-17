@@ -4,8 +4,8 @@ import {
   resetBookingRAGEngine,
   searchBookingsForSnapshots,
 } from "@/lib/bookings/rag/engine";
-import { parseBookingSearchFilters } from "@/lib/bookings/rag/filters";
 import { explainBookingStatus } from "@/lib/bookings/rag/explain-status";
+import { parseBookingSearchFilters } from "@/lib/bookings/rag/filters";
 import type { BookingSnapshot } from "@/lib/bookings/rag/types";
 
 function makeSnapshot(overrides: Partial<BookingSnapshot> = {}): BookingSnapshot {

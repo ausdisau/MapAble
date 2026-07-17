@@ -38,7 +38,7 @@ export async function submitForEthicsReview(projectId: string) {
 export async function attachSyntheticDataset(
   projectId: string,
   schema: Record<string, unknown>,
-  actorUserId: string
+  _actorUserId: string
 ) {
   const project = await prisma.researchSafeRoomProject.findUnique({
     where: { id: projectId },

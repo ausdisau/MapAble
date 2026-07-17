@@ -1,9 +1,9 @@
-import type { ChargeLineInput, PolicyValidationResult } from "@/types/billing";
-
 import {
   findActivePricingRule,
   validateRateAgainstPolicy,
 } from "@/lib/billing/policy/registry";
+import type { ChargeLineInput, PolicyValidationResult } from "@/types/billing";
+
 
 export type ValidateChargeLinesInput = {
   lines: ChargeLineInput[];

@@ -1,8 +1,8 @@
 import { planProviderFinderCopilotActions } from "@/lib/copilot/plan-provider-finder";
 import type { CopilotActionPlan, CopilotPlanningInput } from "@/lib/copilot/types";
-import type { ProviderFinderSessionFields } from "@/lib/provider-finder/ask-bridge";
 import { MOCK_PARTICIPANT_ID } from "@/lib/prms/mockPrmsData";
 import type { DraftPrmsRecord } from "@/lib/prms/types";
+import type { ProviderFinderSessionFields } from "@/lib/provider-finder/ask-bridge";
 
 function draft(
   type: DraftPrmsRecord["type"],

@@ -1,10 +1,10 @@
 import { interpretSearchQuery } from "@/lib/search/interpreter";
+import { searchInterpretRequestSchema } from "@/lib/search/interpreter/validation";
 import {
   SEARCH_INTERPRET_OPERATIONS,
   searchInterpretJsonError,
   searchInterpretJsonOk,
 } from "@/lib/search/search-interpret-api-contract";
-import { searchInterpretRequestSchema } from "@/lib/search/interpreter/validation";
 
 const OPERATION = SEARCH_INTERPRET_OPERATIONS.interpretQuery;
 

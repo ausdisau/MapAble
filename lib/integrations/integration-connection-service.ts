@@ -1,6 +1,6 @@
+import { isIntegrationEnvEnabled } from "@/lib/integrations/integration-feature-policy";
 import type { IntegrationConnectionStatus, IntegrationType } from "@/lib/integrations/integration-types";
 import { INITIAL_INTEGRATION_KEYS } from "@/lib/integrations/integration-types";
-import { isIntegrationEnvEnabled } from "@/lib/integrations/integration-feature-policy";
 import { prisma } from "@/lib/prisma";
 
 const SEED_DEFINITIONS: Array<{

@@ -1,8 +1,8 @@
-import React from "react";
 import Link from "next/link";
+import React from "react";
 
-import { ArrowIcon } from "@/components/marketing/mapable-care-icons";
 import { TrustStrip } from "@/components/marketing/home/TrustStrip";
+import { ArrowIcon } from "@/components/marketing/mapable-care-icons";
 import { WavyText } from "@/components/marketing/MapAbleCareTypography";
 import {
   homepageCategoryChips,

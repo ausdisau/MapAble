@@ -1,6 +1,6 @@
-import type { IndoorAccessPreferences } from "@/lib/indoor-accessibility/fit/types";
 import type { FloorPlanFeature } from "@/lib/floor-plan/schemas";
-import type { OperationalStatus, TrustLevel } from "@/lib/indoor-accessibility/schemas/core";
+import type { IndoorAccessPreferences } from "@/lib/indoor-accessibility/fit/types";
+import type { TrustLevel } from "@/lib/indoor-accessibility/schemas/core";
 
 export type IndoorFitResultCategory =
   | "matches_recorded_requirements"

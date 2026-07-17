@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { AlertTriangle } from "lucide-react";
+import Link from "next/link";
 
 import { StatusBadge } from "@/components/ui/status-badge";
 import type { HighRiskItem } from "@/server/admin/adminSchemas";

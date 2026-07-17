@@ -6,7 +6,7 @@ import { useCallback, useMemo, useState } from "react";
 import { cn } from "@/app/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { mapableEyebrowBadgeClass, mapableSectionCardClass } from "@/lib/brand/styles";
+import { mapableSectionCardClass } from "@/lib/brand/styles";
 import { FUNDING_ROUTE_LABELS } from "@/lib/ndis/claiming/types";
 
 type ClaimLineRow = {

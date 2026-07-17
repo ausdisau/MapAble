@@ -1,4 +1,3 @@
-import { reportPlaceSchema } from "@/types/access-map";
 import { reportAccessPlace } from "@/lib/access-map/access-place-service";
 import { requireApiSession } from "@/lib/api/auth-handler";
 import {
@@ -6,6 +5,7 @@ import {
   parseJsonRequestBody,
 } from "@/lib/api/request-body";
 import { jsonError, jsonOk, zodErrorResponse } from "@/lib/api/response";
+import { reportPlaceSchema } from "@/types/access-map";
 
 export async function POST(
   req: Request,

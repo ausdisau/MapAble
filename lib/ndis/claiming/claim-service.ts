@@ -4,8 +4,12 @@ import type {
 } from "@prisma/client";
 import { Prisma } from "@prisma/client";
 
-import { portalExportAdapter } from "@/lib/ndis/claiming/adapters/PortalExportAdapter";
+import { getUserOrganisationIds } from "@/lib/api/phase3-scope";
+import type { CurrentUser } from "@/lib/auth/current-user";
+import { isAdminRole } from "@/lib/auth/roles";
+import { decryptNdisNumber, maskNdisNumber } from "@/lib/crypto/ndis";
 import { persistPlanManagerInvoices } from "@/lib/ndis/claiming/adapters/PlanManagerInvoiceAdapter";
+import { portalExportAdapter } from "@/lib/ndis/claiming/adapters/PortalExportAdapter";
 import { persistSelfManagedInvoices } from "@/lib/ndis/claiming/adapters/SelfManagedInvoiceAdapter";
 import { createClaimBatch, validateClaimBatch } from "@/lib/ndis/claiming/batchBuilder";
 import {
@@ -23,11 +27,7 @@ import {
   validateClaimLineInput,
   validationResultToStatus,
 } from "@/lib/ndis/claiming/validation";
-import { decryptNdisNumber, maskNdisNumber } from "@/lib/crypto/ndis";
 import { prisma } from "@/lib/prisma";
-import { getUserOrganisationIds } from "@/lib/api/phase3-scope";
-import { isAdminRole } from "@/lib/auth/roles";
-import type { CurrentUser } from "@/lib/auth/current-user";
 
 export async function assertOrgAccess(user: CurrentUser, organisationId: string) {
   if (isAdminRole(user.primaryRole)) return;

@@ -1,13 +1,13 @@
 import type { TransportTrip } from "@prisma/client";
 
 import type { CurrentUser } from "@/lib/auth/current-user";
-import { getActiveAssignment } from "@/lib/transport/transport-access-policy";
+import { prisma } from "@/lib/prisma";
+import { buildTrafficAdvisoryForRoute } from "@/lib/tfnsw/traffic-advisory-service";
 import { getHandoverStatus } from "@/lib/transport/handover-service";
+import { getActiveAssignment } from "@/lib/transport/transport-access-policy";
 import {
   checkVehicleEligibility,
 } from "@/lib/transport/transport-eligibility-service";
-import { buildTrafficAdvisoryForRoute } from "@/lib/tfnsw/traffic-advisory-service";
-import { prisma } from "@/lib/prisma";
 
 export async function getSuitabilityWarningsForTrip(
   trip: TransportTrip

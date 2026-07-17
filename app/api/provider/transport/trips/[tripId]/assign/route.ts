@@ -1,7 +1,7 @@
 import { requireApiPermission } from "@/lib/api/auth-handler";
 import { jsonError, jsonOk } from "@/lib/api/response";
-import { assignDriverAndVehicle } from "@/lib/transport/transport-assignment-service";
 import { requireProviderOrgId } from "@/lib/transport/transport-api-helpers";
+import { assignDriverAndVehicle } from "@/lib/transport/transport-assignment-service";
 import { handleTransportRouteError } from "@/lib/transport/transport-route-handler";
 import { assignTripSchema } from "@/lib/validation/transport-assignment-schemas";
 

@@ -1,13 +1,13 @@
 import type { NdisClaimLineStatus, NdisPaymentRoute } from "@prisma/client";
 
 import { ndisServiceDeliveryConfig } from "@/lib/config/ndis-service-delivery";
-import { validateDeliveryAuthorizationForClaim } from "@/lib/ndis/service-delivery/delivery-event-service";
 import { paymentRouteRequiresMyProviderCheck } from "@/lib/ndis/claiming/paymentRoute";
 import type {
   ClaimLineInput,
   ClaimValidationIssue,
   ClaimValidationResult,
 } from "@/lib/ndis/claiming/types";
+import { validateDeliveryAuthorizationForClaim } from "@/lib/ndis/service-delivery/delivery-event-service";
 import { prisma } from "@/lib/prisma";
 
 const VOID_STATUSES: NdisClaimLineStatus[] = ["voided", "corrected"];

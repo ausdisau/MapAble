@@ -1,9 +1,9 @@
 import { EcosystemAdminForm } from "@/app/admin/certified-api-ecosystem/EcosystemAdminForm";
+import { requireAdmin } from "@/lib/auth/guards";
 import {
   getPartnerConcentrationMetrics,
   listCertifiedApiEcosystem,
 } from "@/lib/certified-api-ecosystem/ecosystem-service";
-import { requireAdmin } from "@/lib/auth/guards";
 import {
   API_CERTIFICATION_DISCLAIMER,
   isCertifiedApiEcosystemV2Enabled,

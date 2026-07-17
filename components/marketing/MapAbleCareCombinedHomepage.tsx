@@ -3,16 +3,16 @@
 import React from "react";
 
 import { BoundaryNotice } from "@/components/canvas/BoundaryNotice";
-import { GuidedSearchPanel } from "@/components/marketing/home/GuidedSearchPanel";
 import { CompetitorContrastStrip } from "@/components/marketing/home/CompetitorContrastStrip";
+import { GuidedSearchPanel } from "@/components/marketing/home/GuidedSearchPanel";
 import { HeroSection } from "@/components/marketing/home/HeroSection";
 import { HomepageFinalCta } from "@/components/marketing/home/HomepageFinalCta";
 import { HomepageMapPreview } from "@/components/marketing/home/HomepageMapPreview";
 import { HomepageProofStrip } from "@/components/marketing/home/HomepageProofStrip";
 import { HomepageProviderPitch } from "@/components/marketing/home/HomepageProviderPitch";
 import { HomepageSupportJourney } from "@/components/marketing/home/HomepageSupportJourney";
-import { MapAbleCareMarketingFooter } from "@/components/marketing/MapAbleCareMarketingFooter";
 import { MapAbleCareMarketingHeader } from "@/components/marketing/mapable-care-shared";
+import { MapAbleCareMarketingFooter } from "@/components/marketing/MapAbleCareMarketingFooter";
 
 export { mapAbleCareCombinedDesignTests } from "@/lib/marketing/mapable-care-combined-data";
 export { MapAbleCareMarketingTypography } from "@/components/marketing/MapAbleCareTypography";

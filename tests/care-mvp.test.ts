@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import type { CurrentUser } from "@/lib/auth/current-user";
 import { hasPermission } from "@/lib/auth/permissions";
 import {
   assertParticipantOwnsBooking,
@@ -9,7 +10,6 @@ import {
   assertWorkerEligibleForBooking,
   bookingHasHighIntensityTasks,
 } from "@/lib/care/worker-eligibility";
-import type { CurrentUser } from "@/lib/auth/current-user";
 
 const participantUser: CurrentUser = {
   id: "p1",

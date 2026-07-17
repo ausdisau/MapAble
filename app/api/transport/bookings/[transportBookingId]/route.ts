@@ -1,11 +1,11 @@
 import { requireApiSession } from "@/lib/api/auth-handler";
 import { jsonError, jsonOk } from "@/lib/api/response";
 import { prisma } from "@/lib/prisma";
-import { assertCanAccessTransportBooking } from "@/lib/transport/transport-booking-access";
 import {
   TransportApiError,
   transportErrorResponse,
 } from "@/lib/transport/transport-api-error";
+import { assertCanAccessTransportBooking } from "@/lib/transport/transport-booking-access";
 import { getVehicleSuitabilityWarnings } from "@/lib/transport/vehicle-suitability";
 
 export async function PATCH(

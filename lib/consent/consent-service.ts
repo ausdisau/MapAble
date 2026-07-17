@@ -1,14 +1,13 @@
-import type { ConsentScope as PrismaConsentScope } from "@prisma/client";
+import type { ConsentScope as PrismaConsentScope ,
+  ConsentRecipientType,
+  ConsentShareMode,
+} from "@prisma/client";
 
 import { createAuditEvent } from "@/lib/audit/audit-event-service";
 import { consentScopeFromPrisma, consentScopeToPrisma } from "@/lib/consent/scope-map";
 import { prisma } from "@/lib/prisma";
 import type { ConsentScope, ConsentStatus } from "@/types/mapable";
 
-import type {
-  ConsentRecipientType,
-  ConsentShareMode,
-} from "@prisma/client";
 
 export interface GrantConsentInput {
   subjectUserId: string;

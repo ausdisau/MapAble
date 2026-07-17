@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -40,9 +41,9 @@ export default function NewSafetySupportTicketPage() {
       <p className="text-sm text-muted-foreground">
         Describe your issue in plain language. A team member will respond. For urgent
         safety risks, call 000; for formal incident reporting use{" "}
-        <a href="/dashboard/safety/incidents/new" className="text-primary underline">
+        <Link href="/dashboard/safety/incidents/new" className="text-primary underline">
           report a concern
-        </a>
+        </Link>
         .
       </p>
       {error ? (

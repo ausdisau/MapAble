@@ -1,5 +1,5 @@
-import { prisma } from "@/lib/prisma";
 import { auditIntegrationAction } from "@/lib/integrations/integration-audit-service";
+import { prisma } from "@/lib/prisma";
 
 export async function linkKeycloakIdentity(input: {
   userId: string;

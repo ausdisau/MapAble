@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { format } from "date-fns";
+import Link from "next/link";
 
 import { SupportTicketStatusPanel } from "@/components/support/SupportTicketStatusPanel";
 import { requireAuth } from "@/lib/auth/guards";

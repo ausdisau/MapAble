@@ -1,12 +1,12 @@
 import type { AccessAccreditationLevel } from "@prisma/client";
 
-import { createAuditEvent } from "@/lib/audit/audit-event-service";
 import { ACCREDITATION_CRITERIA } from "@/lib/access-accreditation/accreditation-criteria-service";
 import {
   calculateAccreditationTotal,
   tierFromTotalScore,
   weightedScoreForLevel,
 } from "@/lib/access-accreditation/accreditation-scoring-service";
+import { createAuditEvent } from "@/lib/audit/audit-event-service";
 import { prisma } from "@/lib/prisma";
 
 export async function createAssessment(params: {

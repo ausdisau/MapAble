@@ -1,18 +1,18 @@
 "use client";
 
+import Link from "next/link";
 import React, { type ReactNode } from "react";
 
 import { SkipToContent } from "@/components/core/SkipToContent";
+import {
+  LogoMark,
+  MapAbleCareMarketingHeader,
+} from "@/components/marketing/mapable-care-shared";
 import { MapAbleAppCompactHeader } from "@/components/marketing/MapAbleAppCompactHeader";
 import {
   MapAbleCareMarketingFooter,
   MapAbleCareSlimFooter,
 } from "@/components/marketing/MapAbleCareMarketingFooter";
-import {
-  LogoMark,
-  MapAbleCareMarketingHeader,
-} from "@/components/marketing/mapable-care-shared";
-import Link from "next/link";
 
 export type MapAbleAppShellVariant = "marketing" | "app" | "minimal";
 

@@ -1,4 +1,5 @@
 import { randomBytes } from "crypto";
+
 import { NextResponse } from "next/server";
 
 import { getKeycloakAuthorizationUrl, isKeycloakEnabled } from "@/lib/auth/keycloak/keycloak-config";

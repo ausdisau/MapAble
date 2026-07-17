@@ -205,7 +205,7 @@ export async function requestOrchestrationReschedule(params: {
   });
 }
 
-export async function listPendingRescheduleRequests(coordinatorId?: string) {
+export async function listPendingRescheduleRequests(_coordinatorId?: string) {
   return prisma.orchestrationRescheduleRequest.findMany({
     where: { status: "pending" },
     orderBy: { createdAt: "desc" },

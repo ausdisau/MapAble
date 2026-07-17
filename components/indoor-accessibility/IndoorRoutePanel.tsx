@@ -2,10 +2,10 @@
 
 import { useMemo, useState } from "react";
 
-import type { FloorPlanFeature } from "@/lib/floor-plan/schemas";
-import type { IndoorRouteGraph, RouteMode } from "@/lib/indoor-accessibility/schemas/core";
-import { planIndoorRoute } from "@/lib/indoor-accessibility/routing/route-planner";
 import { useIndoorFeatureEnabled } from "@/hooks/useIndoorFeatureFlags";
+import type { FloorPlanFeature } from "@/lib/floor-plan/schemas";
+import { planIndoorRoute } from "@/lib/indoor-accessibility/routing/route-planner";
+import type { IndoorRouteGraph, RouteMode } from "@/lib/indoor-accessibility/schemas/core";
 import { mapableCareFocusRing } from "@/lib/marketing/mapable-care-tokens";
 
 type IndoorRoutePanelProps = {
@@ -22,7 +22,11 @@ const ROUTE_MODES: Array<{ value: RouteMode; label: string }> = [
   { value: "avoid_lifts", label: "Avoid lifts" },
 ];
 
-export function IndoorRoutePanel({ routeGraph, features, onRoutePlanned }: IndoorRoutePanelProps) {
+export function IndoorRoutePanel({
+  routeGraph,
+  features,
+  onRoutePlanned: _onRoutePlanned,
+}: IndoorRoutePanelProps) {
   const enabled = useIndoorFeatureEnabled("verifiedIndoorRouting");
   const [mode, setMode] = useState<RouteMode>("step_free");
   const [fromNodeId, setFromNodeId] = useState("");

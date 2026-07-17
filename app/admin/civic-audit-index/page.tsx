@@ -1,5 +1,5 @@
-import { listPublishedCivicAudits } from "@/lib/institutional-permanence/permanence-service";
 import { requireAdmin } from "@/lib/auth/guards";
+import { listPublishedCivicAudits } from "@/lib/institutional-permanence/permanence-service";
 
 export default async function CivicAuditIndexPage() {
   await requireAdmin();

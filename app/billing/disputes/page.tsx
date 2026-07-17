@@ -1,6 +1,6 @@
 import { AccessibleDataTable } from "@/components/billing/AccessibleDataTable";
-import { DisputeTimeline } from "@/components/billing/DisputeTimeline";
 import { BillingPageHeader } from "@/components/billing/BillingPageChrome";
+import { DisputeTimeline } from "@/components/billing/DisputeTimeline";
 import { requireAuth } from "@/lib/auth/guards";
 import { formatAud } from "@/lib/billing/money";
 import { prisma } from "@/lib/prisma";

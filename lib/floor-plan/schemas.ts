@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-import { indoorRouteGraphSchema } from "@/lib/indoor-accessibility/schemas/core";
 import { normalizedPointSchema, type NormalizedPoint } from "@/lib/floor-plan/normalized-point";
+import { indoorRouteGraphSchema } from "@/lib/indoor-accessibility/schemas/core";
 
 export { normalizedPointSchema, type NormalizedPoint };
 

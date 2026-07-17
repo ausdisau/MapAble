@@ -1,9 +1,9 @@
+import { phase10Config } from "@/lib/config/phase10";
 import {
   ALGORITHM_TRANSPARENCY_DISCLAIMER,
   isAlgorithmRegisterV2Enabled,
 } from "@/lib/config/y4-civic-platform";
 import { requireRatifiedCharter } from "@/lib/governance-charter/charter-gate-service";
-import { phase10Config } from "@/lib/config/phase10";
 import { prisma } from "@/lib/prisma";
 
 const BLOCKED_CERTIFICATION_PHRASES = [
