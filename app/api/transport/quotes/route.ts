@@ -44,7 +44,10 @@ export async function POST(req: Request) {
       parsed.data.organisationId,
       "transport:manage:org",
     );
-    const quote = createTransportQuote(parsed.data);
+    const quote = await createTransportQuote({
+      ...parsed.data,
+      actorUserId: user.id,
+    });
     return jsonOk({ quote }, 201);
   } catch (e) {
     if (e instanceof OrganisationAccessError) {

@@ -1,6 +1,7 @@
 /**
  * Staged location disclosure for transport.
  * Exact addresses must not be returned before quote acceptance + assignment window.
+ * Quote acceptance alone does not unlock exact address for providers (see accepted + provider).
  */
 
 export type LocationDisclosureStage =
@@ -10,6 +11,33 @@ export type LocationDisclosureStage =
   | "assigned"
   | "in_service"
   | "completed";
+
+/** Map durable quote status to disclosure stage. Acceptance ≠ assignment. */
+export function locationStageForQuoteStatus(
+  status:
+    | "proposed"
+    | "accepted"
+    | "rejected"
+    | "expired"
+    | "amended"
+    | "cancelled",
+): LocationDisclosureStage {
+  switch (status) {
+    case "accepted":
+      return "accepted";
+    case "proposed":
+    case "amended":
+      return "quote";
+    case "rejected":
+    case "expired":
+    case "cancelled":
+      return "quote";
+    default: {
+      const _exhaustive: never = status;
+      return _exhaustive;
+    }
+  }
+}
 
 export type LocationView = {
   stage: LocationDisclosureStage;

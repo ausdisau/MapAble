@@ -13,7 +13,7 @@ or assert registration.
 | care.request_loop | Care request → evidence | merged_but_flagged / pilot-grade | Prisma Care* | no master care flag | Agreements + billing handoff landed (#327) |
 | care.agreements | Accessible service agreements | merged_but_flagged | Prisma `CareServiceAgreement` | — | Versioned accept APIs; not production_supported |
 | transport.trip_ops | TransportTrip operations | merged_but_flagged | Prisma TransportTrip* | honesty matrix | Trip ≠ outcome |
-| transport.quotes | Transport quotes | **merged_but_process_local** | in-process `Map` | — | Persist in PR 2; clears on restart |
+| transport.quotes | Transport quotes | merged_but_flagged | Prisma `TransportQuote*` | — | Durable versions; acceptance ≠ provider exact address |
 | transport.location_disclosure | Staged address disclosure | merged_but_flagged | service logic | — | Exact address after acceptance |
 | billing.centre | Billing Centre | merged_and_operational (gated) | Prisma Billing* | NDIA/payouts/PM off | Evidence handoff from Care/Transport |
 | communication.passport | Communication Passport | merged_but_flagged | `AccessibilityProfile` + AuditEvent | `MAPABLE_COMMUNICATION_PASSPORT_ENABLED=false` | Projection — not second profile SoT |

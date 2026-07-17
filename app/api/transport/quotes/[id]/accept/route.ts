@@ -10,7 +10,7 @@ export async function POST(
   if (user instanceof Response) return user;
   const { id } = await params;
   try {
-    const quote = acceptTransportQuote({
+    const quote = await acceptTransportQuote({
       quoteId: id,
       participantUserId: user.id,
     });

@@ -1,6 +1,6 @@
 # Transport module
 
-**Maturity:** trip ops = merged_but_flagged / controlled_pilot; quotes = **merged_but_process_local**.  
+**Maturity:** trip ops = merged_but_flagged / controlled_pilot; quotes = **merged_but_flagged** (Prisma durable, not production_supported).  
 **Lane:** MapAble Network / Infrastructure facilitation — not a guarantee of accessible arrival.  
 **Canonical SoT for new work:** `TransportTrip` / `TransportTripRequest` / `TransportTripEvent`  
 (legacy `TransportBooking` preserved via booking bridge).
@@ -11,13 +11,13 @@
 - Operator assignment, driver/vehicle assignment paths, suitability warnings
 - Feature-status honesty matrix (`lib/transport/feature-status.ts`): Available now |
   Pilot / sandbox | Coming next | Requires partner
-- **First-class quotes (process-local until Prisma Prompt 2 / programme PR 2)** —
-  `POST /api/transport/quotes`, `POST /api/transport/quotes/[id]/accept`
-  (`lib/transport/quotes/quote-service.ts` uses an in-process `Map`; clears on restart)
+- **Persistent first-class quotes** — Prisma `TransportQuote` + `TransportQuoteVersion`
+  (`POST /api/transport/quotes`, `GET /api/transport/quotes/[id]`,
+  `POST /api/transport/quotes/[id]/accept`)
 - **Staged location disclosure** — `lib/transport/privacy/location-disclosure.ts`
-  (exact address only after acceptance / authorised window)
+  (provider exact address still withheld at `accepted` until assignment window)
 - Completed trip → `BillingServiceRecord` via `POST /api/transport/trips/[tripId]/billing-handoff`
-- Funding disclaimer on quotes — quote ≠ NDIS funding approval
+- Funding disclaimer stored per quote version — quote ≠ NDIS funding approval
 - Pricing components may be zero until versioned pricing policy applied
 
 ## Routes
@@ -39,14 +39,15 @@
 
 - No live GPS requirement as universal prerequisite (`TRANSPORT_LIVE_TRACKING_ENABLED` default false)
 - Default routing provider is **mock** — sandbox/pilot labels required; never silent mock as live in production
-- Process-local quotes are **not durable** — do not market as production quote store
+- Quotes are durable in Prisma but **not production_supported** until pilot exit criteria
+- Quote acceptance ≠ exact address for providers; assignment window still required
 - Route-found ≠ completed trip ≠ participant outcome
 - No autonomous dispatch; no guaranteed accessible ETA
 
 ## Programme next steps
 
-1. **PR 2** — Persist `TransportQuote` / versions in Prisma; keep staged disclosure
-2. Driver/vehicle eligibility confirmation completeness
+1. Driver/vehicle eligibility confirmation completeness
+2. Recurring Care + journey integration (programme PR 3–4)
 3. Return-journey recovery with Continuity (PR 5)
 
 ## Related

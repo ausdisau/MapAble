@@ -128,6 +128,7 @@ model User {
   transportTripRequests     TransportTripRequest[] @relation("TransportTripRequestParticipant")
   transportTrips            TransportTrip[]        @relation("TransportTripParticipant")
   transportTripEvents       TransportTripEvent[]   @relation("TransportTripEventActor")
+  transportQuotes           TransportQuote[]       @relation("TransportQuoteParticipant")
 
   // AI-enabled case management
   caseManagementOwned       Case[]                 @relation("CaseAssignedToUser")
@@ -718,6 +719,7 @@ model Organisation {
   onboardingProfiles     OnboardingProfile[]
   transportTripRequests  TransportTripRequest[] @relation("TransportTripRequestProvider")
   transportTrips         TransportTrip[]        @relation("TransportTripProvider")
+  transportQuotes        TransportQuote[]       @relation("TransportQuoteOrganisation")
   transportDrivers       TransportDriver[]      @relation("TransportDrivers")
   transportVehicles      TransportVehicle[]     @relation("TransportVehicles")
   rideRuns               RideRun[]              @relation("RideRuns")
@@ -7852,9 +7854,66 @@ model TransportTripRequest {
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
   trip                  TransportTrip?
+  quotes                TransportQuote[]
 
   @@index([participantId, status])
   @@map("transport_trip_requests")
+}
+
+enum TransportQuoteStatus {
+  proposed
+  accepted
+  rejected
+  expired
+  amended
+  cancelled
+}
+
+/// Durable transport quote with immutable version history.
+/// Quote acceptance is required before exact address disclosure to providers/drivers.
+model TransportQuote {
+  id                String               @id @default(cuid())
+  organisationId    String
+  organisation      Organisation         @relation("TransportQuoteOrganisation", fields: [organisationId], references: [id], onDelete: Cascade)
+  participantUserId String
+  participant       User                 @relation("TransportQuoteParticipant", fields: [participantUserId], references: [id], onDelete: Cascade)
+  tripRequestId     String?
+  tripRequest       TransportTripRequest? @relation(fields: [tripRequestId], references: [id], onDelete: SetNull)
+  currentVersion    Int                  @default(1)
+  status            TransportQuoteStatus @default(proposed)
+  providerLabel     String
+  expiresAt         DateTime
+  acceptedAt        DateTime?
+  rejectedAt        DateTime?
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+  versions          TransportQuoteVersion[]
+
+  @@index([organisationId, status])
+  @@index([participantUserId, status])
+  @@index([tripRequestId])
+  @@index([expiresAt])
+  @@map("transport_quotes")
+}
+
+model TransportQuoteVersion {
+  id                       String         @id @default(cuid())
+  quoteId                  String
+  quote                    TransportQuote @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+  version                  Int
+  currency                 String         @default("AUD")
+  components               Json
+  totalCents               Int
+  vehicleAssumptions       Json           @default("[]")
+  accessibilityAssumptions Json           @default("[]")
+  exclusions               Json           @default("[]")
+  fundingDisclaimer        String
+  cancellationPolicy       String
+  createdAt                DateTime       @default(now())
+
+  @@unique([quoteId, version])
+  @@index([quoteId])
+  @@map("transport_quote_versions")
 }
 
 model TransportTrip {
