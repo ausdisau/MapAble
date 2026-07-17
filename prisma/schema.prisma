@@ -140,6 +140,9 @@ model User {
   caseTasksCompleted        CaseTask[]             @relation("CaseTaskCompletedBy")
   caseLinksCreated          CaseLink[]             @relation("CaseLinkCreatedBy")
   caseAiInsightsRequested   CaseAIInsight[]        @relation("CaseAIInsightRequestedBy")
+  billingServiceRecords     BillingServiceRecord[] @relation("BillingServiceRecordParticipant")
+  billingDisputes           BillingDispute[]       @relation("BillingDisputeParticipant")
+  billingDisputeMessages    BillingDisputeMessage[] @relation("BillingDisputeMessageAuthor")
 }
 
 model PasskeyCredential {
@@ -716,6 +719,12 @@ model Organisation {
   engagementImprovementActions EngagementImprovementAction[]
   engagementNpsResponses EngagementNpsResponse[]
   workerTrainingModules  WorkerTrainingModule[]
+  billingServiceRecords  BillingServiceRecord[] @relation("BillingServiceRecordOrg")
+  pricingPolicies        PricingPolicy[]
+  billingCentrePayouts   BillingCentreProviderPayout[]
+  billingClaimBatches    BillingClaimBatch[]
+  billingIntegrationConnections BillingIntegrationConnection[]
+  billingReconSessions   BillingReconciliationSession[]
 }
 
 model OrganisationMember {
@@ -5179,9 +5188,16 @@ enum BillingAccountRole {
 enum BillingFundingSourceType {
   ndis_plan_managed
   ndis_self_managed
+  ndis_agency_managed
   private_card
+  private_pay
   organisation_invoice
+  employer_funded
+  insurance
+  home_care_package
   grant
+  grant_funded
+  mixed
   other
 }
 
@@ -5189,6 +5205,9 @@ enum BillingServiceType {
   care
   transport
   jobs
+  foods
+  moves
+  academy
   marketplace
   subscription
   other
@@ -5196,13 +5215,122 @@ enum BillingServiceType {
 
 enum BillingInvoiceStatus {
   draft
+  evidence_required
+  policy_review_required
+  participant_review
+  provider_review
+  approved
+  ready_to_issue
   issued
-  pending_payment
+  sent
+  partially_paid
   paid
+  overdue
+  disputed
+  on_hold
+  credited
+  void
+  written_off
+  pending_payment
   failed
   refunded
   cancelled
   exported
+}
+
+enum BillingServiceRecordStatus {
+  open
+  evidence_pending
+  locked
+  charged
+  invoiced
+  cancelled
+}
+
+enum BillingServiceRecordSourceType {
+  care_shift
+  timesheet
+  transport_trip
+  employment_session
+  foods_order
+  marketplace_transaction
+  subscription_period
+  cancellation
+  travel_cost
+  non_labour_cost
+  other
+}
+
+enum BillingEvidenceStatus {
+  missing
+  submitted
+  approved
+  rejected
+}
+
+enum PricingPolicyStatus {
+  draft
+  verified
+  active
+  superseded
+  retired
+}
+
+enum BillingApprovalType {
+  participant
+  provider
+  mapable_finance
+}
+
+enum BillingApprovalDecision {
+  pending
+  approved
+  rejected
+  changes_requested
+}
+
+enum BillingDisputeStatus {
+  open
+  awaiting_evidence
+  under_review
+  resolved_credit
+  resolved_upheld
+  resolved_partial
+  withdrawn
+  escalated
+}
+
+enum BillingCreditNoteStatus {
+  draft
+  issued
+  applied
+  void
+}
+
+enum BillingCentreClaimGateway {
+  mock
+  csv_export
+  plan_manager
+  official_disabled
+}
+
+enum BillingCentrePayoutState {
+  calculated
+  review_required
+  approved
+  scheduled
+  processing
+  paid
+  failed
+  held
+  cancelled
+}
+
+enum BillingReconciliationMatchStatus {
+  suggested
+  confirmed
+  rejected
+  unmatched
 }
 
 enum BillingPayoutStatus {
@@ -5347,6 +5475,10 @@ model BillingInvoice {
   platformFeeCents         Int                    @default(0)
   gstCents                 Int                    @default(0)
   totalCents               Int                    @default(0)
+  discountCents            Int                    @default(0)
+  coPaymentCents           Int                    @default(0)
+  creditCents              Int                    @default(0)
+  amountPaidCents          Int                    @default(0)
   ndisLineItem             String?
   ndisClaimable            Boolean                @default(false)
   stripeCheckoutSessionId  String?
@@ -5356,6 +5488,12 @@ model BillingInvoice {
   planManagerExportStatus  String?
   dueAt                    DateTime?
   paidAt                   DateTime?
+  issuedAt                 DateTime?
+  servicePeriodStart       DateTime?
+  servicePeriodEnd         DateTime?
+  purchaseOrderRef         String?
+  planManagerRef           String?
+  participantDisplayRef    String?
   adminApprovalStatus      BillingAdminApprovalStatus @default(draft)
   disputedAt               DateTime?
   disputeReason            String?
@@ -5363,15 +5501,26 @@ model BillingInvoice {
   transferGroup            String?
   payerType                BillingPayerType?
   fundingSourceType        BillingFundingSourceType?
-  invoiceNumber            String?
+  invoiceNumber            String?                @unique
   payoutStatus             BillingPayoutStatus        @default(none)
   xeroInvoiceId            String?
+  draftVersion             Int                    @default(1)
+  policyVersionId          String?
+  notesForBilling          String?
   createdAt                DateTime               @default(now())
   updatedAt                DateTime               @updatedAt
 
-  lineItems BillingInvoiceLineItem[]
-  payments  BillingPayment[]
-  payoutBlocks PayoutBlock[]
+  lineItems      BillingInvoiceLineItem[]
+  payments       BillingPayment[]
+  payoutBlocks   PayoutBlock[]
+  transitions    BillingInvoiceTransition[]
+  approvals      BillingInvoiceApproval[]
+  deliveries     BillingInvoiceDelivery[]
+  creditNotes    BillingCreditNote[]
+  disputes       BillingDispute[]
+  serviceRecords BillingServiceRecord[]
+  claimItems     BillingClaimItem[]
+  reconMatches   BillingReconciliationMatch[]
 
   @@index([userId, status])
   @@index([providerId])
@@ -5380,29 +5529,46 @@ model BillingInvoice {
   @@index([adminApprovalStatus])
   @@index([transferGroup])
   @@index([invoiceNumber])
+  @@index([status, dueAt])
+  @@index([providerId, status])
 }
 
 model BillingInvoiceLineItem {
-  id              String         @id @default(cuid())
-  invoiceId       String
-  invoice         BillingInvoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
-  description     String
-  quantity        Decimal        @default(1)
-  unitAmountCents Int
-  totalCents      Int
-  ndisLineItem    String?
-  gstApplicable   Boolean        @default(false)
-  lineType        BillingInvoiceLineType?
-  recipientId     String?
-  serviceCategory String?
-  metadata        Json?
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @default(now()) @updatedAt
+  id                String         @id @default(cuid())
+  invoiceId         String
+  invoice           BillingInvoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  description       String
+  quantity          Decimal        @default(1)
+  unitAmountCents   Int
+  totalCents        Int
+  ndisLineItem      String?
+  gstApplicable     Boolean        @default(false)
+  gstCents          Int            @default(0)
+  lineType          BillingInvoiceLineType?
+  recipientId       String?
+  serviceCategory   String?
+  unit              String?
+  serviceDate       DateTime?
+  policyVersionId   String?
+  serviceRecordId   String?
+  serviceRecord     BillingServiceRecord? @relation(fields: [serviceRecordId], references: [id], onDelete: SetNull)
+  evidenceStatus    BillingEvidenceStatus @default(missing)
+  validationStatus  String?
+  travelClassification String?
+  locationCategory  String?
+  fundedCents       Int            @default(0)
+  coPaymentCents    Int            @default(0)
+  privateCents      Int            @default(0)
+  metadata          Json?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @default(now()) @updatedAt
 
   evidence InvoiceLineEvidence[]
 
   @@index([invoiceId])
   @@index([recipientId])
+  @@index([serviceRecordId])
+  @@index([policyVersionId])
 }
 
 model BillingPayment {
@@ -8646,4 +8812,373 @@ model WorkerTrainingCompletion {
   @@unique([moduleId, userId])
   @@index([userId])
   @@map("worker_training_completions")
+}
+
+// --- Billing & Invoicing Centre (financial operations layer) ---
+
+model PricingPolicy {
+  id             String   @id @default(cuid())
+  organisationId String?
+  organisation   Organisation? @relation(fields: [organisationId], references: [id], onDelete: SetNull)
+  name           String
+  jurisdiction   String   @default("AU")
+  sourceUrl      String?
+  notes          String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  versions PricingPolicyVersion[]
+
+  @@index([organisationId])
+  @@index([jurisdiction])
+}
+
+model PricingPolicyVersion {
+  id               String              @id @default(cuid())
+  policyId         String
+  policy           PricingPolicy       @relation(fields: [policyId], references: [id], onDelete: Cascade)
+  version          String
+  effectiveFrom    DateTime
+  effectiveTo      DateTime?
+  status           PricingPolicyStatus @default(draft)
+  verificationDate DateTime?
+  verifiedByUserId String?
+  sourceUrl        String?
+  notes            String?
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+
+  rules PricingRule[]
+
+  @@unique([policyId, version])
+  @@index([status, effectiveFrom])
+}
+
+model PricingRule {
+  id                 String               @id @default(cuid())
+  policyVersionId    String
+  policyVersion      PricingPolicyVersion @relation(fields: [policyVersionId], references: [id], onDelete: Cascade)
+  supportCategory    String?
+  supportItemNumber  String
+  supportItemName    String
+  registrationGroup  String?
+  unit               String
+  weekdayOrTimeBand  String?
+  remoteLoading      String?
+  providerType       String?
+  priceCapCents      Int
+  gstTreatment       String               @default("input_taxed")
+  cancellationRules  Json?
+  travelRules        Json?
+  nonLabourRules     Json?
+  requiredEvidence   Json?
+  status             PricingPolicyStatus  @default(verified)
+  notes              String?
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+
+  @@index([policyVersionId])
+  @@index([supportItemNumber])
+  @@index([supportItemNumber, weekdayOrTimeBand])
+}
+
+model BillingServiceRecord {
+  id                 String                        @id @default(cuid())
+  organisationId     String?
+  organisation       Organisation?                 @relation("BillingServiceRecordOrg", fields: [organisationId], references: [id], onDelete: SetNull)
+  participantId      String
+  participant        User                          @relation("BillingServiceRecordParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  sourceType         BillingServiceRecordSourceType
+  sourceId           String
+  serviceType        BillingServiceType
+  status             BillingServiceRecordStatus    @default(open)
+  serviceStart       DateTime
+  serviceEnd         DateTime?
+  quantity           Decimal                       @default(1) @db.Decimal(12, 4)
+  unit               String                        @default("hour")
+  supportItemCode    String?
+  workerOrProviderId String?
+  fundingSourceType  BillingFundingSourceType?
+  estimatedCents     Int                           @default(0)
+  lockedAt           DateTime?
+  lockedByUserId     String?
+  invoiceId          String?
+  invoice            BillingInvoice?               @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
+  chargeSnapshot     Json?
+  anomalyFlags       Json?
+  notesForBilling    String?
+  createdAt          DateTime                      @default(now())
+  updatedAt          DateTime                      @updatedAt
+
+  evidence  BillingServiceEvidence[]
+  lineItems BillingInvoiceLineItem[]
+
+  @@unique([sourceType, sourceId])
+  @@index([participantId, status])
+  @@index([organisationId, status])
+  @@index([invoiceId])
+  @@index([status, serviceStart])
+}
+
+model BillingServiceEvidence {
+  id              String                @id @default(cuid())
+  serviceRecordId String
+  serviceRecord   BillingServiceRecord  @relation(fields: [serviceRecordId], references: [id], onDelete: Cascade)
+  evidenceType    String
+  status          BillingEvidenceStatus @default(submitted)
+  referenceId     String?
+  summary         String
+  metadata        Json?
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+
+  @@index([serviceRecordId])
+}
+
+model BillingInvoiceTransition {
+  id          String               @id @default(cuid())
+  invoiceId   String
+  invoice     BillingInvoice       @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  actorId     String?
+  actorRole   String?
+  priorState  BillingInvoiceStatus
+  newState    BillingInvoiceStatus
+  reason      String?
+  evidenceIds Json?
+  ipAddress   String?
+  sessionId   String?
+  createdAt   DateTime             @default(now())
+
+  @@index([invoiceId, createdAt])
+}
+
+model BillingInvoiceApproval {
+  id           String                  @id @default(cuid())
+  invoiceId    String
+  invoice      BillingInvoice          @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  approvalType BillingApprovalType
+  decision     BillingApprovalDecision @default(pending)
+  actorId      String?
+  actorRole    String?
+  reason       String?
+  decidedAt    DateTime?
+  createdAt    DateTime                @default(now())
+  updatedAt    DateTime                @updatedAt
+
+  @@index([invoiceId])
+  @@index([decision])
+}
+
+model BillingInvoiceDelivery {
+  id          String   @id @default(cuid())
+  invoiceId   String
+  invoice     BillingInvoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  channel     String
+  recipient   String?
+  status      String
+  externalId  String?
+  payload     Json?
+  sentAt      DateTime?
+  createdAt   DateTime @default(now())
+
+  @@index([invoiceId])
+}
+
+model BillingCreditNote {
+  id              String                 @id @default(cuid())
+  invoiceId       String
+  invoice         BillingInvoice         @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  creditNoteNumber String?               @unique
+  status          BillingCreditNoteStatus @default(draft)
+  amountCents     Int
+  reason          String
+  lineItemIds     Json?
+  issuedAt        DateTime?
+  createdById     String?
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
+
+  @@index([invoiceId])
+  @@index([status])
+}
+
+model BillingDispute {
+  id            String               @id @default(cuid())
+  invoiceId     String
+  invoice       BillingInvoice       @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  participantId String
+  participant   User                 @relation("BillingDisputeParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  status        BillingDisputeStatus @default(open)
+  scope         String               @default("invoice")
+  lineItemIds   Json?
+  summary       String
+  preferredContact String?
+  outcomeReason String?
+  amountOnHoldCents Int              @default(0)
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+  resolvedAt    DateTime?
+
+  messages BillingDisputeMessage[]
+
+  @@index([invoiceId])
+  @@index([participantId, status])
+}
+
+model BillingDisputeMessage {
+  id         String         @id @default(cuid())
+  disputeId  String
+  dispute    BillingDispute @relation(fields: [disputeId], references: [id], onDelete: Cascade)
+  authorId   String?
+  author     User?          @relation("BillingDisputeMessageAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+  body       String
+  isInternal Boolean        @default(false)
+  createdAt  DateTime       @default(now())
+
+  @@index([disputeId, createdAt])
+}
+
+model BillingClaimBatch {
+  id                 String                   @id @default(cuid())
+  organisationId     String
+  organisation       Organisation             @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+  gateway            BillingCentreClaimGateway @default(mock)
+  status             String                   @default("NOT_READY")
+  externalReference  String?
+  simulated          Boolean                  @default(true)
+  validationJson     Json?
+  exportChecksum     String?
+  createdById        String?
+  submittedAt        DateTime?
+  createdAt          DateTime                 @default(now())
+  updatedAt          DateTime                 @updatedAt
+
+  items BillingClaimItem[]
+
+  @@index([organisationId, status])
+  @@index([externalReference])
+}
+
+model BillingClaimItem {
+  id            String           @id @default(cuid())
+  batchId       String
+  batch         BillingClaimBatch @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  invoiceId     String?
+  invoice       BillingInvoice?  @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
+  ndisClaimLineId String?
+  supportItemCode String?
+  amountCents   Int
+  status        String           @default("NOT_READY")
+  rejectionCode String?
+  rejectionMessage String?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  @@index([batchId])
+  @@index([invoiceId])
+}
+
+model BillingCentreProviderPayout {
+  id                 String                  @id @default(cuid())
+  organisationId     String
+  organisation       Organisation            @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+  status             BillingCentrePayoutState @default(calculated)
+  periodStart        DateTime
+  periodEnd          DateTime
+  grossCents         Int                     @default(0)
+  commissionCents    Int                     @default(0)
+  adjustmentsCents   Int                     @default(0)
+  withheldCents      Int                     @default(0)
+  netPayableCents    Int                     @default(0)
+  remittanceJson     Json?
+  destinationRef     String?
+  approvedById       String?
+  releasedAt         DateTime?
+  createdAt          DateTime                @default(now())
+  updatedAt          DateTime                @updatedAt
+
+  @@index([organisationId, status])
+  @@index([periodEnd])
+}
+
+model BillingReconciliationSession {
+  id             String   @id @default(cuid())
+  organisationId String?
+  organisation   Organisation? @relation(fields: [organisationId], references: [id], onDelete: SetNull)
+  source         String
+  status         String   @default("open")
+  notes          String?
+  createdById    String?
+  confirmedAt    DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  matches BillingReconciliationMatch[]
+
+  @@index([organisationId, status])
+}
+
+model BillingReconciliationMatch {
+  id              String                         @id @default(cuid())
+  sessionId       String
+  session         BillingReconciliationSession   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  invoiceId       String?
+  invoice         BillingInvoice?                @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
+  externalPaymentRef String?
+  amountCents     Int
+  confidenceBps   Int                            @default(0)
+  reasons         Json?
+  status          BillingReconciliationMatchStatus @default(suggested)
+  notes           String?
+  confirmedById   String?
+  createdAt       DateTime                       @default(now())
+  updatedAt       DateTime                       @updatedAt
+
+  @@index([sessionId])
+  @@index([invoiceId])
+  @@index([status])
+}
+
+model BillingIntegrationConnection {
+  id             String   @id @default(cuid())
+  organisationId String?
+  organisation   Organisation? @relation(fields: [organisationId], references: [id], onDelete: SetNull)
+  provider       String
+  status         String   @default("disconnected")
+  externalTenantId String?
+  configJson     Json?
+  lastSyncAt     DateTime?
+  lastError      String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([organisationId, provider])
+  @@unique([organisationId, provider])
+}
+
+model BillingInvoiceNumberSequence {
+  id        String   @id @default(cuid())
+  prefix    String   @default("MAP")
+  year      Int
+  lastValue Int      @default(0)
+  updatedAt DateTime @updatedAt
+
+  @@unique([prefix, year])
+}
+
+model BillingSafeguardAlert {
+  id             String   @id @default(cuid())
+  organisationId String?
+  entityType     String
+  entityId       String
+  ruleCode       String
+  severity       String   @default("review_required")
+  message        String
+  metadata       Json?
+  resolvedAt     DateTime?
+  createdAt      DateTime @default(now())
+
+  @@index([entityType, entityId])
+  @@index([ruleCode, createdAt])
+  @@index([resolvedAt])
 }
