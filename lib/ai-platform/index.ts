@@ -39,3 +39,9 @@ export { CAPABILITY_MATURITY } from "./types/maturity";
 export { getAlgorithmRegisterRefForCapability } from "./authority/algorithm-register-adapter";
 export { captureAiPlatformTelemetry } from "./telemetry/adapter";
 export { redactSensitiveText } from "./redaction/sensitive";
+export {
+  EVAL_SCENARIOS,
+  runAiEvaluationSuite,
+  runEvalScenario,
+  EVAL_DIMENSIONS,
+} from "./evaluations";

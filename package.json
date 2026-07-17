@@ -48,7 +48,9 @@
     "sync:replit-unified": "bash scripts/sync-replit-unified.sh",
     "check:replit-unified": "bash scripts/check-replit-unified-deployment.sh",
     "test:access-intelligence-next": "vitest run tests/access-intelligence-next",
-    "test:trust-fabric": "vitest run tests/trust-fabric"
+    "test:trust-fabric": "vitest run tests/trust-fabric",
+    "ai:evals": "tsx scripts/ai-platform/run-evals.ts",
+    "test:ai-platform": "vitest run tests/ai-platform"
   },
   "lint-staged": {
     "*.{js,ts,tsx}": [
