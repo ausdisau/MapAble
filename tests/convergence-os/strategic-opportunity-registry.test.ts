@@ -58,11 +58,11 @@ describe("Strategic opportunity registry honesty", () => {
     expect(seq).toMatch(/No Prisma product migration/i);
   });
 
-  it("marks process-local transport quotes as non-durable", () => {
+  it("marks transport quotes as Prisma-durable but not production_supported", () => {
     const quotes = CAPABILITY_SEEDS.find((c) => c.capabilityKey === "transport.quotes");
     expect(quotes).toBeTruthy();
-    expect(quotes!.persistenceType).toBe("process_local");
-    expect(quotes!.honesty.durable).toBe(false);
+    expect(quotes!.persistenceType).toBe("prisma");
+    expect(quotes!.honesty.durable).toBe(true);
     expect(quotes!.honesty.productionSupported).toBe(false);
     expect(quotes!.honesty.implemented).toBe(true);
 
@@ -70,8 +70,16 @@ describe("Strategic opportunity registry honesty", () => {
       join(ROOT, "lib/transport/quotes/quote-service.ts"),
       "utf8",
     );
-    expect(quoteSource).toMatch(/process-local/i);
-    expect(quoteSource).toMatch(/new Map</);
+    expect(quoteSource).toMatch(/Prisma-persisted/i);
+    expect(quoteSource).not.toMatch(/new Map</);
+    expect(
+      existsSync(
+        join(
+          ROOT,
+          "prisma/migrations/20260717150000_transport_quotes_persistent/migration.sql",
+        ),
+      ),
+    ).toBe(true);
   });
 
   it("records synthetic AccessCast and Starting Work honestly", () => {
@@ -133,13 +141,13 @@ describe("Strategic opportunity registry honesty", () => {
     }
   });
 
-  it("documents Care agreements and Transport process-local quotes in module docs", () => {
+  it("documents Care agreements and Transport persistent quotes in module docs", () => {
     const care = readFileSync(join(ROOT, "docs/modules/care.md"), "utf8");
     const transport = readFileSync(join(ROOT, "docs/modules/transport.md"), "utf8");
     expect(care).toMatch(/billing-handoff/i);
     expect(care).toMatch(/agreement/i);
     expect(care).not.toMatch(/Service agreement placeholder/i);
-    expect(transport).toMatch(/process-local/i);
+    expect(transport).toMatch(/TransportQuote/i);
     expect(transport).toMatch(/TransportTrip/i);
   });
 

@@ -142,25 +142,27 @@ export const PUBLIC_CLAIM_REGISTRY: PublicClaimEntry[] = [
     claimKey: "claim.transport_quotes_durable",
     surface: "transport",
     capabilityKey: "transport.quotes",
-    currentMaturity: "synthetic_demo",
+    currentMaturity: "controlled_pilot",
     publicClaimAllowed: false,
     prohibitedWording: [
       "production transport quotes",
-      "persistent quote store",
       "NDIS funding approved by quote",
+      "guaranteed accessible arrival from quote",
     ],
     allowedWording: [
-      "process-local quote until Prisma persistence",
+      "versioned transport quote",
       "quote is not funding approval",
-      "exact address after acceptance",
+      "exact address after acceptance and assignment window",
     ],
     evidenceRequired: [
       "Prisma TransportQuote persistence",
       "tenant isolation tests",
       "staged location disclosure tests",
+      "controlled_pilot exit",
     ],
     sourceOnMain: true,
-    notes: "Quotes use in-process Map (#327); durable store is programme PR 2.",
+    notes:
+      "Prisma TransportQuote + versions; not production_supported; acceptance ≠ provider exact address.",
   },
   {
     claimKey: "claim.starting_work_live",
