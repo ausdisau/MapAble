@@ -10,8 +10,8 @@ import { InvoiceStatusBadge } from "@/components/billing/InvoiceStatusBadge";
 import { PolicyValidationPanel } from "@/components/billing/PolicyValidationPanel";
 import { requireAuth } from "@/lib/auth/guards";
 import { formatAud } from "@/lib/billing/money";
-import { prisma } from "@/lib/prisma";
 import { mapableSectionCardClass } from "@/lib/brand/styles";
+import { prisma } from "@/lib/prisma";
 import type { BillingInvoiceState } from "@/types/billing";
 
 export default async function BillingInvoiceDetailPage({

@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { format } from "date-fns";
+import Link from "next/link";
 
 import { SupportTicketStatusPanel } from "@/components/support/SupportTicketStatusPanel";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";

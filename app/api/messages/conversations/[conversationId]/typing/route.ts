@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 
 import { requireApiSession } from "@/lib/api/auth-handler";
-import { canAccessMessageThread } from "@/lib/messages/message-access-policy";
 import { isAdminRole } from "@/lib/auth/roles";
+import { canAccessMessageThread } from "@/lib/messages/message-access-policy";
 
 const typingStore = new Map<string, Map<string, number>>();
 

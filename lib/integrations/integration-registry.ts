@@ -1,11 +1,16 @@
 import { maplibreAdapter } from "@/lib/integrations/adapters/maplibre-adapter";
+import { ndiaAdapter } from "@/lib/integrations/adapters/ndia-adapter";
 import { openSearchAdapter } from "@/lib/integrations/adapters/opensearch-adapter";
 import { openStreetMapAdapter } from "@/lib/integrations/adapters/openstreetmap-adapter";
-import { ndiaAdapter } from "@/lib/integrations/adapters/ndia-adapter";
 import { postgresAdapter } from "@/lib/integrations/adapters/postgres-adapter";
 import { stripeAdapter } from "@/lib/integrations/adapters/stripe-adapter";
 import { createStubAdapter } from "@/lib/integrations/adapters/stub-adapter";
 import { xeroAdapter } from "@/lib/integrations/adapters/xero-adapter";
+import {
+  getIntegrationConnection,
+  getPublicConnectionSummary,
+  listIntegrationConnections,
+} from "@/lib/integrations/integration-connection-service";
 import {
   IntegrationDisabledError,
   IntegrationHealthError,
@@ -19,11 +24,6 @@ import type {
   IntegrationKey,
   IntegrationPublicConfig,
 } from "@/lib/integrations/integration-types";
-import {
-  getIntegrationConnection,
-  getPublicConnectionSummary,
-  listIntegrationConnections,
-} from "@/lib/integrations/integration-connection-service";
 
 const adapters = new Map<string, IntegrationAdapter>();
 

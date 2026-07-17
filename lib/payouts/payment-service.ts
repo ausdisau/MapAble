@@ -9,9 +9,9 @@ import {
 import { createDraftInvoice } from "@/lib/billing-core/invoice-service";
 import { payoutPolicyDefaults } from "@/lib/payouts/config";
 import { transferGroupForBooking } from "@/lib/payouts/payout-policy";
+import { checkDuplicateActivePayment } from "@/lib/payouts/price-rules";
 import { calculatePayoutSplits } from "@/lib/payouts/split-calculator";
 import type { CreateBookingPaymentInput } from "@/lib/payouts/types";
-import { checkDuplicateActivePayment } from "@/lib/payouts/price-rules";
 import { prisma } from "@/lib/prisma";
 
 export async function createBookingPayment(input: CreateBookingPaymentInput) {

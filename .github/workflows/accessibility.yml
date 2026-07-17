@@ -1,0 +1,54 @@
+name: Accessibility
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: a11y-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  accessibility:
+    name: Accessibility
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      NODE_OPTIONS: --max-old-space-size=6144
+      NEXTAUTH_SECRET: ci-nextauth-secret-not-for-production-use-32chars
+      NEXTAUTH_URL: http://localhost:3000
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mapable_a11y?schema=public
+      DIRECT_URL: postgresql://postgres:postgres@localhost:5432/mapable_a11y?schema=public
+      # Public shells only when DB unavailable; auth routes skip honestly
+      A11Y_SKIP_AUTH_ROUTES: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.12.1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Prisma generate
+        run: pnpm exec prisma generate
+
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Build
+        run: pnpm build
+
+      - name: Axe smoke (public + documented auth skips)
+        env:
+          PLAYWRIGHT_WEB_SERVER: pnpm start
+          A11Y_SKIP_AUTH_ROUTES: "1"
+        run: pnpm test:a11y

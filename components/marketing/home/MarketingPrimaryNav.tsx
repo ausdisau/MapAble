@@ -6,8 +6,8 @@ import React, { useEffect, useRef, useState } from "react";
 
 import { LogoMark } from "@/components/marketing/mapable-care-shared";
 import { MAPABLE_DONATION_URL } from "@/lib/brand/constants";
-import { mapableCareFocusRing } from "@/lib/marketing/mapable-care-tokens";
 import { marketingFeatureRoutes } from "@/lib/marketing/mapable-care-routes";
+import { mapableCareFocusRing } from "@/lib/marketing/mapable-care-tokens";
 
 function useDismissOnOutsideAndEscape(
   open: boolean,

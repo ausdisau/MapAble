@@ -1,5 +1,5 @@
-import type { BookingSearchHit, BookingSnapshot } from "./types";
 import { chunkBookingSnapshot } from "./chunker";
+import type { BookingSearchHit, BookingSnapshot } from "./types";
 
 const STOP_WORDS = new Set([
   "the",

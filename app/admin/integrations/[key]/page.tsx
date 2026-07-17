@@ -2,8 +2,8 @@ import { notFound } from "next/navigation";
 
 import { IntegrationConfigPanel } from "@/components/integrations/IntegrationConfigPanel";
 import { requireAdmin } from "@/lib/auth/guards";
-import { getIntegrationPublic } from "@/lib/integrations/integration-registry";
 import { listIntegrationEvents } from "@/lib/integrations/integration-event-service";
+import { getIntegrationPublic } from "@/lib/integrations/integration-registry";
 
 export default async function AdminIntegrationDetailPage({
   params,

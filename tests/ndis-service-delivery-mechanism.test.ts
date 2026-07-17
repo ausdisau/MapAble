@@ -1,12 +1,12 @@
 import { describe, expect, it, vi } from "vitest";
 
 import * as ndisServiceDeliveryConfig from "@/lib/config/ndis-service-delivery";
+import { validateDeliveryAuthorizationForClaim } from "@/lib/ndis/service-delivery/delivery-event-service";
 import {
   defaultAuthorizationTypeForRoute,
   getDeliveryMechanism,
   listDeliveryMechanisms,
 } from "@/lib/ndis/service-delivery/mechanism-catalog";
-import { validateDeliveryAuthorizationForClaim } from "@/lib/ndis/service-delivery/delivery-event-service";
 
 describe("NDIS service delivery mechanism catalog", () => {
   it("lists eight delivery mechanisms", () => {

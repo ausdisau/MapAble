@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 
-import { fetchProactiveChipLabels } from "@/lib/search/proactive-suggestions-client";
 import { HERO_SUGGESTED_SEARCHES_FALLBACK } from "@/lib/provider-finder/filters";
+import { fetchProactiveChipLabels } from "@/lib/search/proactive-suggestions-client";
 import type { AutocompleteContext } from "@/types/search";
 
 export function useProactiveChipSuggestions(context: AutocompleteContext) {

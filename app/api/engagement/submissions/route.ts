@@ -1,4 +1,4 @@
-import { requireApiPermission, requireApiSession } from "@/lib/api/auth-handler";
+import { requireApiPermission } from "@/lib/api/auth-handler";
 import { jsonError, jsonOk } from "@/lib/api/response";
 import { isEngagementPlatformEnabled } from "@/lib/config/engagement";
 import {

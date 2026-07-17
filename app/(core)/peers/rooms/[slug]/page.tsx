@@ -3,8 +3,8 @@ import { notFound } from "next/navigation";
 
 import { CorePageHeader } from "@/components/core/CorePageHeader";
 import { PeersThreadList } from "@/components/mapable-peers/PeersThreadList";
-import { getPeersRoom, PEERS_ROOMS } from "@/lib/mapable-peers/rooms";
 import { getPeersLinkHelpers } from "@/lib/mapable-peers/peers-request";
+import { getPeersRoom, PEERS_ROOMS } from "@/lib/mapable-peers/rooms";
 import { threadsForRoom } from "@/lib/mapable-peers/seed-threads";
 
 export function generateStaticParams() {

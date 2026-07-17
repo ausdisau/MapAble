@@ -111,20 +111,22 @@ export async function completeTrainingModule(
   userId: string,
   answers: number[]
 ) {
-  const module = await prisma.workerTrainingModule.findUnique({
+  const trainingModule = await prisma.workerTrainingModule.findUnique({
     where: { id: moduleId },
   });
-  if (!module) throw new Error("Module not found");
+  if (!trainingModule) throw new Error("Module not found");
 
-  const quiz = module.quizQuestions as Array<{ correctIndex: number }>;
+  const quiz = trainingModule.quizQuestions as Array<{ correctIndex: number }>;
   const score = scoreQuiz(quiz, answers);
 
-  if (score < module.passingScore) {
-    throw new Error(`Score ${score}% below passing threshold of ${module.passingScore}%`);
+  if (score < trainingModule.passingScore) {
+    throw new Error(
+      `Score ${score}% below passing threshold of ${trainingModule.passingScore}%`
+    );
   }
 
   const expiresAt = new Date();
-  expiresAt.setMonth(expiresAt.getMonth() + module.expiryMonths);
+  expiresAt.setMonth(expiresAt.getMonth() + trainingModule.expiryMonths);
 
   return prisma.workerTrainingCompletion.upsert({
     where: { moduleId_userId: { moduleId, userId } },

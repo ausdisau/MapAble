@@ -1,6 +1,6 @@
+import { IncidentIntakeWizard } from "@/components/phase4/IncidentIntakeWizard";
 import { y1WedgeConfig } from "@/lib/config/y1-wedge";
 
-import { IncidentIntakeWizard } from "@/components/phase4/IncidentIntakeWizard";
 import LegacyNewIncidentPage from "./legacy-form";
 
 export default function NewSafetyIncidentPage() {

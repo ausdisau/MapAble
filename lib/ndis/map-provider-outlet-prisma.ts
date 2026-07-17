@@ -1,7 +1,7 @@
 import type { Prisma } from "@prisma/client";
 
-import type { ProviderOutlet } from "@/data/provider-outlets.types";
 import { mapOutletToProvider } from "@/app/provider-finder/outletToProvider";
+import type { ProviderOutlet } from "@/data/provider-outlets.types";
 
 export type ProviderOutletPrismaInput = {
   id: string;

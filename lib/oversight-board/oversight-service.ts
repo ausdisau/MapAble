@@ -1,10 +1,10 @@
 import { createAuditEvent } from "@/lib/audit/audit-event-service";
+import { phase10Config } from "@/lib/config/phase10";
 import {
   isOversightBoardV2Enabled,
   y4CivicPlatformConfig,
 } from "@/lib/config/y4-civic-platform";
 import { requireRatifiedCharter } from "@/lib/governance-charter/charter-gate-service";
-import { phase10Config } from "@/lib/config/phase10";
 import { prisma } from "@/lib/prisma";
 
 export async function scheduleOversightMeeting(params: {

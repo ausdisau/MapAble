@@ -1,11 +1,11 @@
 import React from "react";
 
-import type { CanvasModule } from "@/lib/canvas/canvas-data";
-import { digitalTwinCards } from "@/lib/canvas/canvas-data";
+import { BoundaryNotice } from "@/components/canvas/BoundaryNotice";
 import { CanvasBlockGrid } from "@/components/canvas/CanvasBlockGrid";
 import { CanvasPositioningBanner } from "@/components/canvas/CanvasPositioningBanner";
-import { BoundaryNotice } from "@/components/canvas/BoundaryNotice";
 import { DigitalTwinLayer } from "@/components/canvas/DigitalTwinLayer";
+import type { CanvasModule } from "@/lib/canvas/canvas-data";
+import { digitalTwinCards } from "@/lib/canvas/canvas-data";
 import { getBlocksForModule } from "@/lib/canvas/canvas-filters";
 
 const moduleLabels: Record<CanvasModule, string> = {

@@ -1,5 +1,5 @@
-import { formatAud } from "@/lib/billing/money";
 import { plainLanguageStatus } from "@/lib/billing/invoicing/state-machine";
+import { formatAud } from "@/lib/billing/money";
 import type { BillingInvoiceState } from "@/types/billing";
 
 export type InvoiceDocumentLine = {

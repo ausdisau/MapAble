@@ -4,6 +4,7 @@ import L from "leaflet";
 import { useMemo } from "react";
 import { Marker } from "react-leaflet";
 
+import type { DemoAccessTier } from "@/lib/demo/accessibility-places";
 import {
   categoryIconLetter,
   tierAbbreviation,
@@ -12,7 +13,6 @@ import {
   getPlaceCoordinates,
 } from "@/lib/map/accessibilityMapUtils";
 
-import type { DemoAccessTier } from "@/lib/demo/accessibility-places";
 
 export type AccessibilityMapMarkerPlace = CoordinatePlace & {
   id: string;

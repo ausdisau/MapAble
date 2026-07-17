@@ -1,8 +1,8 @@
 import type { AccessDisplayNameMode, AccessRatingValue } from "@prisma/client";
 
-import { createAuditEvent } from "@/lib/audit/audit-event-service";
 import { scanReviewForModerationFlags } from "@/lib/access-moderation/content-safety-rules";
 import { recomputePlaceRatingSummaries } from "@/lib/access-reviews/review-summary-service";
+import { createAuditEvent } from "@/lib/audit/audit-event-service";
 import { prisma } from "@/lib/prisma";
 
 const REVIEW_RATE_LIMIT_PER_HOUR = 10;

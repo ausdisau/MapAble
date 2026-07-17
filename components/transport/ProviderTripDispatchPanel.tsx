@@ -2,10 +2,10 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-import { VehicleSuitabilityWarning } from "@/components/phase3/VehicleSuitabilityWarning";
 import { formInputClass } from "@/components/forms/AccessibleFormField";
-import { Button } from "@/components/ui/button";
+import { VehicleSuitabilityWarning } from "@/components/phase3/VehicleSuitabilityWarning";
 import { TransportTripStatusBadge } from "@/components/transport/TransportTripStatusBadge";
+import { Button } from "@/components/ui/button";
 import type { TransportTripApiResponse } from "@/types/transport";
 
 type DriverOption = { id: string; displayName: string };

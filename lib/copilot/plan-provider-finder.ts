@@ -1,6 +1,6 @@
 import { runProviderFinderTurnWithAgentFlag } from "@/lib/agent/run-agent-turn";
-import type { CopilotActionPlan } from "@/lib/copilot/types";
 import { appendProviderFinderTurn } from "@/lib/agent-sessions/provider-finder-session";
+import type { CopilotActionPlan } from "@/lib/copilot/types";
 import {
   serialiseFinderPayload,
   type ProviderFinderSessionFields,

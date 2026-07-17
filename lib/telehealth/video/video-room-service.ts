@@ -1,9 +1,9 @@
 import { createAuditEvent } from "@/lib/audit/audit-event-service";
-import { getVideoProvider } from "@/lib/telehealth/video/video-adapter";
+import { prisma } from "@/lib/prisma";
 import { jitsiVideoAdapter } from "@/lib/telehealth/video/jitsi-video-adapter";
 import { livekitVideoAdapter } from "@/lib/telehealth/video/livekit-video-adapter";
 import { mockVideoAdapter } from "@/lib/telehealth/video/mock-video-adapter";
-import { prisma } from "@/lib/prisma";
+import { getVideoProvider } from "@/lib/telehealth/video/video-adapter";
 
 function getAdapter() {
   const p = getVideoProvider();

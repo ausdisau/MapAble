@@ -1,5 +1,5 @@
-import { PEERS_HERITAGE } from "@/lib/mapable-peers/copy";
 import { mapableSectionCardClass } from "@/lib/brand/styles";
+import { PEERS_HERITAGE } from "@/lib/mapable-peers/copy";
 
 export function PeersHeritage() {
   return (

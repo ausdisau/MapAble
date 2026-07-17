@@ -1,8 +1,8 @@
 import type { CareBookingStatus } from "@prisma/client";
 
 import { createAuditEvent } from "@/lib/audit/audit-event-service";
-import { assertProviderOrgAccess } from "@/lib/care/access-control";
 import type { CurrentUser } from "@/lib/auth/current-user";
+import { assertProviderOrgAccess } from "@/lib/care/access-control";
 import { prisma } from "@/lib/prisma";
 
 export async function recordCareBookingEvent(params: {
@@ -197,9 +197,7 @@ export async function getCareBookingForUser(
   });
   if (!booking) throw new Error("NOT_FOUND");
 
-  const { assertParticipantOwnsBooking, assertProviderOrgAccess } = await import(
-    "@/lib/care/access-control"
-  );
+  const { assertProviderOrgAccess } = await import("@/lib/care/access-control");
   const { isAdminRole } = await import("@/lib/auth/roles");
 
   if (isAdminRole(user.primaryRole)) return booking;

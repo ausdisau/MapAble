@@ -1,10 +1,10 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { disabilityServicesToolNames } from "@/lib/agent/disability-services-tools";
 import {
   DISABILITY_AGENT_OPERATIONS,
   disabilityAgentJsonError,
 } from "@/lib/api/disability-agent-api-contract";
-import { disabilityServicesToolNames } from "@/lib/agent/disability-services-tools";
 import { isDisabilityServicesAgentConfigured } from "@/lib/config/disability-services-agent";
 
 describe("disability agent API contract", () => {

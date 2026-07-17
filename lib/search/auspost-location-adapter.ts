@@ -1,7 +1,7 @@
 import { searchPostcodes } from "@/lib/auspost-pac/postcode-search-service";
 import type { LocationAutocompleteAdapter } from "@/lib/search/location-autocomplete-adapter";
-import type { AutocompleteSuggestion } from "@/types/search";
 import type { AusPostState } from "@/types/auspost-pac";
+import type { AutocompleteSuggestion } from "@/types/search";
 
 function titleCaseLocation(name: string): string {
   return name

@@ -1,7 +1,7 @@
 import { randomBytes } from "node:crypto";
 
-import { hash } from "bcryptjs";
 import type { MapAbleUserRole, User } from "@prisma/client";
+import { hash } from "bcryptjs";
 
 import { normalizeAuthEmail } from "@/lib/auth/auth-flow";
 import { prisma } from "@/lib/prisma";

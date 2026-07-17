@@ -1,7 +1,6 @@
 import { searchAgentConfig } from "@/lib/config/search-agent";
 import type { CopilotAgentMeta, CopilotProviderResult } from "@/lib/copilot/types";
 import {
-  applyInterpretationToFields,
   buildFinderSearchParams,
   type AppliedSearchFields,
 } from "@/lib/search/apply-interpretation";
@@ -79,7 +78,7 @@ export async function runProviderFinderAskTurn(
   const effectiveQuery = mergeProviderContextIntoQuery(userText, options);
   const turn = await runProviderFinderConversationTurn(effectiveQuery, session);
 
-  let applied = mergeAppliedFields(options?.priorApplied, turn.applied);
+  const applied = mergeAppliedFields(options?.priorApplied, turn.applied);
 
   if (options?.providerName && !applied.providerName) {
     applied.providerName = options.providerName;

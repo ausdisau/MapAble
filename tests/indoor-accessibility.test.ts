@@ -1,16 +1,16 @@
 import { describe, expect, it } from "vitest";
 
-import { evaluateIndoorFit } from "@/lib/indoor-accessibility/fit/indoor-fit-engine";
-import { DEFAULT_INDOOR_PREFERENCES } from "@/lib/indoor-accessibility/fit/types";
-import { planIndoorRoute } from "@/lib/indoor-accessibility/routing/route-planner";
-import { assertPublicationTransition } from "@/lib/indoor-accessibility/publication/state-machine";
-import { resolveFeatureOperationalStatus } from "@/lib/indoor-accessibility/status/incident-resolver";
+import { getDemoFloorPlanDetail } from "@/lib/demo/floor-plan-fixture";
 import {
   signCheckpointToken,
   verifyCheckpointToken,
 } from "@/lib/indoor-accessibility/checkpoints/checkpoint-validator";
 import { getIndoorFeatureFlags } from "@/lib/indoor-accessibility/feature-flags";
-import { getDemoFloorPlanDetail } from "@/lib/demo/floor-plan-fixture";
+import { evaluateIndoorFit } from "@/lib/indoor-accessibility/fit/indoor-fit-engine";
+import { DEFAULT_INDOOR_PREFERENCES } from "@/lib/indoor-accessibility/fit/types";
+import { assertPublicationTransition } from "@/lib/indoor-accessibility/publication/state-machine";
+import { planIndoorRoute } from "@/lib/indoor-accessibility/routing/route-planner";
+import { resolveFeatureOperationalStatus } from "@/lib/indoor-accessibility/status/incident-resolver";
 
 describe("indoor feature flags", () => {
   it("returns typed flag map", () => {

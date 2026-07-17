@@ -1,7 +1,7 @@
 import { requireApiSession } from "@/lib/api/auth-handler";
 import { jsonOk } from "@/lib/api/response";
-import { listCoordinatorParticipants } from "@/lib/support-coordinator/relationship-service";
 import { hasPermission } from "@/lib/auth/permissions";
+import { listCoordinatorParticipants } from "@/lib/support-coordinator/relationship-service";
 
 export async function GET() {
   const user = await requireApiSession();

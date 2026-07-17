@@ -1,10 +1,6 @@
 import { requireApiSession } from "@/lib/api/auth-handler";
 import { jsonError, jsonOk } from "@/lib/api/response";
-import {
-  attestServiceDelivered,
-  confirmServiceForBooking,
-  disputeServiceForBooking,
-} from "@/lib/payouts/attestation-bridge";
+import { attestServiceDelivered } from "@/lib/payouts/attestation-bridge";
 import { prisma } from "@/lib/prisma";
 
 async function assertBookingAccess(bookingId: string, userId: string) {

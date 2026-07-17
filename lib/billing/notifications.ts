@@ -1,5 +1,5 @@
-import { notifyUser } from "@/lib/notifications/notification-service";
 import { plainLanguageStatus } from "@/lib/billing/invoicing/state-machine";
+import { notifyUser } from "@/lib/notifications/notification-service";
 import type { BillingInvoiceState } from "@/types/billing";
 
 export type BillingNotificationEvent =

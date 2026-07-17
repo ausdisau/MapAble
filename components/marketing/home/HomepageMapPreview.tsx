@@ -1,5 +1,5 @@
-import React from "react";
 import Link from "next/link";
+import React from "react";
 
 import { DEMO_ACCESS_PLACES } from "@/lib/demo/accessibility-places";
 import { homepageMapPreviewFilters } from "@/lib/marketing/mapable-care-combined-data";

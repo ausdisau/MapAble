@@ -1,18 +1,18 @@
 import { describe, expect, it } from "vitest";
 
+import { filterFeaturesForDisplay } from "@/components/accessibility-map/floor-plan/FloorPlanTextAlternative";
 import {
   getDemoFloorPlanDetail,
   getDemoFloorPlanSummaries,
   demoVenueHasFloorPlan,
 } from "@/lib/demo/floor-plan-fixture";
 import { isValidNormalizedPoint, normalizedToPercent } from "@/lib/floor-plan/coordinates";
+import { parseFloorPlanSearchParams, buildFloorPlanPath } from "@/lib/floor-plan/floor-plan-url-state";
+import { isRouteAvailable, sortFloors } from "@/lib/floor-plan/route-utils";
 import {
   floorPlanDocumentSchema,
   floorPlanFeatureSchema,
 } from "@/lib/floor-plan/schemas";
-import { isRouteAvailable, sortFloors } from "@/lib/floor-plan/route-utils";
-import { filterFeaturesForDisplay } from "@/components/accessibility-map/floor-plan/FloorPlanTextAlternative";
-import { parseFloorPlanSearchParams, buildFloorPlanPath } from "@/lib/floor-plan/floor-plan-url-state";
 
 describe("floor plan schemas", () => {
   it("parses valid normalized points", () => {

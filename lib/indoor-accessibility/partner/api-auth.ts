@@ -1,7 +1,7 @@
 import { createHash, timingSafeEqual } from "crypto";
 
-import { isIndoorFeatureEnabled } from "@/lib/indoor-accessibility/feature-flags";
 import { indoorApiError } from "@/lib/indoor-accessibility/api-errors";
+import { isIndoorFeatureEnabled } from "@/lib/indoor-accessibility/feature-flags";
 import { prisma } from "@/lib/prisma";
 
 export function hashPartnerApiKey(key: string): string {

@@ -6,12 +6,12 @@ import {
   TOOL_GET_BOOKING_CONTEXT,
   TOOL_SEARCH_BOOKINGS,
 } from "@/lib/agent/tools/booking-tools";
+import type { CurrentUser } from "@/lib/auth/current-user";
 import {
   explainScopedBookingStatus,
   getScopedBookingContext,
   searchScopedBookings,
 } from "@/lib/bookings/rag/search-service";
-import type { CurrentUser } from "@/lib/auth/current-user";
 
 export const bookingServicesToolNames = {
   searchBookings: TOOL_SEARCH_BOOKINGS,

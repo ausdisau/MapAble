@@ -5,8 +5,8 @@ import { useCallback, useEffect, useState, type ReactNode } from "react";
 
 import { AdminOpsShell } from "@/components/admin/back-of-house/AdminOpsShell";
 import { formInputClass } from "@/components/forms/AccessibleFormField";
-import { StatusBadge } from "@/components/ui/status-badge";
 import { Button } from "@/components/ui/button";
+import { StatusBadge } from "@/components/ui/status-badge";
 
 type Column<T> = {
   key: string;

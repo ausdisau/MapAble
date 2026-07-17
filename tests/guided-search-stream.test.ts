@@ -1,11 +1,11 @@
 import { readUIMessageStream } from "ai";
 import { describe, expect, it } from "vitest";
 
+import type { ProviderFinderAskTurn } from "@/lib/provider-finder/ask-bridge";
 import {
   buildFinderAgentStreamData,
   createFinderChatResponseStream,
 } from "@/lib/provider-finder/conversation/stream-assistant";
-import type { ProviderFinderAskTurn } from "@/lib/provider-finder/ask-bridge";
 
 function clarificationTurn(): ProviderFinderAskTurn {
   return {

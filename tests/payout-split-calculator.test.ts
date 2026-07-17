@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 
 import { payoutPolicyDefaults } from "@/lib/payouts/config";
-import { calculatePayoutSplits } from "@/lib/payouts/split-calculator";
 import { checkPriceRules } from "@/lib/payouts/price-rules";
+import { calculatePayoutSplits } from "@/lib/payouts/split-calculator";
 
 describe("calculatePayoutSplits", () => {
   it("allocates worker share with zero-fee pilot", () => {

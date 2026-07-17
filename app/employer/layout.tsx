@@ -1,5 +1,5 @@
-import { EmployerNav } from "@/components/layout/EmployerNav";
 import { AuthenticatedRoleAppShell } from "@/components/layout/AuthenticatedRoleAppShell";
+import { EmployerNav } from "@/components/layout/EmployerNav";
 import { requireAuth } from "@/lib/auth/guards";
 
 export const dynamic = "force-dynamic";

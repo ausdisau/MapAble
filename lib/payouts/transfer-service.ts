@@ -1,9 +1,9 @@
+import { isConnectPayoutsEnabled } from "@/lib/billing/config";
 import { writeBillingAuditLog } from "@/lib/billing-core/audit";
 import { isBillingStripeConfigured } from "@/lib/billing-core/config";
-import { isConnectPayoutsEnabled } from "@/lib/billing/config";
+import { isPayoutsEnabled } from "@/lib/payouts/config";
 import { splitTransferIdempotencyKey } from "@/lib/payouts/payout-policy";
 import { canReleasePayout } from "@/lib/payouts/readiness-service";
-import { isPayoutsEnabled } from "@/lib/payouts/config";
 import { prisma } from "@/lib/prisma";
 import { getStripeClient } from "@/lib/stripe/client";
 

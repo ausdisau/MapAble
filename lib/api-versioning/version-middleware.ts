@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
-import { y3NationalTrustConfig } from "@/lib/config/y3-national-trust";
 import { getApiVersionPolicy } from "@/lib/api-versioning/version-policy-service";
+import { y3NationalTrustConfig } from "@/lib/config/y3-national-trust";
 
 export type ResolvedApiVersion = "v1" | "v2";
 

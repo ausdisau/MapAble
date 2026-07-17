@@ -1,18 +1,18 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  isNominatimGeocodingConfigured,
-  isOpenStreetMapConfigured,
-} from "@/lib/config/openstreetmap";
-import {
   isOpenSearchConfigured,
   openSearchConfig,
 } from "@/lib/config/opensearch";
 import {
+  isNominatimGeocodingConfigured,
+  isOpenStreetMapConfigured,
+} from "@/lib/config/openstreetmap";
+import { isIntegrationEnvEnabled } from "@/lib/integrations/integration-feature-policy";
+import {
   getIntegrationAdapter,
   listRegisteredIntegrationKeys,
 } from "@/lib/integrations/integration-registry";
-import { isIntegrationEnvEnabled } from "@/lib/integrations/integration-feature-policy";
 import { SERVICE_CATEGORY_SEARCH_FIELDS } from "@/lib/search/service-category-index";
 
 function restoreEnv(key: string, value: string | undefined) {

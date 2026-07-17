@@ -1,6 +1,6 @@
-import { Chat } from "chat";
 import { createSlackAdapter } from "@chat-adapter/slack";
 import { createMemoryState } from "@chat-adapter/state-memory";
+import { Chat } from "chat";
 
 import { runProviderFinderAskTurn } from "@/lib/provider-finder/ask-bridge";
 import { streamFinderAssistantText } from "@/lib/provider-finder/conversation/stream-assistant";

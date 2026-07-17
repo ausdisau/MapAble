@@ -1,5 +1,5 @@
-import type { SchedulingAdapter } from "@/lib/scheduling/scheduling-adapter";
 import { internalSchedulingAdapter } from "@/lib/scheduling/internal-scheduling-adapter";
+import type { SchedulingAdapter } from "@/lib/scheduling/scheduling-adapter";
 
 export const calcomAdapter: SchedulingAdapter = {
   async listAvailability(practitionerId, from, to) {

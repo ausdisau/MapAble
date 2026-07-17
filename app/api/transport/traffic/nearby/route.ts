@@ -1,6 +1,6 @@
-import { isTfnswLiveTrafficAvailable } from "@/lib/config/tfnsw";
 import { requireApiPermission } from "@/lib/api/auth-handler";
 import { jsonOk } from "@/lib/api/response";
+import { isTfnswLiveTrafficAvailable } from "@/lib/config/tfnsw";
 import { tfnswNotConfiguredError } from "@/lib/tfnsw/tfnsw-api-error";
 import { buildTrafficAdvisoryForRoute } from "@/lib/tfnsw/traffic-advisory-service";
 import { handleTransportRouteError } from "@/lib/transport/transport-route-handler";

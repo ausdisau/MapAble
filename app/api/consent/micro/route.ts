@@ -1,5 +1,6 @@
 import { requireApiSession } from "@/lib/api/auth-handler";
 import { jsonError, jsonOk } from "@/lib/api/response";
+import { isAdminRole } from "@/lib/auth/roles";
 import {
   isMicroConsentV2Enabled,
   listMicroConsentsForParticipant,
@@ -9,7 +10,6 @@ import {
   exportConsentAuditCsv,
   type MicroConsentAction,
 } from "@/lib/consent/micro-consent-service";
-import { isAdminRole } from "@/lib/auth/roles";
 
 export async function GET(req: Request) {
   const user = await requireApiSession();

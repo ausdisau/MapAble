@@ -1,3 +1,7 @@
+import type {
+  AccessAccreditationTier,
+  AccessConfidenceLevel,
+} from "@prisma/client";
 import Link from "next/link";
 
 import { AccessConfidenceBadge } from "@/components/access/AccessConfidenceBadge";
@@ -6,10 +10,6 @@ import { AccessibilityDisclaimerPanel } from "@/components/access/AccessibilityD
 import { AccreditationSummaryPanel } from "@/components/access-accreditation/AccreditationSummaryPanel";
 import { CommunityReviewPreview } from "@/components/access-reviews/CommunityReviewPreview";
 import { ACCESS_LABELS } from "@/lib/access-map/copy";
-import type {
-  AccessAccreditationTier,
-  AccessConfidenceLevel,
-} from "@prisma/client";
 
 export function AccessPlaceProfile({
   place,

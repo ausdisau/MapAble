@@ -1,8 +1,9 @@
 import { createHmac } from "crypto";
 
+import type { MapAbleUserRole } from "@prisma/client";
+
 import { getMetabaseConfig, isMetabaseEnabled } from "@/lib/analytics/metabase/metabase-client";
 import { canAccessAnalyticsView } from "@/lib/data-governance/analytics-view-policy";
-import type { MapAbleUserRole } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 
 export async function createMetabaseEmbedToken(input: {

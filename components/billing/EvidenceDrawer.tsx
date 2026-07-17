@@ -36,7 +36,7 @@ export function EvidenceDrawer({
       ) : items.length === 0 ? (
         <p className="mt-2 text-sm text-slate-600">No evidence attached yet.</p>
       ) : (
-        <ul className="mt-4 space-y-3" role="list">
+        <ul className="mt-4 space-y-3">
           {items.map((item) => (
             <li
               key={item.id}

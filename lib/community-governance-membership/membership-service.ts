@@ -1,9 +1,9 @@
 import { createAuditEvent } from "@/lib/audit/audit-event-service";
-import { requireRatifiedCharter } from "@/lib/governance-charter/charter-gate-service";
 import {
   isCommunityGovernanceMembershipV2Enabled,
   ACCOUNTABILITY_TRANSPARENCY_DISCLAIMER,
 } from "@/lib/config/y5-rights-infrastructure";
+import { requireRatifiedCharter } from "@/lib/governance-charter/charter-gate-service";
 import { prisma } from "@/lib/prisma";
 
 const DEFAULT_TERM_MONTHS = 12;

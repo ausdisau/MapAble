@@ -1,9 +1,9 @@
 "use client";
 
-import L from "leaflet";
 import dynamic from "next/dynamic";
 import { useCallback, useMemo, useState } from "react";
 
+import { useUserLocation } from "@/hooks/useUserLocation";
 import type { AccessNeed } from "@/lib/access-fit/types";
 import type { DemoAccessPlace } from "@/lib/demo/accessibility-places";
 import {
@@ -12,7 +12,6 @@ import {
   getPlaceCoordinates,
   partitionPlacesByCoordinates,
 } from "@/lib/map/accessibilityMapUtils";
-import { useUserLocation } from "@/hooks/useUserLocation";
 
 const OpenStreetMapViewInner = dynamic(
   () =>

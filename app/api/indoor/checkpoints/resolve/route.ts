@@ -1,8 +1,10 @@
-import { isIndoorFeatureEnabled } from "@/lib/indoor-accessibility/feature-flags";
+import { z } from "zod";
+
 import { featureDisabledResponse, indoorApiError } from "@/lib/indoor-accessibility/api-errors";
 import { verifyCheckpointToken } from "@/lib/indoor-accessibility/checkpoints/checkpoint-validator";
+import { isIndoorFeatureEnabled } from "@/lib/indoor-accessibility/feature-flags";
 import { prisma } from "@/lib/prisma";
-import { z } from "zod";
+
 
 const resolveSchema = z.object({
   token: z.string().min(1),

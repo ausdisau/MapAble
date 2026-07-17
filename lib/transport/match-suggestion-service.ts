@@ -1,9 +1,9 @@
 import { prisma } from "@/lib/prisma";
+import { parseMobilityRequirements } from "@/lib/transport/mobility-schema";
 import {
   checkDriverEligibilityForTrip,
   checkVehicleEligibility,
 } from "@/lib/transport/transport-eligibility-service";
-import { parseMobilityRequirements } from "@/lib/transport/mobility-schema";
 
 export type TransportMatchSuggestion = {
   vehicleId: string;

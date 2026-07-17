@@ -1,16 +1,15 @@
 import { describe, expect, it } from "vitest";
 
-import { y3NationalTrustConfig } from "@/lib/config/y3-national-trust";
-import {
-  NON_ADVISORY_DISCLAIMER,
-  WORKER_ASSIST_DISCLAIMER,
-} from "@/lib/config/y3-national-trust";
 import {
   assertNonAdvisoryCopy,
   getCategoryGuidance,
 } from "@/lib/budget/budget-guidance-service";
-import { mapClaimsToWorkerStatuses } from "@/lib/trust-passport/issuer-adapter";
+import { y3NationalTrustConfig ,
+  NON_ADVISORY_DISCLAIMER,
+  WORKER_ASSIST_DISCLAIMER,
+} from "@/lib/config/y3-national-trust";
 import { validateWorkerAssistPrompt } from "@/lib/copilot/worker-assist-service";
+import { mapClaimsToWorkerStatuses } from "@/lib/trust-passport/issuer-adapter";
 
 describe("Y3 national trust config", () => {
   it("disables all Y3 features by default", () => {

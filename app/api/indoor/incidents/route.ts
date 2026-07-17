@@ -1,10 +1,11 @@
-import { requireApiSession } from "@/lib/api/auth-handler";
-import { isIndoorFeatureEnabled } from "@/lib/indoor-accessibility/feature-flags";
-import { featureDisabledResponse, indoorApiError } from "@/lib/indoor-accessibility/api-errors";
-import { canReportStatus, canVerifyStatus } from "@/lib/indoor-accessibility/permissions";
-import { recordIndoorAuditEvent } from "@/lib/indoor-accessibility/audit/indoor-audit-service";
-import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+
+import { requireApiSession } from "@/lib/api/auth-handler";
+import { featureDisabledResponse, indoorApiError } from "@/lib/indoor-accessibility/api-errors";
+import { recordIndoorAuditEvent } from "@/lib/indoor-accessibility/audit/indoor-audit-service";
+import { isIndoorFeatureEnabled } from "@/lib/indoor-accessibility/feature-flags";
+import { canReportStatus, canVerifyStatus } from "@/lib/indoor-accessibility/permissions";
+import { prisma } from "@/lib/prisma";
 
 const incidentSchema = z.object({
   placeId: z.string(),

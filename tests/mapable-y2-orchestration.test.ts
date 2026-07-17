@@ -1,9 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { y2OrchestrationConfig } from "@/lib/config/y2-orchestration";
 import {
   isBackupRecoveryEnabled,
   isMicroConsentActive,
+  RECONCILIATION_AMOUNT_TOLERANCE_CENTS,
+  y2OrchestrationConfig,
 } from "@/lib/config/y2-orchestration";
 import {
   MICRO_CONSENT_ACTIONS,
@@ -11,12 +12,13 @@ import {
   isMicroConsentV2Enabled,
 } from "@/lib/consent/micro-consent-service";
 import { whereOrganisationScope } from "@/lib/multi-tenant-admin/tenant-context";
-import { RECONCILIATION_AMOUNT_TOLERANCE_CENTS } from "@/lib/config/y2-orchestration";
 
 describe("Y2 orchestration config", () => {
   it("disables all Y2 features by default", () => {
     expect(y2OrchestrationConfig.backupRecoveryPilotEnabled).toBe(false);
-    expect(y2OrchestrationConfig.careTransportOrchestrationV2Enabled).toBe(false);
+    expect(y2OrchestrationConfig.careTransportOrchestrationV2Enabled).toBe(
+      false,
+    );
     expect(y2OrchestrationConfig.microConsentV2Enabled).toBe(false);
     expect(y2OrchestrationConfig.planManagerIntegrationEnabled).toBe(false);
     expect(y2OrchestrationConfig.supportCoordinatorPortalEnabled).toBe(false);
@@ -51,7 +53,7 @@ describe("Tenant scoping helpers", () => {
         tenantId: null,
         organisationId: "org_1",
         enabled: false,
-      })
+      }),
     ).toEqual({});
   });
 
@@ -61,7 +63,7 @@ describe("Tenant scoping helpers", () => {
         tenantId: "t_1",
         organisationId: "org_1",
         enabled: true,
-      })
+      }),
     ).toEqual({ organisationId: "org_1" });
   });
 });
@@ -91,7 +93,7 @@ describe("Backup recovery pilot idempotency", () => {
     ];
     expect(pipeline).toContain("awaiting_dispatch");
     expect(pipeline.indexOf("awaiting_dispatch")).toBeLessThan(
-      pipeline.indexOf("assigned")
+      pipeline.indexOf("assigned"),
     );
   });
 });

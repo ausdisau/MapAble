@@ -1,7 +1,7 @@
-import type { IntegrationAdapter } from "@/lib/integrations/integration-types";
 import { auditIntegrationAction } from "@/lib/integrations/integration-audit-service";
 import { getIntegrationConnection } from "@/lib/integrations/integration-connection-service";
 import { getIntegrationAdapter } from "@/lib/integrations/integration-registry";
+import type { IntegrationAdapter } from "@/lib/integrations/integration-types";
 import { prisma } from "@/lib/prisma";
 
 export async function runIntegrationHealthCheck(

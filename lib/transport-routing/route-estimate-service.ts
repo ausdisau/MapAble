@@ -1,16 +1,16 @@
 import type { TransportRoutingProvider } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
-import { getRoutingAdapter } from "@/lib/transport-routing/routing-provider-registry";
+import { buildTrafficAdvisoryForRoute } from "@/lib/tfnsw/traffic-advisory-service";
 import {
   buildRouteCacheKey,
   getCachedEstimate,
   rememberEstimate,
 } from "@/lib/transport-routing/route-cache-service";
-import { buildTrafficAdvisoryForRoute } from "@/lib/tfnsw/traffic-advisory-service";
+import { getRoutingAdapter } from "@/lib/transport-routing/routing-provider-registry";
+import type { TrafficAdvisory } from "@/types/tfnsw";
 import type { RouteEstimateInput } from "@/types/transport-routing";
 import { ROUTE_ADVISORY_DISCLAIMER } from "@/types/transport-routing";
-import type { TrafficAdvisory } from "@/types/tfnsw";
 
 export async function createRouteEstimate(params: {
   input: RouteEstimateInput;

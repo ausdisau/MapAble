@@ -11,7 +11,7 @@ export function PayoutTimeline({ events }: { events: TimelineEvent[] }) {
       <h2 id="payout-timeline-heading" className="text-lg font-semibold">
         Payout timeline
       </h2>
-      <ol className="mt-4 space-y-4 border-l-2 pl-4" role="list">
+      <ol className="mt-4 space-y-4 border-l-2 pl-4">
         {events.map((event) => (
           <li key={event.id}>
             <p className="font-medium">{event.label}</p>

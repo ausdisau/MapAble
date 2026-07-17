@@ -1,7 +1,7 @@
 import Link from "next/link";
 
-import { FinanceKpiGrid } from "@/components/billing/FinanceKpiGrid";
 import { BillingPageHeader } from "@/components/billing/BillingPageChrome";
+import { FinanceKpiGrid } from "@/components/billing/FinanceKpiGrid";
 import { requireAuth } from "@/lib/auth/guards";
 import { computeBillingOverviewKpis } from "@/lib/billing/overview/kpis";
 import { mapableSectionCardClass } from "@/lib/brand/styles";

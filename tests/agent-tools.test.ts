@@ -2,11 +2,11 @@ import { describe, expect, it, vi } from "vitest";
 
 import { runProviderFinderAgentTurn } from "@/lib/agent/run-agent-turn";
 import { resetProviderFinderSessionsForTests } from "@/lib/agent-sessions/provider-finder-session";
-import { mergeAppliedFields } from "@/lib/provider-finder/merge-applied";
 import {
   buildClarificationQuestion,
   needsProviderFinderClarification,
 } from "@/lib/provider-finder/clarification";
+import { mergeAppliedFields } from "@/lib/provider-finder/merge-applied";
 import { parseLocationForNdisSearch } from "@/lib/provider-finder/ndis-search-from-applied";
 
 vi.mock("@/lib/ingestion/ndis-providers-search", () => ({

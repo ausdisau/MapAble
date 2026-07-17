@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { format } from "date-fns";
+import Link from "next/link";
 import { useState } from "react";
 
 import { BillingStatusBadge } from "@/components/billing/BillingStatusBadge";

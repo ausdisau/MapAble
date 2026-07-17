@@ -37,20 +37,20 @@ This runs `pnpm install --frozen-lockfile` followed by `prisma generate`.
 
 ### Scripts
 
-| Command | Purpose |
-| --- | --- |
-| `pnpm dev` | Development server (Turbopack) |
-| `pnpm build` | Production build |
-| `pnpm start` | Production server |
-| `pnpm lint` / `pnpm lint:fix` | ESLint |
-| `pnpm type-check` | TypeScript |
-| `pnpm test` | Vitest |
-| `pnpm setup:cloud-agent` | Install locked dependencies and generate Prisma Client for cloud agents |
-| `pnpm check:integrations-env` | Validate optional integration env vars |
+| Command                       | Purpose                                                                 |
+| ----------------------------- | ----------------------------------------------------------------------- |
+| `pnpm dev`                    | Development server (Turbopack)                                          |
+| `pnpm build`                  | Production build                                                        |
+| `pnpm start`                  | Production server                                                       |
+| `pnpm lint` / `pnpm lint:fix` | ESLint                                                                  |
+| `pnpm type-check`             | TypeScript                                                              |
+| `pnpm test`                   | Vitest                                                                  |
+| `pnpm setup:cloud-agent`      | Install locked dependencies and generate Prisma Client for cloud agents |
+| `pnpm check:integrations-env` | Validate optional integration env vars                                  |
 
 ### Database
 
-The data model lives in a single schema: `prisma/schema.prisma`. Apply changes with `npx prisma migrate deploy` (or `npx prisma db push` in local dev).
+The data model lives in a single schema: `prisma/schema.prisma`. Apply reviewed migrations with `npx prisma migrate deploy` (production and shared environments). Use `pnpm db:migrate:dev` for local migration development. Do not use `prisma db push` against production.
 
 ## Project layout
 
@@ -106,56 +106,56 @@ Detailed guides live under `docs/`. This file is the only project README at the 
 
 ### Platform
 
-| Doc | Description |
-| --- | --- |
-| [docs/mapable/core.md](docs/mapable/core.md) | `/core` hub and integrations |
-| [docs/mapable/ui.md](docs/mapable/ui.md) | Core UI shell |
-| [docs/mapable/core-phases.md](docs/mapable/core-phases.md) | Phases 1–12 — routes, models, deploy |
-| [docs/mapable/cursor-prompts-phases-6-10.md](docs/mapable/cursor-prompts-phases-6-10.md) | Cursor prompt packs (phases 6–10) |
+| Doc                                                                                        | Description                           |
+| ------------------------------------------------------------------------------------------ | ------------------------------------- |
+| [docs/mapable/core.md](docs/mapable/core.md)                                               | `/core` hub and integrations          |
+| [docs/mapable/ui.md](docs/mapable/ui.md)                                                   | Core UI shell                         |
+| [docs/mapable/core-phases.md](docs/mapable/core-phases.md)                                 | Phases 1–12 — routes, models, deploy  |
+| [docs/mapable/cursor-prompts-phases-6-10.md](docs/mapable/cursor-prompts-phases-6-10.md)   | Cursor prompt packs (phases 6–10)     |
 | [docs/mapable/cursor-five-year-masterplan.md](docs/mapable/cursor-five-year-masterplan.md) | Cursor five-year strategic masterplan |
 
 ### Modules
 
-| Doc | Description |
-| --- | --- |
-| [docs/modules/bookings.md](docs/modules/bookings.md) | Bookings foundation |
-| [docs/modules/care.md](docs/modules/care.md) | Care MVP |
-| [docs/modules/case-management.md](docs/modules/case-management.md) | Case management (AI-assisted) |
-| [docs/modules/calendar.md](docs/modules/calendar.md) | Unified calendar |
-| [docs/modules/consent.md](docs/modules/consent.md) | Consent model |
-| [docs/modules/cross-module-orchestration.md](docs/modules/cross-module-orchestration.md) | Cross-module flows |
-| [docs/modules/incidents.md](docs/modules/incidents.md) | Incident reporting |
-| [docs/modules/jobs.md](docs/modules/jobs.md) | Inclusive jobs |
-| [docs/modules/privacy-and-audit.md](docs/modules/privacy-and-audit.md) | Privacy and audit |
-| [docs/modules/provider-capacity.md](docs/modules/provider-capacity.md) | Provider capacity |
-| [docs/modules/transport.md](docs/modules/transport.md) | Transport module |
-| [docs/modules/transport-scheduling.md](docs/modules/transport-scheduling.md) | Transport scheduling |
-| [docs/modules/accessibility.md](docs/modules/accessibility.md) | Accessibility profiles |
-| [docs/modules/admin-dashboard.md](docs/modules/admin-dashboard.md) | Admin dashboard |
+| Doc                                                                                      | Description                   |
+| ---------------------------------------------------------------------------------------- | ----------------------------- |
+| [docs/modules/bookings.md](docs/modules/bookings.md)                                     | Bookings foundation           |
+| [docs/modules/care.md](docs/modules/care.md)                                             | Care MVP                      |
+| [docs/modules/case-management.md](docs/modules/case-management.md)                       | Case management (AI-assisted) |
+| [docs/modules/calendar.md](docs/modules/calendar.md)                                     | Unified calendar              |
+| [docs/modules/consent.md](docs/modules/consent.md)                                       | Consent model                 |
+| [docs/modules/cross-module-orchestration.md](docs/modules/cross-module-orchestration.md) | Cross-module flows            |
+| [docs/modules/incidents.md](docs/modules/incidents.md)                                   | Incident reporting            |
+| [docs/modules/jobs.md](docs/modules/jobs.md)                                             | Inclusive jobs                |
+| [docs/modules/privacy-and-audit.md](docs/modules/privacy-and-audit.md)                   | Privacy and audit             |
+| [docs/modules/provider-capacity.md](docs/modules/provider-capacity.md)                   | Provider capacity             |
+| [docs/modules/transport.md](docs/modules/transport.md)                                   | Transport module              |
+| [docs/modules/transport-scheduling.md](docs/modules/transport-scheduling.md)             | Transport scheduling          |
+| [docs/modules/accessibility.md](docs/modules/accessibility.md)                           | Accessibility profiles        |
+| [docs/modules/admin-dashboard.md](docs/modules/admin-dashboard.md)                       | Admin dashboard               |
 
 Phase 2 and Phase 4 capabilities (messaging, documents, matching, timesheets, Stripe/Xero placeholders, etc.) are documented in [core phases](docs/mapable/core-phases.md#phase-2) and [phase 4](docs/mapable/core-phases.md#phase-4).
 
 ### Operations and integrations
 
-| Doc | Description |
-| --- | --- |
-| [docs/design-system.md](docs/design-system.md) | UI tokens, components, module accents, maps |
-| [docs/operations/neon.md](docs/operations/neon.md) | Neon Postgres |
+| Doc                                                                    | Description                                                  |
+| ---------------------------------------------------------------------- | ------------------------------------------------------------ |
+| [docs/design-system.md](docs/design-system.md)                         | UI tokens, components, module accents, maps                  |
+| [docs/operations/neon.md](docs/operations/neon.md)                     | Neon Postgres                                                |
 | [docs/operations/replit-imports.md](docs/operations/replit-imports.md) | Import MapAble Repls (Care, Unified, Transport, Marketplace) |
-| [docs/billing.md](docs/billing.md) | Billing |
-| [docs/integrations/environment.md](docs/integrations/environment.md) | Integration environment variables |
-| [docs/safety.md](docs/safety.md) | Safety and incident centre |
-| [docs/av-mcp.md](docs/av-mcp.md) | AV / MCP transport |
-| [docs/ndia-provider-claiming.md](docs/ndia-provider-claiming.md) | NDIA provider claiming |
-| [docs/ROUTING_SLUGS.md](docs/ROUTING_SLUGS.md) | Route slugs |
+| [docs/billing.md](docs/billing.md)                                     | Billing                                                      |
+| [docs/integrations/environment.md](docs/integrations/environment.md)   | Integration environment variables                            |
+| [docs/safety.md](docs/safety.md)                                       | Safety and incident centre                                   |
+| [docs/av-mcp.md](docs/av-mcp.md)                                       | AV / MCP transport                                           |
+| [docs/ndia-provider-claiming.md](docs/ndia-provider-claiming.md)       | NDIA provider claiming                                       |
+| [docs/ROUTING_SLUGS.md](docs/ROUTING_SLUGS.md)                         | Route slugs                                                  |
 
 ### QA and mobile
 
-| Doc | Description |
-| --- | --- |
-| [docs/qa/phase-3.md](docs/qa/phase-3.md) | Phase 3 QA checklist |
-| [mobile-contracts/MOBILE_APP_ARCHITECTURE.md](mobile-contracts/MOBILE_APP_ARCHITECTURE.md) | Mobile architecture |
-| [mobile-contracts/MOBILE_SCREEN_MAP.md](mobile-contracts/MOBILE_SCREEN_MAP.md) | Mobile screen map |
+| Doc                                                                                        | Description          |
+| ------------------------------------------------------------------------------------------ | -------------------- |
+| [docs/qa/phase-3.md](docs/qa/phase-3.md)                                                   | Phase 3 QA checklist |
+| [mobile-contracts/MOBILE_APP_ARCHITECTURE.md](mobile-contracts/MOBILE_APP_ARCHITECTURE.md) | Mobile architecture  |
+| [mobile-contracts/MOBILE_SCREEN_MAP.md](mobile-contracts/MOBILE_SCREEN_MAP.md)             | Mobile screen map    |
 
 ## Code quality
 

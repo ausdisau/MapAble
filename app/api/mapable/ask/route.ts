@@ -1,16 +1,16 @@
 import { runBookingServicesAgentTurn } from "@/lib/agent/booking-services-agent";
 import { runProviderFinderTurnWithAgentFlag } from "@/lib/agent/run-agent-turn";
-import { shouldRouteToBookingAgent } from "@/lib/bookings/rag/copilot-route";
+import { createAgentRun } from "@/lib/agent-ops/agent-run-service";
+import { requireApiSession } from "@/lib/api/auth-handler";
 import {
   DISABILITY_AGENT_OPERATIONS,
   disabilityAgentJsonError,
   disabilityAgentJsonOk,
 } from "@/lib/api/disability-agent-api-contract";
-import { requireApiSession } from "@/lib/api/auth-handler";
-import { getOptionalApiUser } from "@/lib/api/optional-session";
 import { checkIpRateLimit, getClientIp } from "@/lib/api/ip-rate-limit";
-import { createAgentRun } from "@/lib/agent-ops/agent-run-service";
+import { getOptionalApiUser } from "@/lib/api/optional-session";
 import { apiForbidden } from "@/lib/auth/guards";
+import { shouldRouteToBookingAgent } from "@/lib/bookings/rag/copilot-route";
 import { planCopilotActions } from "@/lib/copilot/actionPlanner";
 import { buildCopilotContext } from "@/lib/copilot/contextBuilder";
 import { applyGuardrails } from "@/lib/copilot/guardrails";
@@ -23,13 +23,13 @@ import type {
   CopilotProviderResult,
 } from "@/lib/copilot/types";
 import {
-  serialiseFinderPayload,
-  type ProviderFinderSessionFields,
-} from "@/lib/provider-finder/ask-bridge";
-import {
   assertCanAccessParticipantData,
   ParticipantAccessError,
 } from "@/lib/prms/participant-access";
+import {
+  serialiseFinderPayload,
+  type ProviderFinderSessionFields,
+} from "@/lib/provider-finder/ask-bridge";
 
 const OPERATION = DISABILITY_AGENT_OPERATIONS.mapableAskQuery;
 const MAX_QUERY_LENGTH = 2000;

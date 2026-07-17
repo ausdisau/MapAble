@@ -1,10 +1,10 @@
 import { FederatedResearchAdminForm } from "@/app/admin/federated-research/FederatedResearchAdminForm";
-import { listFederatedAgreements } from "@/lib/federated-research/federation-service";
 import { requireAdmin } from "@/lib/auth/guards";
 import {
   FEDERATED_RESEARCH_DISCLAIMER,
   isFederatedResearchV2Enabled,
 } from "@/lib/config/y5-rights-infrastructure";
+import { listFederatedAgreements } from "@/lib/federated-research/federation-service";
 
 export default async function FederatedResearchPage() {
   await requireAdmin();

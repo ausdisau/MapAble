@@ -1,5 +1,5 @@
-import { searchLocations } from "@/lib/search/location-autocomplete-adapter";
 import { listProactiveLocations } from "@/lib/search/local-location-adapter";
+import { searchLocations } from "@/lib/search/location-autocomplete-adapter";
 import {
   listProactiveProviders,
   searchProviders,

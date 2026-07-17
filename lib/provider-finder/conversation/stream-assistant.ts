@@ -8,12 +8,11 @@ import {
   isSearchInterpreterConfigured,
   searchInterpreterConfig,
 } from "@/lib/config/search-interpreter";
+import type { CopilotAgentMeta } from "@/lib/copilot/types";
 import {
   getInterpreterEngineId,
   getInterpreterModel,
 } from "@/lib/search/interpreter/get-model";
-
-import type { CopilotAgentMeta } from "@/lib/copilot/types";
 import type { FinderAgentData } from "@/types/provider-finder-chat";
 
 import type { ProviderFinderAskTurn } from "../ask-bridge";

@@ -1,0 +1,36 @@
+name: Production claims
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  production-claims:
+    name: Production claims
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.12.1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Production claims scan
+        run: pnpm exec tsx scripts/ci/check-production-claims.ts
+
+      - name: Feature dependency / build lint gate markers
+        run: pnpm exec tsx scripts/ci/check-feature-dependencies.ts
+
+      - name: Migration integrity (includes prod runbook db push ban)
+        run: pnpm exec tsx scripts/ci/check-migration-integrity.ts

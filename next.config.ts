@@ -17,8 +17,9 @@ const nextConfig: NextConfig = {
     ];
   },
   eslint: {
-    dirs: ["app", "components", "lib"],
-    ignoreDuringBuilds: true,
+    // Build fails when lint fails (ignoreDuringBuilds removed — remediation PR 1).
+    // tests/ linted via `pnpm lint:tests` (tracked debt; not ignored during builds for app code).
+    dirs: ["app", "components", "lib", "schemas", "scripts/ci"],
   },
   typescript: {
     ignoreBuildErrors: false, // Ensures type safety at build time

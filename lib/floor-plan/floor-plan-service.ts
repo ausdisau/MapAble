@@ -13,7 +13,7 @@ import {
 /** List published floor plan summaries for a venue. */
 export async function listVenueFloorPlans(
   venueId: string,
-  venueName?: string,
+  _venueName?: string,
 ): Promise<VenueFloorPlanListResponse | null> {
   // Demo venues
   const demo = getDemoFloorPlanSummaries(venueId);

@@ -1,6 +1,6 @@
+import Link from "next/link";
 import React from "react";
 
-import Link from "next/link";
 
 import { Badge } from "@/components/ui/badge";
 import type { CanvasBlock, CanvasStatus } from "@/lib/canvas/canvas-data";

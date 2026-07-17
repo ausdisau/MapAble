@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 
 import { ConsentSharingPanel } from "@/components/consent/ConsentSharingPanel";
@@ -126,12 +127,12 @@ export function MatchCandidateCard({
           {mode === "participant" ? "Not a good fit" : "Reject"}
         </Button>
         {mode === "participant" ? (
-          <a
+          <Link
             href="/dashboard/safety/incidents/new"
             className="inline-flex min-h-11 items-center text-sm text-primary hover:underline"
           >
             Dispute this match
-          </a>
+          </Link>
         ) : null}
       </div>
     </article>

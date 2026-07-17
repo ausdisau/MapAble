@@ -1,7 +1,7 @@
 import Link from "next/link";
 
-import { ProviderWorkerDetailActions } from "@/components/provider/ProviderWorkerDetailActions";
 import { StatusTextBadge } from "@/components/phase3/StatusTextBadge";
+import { ProviderWorkerDetailActions } from "@/components/provider/ProviderWorkerDetailActions";
 import { getUserOrganisationIds } from "@/lib/api/phase3-scope";
 import { requireAuth } from "@/lib/auth/guards";
 import { hasPermission } from "@/lib/auth/permissions";

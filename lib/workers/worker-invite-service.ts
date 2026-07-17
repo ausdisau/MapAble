@@ -2,11 +2,10 @@ import { randomBytes } from "crypto";
 
 import type { WorkerOrganisationInviteStatus } from "@prisma/client";
 
-import { OrganisationAccessError } from "@/lib/api/phase3-scope";
-import { assertOrganisationAccess } from "@/lib/api/phase3-scope";
+import { OrganisationAccessError , assertOrganisationAccess } from "@/lib/api/phase3-scope";
+import { createAuditEvent } from "@/lib/audit/audit-event-service";
 import { normalizeAuthEmail } from "@/lib/auth/auth-flow";
 import type { CurrentUser } from "@/lib/auth/current-user";
-import { createAuditEvent } from "@/lib/audit/audit-event-service";
 import { refreshWorkerOnboarding } from "@/lib/onboarding/onboarding-service";
 import { prisma } from "@/lib/prisma";
 import { syncWorkersOnboardingTask } from "@/lib/provider-onboarding-automation/onboarding-service";

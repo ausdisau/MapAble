@@ -1,12 +1,12 @@
 import Link from "next/link";
 
 import { KmlImportForm } from "@/components/access-import/KmlImportForm";
-import { requireAdmin } from "@/lib/auth/guards";
 import {
   ACCESS_LEGACY_GEOJSON_FILENAME,
   ACCESS_LEGACY_KML_FILENAME,
   MAPABLE_MY_MAPS_KML_URL,
 } from "@/lib/access-map/copy";
+import { requireAdmin } from "@/lib/auth/guards";
 import { prisma } from "@/lib/prisma";
 
 export default async function AdminAccessImportPage() {

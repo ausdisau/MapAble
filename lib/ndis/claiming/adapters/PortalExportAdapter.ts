@@ -1,8 +1,8 @@
-import type { NdisClaimingAdapter } from "@/lib/ndis/claiming/types";
 import {
   buildBulkPaymentRequestExport,
   checksumExport,
 } from "@/lib/ndis/claiming/exporters/bulkPaymentRequestExporter";
+import type { NdisClaimingAdapter } from "@/lib/ndis/claiming/types";
 import { prisma } from "@/lib/prisma";
 
 /**

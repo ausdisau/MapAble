@@ -1,9 +1,9 @@
 import { isOpenSearchConfigured, openSearchConfig } from "@/lib/config/opensearch";
-import { openSearchFetch } from "@/lib/search/opensearch-client";
 import type {
   IntegrationAdapter,
   IntegrationHealthResult,
 } from "@/lib/integrations/integration-types";
+import { openSearchFetch } from "@/lib/search/opensearch-client";
 
 export const openSearchAdapter: IntegrationAdapter = {
   key: "opensearch",

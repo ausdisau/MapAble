@@ -7,8 +7,8 @@ import { PeersPrincipleList } from "@/components/mapable-peers/PeersPrincipleLis
 import { PeersRelatedLinks } from "@/components/mapable-peers/PeersRelatedLinks";
 import { PeersRoomGrid } from "@/components/mapable-peers/PeersRoomGrid";
 import { PEERS_DESCRIPTION, PEERS_TAGLINE } from "@/lib/mapable-peers/copy";
-import { PEERS_ROOMS } from "@/lib/mapable-peers/rooms";
 import { getPeersLinkHelpers } from "@/lib/mapable-peers/peers-request";
+import { PEERS_ROOMS } from "@/lib/mapable-peers/rooms";
 
 export const metadata = {
   title: "MapAble PEERS",

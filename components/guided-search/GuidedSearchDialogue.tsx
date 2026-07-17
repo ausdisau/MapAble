@@ -1,10 +1,9 @@
 "use client";
 
-import React from "react";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useId, useRef, useState } from "react";
+import React, { useCallback, useEffect, useId, useRef, useState } from "react";
 
 import { cn } from "@/app/lib/utils";
 import { AskProviderResultSnippets } from "@/components/provider-finder/AskProviderResultSnippets";

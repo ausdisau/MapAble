@@ -1,7 +1,7 @@
+import { listPublishedAlgorithms } from "@/lib/algorithm-register/register-service";
 import {
   ALGORITHM_TRANSPARENCY_DISCLAIMER,
 } from "@/lib/config/y4-civic-platform";
-import { listPublishedAlgorithms } from "@/lib/algorithm-register/register-service";
 
 export default async function AlgorithmsPage() {
   const algorithms = await listPublishedAlgorithms();

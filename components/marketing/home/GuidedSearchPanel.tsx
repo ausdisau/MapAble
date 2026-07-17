@@ -3,8 +3,8 @@
 import React, { useId, useRef } from "react";
 
 import { GuidedSearchDialogue } from "@/components/guided-search/GuidedSearchDialogue";
-import { SearchIcon } from "@/components/marketing/mapable-care-icons";
 import { useGuidedSearchLauncher } from "@/components/marketing/home/use-guided-search-launcher";
+import { SearchIcon } from "@/components/marketing/mapable-care-icons";
 import {
   guidedSearchPanelCopy,
   guidedSearchPromptChips,

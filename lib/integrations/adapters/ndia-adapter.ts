@@ -1,9 +1,9 @@
+import { phase5Config } from "@/lib/config/phase5";
+import { isIntegrationEnvEnabled } from "@/lib/integrations/integration-feature-policy";
 import type {
   IntegrationAdapter,
   IntegrationHealthResult,
 } from "@/lib/integrations/integration-types";
-import { isIntegrationEnvEnabled } from "@/lib/integrations/integration-feature-policy";
-import { phase5Config } from "@/lib/config/phase5";
 
 export const ndiaAdapter: IntegrationAdapter = {
   key: "ndia",

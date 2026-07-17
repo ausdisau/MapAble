@@ -1,7 +1,7 @@
 import React from "react";
 
-import type { CanvasBlock } from "@/lib/canvas/canvas-data";
 import { CanvasBlockCard } from "@/components/canvas/CanvasBlockCard";
+import type { CanvasBlock } from "@/lib/canvas/canvas-data";
 import {
   mapablePublicEyebrowClass,
   mapablePublicPageContainerClass,

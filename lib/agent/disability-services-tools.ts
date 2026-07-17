@@ -11,12 +11,12 @@ import {
 } from "@/lib/agent/tools/index";
 import { disabilityServicesAgentConfig } from "@/lib/config/disability-services-agent";
 import { searchNdisProviders } from "@/lib/ingestion/ndis-providers-search";
-import { interpretSearchQuery } from "@/lib/search/interpreter";
-import { applyInterpretationToFields } from "@/lib/search/apply-interpretation";
 import {
   buildNdisSearchParamsFromApplied,
   ndisRowToCopilotResult,
 } from "@/lib/provider-finder/ndis-search-from-applied";
+import { applyInterpretationToFields } from "@/lib/search/apply-interpretation";
+import { interpretSearchQuery } from "@/lib/search/interpreter";
 
 export const disabilityServicesToolNames = {
   interpretFinderQuery: TOOL_INTERPRET_FINDER_QUERY,

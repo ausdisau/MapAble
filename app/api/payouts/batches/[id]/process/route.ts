@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { requireApiAdminScope } from "@/lib/api/auth-handler";
-import { jsonError, jsonOk, zodErrorResponse } from "@/lib/api/response";
+import { jsonOk, zodErrorResponse } from "@/lib/api/response";
 import {
   approvePayoutBatch,
   createPayoutBatchFromReadySplits,

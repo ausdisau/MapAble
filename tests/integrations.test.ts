@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
+import { getPublicConnectionSummary } from "@/lib/integrations/integration-connection-service";
 import {
   IntegrationDisabledError,
 } from "@/lib/integrations/integration-error";
@@ -12,7 +13,6 @@ import {
   listRegisteredIntegrationKeys,
   requireIntegrationEnabled,
 } from "@/lib/integrations/integration-registry";
-import { getPublicConnectionSummary } from "@/lib/integrations/integration-connection-service";
 
 describe("integration registry", () => {
   it("returns configured adapters", () => {

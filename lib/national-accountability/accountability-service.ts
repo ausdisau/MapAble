@@ -1,12 +1,11 @@
 import { Prisma } from "@prisma/client";
 
-import { createAuditEvent } from "@/lib/audit/audit-event-service";
-import { requireRatifiedCharter } from "@/lib/governance-charter/charter-gate-service";
+import { phase12Config } from "@/lib/config/phase12";
 import {
   isFederatedAccountabilityV2Enabled,
   ACCOUNTABILITY_TRANSPARENCY_DISCLAIMER,
 } from "@/lib/config/y5-rights-infrastructure";
-import { phase12Config } from "@/lib/config/phase12";
+import { requireRatifiedCharter } from "@/lib/governance-charter/charter-gate-service";
 import { prisma } from "@/lib/prisma";
 
 export async function publishAccountabilityReport(params: {

@@ -1,11 +1,11 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { bookingServicesToolNames } from "@/lib/agent/booking-services-tools";
-import { isBookingServicesAgentConfigured } from "@/lib/config/booking-services-agent";
 import {
   isBookingLookupQuery,
   shouldRouteToBookingAgent,
 } from "@/lib/bookings/rag/copilot-route";
+import { isBookingServicesAgentConfigured } from "@/lib/config/booking-services-agent";
 
 describe("booking services agent config", () => {
   const env = process.env;

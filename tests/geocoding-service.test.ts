@@ -14,8 +14,8 @@ vi.mock("@/lib/map/nominatim-server", () => ({
   forwardGeocodeAustralia: vi.fn(async () => ({ lat: -33.87, lng: 151.21 })),
 }));
 
-import { forwardGeocodeAustralia } from "@/lib/map/nominatim-server";
 import { geocodeSuburbPostcode } from "@/lib/map/geocoding-service";
+import { forwardGeocodeAustralia } from "@/lib/map/nominatim-server";
 
 describe("geocodeSuburbPostcode", () => {
   beforeEach(() => {

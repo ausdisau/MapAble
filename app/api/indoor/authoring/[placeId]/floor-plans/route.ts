@@ -1,17 +1,18 @@
+import { z } from "zod";
+
 import { requireApiSession } from "@/lib/api/auth-handler";
-import { isIndoorFeatureEnabled } from "@/lib/indoor-accessibility/feature-flags";
 import { featureDisabledResponse, indoorApiError } from "@/lib/indoor-accessibility/api-errors";
-import {
-  canCreateFloorPlanDraft,
-  canReviewFloorPlan,
-  canSubmitFloorPlanReview,
-} from "@/lib/indoor-accessibility/permissions";
 import {
   createFloorPlanDraft,
   transitionFloorPlanStatus,
   validateDraftForSubmission,
 } from "@/lib/indoor-accessibility/authoring/floor-plan-authoring-service";
-import { z } from "zod";
+import { isIndoorFeatureEnabled } from "@/lib/indoor-accessibility/feature-flags";
+import {
+  canCreateFloorPlanDraft,
+  canReviewFloorPlan,
+  canSubmitFloorPlanReview,
+} from "@/lib/indoor-accessibility/permissions";
 
 const createDraftSchema = z.object({
   floorCode: z.string().min(1),
@@ -70,7 +71,7 @@ export async function POST(request: Request, { params }: RouteParams) {
   return Response.json({ plan }, { status: 201 });
 }
 
-export async function PATCH(request: Request, { params }: RouteParams) {
+export async function PATCH(request: Request, { params: _params }: RouteParams) {
   if (!isIndoorFeatureEnabled("floorPlanReviewWorkflow")) {
     return featureDisabledResponse("floorPlanReviewWorkflow");
   }

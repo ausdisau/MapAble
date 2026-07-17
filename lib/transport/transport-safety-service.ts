@@ -2,14 +2,14 @@ import type { TransportSafetyEventSeverity } from "@prisma/client";
 
 import type { CurrentUser } from "@/lib/auth/current-user";
 import { phase4Config } from "@/lib/config/phase4";
-import { prisma } from "@/lib/prisma";
 import { createIncident } from "@/lib/incidents/incident-service";
+import { prisma } from "@/lib/prisma";
 import {
   assertAssignedDriver,
   assertCanAccessTrip,
 } from "@/lib/transport/transport-access-policy";
-import { recordTripEvent } from "@/lib/transport/transport-event-service";
 import { TransportApiError } from "@/lib/transport/transport-api-error";
+import { recordTripEvent } from "@/lib/transport/transport-event-service";
 
 export async function reportTripSafetyIssue(
   user: CurrentUser,

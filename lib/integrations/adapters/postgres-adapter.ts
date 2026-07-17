@@ -1,8 +1,8 @@
+import { isIntegrationEnvEnabled } from "@/lib/integrations/integration-feature-policy";
 import type {
   IntegrationAdapter,
   IntegrationHealthResult,
 } from "@/lib/integrations/integration-types";
-import { isIntegrationEnvEnabled } from "@/lib/integrations/integration-feature-policy";
 import { prisma } from "@/lib/prisma";
 
 export const postgresAdapter: IntegrationAdapter = {

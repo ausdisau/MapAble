@@ -1,6 +1,5 @@
-import { getStripeClient } from "@/lib/stripe/client";
-import { stripeConfig } from "@/lib/stripe/config";
 import { connectRefreshUrl, connectReturnUrl } from "@/lib/payouts/config";
+import { getStripeClient } from "@/lib/stripe/client";
 
 export async function createExpressConnectAccount(params: {
   userId: string;

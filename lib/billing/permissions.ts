@@ -1,7 +1,8 @@
-import { hasPermission, type Permission } from "@/lib/auth/permissions";
-import type { UserRole } from "@/types/mapable";
-import type { BillingPermission } from "@/types/billing";
 import type { MapAbleUserRole } from "@prisma/client";
+
+import { hasPermission, type Permission } from "@/lib/auth/permissions";
+import type { BillingPermission } from "@/types/billing";
+import type { UserRole } from "@/types/mapable";
 
 export function hasBillingPermission(
   role: UserRole | MapAbleUserRole,

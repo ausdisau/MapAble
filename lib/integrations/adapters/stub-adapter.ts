@@ -1,9 +1,9 @@
+import { isIntegrationEnvEnabled } from "@/lib/integrations/integration-feature-policy";
 import type {
   IntegrationAdapter,
   IntegrationHealthResult,
   IntegrationType,
 } from "@/lib/integrations/integration-types";
-import { isIntegrationEnvEnabled } from "@/lib/integrations/integration-feature-policy";
 
 export function createStubAdapter(
   key: string,
