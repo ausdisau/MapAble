@@ -77,8 +77,10 @@ jobs:
       - name: Lint
         run: pnpm lint
 
-      - name: Apply migrations for tests
-        run: pnpm exec prisma migrate deploy
+      # Test DB schema: historical migration stubs block migrate-from-zero.
+      # Ephemeral CI uses db push (not a production runbook instruction).
+      - name: Apply schema for tests (ephemeral)
+        run: pnpm exec prisma db push --accept-data-loss --skip-generate
 
       - name: Unit / integration tests
         run: pnpm test

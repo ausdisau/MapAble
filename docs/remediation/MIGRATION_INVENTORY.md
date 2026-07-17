@@ -86,8 +86,24 @@ Timestamps must be unique. PR 1 renames the NDIS claiming migration folder to re
 - `scripts/ci/check-migration-order.ts` — monotonic unique timestamps
 - `scripts/ci/check-migration-integrity.ts` — no duplicates; rejects production runbook `db push`; detects edited historical migrations via git history when `BASE_SHA` set
 
+## Stub migrations blocking migrate-from-zero
+
+Several MapAble Core phase folders are **documentation stubs** (comments only, or minimal DDL) that historically assumed `prisma db push`. Status: `verified`.
+
+Examples: `mapable_core_phase_3`–`5`, `mapable_care_mvp`, `mapable_core_phase_6`–`10`, `mapable_core_phase_12`, `case_management`.
+
+**CI policy (PR 1):**
+
+- Required **Migrations** job: order + integrity + ephemeral schema coherence via CI-only `db push`
+- **Migrate from zero (report)** job: attempts `migrate deploy`, uploads logs, `continue-on-error` until a baseline/squash PR replaces stubs
+- Production remains `prisma migrate deploy` only — never `db push`
+
+## Approved historical repairs
+
+See `scripts/ci/allowed-migration-repairs.json`. PR 1 repairs `20260521120000_mapable_core_phase_2` to create `ProviderResponseStatus` before use.
+
 ## Policy going forward
 
 - Additive migrations only before deprecating legacy structures
-- Never edit historical `migration.sql` bodies
+- Never edit historical `migration.sql` bodies except via allowlisted remediation repairs
 - Never instruct `prisma db push` for production

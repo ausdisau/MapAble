@@ -1,0 +1,10 @@
+{
+  "description": "Historical migration.sql body repairs explicitly approved during remediation. Integrity check allows only these paths relative to BASE_SHA.",
+  "repairs": [
+    {
+      "path": "prisma/migrations/20260521120000_mapable_core_phase_2/migration.sql",
+      "reason": "Create ProviderResponseStatus before ALTER TABLE so migrate-from-zero does not fail (P3018/42704).",
+      "pr": "cursor/remediation-repo-controls-5fc8"
+    }
+  ]
+}

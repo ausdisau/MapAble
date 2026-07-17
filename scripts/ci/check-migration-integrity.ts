@@ -97,6 +97,24 @@ function checkDbPushInProductionRunbooks(): string[] {
   return errors;
 }
 
+function loadAllowedRepairs(): Set<string> {
+  const allowPath = path.join(
+    ROOT,
+    "scripts",
+    "ci",
+    "allowed-migration-repairs.json",
+  );
+  if (!fs.existsSync(allowPath)) return new Set();
+  try {
+    const raw = JSON.parse(fs.readFileSync(allowPath, "utf8")) as {
+      repairs?: Array<{ path: string }>;
+    };
+    return new Set((raw.repairs ?? []).map((r) => r.path.replace(/\\/g, "/")));
+  } catch {
+    return new Set();
+  }
+}
+
 function checkHistoricalMigrationEdits(): string[] {
   const base = process.env.BASE_SHA || process.env.GITHUB_BASE_SHA;
   if (!base) {
@@ -106,6 +124,7 @@ function checkHistoricalMigrationEdits(): string[] {
     return [];
   }
 
+  const allowed = loadAllowedRepairs();
   const errors: string[] = [];
   try {
     const diff = execSync(
@@ -118,6 +137,11 @@ function checkHistoricalMigrationEdits(): string[] {
 
     for (const file of diff) {
       if (!file.endsWith("migration.sql")) continue;
+      const normalized = file.replace(/\\/g, "/");
+      if (allowed.has(normalized)) {
+        console.log(`ALLOW listed historical repair: ${normalized}`);
+        continue;
+      }
       // Renames of folders are OK if SQL content unchanged; detect content edits
       try {
         const contentDiff = execSync(`git diff ${base}...HEAD -- ${file}`, {

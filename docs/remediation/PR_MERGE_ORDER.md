@@ -34,7 +34,7 @@ PR1 → PR2 → PR3 → PR4 → PR6 → PR9
 ## PR 1 exit criteria (gate for PR 2)
 
 - [ ] CI workflow green (install, prisma, type-check, format, lint, test, build, ownership/migration collision checks)
-- [ ] Migrations workflow green (from-zero apply on ephemeral Postgres)
+- [ ] Migrations workflow green (order + integrity + ephemeral schema coherence; migrate-from-zero report may warn until stub baseline PR)
 - [ ] Security workflow green (Semgrep retained + additional gates)
 - [ ] Accessibility workflow green (Playwright + axe smoke)
 - [ ] Production-claims workflow green

@@ -65,7 +65,7 @@ function AustralianDisabilityMark() {
           <span className="text-[#2AA6B8]">D</span>
         </div>
         <div>
-          <p className="text-sm font-black text-[#B98222]">Australian Disability</p>
+          <p className="text-sm font-black text-[#7A5A12]">Australian Disability</p>
           <p className="mt-1 max-w-xs text-xs leading-5 text-slate-600">
             We&apos;re for a fair, dignified and equal society for all people with disabilities.
           </p>
