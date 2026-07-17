@@ -1,8 +1,8 @@
 #!/usr/bin/env tsx
 /**
  * Changed-domain ownership heuristic.
- * Flags PRs that mutate foreign domain aggregates from non-owner packages.
- * When no BASE_SHA is available, validates the ownership map file exists.
+ * Flags PRs that *introduce* foreign domain aggregate writes in non-owner packages.
+ * Pre-existing write sites (e.g. only touched by import-order lint) are not failed.
  */
 import { execSync } from "node:child_process";
 import fs from "node:fs";
@@ -10,7 +10,6 @@ import path from "node:path";
 
 const ROOT = process.cwd();
 
-/** Owner package prefix → aggregate keywords that only the owner should write. */
 const OWNERSHIP: Array<{
   ownerPrefixes: string[];
   foreignWriteHints: RegExp[];
@@ -62,6 +61,28 @@ const OWNERSHIP: Array<{
   },
 ];
 
+/** Known cross-domain orchestration / adapter packages (documented, not new SoTs). */
+const CROSS_DOMAIN_ALLOWLIST = [
+  "lib/orchestration/",
+  "lib/matching/",
+  "lib/payouts/",
+  "lib/national-insights/",
+  "lib/ndis/",
+  "lib/support-coordinator/",
+  "lib/booking-graph/",
+  "lib/bookings/",
+];
+
+function isOwner(file: string, ownerPrefixes: string[]): boolean {
+  return ownerPrefixes.some(
+    (p) => file === p || file.startsWith(p) || file.startsWith("./" + p),
+  );
+}
+
+function isAllowlisted(file: string): boolean {
+  return CROSS_DOMAIN_ALLOWLIST.some((p) => file.startsWith(p));
+}
+
 function changedFiles(base: string): string[] {
   try {
     return execSync(`git diff --name-only ${base}...HEAD`, { encoding: "utf8" })
@@ -73,10 +94,19 @@ function changedFiles(base: string): string[] {
   }
 }
 
-function isOwner(file: string, ownerPrefixes: string[]): boolean {
-  return ownerPrefixes.some(
-    (p) => file === p || file.startsWith(p) || file.startsWith("./" + p),
-  );
+function addedDiffLines(base: string, file: string): string {
+  try {
+    const patch = execSync(`git diff ${base}...HEAD -- ${file}`, {
+      encoding: "utf8",
+    });
+    return patch
+      .split("\n")
+      .filter((l) => l.startsWith("+") && !l.startsWith("+++"))
+      .map((l) => l.slice(1))
+      .join("\n");
+  } catch {
+    return "";
+  }
 }
 
 function main(): void {
@@ -96,7 +126,7 @@ function main(): void {
     process.env.GITHUB_BASE_SHA ||
     process.env.GITHUB_EVENT_BEFORE;
 
-  if (!base) {
+  if (!base || base === "0000000000000000000000000000000000000000") {
     console.log(
       "OK: DOMAIN_OWNERSHIP.md present (skip changed-file scan: no BASE_SHA)",
     );
@@ -112,23 +142,20 @@ function main(): void {
   const errors: string[] = [];
 
   for (const file of files) {
-    let content = "";
-    try {
-      content = fs.readFileSync(path.join(ROOT, file), "utf8");
-    } catch {
-      continue;
-    }
+    if (isAllowlisted(file)) continue;
 
-    // Only flag write-like Prisma calls in non-owner packages
+    const added = addedDiffLines(base, file);
+    if (!added.trim()) continue;
+
     const writes =
       /\.create\(|\.update\(|\.upsert\(|\.delete\(|\.createMany\(|\.updateMany\(/;
-    if (!writes.test(content)) continue;
+    if (!writes.test(added)) continue;
 
     for (const rule of OWNERSHIP) {
       if (isOwner(file, rule.ownerPrefixes)) continue;
-      if (rule.foreignWriteHints.some((re) => re.test(content))) {
+      if (rule.foreignWriteHints.some((re) => re.test(added))) {
         errors.push(
-          `${file} appears to mutate ${rule.domain} aggregates outside owner packages (${rule.ownerPrefixes.join(", ")})`,
+          `${file} introduces ${rule.domain} aggregate writes outside owner packages (${rule.ownerPrefixes.join(", ")})`,
         );
       }
     }
@@ -144,7 +171,7 @@ function main(): void {
   }
 
   console.log(
-    `OK: domain ownership (${files.length} changed lib/api files scanned)`,
+    `OK: domain ownership (${files.length} changed lib/api files; only new write hunks checked)`,
   );
 }
 

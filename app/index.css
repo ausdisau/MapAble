@@ -13,7 +13,8 @@
   --primary-foreground: 0 0% 100%;
 
   --secondary: 160 100% 33%; /* #00A979 */
-  --secondary-foreground: 0 0% 100%;
+  /* Dark navy text — white on #00A979 fails WCAG AA contrast (~3.07:1) */
+  --secondary-foreground: 222 62% 12%;
 
   --background: 192 50% 97%; /* #F6FBFC surface */
   --foreground: 222 62% 12%; /* #0C1833 navy */
