@@ -2,6 +2,7 @@ import { createHash } from "crypto";
 
 import type { BillingCentreClaimGateway } from "@prisma/client";
 
+import { isPlanManagerLiveDeliveryEnabled } from "@/lib/billing/config";
 import { prisma } from "@/lib/prisma";
 import type {
   ClaimBatchState,
@@ -14,6 +15,9 @@ import type {
 
 const SIMULATED_LABEL =
   "[SIMULATED] This claims path does not submit to the NDIA. No live claim was sent.";
+
+const LIVE_PLAN_MANAGER_LABEL =
+  "[LIVE-PLAN-MANAGER] Delivery attempted via configured plan-manager channel. Not an NDIA claim.";
 
 /**
  * In-memory / DB-backed mock gateway. Always simulated.
@@ -212,10 +216,14 @@ export class CsvExportClaimsGateway implements ClaimsGateway {
 
 /**
  * Plan-manager delivery gateway — packages for plan manager, not NDIA API.
+ * Live delivery only when BILLING_PLAN_MANAGER_LIVE=true and credentials exist.
  */
 export class PlanManagerClaimsGateway implements ClaimsGateway {
   readonly name = "plan_manager" as const;
-  readonly simulated = true as const;
+
+  get simulated(): boolean {
+    return !isPlanManagerLiveDeliveryEnabled();
+  }
 
   async validate(batchId: string): Promise<ClaimValidationResult> {
     return new MockClaimsGateway().validate(batchId);
@@ -227,12 +235,81 @@ export class PlanManagerClaimsGateway implements ClaimsGateway {
       return {
         batchId,
         status: "REJECTED",
-        simulated: true,
-        message: `${SIMULATED_LABEL} Plan-manager pack blocked by validation.`,
+        simulated: this.simulated,
+        message: `${this.simulated ? SIMULATED_LABEL : LIVE_PLAN_MANAGER_LABEL} Plan-manager pack blocked by validation.`,
       };
     }
 
-    const externalReference = `PM-PACK-${batchId.slice(0, 8).toUpperCase()}`;
+    const live = isPlanManagerLiveDeliveryEnabled();
+    const externalReference = live
+      ? `PM-LIVE-${batchId.slice(0, 8).toUpperCase()}-${Date.now()}`
+      : `PM-PACK-${batchId.slice(0, 8).toUpperCase()}`;
+
+    if (live) {
+      // Authenticated environment only: attempt configured webhook delivery.
+      // Failures fall back to EXPORTED (pack ready) without pretending NDIA success.
+      const webhook = process.env.BILLING_PLAN_MANAGER_WEBHOOK_URL;
+      let deliveryOk = false;
+      let deliveryError: string | undefined;
+      if (webhook) {
+        try {
+          const batch = await prisma.billingClaimBatch.findUnique({
+            where: { id: batchId },
+            include: { items: true },
+          });
+          const res = await fetch(webhook, {
+            method: "POST",
+            headers: {
+              "content-type": "application/json",
+              ...(process.env.BILLING_PLAN_MANAGER_API_KEY
+                ? {
+                    authorization: `Bearer ${process.env.BILLING_PLAN_MANAGER_API_KEY}`,
+                  }
+                : {}),
+            },
+            body: JSON.stringify({
+              batchId,
+              externalReference,
+              items: batch?.items ?? [],
+              simulated: false,
+            }),
+          });
+          deliveryOk = res.ok;
+          if (!res.ok) {
+            deliveryError = `Plan-manager webhook returned ${res.status}`;
+          }
+        } catch (e) {
+          deliveryError =
+            e instanceof Error ? e.message : "Plan-manager webhook failed";
+        }
+      }
+
+      await prisma.billingClaimBatch.update({
+        where: { id: batchId },
+        data: {
+          status: deliveryOk ? "SUBMITTED" : "EXPORTED",
+          externalReference,
+          simulated: false,
+          submittedAt: new Date(),
+          validationJson: {
+            ...validation,
+            liveDelivery: deliveryOk,
+            deliveryError,
+          } as object,
+        },
+      });
+
+      return {
+        batchId,
+        externalReference,
+        status: deliveryOk ? "SUBMITTED" : "EXPORTED",
+        simulated: false,
+        message: deliveryOk
+          ? `${LIVE_PLAN_MANAGER_LABEL} Pack delivered (${externalReference}).`
+          : `${LIVE_PLAN_MANAGER_LABEL} Pack exported; delivery pending or failed${deliveryError ? `: ${deliveryError}` : ""}.`,
+      };
+    }
+
     await prisma.billingClaimBatch.update({
       where: { id: batchId },
       data: {
@@ -249,7 +326,7 @@ export class PlanManagerClaimsGateway implements ClaimsGateway {
       externalReference,
       status: "EXPORTED",
       simulated: true,
-      message: `${SIMULATED_LABEL} Plan-manager invoice pack prepared (${externalReference}).`,
+      message: `${SIMULATED_LABEL} Plan-manager invoice pack prepared (${externalReference}). Enable BILLING_PLAN_MANAGER_LIVE only after authenticated environment testing.`,
     };
   }
 
@@ -260,8 +337,8 @@ export class PlanManagerClaimsGateway implements ClaimsGateway {
     return {
       externalReference,
       status: (batch?.status as ClaimBatchState) ?? "EXPORTED",
-      simulated: true,
-      details: SIMULATED_LABEL,
+      simulated: batch?.simulated ?? true,
+      details: batch?.simulated === false ? LIVE_PLAN_MANAGER_LABEL : SIMULATED_LABEL,
     };
   }
 
@@ -273,8 +350,8 @@ export class PlanManagerClaimsGateway implements ClaimsGateway {
     return {
       externalReference,
       cancelled: true,
-      simulated: true,
-      message: `${SIMULATED_LABEL} Plan-manager pack marked cancelled.`,
+      simulated: this.simulated,
+      message: `${this.simulated ? SIMULATED_LABEL : LIVE_PLAN_MANAGER_LABEL} Plan-manager pack marked cancelled.`,
     };
   }
 }

@@ -50,6 +50,20 @@ export default async function BillingInvoiceDetailPage({
         description="Invoice detail, evidence, policy checks, and approvals."
       >
         <InvoiceStatusBadge status={invoice.status as BillingInvoiceState} />
+        <div className="flex flex-wrap gap-2">
+          <a
+            className="inline-flex min-h-10 items-center rounded-lg border border-slate-200 bg-white px-3 text-sm font-bold text-[#005B7F] hover:bg-[#F6FBFC] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#F8C51C]/40"
+            href={`/api/billing/invoices/${invoice.id}/document?format=html`}
+          >
+            Download HTML
+          </a>
+          <a
+            className="inline-flex min-h-10 items-center rounded-lg border border-slate-200 bg-white px-3 text-sm font-bold text-[#005B7F] hover:bg-[#F6FBFC] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#F8C51C]/40"
+            href={`/api/billing/invoices/${invoice.id}/document?format=pdf`}
+          >
+            Download tagged PDF
+          </a>
+        </div>
       </BillingPageHeader>
 
       <section

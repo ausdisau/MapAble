@@ -4,6 +4,10 @@ import type {
 } from "@prisma/client";
 
 import { writeFinancialAudit } from "@/lib/billing/audit/financial-audit";
+import {
+  allowPayoutWithoutPayment,
+  isConnectPayoutsEnabled,
+} from "@/lib/billing/config";
 import { addCents, applyBps, type Cents } from "@/lib/billing/money";
 import { prisma } from "@/lib/prisma";
 
@@ -26,6 +30,9 @@ export type CalculateProviderPayablesInput = {
 export async function calculateProviderPayables(
   input: CalculateProviderPayablesInput
 ): Promise<BillingCentreProviderPayout> {
+  const allowUnpaidOrDisputed =
+    input.allowUnpaidOrDisputed ?? allowPayoutWithoutPayment();
+
   const invoices = await prisma.billingInvoice.findMany({
     where: {
       providerId: input.organisationId,
@@ -71,7 +78,7 @@ export async function calculateProviderPayables(
       continue;
     }
 
-    if ((isUnpaid || isDisputed) && input.allowUnpaidOrDisputed) {
+    if ((isUnpaid || isDisputed) && allowUnpaidOrDisputed) {
       withheldCents = addCents(withheldCents, lineSum);
       remittanceLines.push({
         invoiceId: invoice.id,
@@ -122,7 +129,7 @@ export async function calculateProviderPayables(
       netPayableCents,
       remittanceJson: {
         lines: remittanceLines,
-        allowUnpaidOrDisputed: Boolean(input.allowUnpaidOrDisputed),
+        allowUnpaidOrDisputed,
         commissionBps,
       },
     },
@@ -199,12 +206,13 @@ export type ReleasePayoutInput = {
 };
 
 /**
- * Release an approved payout. Marked as scheduled/processing — not a live bank transfer
- * unless a configured Connect path is used separately.
+ * Release an approved payout.
+ * Live Stripe Connect transfers require MAPABLE_PAYOUTS_ENABLED=true + STRIPE_SECRET_KEY
+ * after authenticated environment testing. Otherwise status moves to processing as simulated.
  */
 export async function releaseProviderPayout(
   input: ReleasePayoutInput
-): Promise<BillingCentreProviderPayout> {
+): Promise<BillingCentreProviderPayout & { connectLive: boolean }> {
   const payout = await prisma.billingCentreProviderPayout.findUnique({
     where: { id: input.payoutId },
   });
@@ -215,12 +223,24 @@ export async function releaseProviderPayout(
     throw new Error(`Cannot release payout in status ${payout.status}`);
   }
 
+  const connectLive = isConnectPayoutsEnabled();
+  const destinationRef =
+    input.destinationRef ??
+    (connectLive ? "stripe_connect" : "simulated_destination");
+
   const updated = await prisma.billingCentreProviderPayout.update({
     where: { id: payout.id },
     data: {
       status: "processing",
-      destinationRef: input.destinationRef,
+      destinationRef,
       releasedAt: new Date(),
+      remittanceJson: {
+        ...((payout.remittanceJson as object) ?? {}),
+        connectLive,
+        releaseNote: connectLive
+          ? "Connect payouts enabled — hand off to transfer pipeline after readiness checks."
+          : "SIMULATED release. Enable MAPABLE_PAYOUTS_ENABLED only after authenticated environment testing.",
+      },
     },
   });
 
@@ -228,17 +248,20 @@ export async function releaseProviderPayout(
     organisationId: payout.organisationId,
     actorId: input.actorId,
     actorRole: input.actorRole,
-    action: "provider_payout_released",
+    action: connectLive
+      ? "provider_payout_released_connect_enabled"
+      : "provider_payout_released_simulated",
     entityType: "BillingCentreProviderPayout",
     entityId: payout.id,
     previousValues: { status: payout.status },
     newValues: {
       status: "processing",
-      destinationRef: input.destinationRef,
+      destinationRef,
       netPayableCents: payout.netPayableCents,
+      connectLive,
     },
     reason: input.reason,
   });
 
-  return updated;
+  return { ...updated, connectLive };
 }

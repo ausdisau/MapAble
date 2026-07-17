@@ -76,6 +76,23 @@ export {
   approveInvoice,
 } from "@/lib/billing/invoicing/issue";
 export { createDraftFromServiceRecords } from "@/lib/billing/invoicing/draft";
+export {
+  renderInvoiceHtml,
+  renderInvoiceTaggedPdf,
+  type InvoiceDocumentModel,
+} from "@/lib/billing/invoicing/invoice-document";
+export { loadInvoiceDocumentForUser } from "@/lib/billing/invoicing/load-invoice-document";
+export {
+  assertCanViewBillingInvoice,
+  assertCanManageBillingOrganisation,
+  BillingAccessError,
+} from "@/lib/billing/access";
+export {
+  isPlanManagerLiveDeliveryEnabled,
+  isConnectPayoutsEnabled,
+  allowPayoutWithoutPayment,
+  describeIntegrationReadiness,
+} from "@/lib/billing/config";
 export { createCreditNote } from "@/lib/billing/invoicing/credit-note";
 
 // Approvals

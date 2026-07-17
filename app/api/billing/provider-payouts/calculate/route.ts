@@ -1,5 +1,9 @@
 import { jsonError, jsonOk, zodErrorResponse } from "@/lib/api/response";
 import {
+  BillingAccessError,
+  assertCanManageBillingOrganisation,
+} from "@/lib/billing/access";
+import {
   isResponse,
   requireBillingPermission,
 } from "@/lib/billing/api-helpers";
@@ -15,6 +19,10 @@ export async function POST(req: Request) {
   if (!parsed.success) return zodErrorResponse(parsed.error);
 
   try {
+    await assertCanManageBillingOrganisation(
+      user,
+      parsed.data.organisationId
+    );
     const payout = await calculateProviderPayables({
       organisationId: parsed.data.organisationId,
       periodStart: new Date(parsed.data.periodStart),
@@ -26,6 +34,9 @@ export async function POST(req: Request) {
     });
     return jsonOk({ payout }, 201);
   } catch (e) {
+    if (e instanceof BillingAccessError) {
+      return jsonError(e.message, e.status);
+    }
     return jsonError(
       e instanceof Error ? e.message : "Calculate payouts failed",
       400
