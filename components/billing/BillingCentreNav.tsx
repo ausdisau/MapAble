@@ -6,12 +6,16 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/app/lib/utils";
 
 const LINKS = [
-  { href: "/dashboard/billing", label: "Overview", exact: true },
-  { href: "/dashboard/billing/invoices", label: "Invoices & payments" },
+  { href: "/billing/overview", label: "Overview", exact: true },
+  { href: "/billing/invoices", label: "Invoices & payments" },
   { href: "/dashboard/billing/funding", label: "Funding sources" },
   { href: "/dashboard/billing/legacy", label: "Invoice drafts (legacy)" },
 ];
 
+/**
+ * Legacy horizontal nav used under /dashboard/billing/*.
+ * Primary Billing Centre navigation is now `/billing/*` via BillingSidebar.
+ */
 export function BillingCentreNav() {
   const pathname = usePathname();
 
@@ -22,7 +26,7 @@ export function BillingCentreNav() {
     >
       {LINKS.map((link) => {
         const active = link.exact
-          ? pathname === link.href
+          ? pathname === link.href || pathname === "/dashboard/billing"
           : pathname === link.href || pathname.startsWith(`${link.href}/`);
         return (
           <Link

@@ -188,7 +188,25 @@ export type Permission =
   | "engagement:read:self"
   | "engagement:submit:self"
   | "engagement:manage:any"
-  | "engagement:provider:read";
+  | "engagement:provider:read"
+  | "billing:view_own"
+  | "billing:view_delegated"
+  | "billing:view_provider"
+  | "billing:view_all"
+  | "billing:create_draft"
+  | "billing:edit_draft"
+  | "billing:approve_participant"
+  | "billing:approve_provider"
+  | "billing:issue_invoice"
+  | "billing:void_invoice"
+  | "billing:create_credit_note"
+  | "billing:record_payment"
+  | "billing:reconcile"
+  | "billing:manage_payouts"
+  | "billing:manage_policy"
+  | "billing:manage_integrations"
+  | "billing:export"
+  | "billing:audit";
 
 const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
   participant: [
@@ -231,6 +249,8 @@ const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     "case:read:self",
     "engagement:read:self",
     "engagement:submit:self",
+    "billing:view_own",
+    "billing:approve_participant",
   ],
   family_member: [
     "profile:read:self",
@@ -239,6 +259,8 @@ const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     "notification:read:self",
     "engagement:read:self",
     "engagement:submit:self",
+    "billing:view_delegated",
+    "billing:approve_participant",
   ],
   support_coordinator: [
     "profile:read:any",
@@ -253,6 +275,7 @@ const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     "admin:command-centre:read",
     "admin:participants:read",
     "admin:bookings:read",
+    "billing:view_delegated",
   ],
   support_worker: [
     "booking:read:any",
@@ -261,6 +284,7 @@ const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     "calendar:read:org",
     "timesheet:manage:org",
     "incident:create",
+    "billing:view_own",
   ],
   provider_admin: [
     "booking:read:any",
@@ -287,6 +311,12 @@ const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     "provider:ndia:claim",
     "provider:ndis:claim",
     "engagement:provider:read",
+    "billing:view_provider",
+    "billing:create_draft",
+    "billing:edit_draft",
+    "billing:approve_provider",
+    "billing:issue_invoice",
+    "billing:export",
   ],
   transport_operator: [
     "booking:read:any",
@@ -330,6 +360,8 @@ const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     "admin:command-centre:read",
     "admin:billing:read",
     "admin:bookings:read",
+    "billing:view_delegated",
+    "billing:export",
   ],
   mapable_admin: [
     "profile:read:any",
@@ -461,6 +493,21 @@ const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     "admin:compliance:read",
     "admin:agent-runs:read",
     "admin:actions:write",
+    "billing:view_all",
+    "billing:create_draft",
+    "billing:edit_draft",
+    "billing:approve_participant",
+    "billing:approve_provider",
+    "billing:issue_invoice",
+    "billing:void_invoice",
+    "billing:create_credit_note",
+    "billing:record_payment",
+    "billing:reconcile",
+    "billing:manage_payouts",
+    "billing:manage_policy",
+    "billing:manage_integrations",
+    "billing:export",
+    "billing:audit",
   ],
 };
 
