@@ -47,22 +47,23 @@ export function buildCaseCopilotPack(
   const summary = engine.summarise(snapshot);
   const actions = engine.nextActions(snapshot);
 
-  const chronology: CitedChronologyItem[] = [
-    {
-      at: snapshot.openedAt.toISOString(),
-      source: "system_record_shows",
-      text: `Case ${snapshot.reference} opened: ${snapshot.title}`,
-      citationId: `case:${snapshot.id}:opened`,
-      disputed: false,
-    },
-    ...snapshot.notes.map((n) => ({
-      at: n.createdAt.toISOString(),
-      source: classifyNoteSource(n.body),
-      text: n.body,
-      citationId: `note:${n.id}`,
-      disputed: /dispute|disagree|conflict/i.test(n.body),
-    })),
-  ].sort((a, b) => a.at.localeCompare(b.at));
+  const openedItem: CitedChronologyItem = {
+    at: snapshot.openedAt.toISOString(),
+    source: "system_record_shows",
+    text: `Case ${snapshot.reference} opened: ${snapshot.title}`,
+    citationId: `case:${snapshot.id}:opened`,
+    disputed: false,
+  };
+  const noteItems: CitedChronologyItem[] = snapshot.notes.map((n) => ({
+    at: n.createdAt.toISOString(),
+    source: classifyNoteSource(n.body),
+    text: n.body,
+    citationId: `note:${n.id}`,
+    disputed: /dispute|disagree|conflict/i.test(n.body),
+  }));
+  const chronology: CitedChronologyItem[] = [openedItem, ...noteItems].sort(
+    (a, b) => a.at.localeCompare(b.at)
+  );
 
   const sourceSeparatedSummary: Record<CaseSourceKind, string[]> = {
     participant_says: [],
