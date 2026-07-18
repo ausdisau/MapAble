@@ -3,15 +3,15 @@ import { gateway } from "ai";
 import type { ZodType } from "zod";
 
 import { requireAiCapability } from "@/lib/ai-platform/capabilities/registry";
-import { assertModelCallAllowed } from "@/lib/ai-platform/policies/kill-switches";
 import { isModelAllowedForTask } from "@/lib/ai-platform/models/registry";
-import { captureAiPlatformTelemetry } from "@/lib/ai-platform/telemetry/adapter";
+import { assertModelCallAllowed } from "@/lib/ai-platform/policies/kill-switches";
 import { redactSensitiveText } from "@/lib/ai-platform/redaction/sensitive";
+import { captureAiPlatformTelemetry } from "@/lib/ai-platform/telemetry/adapter";
+import { aiPlatformConfig } from "@/lib/config/ai-platform";
 import {
   isSearchInterpreterConfigured,
   searchInterpreterConfig,
 } from "@/lib/config/search-interpreter";
-import { aiPlatformConfig } from "@/lib/config/ai-platform";
 
 export type GatewayResolveInput = {
   capabilityKey: string;
