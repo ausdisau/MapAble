@@ -65,6 +65,11 @@ const OWNERSHIP: Array<{
 const CROSS_DOMAIN_ALLOWLIST = [
   "lib/orchestration/",
   "lib/matching/",
+  "lib/ai-matching/",
+  "lib/ai-platform/",
+  "lib/mission-portfolio/",
+  "lib/mission-copilot/",
+  "lib/case-copilot/",
   "lib/payouts/",
   "lib/national-insights/",
   "lib/ndis/",

@@ -2550,6 +2550,7 @@ model MatchCandidate {
   createdAt              DateTime             @default(now())
 
   factors MatchFactor[]
+  aiMatchCandidates AiMatchCandidate[]
 
   @@index([matchRunId, status])
 }
@@ -2964,14 +2965,28 @@ model AiMatchCandidate {
   aiMatchRunId    String
   aiMatchRun      AiMatchRun @relation(fields: [aiMatchRunId], references: [id], onDelete: Cascade)
   matchCandidateId String?
+  matchCandidate  MatchCandidate? @relation(fields: [matchCandidateId], references: [id], onDelete: SetNull)
   rank            Int      @default(0)
+  /// Legacy column — stores deterministic rule score only. Not a model score.
   aiScore         Float
   combinedScore   Float
+  /// Explicit deterministic rule score (same basis as aiScore after truth hardening).
+  ruleScore       Float    @default(0)
+  /// Null when no model ran. Never fabricate from rule scores.
+  modelCommentaryScore Float?
+  modelRunId      String?
+  modelVersionLabel String?
+  hardRequirementsMet Boolean @default(true)
+  unknownFieldsJson Json     @default("[]")
+  expiresAt       DateTime?
   lowConfidence   Boolean  @default(false)
   status          String   @default("generated")
   createdAt       DateTime @default(now())
 
   explanations AiMatchExplanation[]
+
+  @@index([matchCandidateId])
+  @@index([expiresAt])
 }
 
 model AiMatchExplanation {
