@@ -1,9 +1,9 @@
 import { missionPortfolioConfig } from "@/lib/config/mission-portfolio";
-import type { GoldenJourneyState } from "@/lib/pilot/starting-work/golden-journey";
 import {
   buildStartingWorkDependencyGraph,
   buildStateHonesty,
 } from "@/lib/pilot/starting-work/dependency-graph";
+import type { GoldenJourneyState } from "@/lib/pilot/starting-work/golden-journey";
 
 import { getMission } from "./registry";
 import type {
@@ -108,11 +108,13 @@ export function projectStartingWorkMission(
     }
   }
 
-  const blocked = dependencies.filter((d) => d.blocksMission);
+  const blockingDependencies = dependencies.filter((d) => d.blocksMission);
   const decisionsRequired: string[] = [];
-  if (state.blocked) {
+  if (state.blocked || blockingDependencies.length > 0) {
     decisionsRequired.push(
-      state.blockReason ?? "Resolve the blocking dependency before continuing."
+      state.blockReason ??
+        blockingDependencies[0]?.label ??
+        "Resolve the blocking dependency before continuing."
     );
   }
   if (state.regionalCandidates.length && !state.regionalConfirmed.length) {
