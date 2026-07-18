@@ -76,3 +76,14 @@ export type {
   HybridRetrievalResult,
   RetrievalSecurityContext,
 } from "./retrieval";
+export {
+  selectProcessingMode,
+  summarizeVisitPackOffline,
+  explainWhatChangedLocally,
+  routeModelBackedEdgeCapability,
+} from "./edge";
+export type {
+  ProcessingReceipt,
+  DeviceCapabilitySnapshot,
+  EdgeBrokerResult,
+} from "./edge";
