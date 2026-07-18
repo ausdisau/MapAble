@@ -21,14 +21,20 @@ Positioning: *An evidence-aware, participant-controlled copilot for complete dis
 | mission.copilot | deterministic | controlled_pilot | MAPABLE_MISSION_COPILOT off |
 | case.copilot | deterministic | controlled_pilot | MAPABLE_CASE_COPILOT off |
 | billing.evidence_copilot | deterministic | controlled_pilot | MAPABLE_BILLING_EVIDENCE_COPILOT off |
+| intake.document_classify | deterministic | synthetic_only | MAPABLE_AI_INTAKE off |
+| intake.field_extract | deterministic | synthetic_only | MAPABLE_AI_INTAKE off |
 
-## Stacked programme branches (this delivery)
+## Advanced AI Expansion train (≤ 3)
 
-AI matching truth → ai-platform foundation → mission portfolio → ai-evals → mission copilot → case copilot → billing evidence copilot.
+1. Evidence Intake contracts (`lib/ai-platform/intake/`)
+2. Mission Evidence Graph + hybrid retrieval
+3. Companion Edge AI broker + ProcessingReceipt
+
+See [ADVANCED_MERGE_TRAIN.md](./ADVANCED_MERGE_TRAIN.md) and [INTAKE.md](./INTAKE.md).
 
 ## Still deferred (follow-on checkpoint)
 
-AURA Agent OS mega-branches, VisionAccess multimodal, Quality & Safeguards Copilot, Continuity Copilot, Companion on-device AI.
+AURA Agent OS mega-branches, VisionAccess multimodal, Quality & Safeguards Copilot, Continuity Copilot, live OCR, embeddings, computer-use.
 
 ## Claim honesty
 

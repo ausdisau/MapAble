@@ -45,3 +45,18 @@ export {
   runEvalScenario,
   EVAL_DIMENSIONS,
 } from "./evaluations";
+export {
+  createSyntheticIntakeSession,
+  beginIntakeReview,
+  applyIntakeReview,
+  attemptApprovedCanonicalWrite,
+  canTransitionIntakeStatus,
+  sourceTextLooksLikeInjection,
+  SYNTHETIC_INTAKE_FIXTURES,
+} from "./intake";
+export type {
+  IntakeDocument,
+  ExtractionCandidate,
+  IntakeProvenanceReceipt,
+  IntakeSession,
+} from "./intake";

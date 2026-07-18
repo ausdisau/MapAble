@@ -37,6 +37,8 @@ describe("AI platform capability registry", () => {
         "billing.evidence_copilot",
         "accesscast.forecast",
         "access_intelligence_next.preflight",
+        "intake.document_classify",
+        "intake.field_extract",
       ])
     );
   });
