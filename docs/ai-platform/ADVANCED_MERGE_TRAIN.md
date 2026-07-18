@@ -4,7 +4,7 @@
 | --- | --- | --- | --- |
 | 1 | `cursor/ai-intake-contracts-6ea8` (#360) | `main` | Evidence Intake contracts, synthetic adapters, flags false |
 | 2 | `cursor/mission-evidence-graph-6ea8` (#361) | intake | Mission Evidence Graph + hybrid retrieval (Starting Work) |
-| 3 | `cursor/companion-edge-ai-6ea8` | graph | Edge AI Capability Broker + ProcessingReceipt |
+| 3 | `cursor/companion-edge-ai-6ea8` (#362) | graph | Edge AI Capability Broker + ProcessingReceipt |
 
 ## Wave 0 housekeeping
 
