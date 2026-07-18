@@ -23,6 +23,8 @@ Positioning: *An evidence-aware, participant-controlled copilot for complete dis
 | billing.evidence_copilot | deterministic | controlled_pilot | MAPABLE_BILLING_EVIDENCE_COPILOT off |
 | intake.document_classify | deterministic | synthetic_only | MAPABLE_AI_INTAKE off |
 | intake.field_extract | deterministic | synthetic_only | MAPABLE_AI_INTAKE off |
+| mission.evidence_graph | deterministic | controlled_pilot | MAPABLE_MISSION_GRAPH off |
+| mission.semantic_retrieval | deterministic | controlled_pilot | MAPABLE_SEMANTIC_RETRIEVAL off |
 
 ## Advanced AI Expansion train (≤ 3)
 
