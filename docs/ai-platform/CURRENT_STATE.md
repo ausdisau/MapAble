@@ -18,10 +18,17 @@ Positioning: *An evidence-aware, participant-controlled copilot for complete dis
 | matching.ai_overlay | deterministic | experimental | AI_MATCHING off |
 | accesscast.forecast | deterministic | synthetic_only | off |
 | access_intelligence_next.preflight | deterministic | synthetic_only | off |
+| mission.copilot | deterministic | controlled_pilot | MAPABLE_MISSION_COPILOT off |
+| case.copilot | deterministic | controlled_pilot | MAPABLE_CASE_COPILOT off |
+| billing.evidence_copilot | deterministic | controlled_pilot | MAPABLE_BILLING_EVIDENCE_COPILOT off |
 
-## Not on main
+## Stacked programme branches (this delivery)
 
-AURA Agent OS, Mission Copilot (user-facing), Replay Lab evals (landing in follow-on PRs), Quality & Safeguards Copilot.
+AI matching truth → ai-platform foundation → mission portfolio → ai-evals → mission copilot → case copilot → billing evidence copilot.
+
+## Still deferred (follow-on checkpoint)
+
+AURA Agent OS mega-branches, VisionAccess multimodal, Quality & Safeguards Copilot, Continuity Copilot, Companion on-device AI.
 
 ## Claim honesty
 
