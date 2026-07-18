@@ -1,8 +1,8 @@
-import { jsonError, jsonOk } from "@/lib/api/response";
 import { requireApiPermission } from "@/lib/api/auth-handler";
+import { jsonError, jsonOk } from "@/lib/api/response";
 import { buildCaseCopilotPack } from "@/lib/case-copilot";
-import { caseCopilotConfig } from "@/lib/config/case-copilot";
 import type { CaseSnapshot } from "@/lib/cases/ai/types";
+import { caseCopilotConfig } from "@/lib/config/case-copilot";
 
 /**
  * Accepts a CaseSnapshot projection body for controlled/demo use.
