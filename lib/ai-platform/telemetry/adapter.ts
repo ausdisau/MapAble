@@ -29,7 +29,7 @@ export function captureAiPlatformTelemetry(
       metadata: {
         kind: event.kind,
         tenant_scoped: event.tenantScoped ?? false,
-        reason: event.reason,
+        reason: event.reason ?? null,
       },
     });
   }
