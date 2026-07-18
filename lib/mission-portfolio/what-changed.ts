@@ -1,4 +1,5 @@
 import { missionPortfolioConfig } from "@/lib/config/mission-portfolio";
+
 import type { SharedMissionProjection } from "./types";
 
 export type WhatChangedEntry = {

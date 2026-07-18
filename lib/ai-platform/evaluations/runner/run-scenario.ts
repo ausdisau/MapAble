@@ -1,7 +1,8 @@
 import { createHash } from "crypto";
 
-import { guardStructuredInput } from "@/lib/ai-platform/models/gateway";
 import { separateConflictingAccounts } from "@/lib/ai-platform/context/envelope";
+import { guardStructuredInput } from "@/lib/ai-platform/models/gateway";
+
 import type {
   EvalAssertion,
   EvalEvent,

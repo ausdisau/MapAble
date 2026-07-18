@@ -1,5 +1,6 @@
 import { randomUUID } from "crypto";
 
+import { formatAccessibleReport } from "../reports/accessible-text";
 import { EVAL_SCENARIOS } from "../scenarios/catalog";
 import type {
   EvalDimension,
@@ -7,8 +8,8 @@ import type {
   EvalScenarioResult,
 } from "../types";
 import { EVAL_DIMENSIONS } from "../types";
+
 import { runEvalScenario } from "./run-scenario";
-import { formatAccessibleReport } from "../reports/accessible-text";
 
 export function runAiEvaluationSuite(filter?: {
   ids?: string[];
