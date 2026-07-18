@@ -1,5 +1,5 @@
-import type { AiCapabilityRegistration } from "./types";
 import { SEEDED_CAPABILITIES } from "./seed";
+import type { AiCapabilityRegistration } from "./types";
 
 const byKey = new Map<string, AiCapabilityRegistration>(
   SEEDED_CAPABILITIES.map((c) => [c.key, c])

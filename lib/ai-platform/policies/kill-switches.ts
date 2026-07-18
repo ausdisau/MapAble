@@ -1,5 +1,5 @@
-import { aiPlatformConfig } from "@/lib/config/ai-platform";
 import { getAiCapability } from "@/lib/ai-platform/capabilities/registry";
+import { aiPlatformConfig } from "@/lib/config/ai-platform";
 
 const capabilityKill = new Set<string>();
 const tenantKill = new Set<string>();
