@@ -242,9 +242,13 @@ export async function buildProviderAttentionQueue(input: {
     });
   }
 
+  // Deadline-first, then severity — never popularity, commercial, or paid ranking.
   items.sort((a, b) => {
-    const rank = { critical: 0, high: 1, medium: 2 };
-    return rank[a.severity] - rank[b.severity];
+    const aDeadline = a.deadlineAt ? Date.parse(a.deadlineAt) : Number.POSITIVE_INFINITY;
+    const bDeadline = b.deadlineAt ? Date.parse(b.deadlineAt) : Number.POSITIVE_INFINITY;
+    if (aDeadline !== bDeadline) return aDeadline - bDeadline;
+    const severityRank = { critical: 0, high: 1, medium: 2 } as const;
+    return severityRank[a.severity] - severityRank[b.severity];
   });
 
   return {
@@ -252,5 +256,7 @@ export async function buildProviderAttentionQueue(input: {
     generatedAt: now.toISOString(),
     items,
     readOnly: true,
+    autoEscalation: false,
+    providerRanking: false,
   };
 }

@@ -34,4 +34,7 @@ export type AttentionQueue = {
   generatedAt: string;
   items: AttentionItem[];
   readOnly: true;
+  /** Explicit honesty — queue never auto-escalates or ranks providers. */
+  autoEscalation: false;
+  providerRanking: false;
 };
