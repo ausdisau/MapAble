@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { adaptStartingWorkMission } from "@/lib/adaptive-access";
 import {
   isStartingWorkPilotEnabled,
   startingWorkPilotConfig,
@@ -9,6 +10,8 @@ import { runGoldenJourney } from "@/lib/pilot/starting-work/golden-journey";
 import { StartingWorkControls } from "./StartingWorkControls";
 
 export default function StartingWorkPilotPage() {
+  const presentation = adaptStartingWorkMission({ profile: null });
+
   if (!isStartingWorkPilotEnabled()) {
     return (
       <main className="mx-auto max-w-3xl space-y-4 p-6">
@@ -25,7 +28,13 @@ export default function StartingWorkPilotPage() {
   const baseline = runGoldenJourney({});
 
   return (
-    <main className="mx-auto max-w-3xl space-y-6 p-6">
+    <main
+      className="mx-auto max-w-3xl space-y-6 p-6"
+      data-adapt-runtime={presentation.applied ? "on" : "off"}
+      data-adapt-rendition={
+        presentation.policy?.contentRendition ?? "standard"
+      }
+    >
       <header className="space-y-2">
         <h1 className="text-2xl font-bold">Starting Work — Taylor</h1>
         <p className="text-muted-foreground">
