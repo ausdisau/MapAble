@@ -10,6 +10,11 @@ export const startingWorkPilotConfig = {
   get dbPersistence() {
     return process.env.MAPABLE_STARTING_WORK_DB_PERSISTENCE_ENABLED === "true";
   },
+  authorityCeiling: "SYNTHETIC_PILOT_ONLY" as const,
+  productionClaimStatus: "not_claimable" as const,
+  maturity: "controlled_pilot" as const,
+  /** Honesty: simulation ≠ live booking / CareOSMission SoR. */
+  isLiveBookingEngine: false as const,
 };
 
 export function isStartingWorkPilotEnabled(
