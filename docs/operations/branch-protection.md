@@ -41,14 +41,14 @@ Specialist second review for auth, consent, safeguarding, billing, payments, ten
 
 ### Longer-term (GitHub Organisation)
 
-1. Create a GitHub Organisation and transfer the repository.  
+1. Create a GitHub Organisation and transfer the repository.
 2. Create teams:
 
-- `@org/mapable-maintainers` — default  
-- `@org/mapable-security` — auth, encryption, tenancy  
-- `@org/mapable-privacy` — consent, participant export  
-- `@org/mapable-safeguarding` — incidents / Q&S  
-- `@org/mapable-billing` — billing, payments, payouts  
+- `@org/mapable-maintainers` — default
+- `@org/mapable-security` — auth, encryption, tenancy
+- `@org/mapable-privacy` — consent, participant export
+- `@org/mapable-safeguarding` — incidents / Q&S
+- `@org/mapable-billing` — billing, payments, payouts
 
 3. Restore team-based CODEOWNERS and enable required CODEOWNER reviews on `main`.
 

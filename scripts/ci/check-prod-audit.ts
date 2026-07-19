@@ -112,7 +112,9 @@ function main(): void {
     ["high", "critical"].includes(String(a.severity ?? "").toLowerCase()),
   );
 
-  const activeExceptions = allowlist.exceptions.filter((e) => e.expiry >= today);
+  const activeExceptions = allowlist.exceptions.filter(
+    (e) => e.expiry >= today,
+  );
   const expired = allowlist.exceptions.filter((e) => e.expiry < today);
   if (expired.length > 0) {
     console.error("Expired advisory allowlist entries (must renew or remove):");
@@ -127,8 +129,7 @@ function main(): void {
     const ids = advisoryIds(adv);
     const pkg = adv.module_name ?? "unknown";
     const paths =
-      adv.findings?.flatMap((f) => f.paths ?? []) ??
-      ([] as string[]);
+      adv.findings?.flatMap((f) => f.paths ?? []) ?? ([] as string[]);
     const matched = activeExceptions.some((ex) => {
       const exId = ex.advisoryId.toUpperCase();
       if (!ids.includes(exId) && !ids.includes(String(adv.id ?? ""))) {
@@ -137,7 +138,8 @@ function main(): void {
       if (ex.package !== pkg) return false;
       if (paths.length === 0) return true;
       return paths.some(
-        (p) => p === ex.path || p.startsWith(`${ex.path}>`) || p.includes(ex.path),
+        (p) =>
+          p === ex.path || p.startsWith(`${ex.path}>`) || p.includes(ex.path),
       );
     });
     if (!matched) {

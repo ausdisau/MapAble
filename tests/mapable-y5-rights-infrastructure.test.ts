@@ -33,12 +33,13 @@ describe("Y5 rights infrastructure config", () => {
 
 describe("Y5 layering helpers", () => {
   it("falls back to phase10/12 when Y5 flags off", () => {
+    // Wave 0: phase10/12 scaffolds fail closed — fallbacks remain off unless explicitly enabled.
     expect(isApiCertificationV2Enabled()).toBe(false);
     expect(isCertifiedApiEcosystemV2Enabled()).toBe(false);
     expect(isFederatedResearchV2Enabled()).toBe(false);
     expect(isResearchFederationAtScaleV2Enabled()).toBe(false);
-    expect(isCommunityGovernanceMembershipV2Enabled()).toBe(true);
-    expect(isFederatedAccountabilityV2Enabled()).toBe(true);
+    expect(isCommunityGovernanceMembershipV2Enabled()).toBe(false);
+    expect(isFederatedAccountabilityV2Enabled()).toBe(false);
   });
 });
 
