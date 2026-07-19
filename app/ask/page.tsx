@@ -1,7 +1,8 @@
 import { Suspense } from "react";
 
-import { AskPageClient } from "./AskPageClient";
 import { Badge } from "@/components/ui/badge";
+
+import { AskPageClient } from "./AskPageClient";
 
 export const metadata = {
   title: "Ask MapAble | MapAble",

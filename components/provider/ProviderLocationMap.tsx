@@ -1,6 +1,6 @@
 "use client";
 
-import L, { latLngBounds } from "leaflet";
+import { latLngBounds } from "leaflet";
 import { useEffect } from "react";
 import {
   MapContainer,

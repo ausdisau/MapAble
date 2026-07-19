@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
 
 import { ndiaApiAdapterStub } from "@/lib/ndis/claiming/adapters/NdiaApiAdapter.stub";
+import { checksumExport } from "@/lib/ndis/claiming/exporters/bulkPaymentRequestExporter";
 import {
   fundingSourceToPaymentRoute,
   paymentRouteRequiresMyProviderCheck,
   paymentRouteUsesBulkExport,
 } from "@/lib/ndis/claiming/paymentRoute";
-import { checksumExport } from "@/lib/ndis/claiming/exporters/bulkPaymentRequestExporter";
 import { FUNDING_ROUTE_LABELS } from "@/lib/ndis/claiming/types";
 
 describe("NDIS payment routes", () => {

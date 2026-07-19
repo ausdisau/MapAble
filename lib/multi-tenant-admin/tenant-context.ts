@@ -1,7 +1,7 @@
 import type { CurrentUser } from "@/lib/auth/current-user";
 import { y2OrchestrationConfig } from "@/lib/config/y2-orchestration";
-import { prisma } from "@/lib/prisma";
 import { assertTenantAccess } from "@/lib/multi-tenant-admin/tenant-service";
+import { prisma } from "@/lib/prisma";
 
 export type TenantContext = {
   tenantId: string | null;

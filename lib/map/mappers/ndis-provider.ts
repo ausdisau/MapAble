@@ -1,8 +1,8 @@
 import type { Provider } from "@/app/provider-finder/providers";
 import type { NdisProviderSearchRow } from "@/lib/ingestion/ndis-providers-search";
 import { entitiesToGeoJSON } from "@/lib/map/geojson";
-import type { MapPointEntity } from "@/lib/map/types";
 import { MAP_LAYER_IDS } from "@/lib/map/map-layer-ids";
+import type { MapPointEntity } from "@/lib/map/types";
 
 const AU_STATES = new Set([
   "NSW",

@@ -12,6 +12,8 @@ export async function createCareShiftFromRequest(params: {
   workerProfileId?: string;
   careBookingId?: string;
   createdById: string;
+  recurringScheduleId?: string;
+  occurrenceDate?: Date;
 }) {
   const request = await prisma.careRequest.findUnique({
     where: { id: params.careRequestId },
@@ -34,6 +36,8 @@ export async function createCareShiftFromRequest(params: {
         ? { summary: request.accessRequirementsSummary }
         : {},
       status: params.workerProfileId ? "worker_assigned" : "scheduled",
+      recurringScheduleId: params.recurringScheduleId,
+      occurrenceDate: params.occurrenceDate,
     },
   });
 

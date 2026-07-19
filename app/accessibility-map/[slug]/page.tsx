@@ -1,9 +1,10 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import type { Metadata } from "next";
 
 import { AccessFitBreakdown } from "@/components/access-fit/AccessFitBreakdown";
 import { WhatToConfirmList } from "@/components/access-fit/WhatToConfirmList";
+import { ViewFloorPlanButton } from "@/components/accessibility-map/floor-plan/ViewFloorPlanButton";
 import { MapAbleCareMarketingShell } from "@/components/marketing/MapAbleCareMarketingShell";
 import { calculateAccessFit } from "@/lib/access-fit/calculate-access-fit";
 import { DEMO_ACCESS_NEEDS } from "@/lib/access-fit/types";
@@ -140,6 +141,31 @@ export default async function AccessibilityMapPlacePage({ params }: PageProps) {
             ...unknownDomains.map((domain) => `Confirm: ${domain.name}`),
           ]}
         />
+
+        <section
+          aria-labelledby="floor-plan-heading"
+          className="rounded-2xl border border-slate-200 bg-[#F6FBFC] p-5"
+        >
+          <h2 id="floor-plan-heading" className="text-xl font-black">
+            Indoor floor plan
+          </h2>
+          <p className="mt-2 text-sm text-slate-600">
+            View an interactive floor plan with verified accessibility features, measurements, and
+            step-free routes where available.
+          </p>
+          <div className="mt-4">
+            {place.hasFloorPlan ? (
+              <ViewFloorPlanButton
+                venueId={place.id}
+                venueName={place.name}
+                venueSlug={place.slug}
+                variant="primary"
+              />
+            ) : (
+              <p className="text-sm text-slate-600">Floor plan not currently available.</p>
+            )}
+          </div>
+        </section>
 
         <section aria-labelledby="evidence-heading">
           <h2 id="evidence-heading" className="text-xl font-black">

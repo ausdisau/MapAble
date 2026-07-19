@@ -1,10 +1,11 @@
-import { getAppleClientSecret } from "@/lib/auth/apple-client-secret";
 import AppleProvider from "next-auth/providers/apple";
 import Auth0Provider from "next-auth/providers/auth0";
 import AzureADProvider from "next-auth/providers/azure-ad";
 import FacebookProvider from "next-auth/providers/facebook";
 import GoogleProvider from "next-auth/providers/google";
 import type { Provider } from "next-auth/providers/index";
+
+import { getAppleClientSecret } from "@/lib/auth/apple-client-secret";
 
 export type OAuthProviderFlags = {
   auth0: boolean;

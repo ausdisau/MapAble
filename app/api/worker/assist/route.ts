@@ -3,7 +3,6 @@ import { NextResponse } from "next/server";
 import { requireApiSession } from "@/lib/api/auth-handler";
 import { jsonError } from "@/lib/api/response";
 import { handleWorkerAssistRequest } from "@/lib/copilot/worker-assist-service";
-import { prisma } from "@/lib/prisma";
 
 export async function POST(req: Request) {
   const user = await requireApiSession();

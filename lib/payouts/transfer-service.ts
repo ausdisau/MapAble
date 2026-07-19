@@ -1,11 +1,21 @@
+import { isConnectPayoutsEnabled } from "@/lib/billing/config";
 import { writeBillingAuditLog } from "@/lib/billing-core/audit";
 import { isBillingStripeConfigured } from "@/lib/billing-core/config";
+import { isPayoutsEnabled } from "@/lib/payouts/config";
 import { splitTransferIdempotencyKey } from "@/lib/payouts/payout-policy";
 import { canReleasePayout } from "@/lib/payouts/readiness-service";
 import { prisma } from "@/lib/prisma";
 import { getStripeClient } from "@/lib/stripe/client";
 
 export async function createTransferForPayoutSplit(payoutSplitId: string) {
+  if (!isPayoutsEnabled() && !isConnectPayoutsEnabled()) {
+    return {
+      ok: false as const,
+      error:
+        "Stripe Connect payouts are disabled. Set MAPABLE_PAYOUTS_ENABLED=true only after authenticated environment testing.",
+    };
+  }
+
   if (!isBillingStripeConfigured()) {
     return { ok: false as const, error: "Stripe is not configured" };
   }

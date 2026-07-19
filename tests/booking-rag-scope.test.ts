@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 
+import type { CurrentUser } from "@/lib/auth/current-user";
 import {
   canViewSensitiveBookingFields,
   buildBookingRAGScope,
 } from "@/lib/bookings/rag/scope";
-import type { CurrentUser } from "@/lib/auth/current-user";
 
 function makeUser(overrides: Partial<CurrentUser> = {}): CurrentUser {
   return {

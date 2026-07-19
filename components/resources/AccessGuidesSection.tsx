@@ -1,14 +1,14 @@
 import Link from "next/link";
 import React from "react";
 
-import type { AccessGuide } from "@/lib/resources/access-guides-data";
-import { accessGuideDownloads } from "@/lib/resources/access-guides-data";
 import {
   mapablePublicCardClass,
   mapablePublicEyebrowClass,
   mapablePublicPageContainerClass,
   mapablePublicPrimaryButtonClass,
 } from "@/lib/marketing/public-page-styles";
+import type { AccessGuide } from "@/lib/resources/access-guides-data";
+import { accessGuideDownloads } from "@/lib/resources/access-guides-data";
 
 type AccessGuidesSectionProps = {
   capitalGuides: AccessGuide[];

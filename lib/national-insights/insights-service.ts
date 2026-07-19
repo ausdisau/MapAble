@@ -8,8 +8,8 @@ import {
   getLatestBackupRecoverySuccessRate,
   getLatestReconciliationUnpaidPercent,
 } from "@/lib/continuity/continuity-intelligence-service";
-import { getTrustPassportPilotMetrics } from "@/lib/trust-passport/trust-passport-service";
 import { prisma } from "@/lib/prisma";
+import { getTrustPassportPilotMetrics } from "@/lib/trust-passport/trust-passport-service";
 
 function suppressMetric(n: number) {
   if (n > 0 && n < phase5Config.smallCellSuppressionThreshold) {

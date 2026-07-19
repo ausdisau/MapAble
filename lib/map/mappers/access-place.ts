@@ -1,6 +1,6 @@
 import { entitiesToGeoJSON } from "@/lib/map/geojson";
-import type { MapPointEntity } from "@/lib/map/types";
 import { MAP_LAYER_IDS } from "@/lib/map/map-layer-ids";
+import type { MapPointEntity } from "@/lib/map/types";
 
 export type AccessPlaceMapInput = {
   id: string;

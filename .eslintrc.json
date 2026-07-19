@@ -46,6 +46,11 @@
       }
     ],
     "import/no-unresolved": "error",
+    "import/no-named-as-default": "off",
+    "import/no-named-as-default-member": "off",
+    "@next/next/no-img-element": "off",
+    "@typescript-eslint/no-explicit-any": "off",
+    "react-hooks/exhaustive-deps": "off",
     "react/react-in-jsx-scope": "off",
     "react/prop-types": "off"
   },

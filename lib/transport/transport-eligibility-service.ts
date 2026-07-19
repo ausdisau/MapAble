@@ -1,8 +1,8 @@
 import type { TransportVerificationKind } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
-import { TransportApiError } from "@/lib/transport/transport-api-error";
 import { parseMobilityRequirements } from "@/lib/transport/mobility-schema";
+import { TransportApiError } from "@/lib/transport/transport-api-error";
 import type { EligibilityCheckResult } from "@/types/transport-scheduling";
 
 const DRIVER_REQUIRED: TransportVerificationKind[] = [

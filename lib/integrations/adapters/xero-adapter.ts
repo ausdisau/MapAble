@@ -1,9 +1,9 @@
+import { isXeroConfigured } from "@/lib/config/phase2";
+import { isIntegrationEnvEnabled } from "@/lib/integrations/integration-feature-policy";
 import type {
   IntegrationAdapter,
   IntegrationHealthResult,
 } from "@/lib/integrations/integration-types";
-import { isIntegrationEnvEnabled } from "@/lib/integrations/integration-feature-policy";
-import { isXeroConfigured } from "@/lib/config/phase2";
 
 export const xeroAdapter: IntegrationAdapter = {
   key: "xero",

@@ -1,7 +1,7 @@
 import { requireAuth } from "@/lib/auth/guards";
 import { BENCHMARK_DISCLAIMER } from "@/lib/config/y4-civic-platform";
-import { getSafeguardedBenchmarksForOrg } from "@/lib/provider-benchmarking/benchmark-service";
 import { prisma } from "@/lib/prisma";
+import { getSafeguardedBenchmarksForOrg } from "@/lib/provider-benchmarking/benchmark-service";
 
 export default async function ProviderBenchmarksPage() {
   const user = await requireAuth();

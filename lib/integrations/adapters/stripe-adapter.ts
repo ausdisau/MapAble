@@ -1,8 +1,8 @@
+import { isIntegrationEnvEnabled } from "@/lib/integrations/integration-feature-policy";
 import type {
   IntegrationAdapter,
   IntegrationHealthResult,
 } from "@/lib/integrations/integration-types";
-import { isIntegrationEnvEnabled } from "@/lib/integrations/integration-feature-policy";
 import { isStripeIntegrationEnabled } from "@/lib/stripe/config";
 
 export const stripeAdapter: IntegrationAdapter = {

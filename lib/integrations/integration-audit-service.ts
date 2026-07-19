@@ -1,5 +1,5 @@
-import { logIntegrationEvent } from "@/lib/integrations/integration-event-service";
 import { createAuditEvent } from "@/lib/audit/audit-event-service";
+import { logIntegrationEvent } from "@/lib/integrations/integration-event-service";
 
 export async function auditIntegrationAction(input: {
   integrationKey: string;

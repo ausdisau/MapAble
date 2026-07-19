@@ -1,6 +1,6 @@
 import { requireAuth } from "@/lib/auth/guards";
-import { getTrustPassportSummary } from "@/lib/trust-passport/trust-passport-service";
 import { prisma } from "@/lib/prisma";
+import { getTrustPassportSummary } from "@/lib/trust-passport/trust-passport-service";
 
 import { TrustPassportActions } from "./TrustPassportActions";
 

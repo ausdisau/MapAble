@@ -1,7 +1,7 @@
+import { prisma } from "@/lib/prisma";
 import { calcomAdapter } from "@/lib/scheduling/calcom-adapter";
 import { internalSchedulingAdapter } from "@/lib/scheduling/internal-scheduling-adapter";
 import type { SchedulingAdapter } from "@/lib/scheduling/scheduling-adapter";
-import { prisma } from "@/lib/prisma";
 
 export function getSchedulingProvider() {
   return process.env.SCHEDULING_PROVIDER === "calcom" ? "calcom" : "internal";

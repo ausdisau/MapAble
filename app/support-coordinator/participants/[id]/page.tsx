@@ -5,11 +5,11 @@ import {
   computeParticipantContinuityScore,
   isContinuityIntelligenceEnabled,
 } from "@/lib/continuity/continuity-intelligence-service";
+import { listParticipationGoalsForCoordinator } from "@/lib/participation/participation-planner-service";
 import {
   getCoordinatorParticipantTimeline,
   getCoordinatorParticipantSummary,
 } from "@/lib/support-coordinator/relationship-service";
-import { listParticipationGoalsForCoordinator } from "@/lib/participation/participation-planner-service";
 
 export default async function CoordinatorParticipantDetailPage({
   params,

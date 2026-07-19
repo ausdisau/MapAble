@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-/** Canonical book-trip flow lives under the dashboard shell. */
+/** Canonical book-trip flow for the transport module pack path. */
 export default function TransportBookRedirectPage() {
-  redirect("/dashboard/transport/new");
+  redirect("/transport/request");
 }

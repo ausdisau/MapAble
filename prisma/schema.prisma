@@ -128,6 +128,7 @@ model User {
   transportTripRequests     TransportTripRequest[] @relation("TransportTripRequestParticipant")
   transportTrips            TransportTrip[]        @relation("TransportTripParticipant")
   transportTripEvents       TransportTripEvent[]   @relation("TransportTripEventActor")
+  transportQuotes           TransportQuote[]       @relation("TransportQuoteParticipant")
 
   // AI-enabled case management
   caseManagementOwned       Case[]                 @relation("CaseAssignedToUser")
@@ -140,6 +141,15 @@ model User {
   caseTasksCompleted        CaseTask[]             @relation("CaseTaskCompletedBy")
   caseLinksCreated          CaseLink[]             @relation("CaseLinkCreatedBy")
   caseAiInsightsRequested   CaseAIInsight[]        @relation("CaseAIInsightRequestedBy")
+  billingServiceRecords     BillingServiceRecord[] @relation("BillingServiceRecordParticipant")
+  billingDisputes           BillingDispute[]       @relation("BillingDisputeParticipant")
+  billingDisputeMessages    BillingDisputeMessage[] @relation("BillingDisputeMessageAuthor")
+
+  // Trust Fabric — purpose-bound access receipts (participant-facing)
+  accessReceiptsAsParticipant ParticipantAccessReceipt[] @relation("AccessReceiptParticipant")
+  accessReceiptsAsActor       ParticipantAccessReceipt[] @relation("AccessReceiptActor")
+  breakGlassSessionsOpened    BreakGlassAccessSession[]  @relation("BreakGlassOpenedBy")
+  decisionNoticesOwned        DecisionNoticeRecord[]     @relation("DecisionNoticeHumanOwner")
 
   // Shared programme foundation
   participantAuthorityGrantsAsParticipant ParticipantAuthorityGrant[] @relation("AuthorityGrantParticipant")
@@ -725,6 +735,7 @@ model Organisation {
   onboardingProfiles     OnboardingProfile[]
   transportTripRequests  TransportTripRequest[] @relation("TransportTripRequestProvider")
   transportTrips         TransportTrip[]        @relation("TransportTripProvider")
+  transportQuotes        TransportQuote[]       @relation("TransportQuoteOrganisation")
   transportDrivers       TransportDriver[]      @relation("TransportDrivers")
   transportVehicles      TransportVehicle[]     @relation("TransportVehicles")
   rideRuns               RideRun[]              @relation("RideRuns")
@@ -732,6 +743,13 @@ model Organisation {
   engagementImprovementActions EngagementImprovementAction[]
   engagementNpsResponses EngagementNpsResponse[]
   workerTrainingModules  WorkerTrainingModule[]
+  billingServiceRecords  BillingServiceRecord[] @relation("BillingServiceRecordOrg")
+  pricingPolicies        PricingPolicy[]
+  billingCentrePayouts   BillingCentreProviderPayout[]
+  billingClaimBatches    BillingClaimBatch[]
+  billingIntegrationConnections BillingIntegrationConnection[]
+  billingReconSessions   BillingReconciliationSession[]
+  accessReceipts         ParticipantAccessReceipt[] @relation("AccessReceiptOrganisation")
 
   // Shared programme foundation
   navigatorOrganisations              NavigatorOrganisation[]
@@ -824,6 +842,83 @@ model AuditEvent {
   @@index([action])
   @@index([participantId])
   @@index([createdAt])
+}
+
+/// Purpose-bound receipt for sensitive participant-data access (Trust Fabric).
+/// Categories only — never stores raw secrets or model chain-of-thought.
+model ParticipantAccessReceipt {
+  id               String   @id @default(cuid())
+  participantId    String
+  participant      User     @relation("AccessReceiptParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  actorUserId      String?
+  actorUser        User?    @relation("AccessReceiptActor", fields: [actorUserId], references: [id], onDelete: SetNull)
+  organisationId   String?
+  organisation     Organisation? @relation("AccessReceiptOrganisation", fields: [organisationId], references: [id], onDelete: SetNull)
+  purpose          String
+  fieldCategories  String[] @default([])
+  authoritySource  String
+  authorityRef     String?
+  consentRecordId  String?
+  expiresAt        DateTime?
+  correlationId    String
+  outcome          String
+  challengedAt     DateTime?
+  challengeNote    String?
+  createdAt        DateTime @default(now())
+
+  @@index([participantId, createdAt])
+  @@index([correlationId])
+  @@index([actorUserId, createdAt])
+  @@map("participant_access_receipts")
+}
+
+/// Durable break-glass session with after-action review requirement.
+model BreakGlassAccessSession {
+  id                 String    @id @default(cuid())
+  adminUserId        String
+  adminUser          User      @relation("BreakGlassOpenedBy", fields: [adminUserId], references: [id], onDelete: Cascade)
+  purpose            String
+  reason             String
+  organisationId     String?
+  participantId      String?
+  fieldCategories    String[]  @default([])
+  openedAt           DateTime  @default(now())
+  expiresAt          DateTime
+  ticketRef          String?
+  afterActionRequired Boolean  @default(true)
+  afterActionCompletedAt DateTime?
+  afterActionNote    String?
+  revokedAt          DateTime?
+  correlationId      String
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  @@index([adminUserId, expiresAt])
+  @@index([participantId])
+  @@index([correlationId])
+  @@map("break_glass_access_sessions")
+}
+
+/// Consequential deterministic decision notice (explainable, challengeable).
+model DecisionNoticeRecord {
+  id                 String   @id @default(cuid())
+  decision           String
+  responsibleSystem  String
+  reasonCodes        String[] @default([])
+  evidenceRefs       String[] @default([])
+  unknowns           String[] @default([])
+  humanOwnerUserId   String?
+  humanOwner         User?    @relation("DecisionNoticeHumanOwner", fields: [humanOwnerUserId], references: [id], onDelete: SetNull)
+  participantId      String?
+  organisationId     String?
+  reviewPath         String
+  correctionPath     String
+  correlationId      String
+  createdAt          DateTime @default(now())
+
+  @@index([participantId, createdAt])
+  @@index([correlationId])
+  @@map("decision_notice_records")
 }
 
 model Booking {
@@ -1570,11 +1665,15 @@ model CareShift {
   careServiceLog          CareServiceLog?
   shiftCancellations      CareShiftCancellation[]
   backupRecovery          BackupShiftRecovery?
+  recurringScheduleId     String?
+  recurringSchedule       CareRecurringSchedule? @relation(fields: [recurringScheduleId], references: [id], onDelete: SetNull)
+  occurrenceDate          DateTime?
 
   @@index([participantId, status])
   @@index([organisationId])
   @@index([workerProfileId])
   @@index([careBookingId])
+  @@index([recurringScheduleId, occurrenceDate])
 }
 
 model CareBooking {
@@ -1605,10 +1704,66 @@ model CareBooking {
   recoveryLinks     CareServiceRecoveryLink[]
   invoiceLinks      CareInvoiceLink[]
   ndisDeliveryAuthorizations NdisServiceDeliveryAuthorization[]
+  recurringSchedules CareRecurringSchedule[]
 
   @@index([participantId, status])
   @@index([organisationId, status])
   @@map("care_bookings")
+}
+
+enum CareRecurringScheduleStatus {
+  draft
+  active
+  paused
+  ended
+}
+
+enum CareScheduleExceptionType {
+  skip
+  reschedule
+}
+
+/// Recurring Care cadence for a booking. Agreement SoT remains CareServiceAgreement.
+model CareRecurringSchedule {
+  id             String                      @id @default(cuid())
+  careBookingId  String
+  careBooking    CareBooking                 @relation(fields: [careBookingId], references: [id], onDelete: Cascade)
+  participantId  String
+  organisationId String
+  /// weekly | fortnightly
+  frequency      String
+  /// ISO weekdays 1=Mon .. 7=Sun
+  byWeekday      Int[]
+  startTimeLocal String
+  endTimeLocal   String
+  timezone       String                      @default("Australia/Sydney")
+  effectiveFrom  DateTime
+  effectiveTo    DateTime?
+  status         CareRecurringScheduleStatus @default(draft)
+  createdAt      DateTime                    @default(now())
+  updatedAt      DateTime                    @updatedAt
+
+  exceptions CareRecurringScheduleException[]
+  shifts     CareShift[]
+
+  @@index([careBookingId, status])
+  @@index([participantId])
+  @@map("care_recurring_schedules")
+}
+
+model CareRecurringScheduleException {
+  id             String                    @id @default(cuid())
+  scheduleId     String
+  schedule       CareRecurringSchedule     @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+  occurrenceDate DateTime                  @db.Date
+  type           CareScheduleExceptionType
+  newStartAt     DateTime?
+  newEndAt       DateTime?
+  reason         String?
+  createdAt      DateTime                  @default(now())
+
+  @@unique([scheduleId, occurrenceDate])
+  @@map("care_recurring_schedule_exceptions")
 }
 
 model CareBookingEvent {
@@ -2416,6 +2571,7 @@ model MatchCandidate {
   createdAt              DateTime             @default(now())
 
   factors MatchFactor[]
+  aiMatchCandidates AiMatchCandidate[]
 
   @@index([matchRunId, status])
 }
@@ -2830,14 +2986,28 @@ model AiMatchCandidate {
   aiMatchRunId    String
   aiMatchRun      AiMatchRun @relation(fields: [aiMatchRunId], references: [id], onDelete: Cascade)
   matchCandidateId String?
+  matchCandidate  MatchCandidate? @relation(fields: [matchCandidateId], references: [id], onDelete: SetNull)
   rank            Int      @default(0)
+  /// Legacy column — stores deterministic rule score only. Not a model score.
   aiScore         Float
   combinedScore   Float
+  /// Explicit deterministic rule score (same basis as aiScore after truth hardening).
+  ruleScore       Float    @default(0)
+  /// Null when no model ran. Never fabricate from rule scores.
+  modelCommentaryScore Float?
+  modelRunId      String?
+  modelVersionLabel String?
+  hardRequirementsMet Boolean @default(true)
+  unknownFieldsJson Json     @default("[]")
+  expiresAt       DateTime?
   lowConfidence   Boolean  @default(false)
   status          String   @default("generated")
   createdAt       DateTime @default(now())
 
   explanations AiMatchExplanation[]
+
+  @@index([matchCandidateId])
+  @@index([expiresAt])
 }
 
 model AiMatchExplanation {
@@ -5200,9 +5370,16 @@ enum BillingAccountRole {
 enum BillingFundingSourceType {
   ndis_plan_managed
   ndis_self_managed
+  ndis_agency_managed
   private_card
+  private_pay
   organisation_invoice
+  employer_funded
+  insurance
+  home_care_package
   grant
+  grant_funded
+  mixed
   other
 }
 
@@ -5210,6 +5387,9 @@ enum BillingServiceType {
   care
   transport
   jobs
+  foods
+  moves
+  academy
   marketplace
   subscription
   other
@@ -5217,13 +5397,122 @@ enum BillingServiceType {
 
 enum BillingInvoiceStatus {
   draft
+  evidence_required
+  policy_review_required
+  participant_review
+  provider_review
+  approved
+  ready_to_issue
   issued
-  pending_payment
+  sent
+  partially_paid
   paid
+  overdue
+  disputed
+  on_hold
+  credited
+  void
+  written_off
+  pending_payment
   failed
   refunded
   cancelled
   exported
+}
+
+enum BillingServiceRecordStatus {
+  open
+  evidence_pending
+  locked
+  charged
+  invoiced
+  cancelled
+}
+
+enum BillingServiceRecordSourceType {
+  care_shift
+  timesheet
+  transport_trip
+  employment_session
+  foods_order
+  marketplace_transaction
+  subscription_period
+  cancellation
+  travel_cost
+  non_labour_cost
+  other
+}
+
+enum BillingEvidenceStatus {
+  missing
+  submitted
+  approved
+  rejected
+}
+
+enum PricingPolicyStatus {
+  draft
+  verified
+  active
+  superseded
+  retired
+}
+
+enum BillingApprovalType {
+  participant
+  provider
+  mapable_finance
+}
+
+enum BillingApprovalDecision {
+  pending
+  approved
+  rejected
+  changes_requested
+}
+
+enum BillingDisputeStatus {
+  open
+  awaiting_evidence
+  under_review
+  resolved_credit
+  resolved_upheld
+  resolved_partial
+  withdrawn
+  escalated
+}
+
+enum BillingCreditNoteStatus {
+  draft
+  issued
+  applied
+  void
+}
+
+enum BillingCentreClaimGateway {
+  mock
+  csv_export
+  plan_manager
+  official_disabled
+}
+
+enum BillingCentrePayoutState {
+  calculated
+  review_required
+  approved
+  scheduled
+  processing
+  paid
+  failed
+  held
+  cancelled
+}
+
+enum BillingReconciliationMatchStatus {
+  suggested
+  confirmed
+  rejected
+  unmatched
 }
 
 enum BillingPayoutStatus {
@@ -5368,6 +5657,10 @@ model BillingInvoice {
   platformFeeCents         Int                    @default(0)
   gstCents                 Int                    @default(0)
   totalCents               Int                    @default(0)
+  discountCents            Int                    @default(0)
+  coPaymentCents           Int                    @default(0)
+  creditCents              Int                    @default(0)
+  amountPaidCents          Int                    @default(0)
   ndisLineItem             String?
   ndisClaimable            Boolean                @default(false)
   stripeCheckoutSessionId  String?
@@ -5377,6 +5670,12 @@ model BillingInvoice {
   planManagerExportStatus  String?
   dueAt                    DateTime?
   paidAt                   DateTime?
+  issuedAt                 DateTime?
+  servicePeriodStart       DateTime?
+  servicePeriodEnd         DateTime?
+  purchaseOrderRef         String?
+  planManagerRef           String?
+  participantDisplayRef    String?
   adminApprovalStatus      BillingAdminApprovalStatus @default(draft)
   disputedAt               DateTime?
   disputeReason            String?
@@ -5384,15 +5683,26 @@ model BillingInvoice {
   transferGroup            String?
   payerType                BillingPayerType?
   fundingSourceType        BillingFundingSourceType?
-  invoiceNumber            String?
+  invoiceNumber            String?                @unique
   payoutStatus             BillingPayoutStatus        @default(none)
   xeroInvoiceId            String?
+  draftVersion             Int                    @default(1)
+  policyVersionId          String?
+  notesForBilling          String?
   createdAt                DateTime               @default(now())
   updatedAt                DateTime               @updatedAt
 
-  lineItems BillingInvoiceLineItem[]
-  payments  BillingPayment[]
-  payoutBlocks PayoutBlock[]
+  lineItems      BillingInvoiceLineItem[]
+  payments       BillingPayment[]
+  payoutBlocks   PayoutBlock[]
+  transitions    BillingInvoiceTransition[]
+  approvals      BillingInvoiceApproval[]
+  deliveries     BillingInvoiceDelivery[]
+  creditNotes    BillingCreditNote[]
+  disputes       BillingDispute[]
+  serviceRecords BillingServiceRecord[]
+  claimItems     BillingClaimItem[]
+  reconMatches   BillingReconciliationMatch[]
 
   @@index([userId, status])
   @@index([providerId])
@@ -5401,29 +5711,46 @@ model BillingInvoice {
   @@index([adminApprovalStatus])
   @@index([transferGroup])
   @@index([invoiceNumber])
+  @@index([status, dueAt])
+  @@index([providerId, status])
 }
 
 model BillingInvoiceLineItem {
-  id              String         @id @default(cuid())
-  invoiceId       String
-  invoice         BillingInvoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
-  description     String
-  quantity        Decimal        @default(1)
-  unitAmountCents Int
-  totalCents      Int
-  ndisLineItem    String?
-  gstApplicable   Boolean        @default(false)
-  lineType        BillingInvoiceLineType?
-  recipientId     String?
-  serviceCategory String?
-  metadata        Json?
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @default(now()) @updatedAt
+  id                String         @id @default(cuid())
+  invoiceId         String
+  invoice           BillingInvoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  description       String
+  quantity          Decimal        @default(1)
+  unitAmountCents   Int
+  totalCents        Int
+  ndisLineItem      String?
+  gstApplicable     Boolean        @default(false)
+  gstCents          Int            @default(0)
+  lineType          BillingInvoiceLineType?
+  recipientId       String?
+  serviceCategory   String?
+  unit              String?
+  serviceDate       DateTime?
+  policyVersionId   String?
+  serviceRecordId   String?
+  serviceRecord     BillingServiceRecord? @relation(fields: [serviceRecordId], references: [id], onDelete: SetNull)
+  evidenceStatus    BillingEvidenceStatus @default(missing)
+  validationStatus  String?
+  travelClassification String?
+  locationCategory  String?
+  fundedCents       Int            @default(0)
+  coPaymentCents    Int            @default(0)
+  privateCents      Int            @default(0)
+  metadata          Json?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @default(now()) @updatedAt
 
   evidence InvoiceLineEvidence[]
 
   @@index([invoiceId])
   @@index([recipientId])
+  @@index([serviceRecordId])
+  @@index([policyVersionId])
 }
 
 model BillingPayment {
@@ -6863,10 +7190,80 @@ model AccessPlace {
   venueClaims      AccessVenueClaim[]
   venueProfile     AccessVenueProfile?
   importItems      AccessImportItem[]
+  floorPlans       AccessFloorPlan[]
+  floorPlanCorrections FloorPlanCorrectionProposal[]
+  indoorIncidents  IndoorAccessibilityIncident[]
+  visitPlans       VisitPlan[]
+  indoorCheckpoints IndoorCheckpoint[]
+  evidenceEnvelopes AccessEvidenceEnvelopeRecord[]
+  changeReviews    AccessChangeReviewRecord[]
 
   @@index([status])
   @@index([suburb, stateOrRegion])
   @@map("access_places")
+}
+
+/// Append-only living access evidence envelope (provenance). Does not replace AccessPlace.
+model AccessEvidenceEnvelopeRecord {
+  id                   String   @id @default(cuid())
+  envelopeId           String   @unique @map("envelope_id")
+  placeId              String?  @map("place_id")
+  place                AccessPlace? @relation(fields: [placeId], references: [id], onDelete: SetNull)
+  subjectCanonicalRef  String   @map("subject_canonical_ref")
+  subjectNodeId        String?  @map("subject_node_id")
+  featureKey           String?  @map("feature_key")
+  evidenceClasses      String[] @default([]) @map("evidence_classes")
+  envelopeJson         Json     @map("envelope_json")
+  conflictState        String   @default("none") @map("conflict_state")
+  verificationStatus   String   @default("unverified") @map("verification_status")
+  observedAt           DateTime? @map("observed_at")
+  effectiveFrom        DateTime? @map("effective_from")
+  effectiveTo          DateTime? @map("effective_to")
+  freshnessPolicyKey   String?  @map("freshness_policy_key")
+  expiresAt            DateTime? @map("expires_at")
+  precisionNote        String?  @map("precision_note")
+  confidenceBasis      String?  @map("confidence_basis")
+  contributorMode      String   @default("private") @map("contributor_mode")
+  createdById          String?  @map("created_by")
+  createdAt            DateTime @default(now()) @map("created_at")
+  supersededById       String?  @map("superseded_by")
+  changeReviews        AccessChangeReviewRecord[]
+
+  @@index([placeId, createdAt])
+  @@index([subjectCanonicalRef])
+  @@index([subjectNodeId])
+  @@index([expiresAt])
+  @@map("access_evidence_envelope_records")
+}
+
+/// Durable human change review — never auto-publishes to AccessPlace.
+model AccessChangeReviewRecord {
+  id                   String   @id @default(cuid())
+  reviewId             String   @unique @map("review_id")
+  placeId              String?  @map("place_id")
+  place                AccessPlace? @relation(fields: [placeId], references: [id], onDelete: SetNull)
+  evidenceEnvelopeId   String?  @map("evidence_envelope_id")
+  evidenceEnvelope     AccessEvidenceEnvelopeRecord? @relation(fields: [evidenceEnvelopeId], references: [id], onDelete: SetNull)
+  subjectCanonicalRef  String   @map("subject_canonical_ref")
+  subjectNodeId        String   @map("subject_node_id")
+  ontologyConceptId    String   @map("ontology_concept_id")
+  candidateJson        Json     @map("candidate_json")
+  outcome              String
+  oldStateSummary      String   @map("old_state_summary")
+  newCandidateSummary  String   @map("new_candidate_summary")
+  decision             String   @default("pending")
+  reviewerId           String?  @map("reviewer_id")
+  decidedAt            DateTime? @map("decided_at")
+  notesJson            Json     @default("[]") @map("notes_json")
+  autoOverwriteBlocked Boolean  @default(true) @map("auto_overwrite_blocked")
+  expiryAt             DateTime? @map("expiry_at")
+  createdAt            DateTime @default(now()) @map("created_at")
+  updatedAt            DateTime @updatedAt @map("updated_at")
+
+  @@index([placeId, createdAt])
+  @@index([subjectNodeId, decision])
+  @@index([decision, createdAt])
+  @@map("access_change_review_records")
 }
 
 model AccessPlaceLocation {
@@ -6935,6 +7332,182 @@ model AccessPlaceEvent {
   metadata  Json?
   createdAt DateTime @default(now()) @map("created_at")
   @@map("access_place_events")
+}
+
+enum AccessFloorPlanStatus {
+  draft
+  in_review
+  changes_requested
+  approved
+  published
+  superseded
+  archived
+  rejected
+}
+
+enum AccessFloorPlanVisibility {
+  public
+  authenticated
+  restricted
+  staffOnly
+}
+
+model AccessFloorPlan {
+  id                  String                    @id @default(cuid())
+  placeId             String                    @map("place_id")
+  place               AccessPlace               @relation(fields: [placeId], references: [id], onDelete: Cascade)
+  schemaVersion       Int                       @default(1) @map("schema_version")
+  floorCode           String                    @map("floor_code")
+  floorName           String                    @map("floor_name")
+  sortOrder           Int                       @default(0) @map("sort_order")
+  planAssetUrl        String                    @map("plan_asset_url")
+  planAssetType       String                    @map("plan_asset_type")
+  originalWidth       Int                       @map("original_width")
+  originalHeight      Int                       @map("original_height")
+  altText             String?                   @map("alt_text")
+  orientationLabel    String?                   @map("orientation_label")
+  isToScale           Boolean                   @default(false) @map("is_to_scale")
+  metresPerPlanUnit   Float?                    @map("metres_per_plan_unit")
+  publicationStatus   AccessFloorPlanStatus     @default(draft) @map("publication_status")
+  visibility          AccessFloorPlanVisibility @default(public)
+  sourceName          String?                   @map("source_name")
+  sourceUrl           String?                   @map("source_url")
+  licenceOrPermission String?                   @map("licence_or_permission")
+  version             Int                       @default(1)
+  verifiedAt          DateTime?                 @map("verified_at")
+  verifiedByType      String?                   @map("verified_by_type")
+  publishedAt         DateTime?                 @map("published_at")
+  supersededAt        DateTime?                 @map("superseded_at")
+  structuredData      Json                      @map("structured_data")
+  createdAt           DateTime                  @default(now()) @map("created_at")
+  updatedAt           DateTime                  @updatedAt @map("updated_at")
+
+  @@index([placeId, publicationStatus])
+  @@map("access_floor_plans")
+}
+
+model FloorPlanCorrectionProposal {
+  id            String   @id @default(cuid())
+  placeId       String   @map("place_id")
+  place         AccessPlace @relation(fields: [placeId], references: [id], onDelete: Cascade)
+  floorPlanId   String?  @map("floor_plan_id")
+  featureId     String?  @map("feature_id")
+  correctionType String  @map("correction_type")
+  description   String
+  proposedChanges Json?  @map("proposed_changes")
+  reporterId    String?  @map("reporter_id")
+  status        String   @default("pending")
+  moderatorId   String?  @map("moderator_id")
+  moderatorNotes String? @map("moderator_notes")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@index([placeId, status])
+  @@map("floor_plan_correction_proposals")
+}
+
+model IndoorAccessibilityIncident {
+  id              String   @id @default(cuid())
+  placeId         String   @map("place_id")
+  place           AccessPlace @relation(fields: [placeId], references: [id], onDelete: Cascade)
+  floorPlanId     String?  @map("floor_plan_id")
+  featureId       String?  @map("feature_id")
+  incidentType    String   @map("incident_type")
+  description     String
+  source          String
+  trustLevel      String   @map("trust_level")
+  operationalStatus String @default("unavailable") @map("operational_status")
+  reportedAt      DateTime @default(now()) @map("reported_at")
+  verifiedAt      DateTime? @map("verified_at")
+  effectiveFrom   DateTime @default(now()) @map("effective_from")
+  expectedResolutionAt DateTime? @map("expected_resolution_at")
+  expiresAt       DateTime? @map("expires_at")
+  resolvedAt      DateTime? @map("resolved_at")
+  moderationState String   @default("pending") @map("moderation_state")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@index([placeId, resolvedAt])
+  @@map("indoor_accessibility_incidents")
+}
+
+model VisitPlan {
+  id            String   @id @default(cuid())
+  ownerUserId   String   @map("owner_user_id")
+  placeId       String   @map("place_id")
+  place         AccessPlace @relation(fields: [placeId], references: [id], onDelete: Cascade)
+  title         String?
+  scheduledAt   DateTime? @map("scheduled_at")
+  payload       Json
+  shareScopes   Json?    @map("share_scopes")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  shares        VisitPlanShare[]
+
+  @@index([ownerUserId])
+  @@map("visit_plans")
+}
+
+model VisitPlanShare {
+  id            String   @id @default(cuid())
+  visitPlanId   String   @map("visit_plan_id")
+  visitPlan     VisitPlan @relation(fields: [visitPlanId], references: [id], onDelete: Cascade)
+  tokenHash     String   @unique @map("token_hash")
+  scopes        Json
+  expiresAt     DateTime @map("expires_at")
+  revokedAt     DateTime? @map("revoked_at")
+  accessCount   Int      @default(0) @map("access_count")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@index([visitPlanId])
+  @@map("visit_plan_shares")
+}
+
+model IndoorCheckpoint {
+  id              String   @id @default(cuid())
+  placeId         String   @map("place_id")
+  place           AccessPlace @relation(fields: [placeId], references: [id], onDelete: Cascade)
+  floorPlanId     String   @map("floor_plan_id")
+  label           String
+  publicLabel     String   @map("public_label")
+  position        Json
+  routeNodeId     String?  @map("route_node_id")
+  tokenVersion    Int      @default(1) @map("token_version")
+  active          Boolean  @default(true)
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@index([placeId, active])
+  @@map("indoor_checkpoints")
+}
+
+model PartnerApiClient {
+  id            String   @id @default(cuid())
+  name          String
+  scopes        String[]
+  keyHash       String   @unique @map("key_hash")
+  keyPrefix     String   @map("key_prefix")
+  active        Boolean  @default(true)
+  rateLimit     Int      @default(100) @map("rate_limit")
+  allowedOrigins String[] @map("allowed_origins")
+  lastUsedAt    DateTime? @map("last_used_at")
+  expiresAt     DateTime? @map("expires_at")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@map("partner_api_clients")
+}
+
+model AccessibilityPreferenceProfile {
+  id            String   @id @default(cuid())
+  userId        String?  @unique @map("user_id")
+  sessionKey    String?  @unique @map("session_key")
+  preferences   Json
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@map("accessibility_preference_profiles")
 }
 
 model AccessPlaceReview {
@@ -7377,9 +7950,66 @@ model TransportTripRequest {
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
   trip                  TransportTrip?
+  quotes                TransportQuote[]
 
   @@index([participantId, status])
   @@map("transport_trip_requests")
+}
+
+enum TransportQuoteStatus {
+  proposed
+  accepted
+  rejected
+  expired
+  amended
+  cancelled
+}
+
+/// Durable transport quote with immutable version history.
+/// Quote acceptance is required before exact address disclosure to providers/drivers.
+model TransportQuote {
+  id                String               @id @default(cuid())
+  organisationId    String
+  organisation      Organisation         @relation("TransportQuoteOrganisation", fields: [organisationId], references: [id], onDelete: Cascade)
+  participantUserId String
+  participant       User                 @relation("TransportQuoteParticipant", fields: [participantUserId], references: [id], onDelete: Cascade)
+  tripRequestId     String?
+  tripRequest       TransportTripRequest? @relation(fields: [tripRequestId], references: [id], onDelete: SetNull)
+  currentVersion    Int                  @default(1)
+  status            TransportQuoteStatus @default(proposed)
+  providerLabel     String
+  expiresAt         DateTime
+  acceptedAt        DateTime?
+  rejectedAt        DateTime?
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+  versions          TransportQuoteVersion[]
+
+  @@index([organisationId, status])
+  @@index([participantUserId, status])
+  @@index([tripRequestId])
+  @@index([expiresAt])
+  @@map("transport_quotes")
+}
+
+model TransportQuoteVersion {
+  id                       String         @id @default(cuid())
+  quoteId                  String
+  quote                    TransportQuote @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+  version                  Int
+  currency                 String         @default("AUD")
+  components               Json
+  totalCents               Int
+  vehicleAssumptions       Json           @default("[]")
+  accessibilityAssumptions Json           @default("[]")
+  exclusions               Json           @default("[]")
+  fundingDisclaimer        String
+  cancellationPolicy       String
+  createdAt                DateTime       @default(now())
+
+  @@unique([quoteId, version])
+  @@index([quoteId])
+  @@map("transport_quote_versions")
 }
 
 model TransportTrip {
@@ -8923,4 +9553,1465 @@ model TrustRelationshipSnapshot {
 
   @@index([relationshipId, status])
   @@map("trust_relationship_snapshots")
+}
+
+// --- Billing & Invoicing Centre (financial operations layer) ---
+
+model PricingPolicy {
+  id             String   @id @default(cuid())
+  organisationId String?
+  organisation   Organisation? @relation(fields: [organisationId], references: [id], onDelete: SetNull)
+  name           String
+  jurisdiction   String   @default("AU")
+  sourceUrl      String?
+  notes          String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  versions PricingPolicyVersion[]
+
+  @@index([organisationId])
+  @@index([jurisdiction])
+}
+
+model PricingPolicyVersion {
+  id               String              @id @default(cuid())
+  policyId         String
+  policy           PricingPolicy       @relation(fields: [policyId], references: [id], onDelete: Cascade)
+  version          String
+  effectiveFrom    DateTime
+  effectiveTo      DateTime?
+  status           PricingPolicyStatus @default(draft)
+  verificationDate DateTime?
+  verifiedByUserId String?
+  sourceUrl        String?
+  notes            String?
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+
+  rules PricingRule[]
+
+  @@unique([policyId, version])
+  @@index([status, effectiveFrom])
+}
+
+model PricingRule {
+  id                 String               @id @default(cuid())
+  policyVersionId    String
+  policyVersion      PricingPolicyVersion @relation(fields: [policyVersionId], references: [id], onDelete: Cascade)
+  supportCategory    String?
+  supportItemNumber  String
+  supportItemName    String
+  registrationGroup  String?
+  unit               String
+  weekdayOrTimeBand  String?
+  remoteLoading      String?
+  providerType       String?
+  priceCapCents      Int
+  gstTreatment       String               @default("input_taxed")
+  cancellationRules  Json?
+  travelRules        Json?
+  nonLabourRules     Json?
+  requiredEvidence   Json?
+  status             PricingPolicyStatus  @default(verified)
+  notes              String?
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+
+  @@index([policyVersionId])
+  @@index([supportItemNumber])
+  @@index([supportItemNumber, weekdayOrTimeBand])
+}
+
+model BillingServiceRecord {
+  id                 String                        @id @default(cuid())
+  organisationId     String?
+  organisation       Organisation?                 @relation("BillingServiceRecordOrg", fields: [organisationId], references: [id], onDelete: SetNull)
+  participantId      String
+  participant        User                          @relation("BillingServiceRecordParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  sourceType         BillingServiceRecordSourceType
+  sourceId           String
+  serviceType        BillingServiceType
+  status             BillingServiceRecordStatus    @default(open)
+  serviceStart       DateTime
+  serviceEnd         DateTime?
+  quantity           Decimal                       @default(1) @db.Decimal(12, 4)
+  unit               String                        @default("hour")
+  supportItemCode    String?
+  workerOrProviderId String?
+  fundingSourceType  BillingFundingSourceType?
+  estimatedCents     Int                           @default(0)
+  lockedAt           DateTime?
+  lockedByUserId     String?
+  invoiceId          String?
+  invoice            BillingInvoice?               @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
+  chargeSnapshot     Json?
+  anomalyFlags       Json?
+  notesForBilling    String?
+  createdAt          DateTime                      @default(now())
+  updatedAt          DateTime                      @updatedAt
+
+  evidence  BillingServiceEvidence[]
+  lineItems BillingInvoiceLineItem[]
+
+  @@unique([sourceType, sourceId])
+  @@index([participantId, status])
+  @@index([organisationId, status])
+  @@index([invoiceId])
+  @@index([status, serviceStart])
+}
+
+model BillingServiceEvidence {
+  id              String                @id @default(cuid())
+  serviceRecordId String
+  serviceRecord   BillingServiceRecord  @relation(fields: [serviceRecordId], references: [id], onDelete: Cascade)
+  evidenceType    String
+  status          BillingEvidenceStatus @default(submitted)
+  referenceId     String?
+  summary         String
+  metadata        Json?
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+
+  @@index([serviceRecordId])
+}
+
+model BillingInvoiceTransition {
+  id          String               @id @default(cuid())
+  invoiceId   String
+  invoice     BillingInvoice       @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  actorId     String?
+  actorRole   String?
+  priorState  BillingInvoiceStatus
+  newState    BillingInvoiceStatus
+  reason      String?
+  evidenceIds Json?
+  ipAddress   String?
+  sessionId   String?
+  createdAt   DateTime             @default(now())
+
+  @@index([invoiceId, createdAt])
+}
+
+model BillingInvoiceApproval {
+  id           String                  @id @default(cuid())
+  invoiceId    String
+  invoice      BillingInvoice          @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  approvalType BillingApprovalType
+  decision     BillingApprovalDecision @default(pending)
+  actorId      String?
+  actorRole    String?
+  reason       String?
+  decidedAt    DateTime?
+  createdAt    DateTime                @default(now())
+  updatedAt    DateTime                @updatedAt
+
+  @@index([invoiceId])
+  @@index([decision])
+}
+
+model BillingInvoiceDelivery {
+  id          String   @id @default(cuid())
+  invoiceId   String
+  invoice     BillingInvoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  channel     String
+  recipient   String?
+  status      String
+  externalId  String?
+  payload     Json?
+  sentAt      DateTime?
+  createdAt   DateTime @default(now())
+
+  @@index([invoiceId])
+}
+
+model BillingCreditNote {
+  id              String                 @id @default(cuid())
+  invoiceId       String
+  invoice         BillingInvoice         @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  creditNoteNumber String?               @unique
+  status          BillingCreditNoteStatus @default(draft)
+  amountCents     Int
+  reason          String
+  lineItemIds     Json?
+  issuedAt        DateTime?
+  createdById     String?
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
+
+  @@index([invoiceId])
+  @@index([status])
+}
+
+model BillingDispute {
+  id            String               @id @default(cuid())
+  invoiceId     String
+  invoice       BillingInvoice       @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  participantId String
+  participant   User                 @relation("BillingDisputeParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  status        BillingDisputeStatus @default(open)
+  scope         String               @default("invoice")
+  lineItemIds   Json?
+  summary       String
+  preferredContact String?
+  outcomeReason String?
+  amountOnHoldCents Int              @default(0)
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+  resolvedAt    DateTime?
+
+  messages BillingDisputeMessage[]
+
+  @@index([invoiceId])
+  @@index([participantId, status])
+}
+
+model BillingDisputeMessage {
+  id         String         @id @default(cuid())
+  disputeId  String
+  dispute    BillingDispute @relation(fields: [disputeId], references: [id], onDelete: Cascade)
+  authorId   String?
+  author     User?          @relation("BillingDisputeMessageAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+  body       String
+  isInternal Boolean        @default(false)
+  createdAt  DateTime       @default(now())
+
+  @@index([disputeId, createdAt])
+}
+
+model BillingClaimBatch {
+  id                 String                   @id @default(cuid())
+  organisationId     String
+  organisation       Organisation             @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+  gateway            BillingCentreClaimGateway @default(mock)
+  status             String                   @default("NOT_READY")
+  externalReference  String?
+  simulated          Boolean                  @default(true)
+  validationJson     Json?
+  exportChecksum     String?
+  createdById        String?
+  submittedAt        DateTime?
+  createdAt          DateTime                 @default(now())
+  updatedAt          DateTime                 @updatedAt
+
+  items BillingClaimItem[]
+
+  @@index([organisationId, status])
+  @@index([externalReference])
+}
+
+model BillingClaimItem {
+  id            String           @id @default(cuid())
+  batchId       String
+  batch         BillingClaimBatch @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  invoiceId     String?
+  invoice       BillingInvoice?  @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
+  ndisClaimLineId String?
+  supportItemCode String?
+  amountCents   Int
+  status        String           @default("NOT_READY")
+  rejectionCode String?
+  rejectionMessage String?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  @@index([batchId])
+  @@index([invoiceId])
+}
+
+model BillingCentreProviderPayout {
+  id                 String                  @id @default(cuid())
+  organisationId     String
+  organisation       Organisation            @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+  status             BillingCentrePayoutState @default(calculated)
+  periodStart        DateTime
+  periodEnd          DateTime
+  grossCents         Int                     @default(0)
+  commissionCents    Int                     @default(0)
+  adjustmentsCents   Int                     @default(0)
+  withheldCents      Int                     @default(0)
+  netPayableCents    Int                     @default(0)
+  remittanceJson     Json?
+  destinationRef     String?
+  approvedById       String?
+  releasedAt         DateTime?
+  createdAt          DateTime                @default(now())
+  updatedAt          DateTime                @updatedAt
+
+  @@index([organisationId, status])
+  @@index([periodEnd])
+}
+
+model BillingReconciliationSession {
+  id             String   @id @default(cuid())
+  organisationId String?
+  organisation   Organisation? @relation(fields: [organisationId], references: [id], onDelete: SetNull)
+  source         String
+  status         String   @default("open")
+  notes          String?
+  createdById    String?
+  confirmedAt    DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  matches BillingReconciliationMatch[]
+
+  @@index([organisationId, status])
+}
+
+model BillingReconciliationMatch {
+  id              String                         @id @default(cuid())
+  sessionId       String
+  session         BillingReconciliationSession   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  invoiceId       String?
+  invoice         BillingInvoice?                @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
+  externalPaymentRef String?
+  amountCents     Int
+  confidenceBps   Int                            @default(0)
+  reasons         Json?
+  status          BillingReconciliationMatchStatus @default(suggested)
+  notes           String?
+  confirmedById   String?
+  createdAt       DateTime                       @default(now())
+  updatedAt       DateTime                       @updatedAt
+
+  @@index([sessionId])
+  @@index([invoiceId])
+  @@index([status])
+}
+
+model BillingIntegrationConnection {
+  id             String   @id @default(cuid())
+  organisationId String?
+  organisation   Organisation? @relation(fields: [organisationId], references: [id], onDelete: SetNull)
+  provider       String
+  status         String   @default("disconnected")
+  externalTenantId String?
+  configJson     Json?
+  lastSyncAt     DateTime?
+  lastError      String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([organisationId, provider])
+  @@unique([organisationId, provider])
+}
+
+model BillingInvoiceNumberSequence {
+  id        String   @id @default(cuid())
+  prefix    String   @default("MAP")
+  year      Int
+  lastValue Int      @default(0)
+  updatedAt DateTime @updatedAt
+
+  @@unique([prefix, year])
+}
+
+model BillingSafeguardAlert {
+  id             String   @id @default(cuid())
+  organisationId String?
+  entityType     String
+  entityId       String
+  ruleCode       String
+  severity       String   @default("review_required")
+  message        String
+  metadata       Json?
+  resolvedAt     DateTime?
+  createdAt      DateTime @default(now())
+
+  @@index([entityType, entityId])
+  @@index([ruleCode, createdAt])
+  @@index([resolvedAt])
+}
+
+
+// =============================================================================
+// ConvergenceOS — platform governance registries (Wave 0+)
+// Read-only control plane. Does not replace Git, GitHub, Prisma, or CI.
+// =============================================================================
+
+enum ConvergenceDomainStatus {
+  canonical
+  extension
+  projection
+  adapter
+  read_model
+  duplicate
+  deprecated
+  experimental
+  fixture_only
+  interim
+  target
+}
+
+enum ConvergenceCapabilityMaturity {
+  concept
+  documented
+  scaffolded
+  fixture_only
+  shadow
+  pilot
+  production_gated
+  production_available
+  deprecated
+  retired
+}
+
+enum ConvergenceDependencyEdgeType {
+  based_on
+  depends_on
+  supersedes
+  duplicates
+  conflicts_with
+  extends
+  blocks
+  should_merge_before
+  should_rebase_after
+  makes_obsolete
+  requires_migration
+  requires_flag
+  requires_manual_review
+}
+
+enum ConvergenceDecisionStatus {
+  proposal
+  approved
+  rejected
+  superseded
+}
+
+enum ConvergenceCollisionSeverity {
+  info
+  warning
+  high
+  critical
+}
+
+enum ConvergenceMergeTrainStatus {
+  draft
+  proposed
+  accepted
+  deferred
+  superseded
+}
+
+model RepositorySnapshot {
+  id              String   @id @default(cuid())
+  baseBranch      String   @default("main")
+  baseCommitSha   String
+  scannedAt       DateTime @default(now())
+  source          String   @default("fixture_pilot")
+  snapshotKind    String   @default("main")
+  summaryJson     Json?
+  contentHash     String
+  schemaHash      String?
+  packageGraphHash String?
+  routeGraphHash  String?
+  flagManifestHash String?
+  capabilityManifestHash String?
+  createdAt       DateTime @default(now())
+
+  branches        RepositoryBranch[]
+  pullRequests    RepositoryPullRequest[]
+  dependencies    RepositoryDependency[]
+  schemaSnapshots SchemaSnapshot[]
+  collisions      MigrationCollision[]
+  mergeTrains     MergeTrain[]
+  twinPackages    TwinPackage[]
+  twinModules     TwinModule[]
+  twinRoutes      TwinRoute[]
+  flagManifestEntries FeatureFlagManifestEntry[]
+  graphEdges      RepositoryGraphEdge[]
+  rehearsals      RehearsalRun[]
+  blastSims       BlastRadiusSimulation[]
+  driftFindings   DriftFinding[]
+
+  @@index([scannedAt])
+  @@index([baseCommitSha])
+  @@index([snapshotKind])
+  @@map("convergence_repository_snapshots")
+}
+
+model CanonicalDomain {
+  id                    String                  @id @default(cuid())
+  domainKey             String                  @unique
+  name                  String
+  purpose               String
+  canonicalModel        String?
+  canonicalService      String?
+  canonicalApi          String?
+  canonicalEventOwner   String?
+  owningProgramme       String?
+  authoritativePath     String?
+  acceptedDecisionId    String?
+  status                ConvergenceDomainStatus @default(interim)
+  compatibilityAliases  Json?
+  duplicateImplementations Json?
+  migrationState        String?
+  deprecationState      String?
+  reviewDate            DateTime?
+  notes                 String?
+  createdAt             DateTime                @default(now())
+  updatedAt             DateTime                @updatedAt
+
+  versions              CanonicalDomainVersion[]
+
+  @@index([status])
+  @@index([owningProgramme])
+  @@map("convergence_canonical_domains")
+}
+
+model CanonicalDomainVersion {
+  id              String                  @id @default(cuid())
+  domainId        String
+  domain          CanonicalDomain         @relation(fields: [domainId], references: [id], onDelete: Cascade)
+  version         Int
+  status          ConvergenceDomainStatus
+  canonicalModel  String?
+  evidenceJson    Json?
+  changeSummary   String?
+  createdAt       DateTime                @default(now())
+
+  @@unique([domainId, version])
+  @@index([domainId])
+  @@map("convergence_canonical_domain_versions")
+}
+
+model RepositoryBranch {
+  id              String   @id @default(cuid())
+  snapshotId      String
+  snapshot        RepositorySnapshot @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
+  name            String
+  tipCommitSha    String?
+  aheadOfMain     Int?
+  behindMain      Int?
+  mergeBaseSha    String?
+  dropsIndoor     Boolean  @default(false)
+  schemaChanged   Boolean  @default(false)
+  notes           String?
+  metadataJson    Json?
+  createdAt       DateTime @default(now())
+
+  pullRequests    RepositoryPullRequest[] @relation("PrHeadBranch")
+
+  @@unique([snapshotId, name])
+  @@index([snapshotId])
+  @@index([name])
+  @@map("convergence_repository_branches")
+}
+
+model RepositoryPullRequest {
+  id              String   @id @default(cuid())
+  snapshotId      String
+  snapshot        RepositorySnapshot @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
+  number          Int
+  title           String
+  state           String
+  isDraft         Boolean  @default(true)
+  baseBranch      String
+  headBranch      String
+  headBranchId    String?
+  headBranchRef   RepositoryBranch? @relation("PrHeadBranch", fields: [headBranchId], references: [id], onDelete: SetNull)
+  baseCommitSha   String?
+  headCommitSha   String?
+  mergeable       String?
+  changedFiles    Int?
+  additions       Int?
+  deletions       Int?
+  url             String?
+  classLabel      String?
+  collisionRisk   String?
+  domainsAffected Json?
+  prismaModelsAdded Json?
+  migrationsAdded Json?
+  featureFlagsAdded Json?
+  knownLimitations String?
+  explicitNonGoals String?
+  recommendedMergeOrder Int?
+  warningLabels   Json?
+  metadataJson    Json?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  dependenciesFrom RepositoryDependency[] @relation("DepFromPr")
+  dependenciesTo   RepositoryDependency[] @relation("DepToPr")
+
+  @@unique([snapshotId, number])
+  @@index([snapshotId])
+  @@index([number])
+  @@index([headBranch])
+  @@map("convergence_repository_pull_requests")
+}
+
+model RepositoryDependency {
+  id              String                       @id @default(cuid())
+  snapshotId      String
+  snapshot        RepositorySnapshot           @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
+  edgeType        ConvergenceDependencyEdgeType
+  fromPrId        String?
+  fromPr          RepositoryPullRequest?       @relation("DepFromPr", fields: [fromPrId], references: [id], onDelete: Cascade)
+  toPrId          String?
+  toPr            RepositoryPullRequest?       @relation("DepToPr", fields: [toPrId], references: [id], onDelete: Cascade)
+  fromRef         String?
+  toRef           String?
+  evidence        String?
+  createdAt       DateTime                     @default(now())
+
+  @@index([snapshotId])
+  @@index([edgeType])
+  @@index([fromPrId])
+  @@index([toPrId])
+  @@map("convergence_repository_dependencies")
+}
+
+model PlatformCapability {
+  id                    String                         @id @default(cuid())
+  capabilityKey         String                         @unique
+  name                  String
+  programme             String?
+  userValue             String?
+  canonicalOwner        String?
+  implementationPaths   Json?
+  authorityLevel        String?
+  readWrite             String?
+  externalSideEffects   Boolean                        @default(false)
+  participantApprovalRequired Boolean                  @default(false)
+  featureFlags          Json?
+  dataDomains           Json?
+  maturity              ConvergenceCapabilityMaturity  @default(concept)
+  persistenceType       String?
+  runtimeMode           String?
+  productionClaimStatus String?
+  rollbackNotes         String?
+  owner                 String?
+  honestyJson           Json?
+  createdAt             DateTime                       @default(now())
+  updatedAt             DateTime                       @updatedAt
+
+  @@index([maturity])
+  @@index([programme])
+  @@map("convergence_platform_capabilities")
+}
+
+model ArchitectureDecision {
+  id              String                     @id @default(cuid())
+  decisionKey     String                     @unique
+  title           String
+  decisionType    String
+  context         String?
+  alternativesJson Json?
+  selectedOption  String?
+  rationale       String?
+  evidenceJson    Json?
+  consequences    String?
+  affectedPaths   Json?
+  affectedPrs     Json?
+  status          ConvergenceDecisionStatus  @default(proposal)
+  isAiProposal    Boolean                    @default(false)
+  owner           String?
+  approver        String?
+  decidedAt       DateTime?
+  reviewDate      DateTime?
+  supersededById  String?
+  createdAt       DateTime                   @default(now())
+  updatedAt       DateTime                   @updatedAt
+
+  @@index([status])
+  @@index([decisionType])
+  @@map("convergence_architecture_decisions")
+}
+
+model SchemaSnapshot {
+  id              String   @id @default(cuid())
+  snapshotId      String
+  snapshot        RepositorySnapshot @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
+  refLabel        String
+  refName         String
+  modelCount      Int
+  modelNamesJson  Json
+  migrationDirsJson Json?
+  contentHash     String?
+  createdAt       DateTime @default(now())
+
+  @@unique([snapshotId, refLabel])
+  @@index([snapshotId])
+  @@map("convergence_schema_snapshots")
+}
+
+model MigrationCollision {
+  id              String                       @id @default(cuid())
+  snapshotId      String
+  snapshot        RepositorySnapshot           @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
+  collisionKey    String
+  severity        ConvergenceCollisionSeverity @default(warning)
+  category        String
+  title           String
+  affectedModels  Json?
+  affectedBranches Json?
+  exactDifference String?
+  semanticInterpretation String?
+  canonicalRecommendation String?
+  migrationStrategy String?
+  dataPreservationRisk String?
+  rollbackNotes   String?
+  manualDecisionRequired Boolean               @default(true)
+  evidenceJson    Json?
+  createdAt       DateTime                     @default(now())
+
+  @@unique([snapshotId, collisionKey])
+  @@index([snapshotId])
+  @@index([severity])
+  @@index([category])
+  @@map("convergence_migration_collisions")
+}
+
+model MergeTrain {
+  id              String                     @id @default(cuid())
+  snapshotId      String
+  snapshot        RepositorySnapshot         @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
+  trainKey        String
+  name            String
+  trainType       String
+  status          ConvergenceMergeTrainStatus @default(draft)
+  summary         String?
+  riskSummary     String?
+  rollbackNotes   String?
+  createdAt       DateTime                   @default(now())
+  updatedAt       DateTime                   @updatedAt
+
+  steps           MergeTrainStep[]
+
+  @@unique([snapshotId, trainKey])
+  @@index([snapshotId])
+  @@index([status])
+  @@map("convergence_merge_trains")
+}
+
+model MergeTrainStep {
+  id              String    @id @default(cuid())
+  trainId         String
+  train           MergeTrain @relation(fields: [trainId], references: [id], onDelete: Cascade)
+  stepOrder       Int
+  action          String
+  prNumber        Int?
+  branchName      String?
+  evidence        String?
+  humanOwner      String?
+  rollback        String?
+  createdAt       DateTime  @default(now())
+
+  @@unique([trainId, stepOrder])
+  @@index([trainId])
+  @@map("convergence_merge_train_steps")
+}
+
+// =============================================================================
+// ConvergenceOS Iteration 2 — Digital Twin, Constitution, Lineage, etc.
+// =============================================================================
+
+enum ConstitutionRuleClass {
+  constitutional_rule
+  architectural_preference
+  programme_convention
+  temporary_exception
+  experimental_rule
+  deprecated_rule
+}
+
+enum ConstitutionExceptionStatus {
+  draft
+  submitted
+  architecture_review
+  security_review
+  privacy_review
+  accessibility_review
+  approved
+  approved_with_conditions
+  rejected
+  expired
+  revoked
+  closed
+}
+
+enum SemanticOverlapClass {
+  identical_concept
+  overlapping_concept
+  extension
+  projection
+  legacy_alias
+  adapter
+  separate_concept
+  uncertain
+  human_review_required
+}
+
+enum BlastRadiusSeverity {
+  local
+  module
+  programme
+  cross_programme
+  platform
+  participant_authority
+  financial
+  safety_critical
+}
+
+enum RehearsalStatus {
+  pending
+  running
+  pass
+  blocked
+  human_review
+  failed
+}
+
+enum DriftSeverity {
+  info
+  warning
+  high
+  critical
+}
+
+enum CompatibilityMatrixState {
+  old_code_old_schema
+  old_code_new_schema
+  new_code_old_schema
+  new_code_new_schema
+}
+
+enum CompatibilitySupportLevel {
+  supported
+  temporarily_supported
+  unsupported
+  unknown
+  human_review_required
+}
+
+model TwinPackage {
+  id              String   @id @default(cuid())
+  snapshotId      String
+  snapshot        RepositorySnapshot @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
+  name            String
+  version         String?
+  path            String?
+  kind            String   @default("workspace")
+  metadataJson    Json?
+  createdAt       DateTime @default(now())
+
+  @@unique([snapshotId, name])
+  @@index([snapshotId])
+  @@map("convergence_twin_packages")
+}
+
+model TwinModule {
+  id              String   @id @default(cuid())
+  snapshotId      String
+  snapshot        RepositorySnapshot @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
+  moduleKey       String
+  path            String
+  programme       String?
+  canonicalDomainKeys Json?
+  description     String?
+  writerCount     Int      @default(0)
+  routeCount      Int      @default(0)
+  metadataJson    Json?
+  createdAt       DateTime @default(now())
+
+  @@unique([snapshotId, moduleKey])
+  @@index([snapshotId])
+  @@index([path])
+  @@map("convergence_twin_modules")
+}
+
+model TwinRoute {
+  id              String   @id @default(cuid())
+  snapshotId      String
+  snapshot        RepositorySnapshot @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
+  method          String   @default("ANY")
+  path            String
+  filePath        String?
+  moduleKey       String?
+  sideEffects     Boolean  @default(false)
+  metadataJson    Json?
+  createdAt       DateTime @default(now())
+
+  @@unique([snapshotId, method, path])
+  @@index([snapshotId])
+  @@index([moduleKey])
+  @@map("convergence_twin_routes")
+}
+
+model FeatureFlagManifestEntry {
+  id              String   @id @default(cuid())
+  snapshotId      String
+  snapshot        RepositorySnapshot @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
+  flagName        String
+  defaultValue    String?
+  owner           String?
+  purpose         String?
+  sourceFile      String?
+  category        String?
+  retirementCondition String?
+  metadataJson    Json?
+  createdAt       DateTime @default(now())
+
+  @@unique([snapshotId, flagName])
+  @@index([snapshotId])
+  @@map("convergence_feature_flag_manifest")
+}
+
+model RepositoryGraphEdge {
+  id              String   @id @default(cuid())
+  snapshotId      String
+  snapshot        RepositorySnapshot @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
+  edgeType        String
+  fromNodeType    String
+  fromNodeKey     String
+  toNodeType      String
+  toNodeKey       String
+  evidence        String?
+  createdAt       DateTime @default(now())
+
+  @@index([snapshotId])
+  @@index([edgeType])
+  @@index([fromNodeKey])
+  @@index([toNodeKey])
+  @@map("convergence_repository_graph_edges")
+}
+
+model ArchitectureConstitution {
+  id              String   @id @default(cuid())
+  constitutionKey String   @unique @default("mapable_architecture_constitution")
+  title           String
+  status          String   @default("active")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  versions        ArchitectureConstitutionVersion[]
+  rules           ArchitectureRule[]
+
+  @@map("convergence_architecture_constitutions")
+}
+
+model ArchitectureConstitutionVersion {
+  id              String   @id @default(cuid())
+  constitutionId  String
+  constitution    ArchitectureConstitution @relation(fields: [constitutionId], references: [id], onDelete: Cascade)
+  version         Int
+  summary         String?
+  effectiveAt     DateTime @default(now())
+  approvedBy      String?
+  createdAt       DateTime @default(now())
+
+  @@unique([constitutionId, version])
+  @@index([constitutionId])
+  @@map("convergence_architecture_constitution_versions")
+}
+
+model ArchitectureRule {
+  id              String   @id @default(cuid())
+  constitutionId  String
+  constitution    ArchitectureConstitution @relation(fields: [constitutionId], references: [id], onDelete: Cascade)
+  ruleKey         String   @unique
+  title           String
+  ruleClass       ConstitutionRuleClass @default(constitutional_rule)
+  plainLanguage   String
+  rationale       String?
+  severity        String   @default("high")
+  detectionMethod String?
+  owner           String?
+  approver        String?
+  effectiveAt     DateTime @default(now())
+  reviewDate      DateTime?
+  supersededByKey String?
+  affectedDomains Json?
+  affectedPaths   Json?
+  prohibitedPatterns Json?
+  requiredConditions Json?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  exceptions      ArchitectureRuleException[]
+  violations      ArchitectureRuleViolation[]
+
+  @@index([constitutionId])
+  @@index([ruleClass])
+  @@map("convergence_architecture_rules")
+}
+
+model ArchitectureRuleException {
+  id              String   @id @default(cuid())
+  ruleId          String
+  rule            ArchitectureRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+  status          ConstitutionExceptionStatus @default(draft)
+  businessReason  String
+  technicalReason String?
+  affectedCapability String?
+  affectedParticipants String?
+  durationDays    Int?
+  expiresAt       DateTime?
+  risk            String?
+  compensatingControls String?
+  monitoring      String?
+  rollback        String?
+  removalPlan     String?
+  owner           String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([ruleId])
+  @@index([status])
+  @@index([expiresAt])
+  @@map("convergence_architecture_rule_exceptions")
+}
+
+model ArchitectureRuleViolation {
+  id              String   @id @default(cuid())
+  ruleId          String
+  rule            ArchitectureRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+  title           String
+  evidence        String?
+  affectedPaths   Json?
+  severity        String   @default("warning")
+  status          String   @default("open")
+  createdAt       DateTime @default(now())
+
+  @@index([ruleId])
+  @@index([status])
+  @@map("convergence_architecture_rule_violations")
+}
+
+model SemanticOverlapCandidate {
+  id              String   @id @default(cuid())
+  candidateKey    String   @unique
+  leftName        String
+  rightName       String
+  leftPath        String?
+  rightPath       String?
+  classification  SemanticOverlapClass @default(uncertain)
+  confidence      Float    @default(0.5)
+  unresolvedDifferences String?
+  recommendedReviewers Json?
+  evidenceJson    Json?
+  humanDecision   String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([classification])
+  @@map("convergence_semantic_overlap_candidates")
+}
+
+model DataLineageNode {
+  id              String   @id @default(cuid())
+  nodeKey         String   @unique
+  label           String
+  dataClass       String
+  fieldPath       String?
+  domainKey       String?
+  synthetic       Boolean  @default(true)
+  metadataJson    Json?
+  createdAt       DateTime @default(now())
+
+  @@index([dataClass])
+  @@map("convergence_data_lineage_nodes")
+}
+
+model DataLineageEdge {
+  id              String   @id @default(cuid())
+  edgeKey         String   @unique
+  fromNodeKey     String
+  toNodeKey       String
+  transformation  String?
+  policyRef       String?
+  createdAt       DateTime @default(now())
+
+  @@index([fromNodeKey])
+  @@index([toNodeKey])
+  @@map("convergence_data_lineage_edges")
+}
+
+model AuthorityChain {
+  id              String   @id @default(cuid())
+  chainKey        String   @unique
+  title           String
+  participantSyntheticId String?
+  purpose         String?
+  status          String   @default("complete")
+  gapFindingsJson Json?
+  createdAt       DateTime @default(now())
+
+  steps           AuthorityChainStep[]
+
+  @@map("convergence_authority_chains")
+}
+
+model AuthorityChainStep {
+  id              String   @id @default(cuid())
+  chainId         String
+  chain           AuthorityChain @relation(fields: [chainId], references: [id], onDelete: Cascade)
+  stepOrder       Int
+  stepType        String
+  actor           String?
+  scope           String?
+  expiresAt       DateTime?
+  outcome         String?
+  evidence        String?
+  createdAt       DateTime @default(now())
+
+  @@unique([chainId, stepOrder])
+  @@index([chainId])
+  @@map("convergence_authority_chain_steps")
+}
+
+model BlastRadiusSimulation {
+  id              String   @id @default(cuid())
+  snapshotId      String?
+  snapshot        RepositorySnapshot? @relation(fields: [snapshotId], references: [id], onDelete: SetNull)
+  simulationKey   String   @unique
+  changeType      String
+  changeSummary   String
+  severity        BlastRadiusSeverity @default(module)
+  aiExplainedSeverity BlastRadiusSeverity?
+  finalSeverity   BlastRadiusSeverity
+  rollbackDifficulty String?
+  impactsJson     Json?
+  counterfactual  Boolean  @default(false)
+  createdAt       DateTime @default(now())
+
+  @@index([severity])
+  @@index([snapshotId])
+  @@map("convergence_blast_radius_simulations")
+}
+
+model RehearsalRun {
+  id              String   @id @default(cuid())
+  snapshotId      String?
+  snapshot        RepositorySnapshot? @relation(fields: [snapshotId], references: [id], onDelete: SetNull)
+  rehearsalKey    String   @unique
+  rehearsalType   String
+  status          RehearsalStatus @default(pending)
+  trainKey        String?
+  summary         String?
+  mutatesRealBranches Boolean @default(false)
+  stepsJson       Json?
+  compatibilityJson Json?
+  createdAt       DateTime @default(now())
+  completedAt     DateTime?
+
+  @@index([status])
+  @@index([snapshotId])
+  @@map("convergence_rehearsal_runs")
+}
+
+model AgentImplementationContract {
+  id              String   @id @default(cuid())
+  contractKey     String   @unique
+  objective       String
+  nonGoals        String?
+  canonicalModels Json?
+  reusableServices Json?
+  prohibitedConcepts Json?
+  allowedPaths    Json?
+  protectedPaths  Json?
+  migrationsPermitted Boolean @default(false)
+  testsRequired   Json?
+  authorityCeiling String?
+  releaseMode     String   @default("audit")
+  rollbackExpectation String?
+  stopConditions  Json?
+  status          String   @default("draft")
+  markdownExport  String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  reviews         AgentPostImplementationReview[]
+
+  @@index([status])
+  @@map("convergence_agent_implementation_contracts")
+}
+
+model AgentPostImplementationReview {
+  id              String   @id @default(cuid())
+  contractId      String
+  contract        AgentImplementationContract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  classification  String
+  findingsJson    Json?
+  createdAt       DateTime @default(now())
+
+  @@index([contractId])
+  @@map("convergence_agent_post_implementation_reviews")
+}
+
+model DriftFinding {
+  id              String   @id @default(cuid())
+  snapshotId      String?
+  snapshot        RepositorySnapshot? @relation(fields: [snapshotId], references: [id], onDelete: SetNull)
+  findingKey      String   @unique
+  layer           String
+  title           String
+  expectedState   String?
+  observedState   String?
+  severity        DriftSeverity @default(warning)
+  owner           String?
+  suggestedAction String?
+  deadline        DateTime?
+  evidenceJson    Json?
+  status          String   @default("open")
+  createdAt       DateTime @default(now())
+
+  @@index([layer])
+  @@index([severity])
+  @@index([snapshotId])
+  @@map("convergence_drift_findings")
+}
+
+model EnvironmentParityRecord {
+  id              String   @id @default(cuid())
+  environmentKey  String   @unique
+  label           String
+  appVersion      String?
+  schemaVersion   String?
+  featureFlagsJson Json?
+  integrationsJson Json?
+  secretsPresentJson Json?
+  dataClassification String?
+  syntheticData   Boolean  @default(true)
+  unsafeDifferences Json?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("convergence_environment_parity_records")
+}
+
+model SecretContract {
+  id              String   @id @default(cuid())
+  secretName      String   @unique
+  owner           String?
+  purpose         String?
+  environmentsJson Json?
+  expectedFormat  String?
+  rotationPolicy  String?
+  required        Boolean  @default(false)
+  associatedIntegration String?
+  fallback        String?
+  affectedCapability String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("convergence_secret_contracts")
+}
+
+model SupplyChainDependency {
+  id              String   @id @default(cuid())
+  packageName     String
+  version         String?
+  ecosystem       String   @default("npm")
+  licence         String?
+  purpose         String?
+  owner           String?
+  direct          Boolean  @default(true)
+  affectedCapabilities Json?
+  securityStatus  String   @default("unknown")
+  upgradePolicy   String?
+  replacementOption String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([packageName, ecosystem])
+  @@index([ecosystem])
+  @@map("convergence_supply_chain_dependencies")
+}
+
+model OwnershipRecord {
+  id              String   @id @default(cuid())
+  subjectType     String
+  subjectKey      String
+  primaryOwner    String?
+  secondaryOwner  String?
+  reviewer        String?
+  organisation    String?
+  knowledgeLocation String?
+  successionState String   @default("ok")
+  lastReviewAt    DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([subjectType, subjectKey])
+  @@index([successionState])
+  @@map("convergence_ownership_records")
+}
+
+model OwnershipGapFinding {
+  id              String   @id @default(cuid())
+  findingKey      String   @unique
+  title           String
+  subjectType     String?
+  subjectKey      String?
+  severity        String   @default("warning")
+  evidence        String?
+  createdAt       DateTime @default(now())
+
+  @@map("convergence_ownership_gap_findings")
+}
+
+model ArchitectureFitnessFunction {
+  id              String   @id @default(cuid())
+  fitnessKey      String   @unique
+  title           String
+  description     String?
+  advisoryOnly    Boolean  @default(true)
+  createdAt       DateTime @default(now())
+
+  results         FitnessFunctionResult[]
+
+  @@map("convergence_architecture_fitness_functions")
+}
+
+model FitnessFunctionResult {
+  id              String   @id @default(cuid())
+  fitnessId       String
+  fitness         ArchitectureFitnessFunction @relation(fields: [fitnessId], references: [id], onDelete: Cascade)
+  passed          Boolean
+  details         String?
+  createdAt       DateTime @default(now())
+
+  @@index([fitnessId])
+  @@map("convergence_fitness_function_results")
+}
+
+model GoldenJourney {
+  id              String   @id @default(cuid())
+  journeyKey      String   @unique
+  title           String
+  description     String?
+  domainsJson     Json?
+  apisJson        Json?
+  modelsJson      Json?
+  flagsJson       Json?
+  rollbackNotes   String?
+  createdAt       DateTime @default(now())
+
+  steps           GoldenJourneyStep[]
+
+  @@map("convergence_golden_journeys")
+}
+
+model GoldenJourneyStep {
+  id              String   @id @default(cuid())
+  journeyId       String
+  journey         GoldenJourney @relation(fields: [journeyId], references: [id], onDelete: Cascade)
+  stepOrder       Int
+  title           String
+  expectation     String?
+  createdAt       DateTime @default(now())
+
+  @@unique([journeyId, stepOrder])
+  @@index([journeyId])
+  @@map("convergence_golden_journey_steps")
+}
+
+model FederatedRepository {
+  id              String   @id @default(cuid())
+  repoKey         String   @unique
+  name            String
+  url             String?
+  role            String   @default("related")
+  createdAt       DateTime @default(now())
+
+  contracts       FederatedContract[]
+
+  @@map("convergence_federated_repositories")
+}
+
+model FederatedContract {
+  id              String   @id @default(cuid())
+  repoId          String
+  repo            FederatedRepository @relation(fields: [repoId], references: [id], onDelete: Cascade)
+  contractKey     String
+  domain          String
+  version         String?
+  status          String   @default("draft")
+  notes           String?
+  createdAt       DateTime @default(now())
+
+  @@unique([repoId, contractKey])
+  @@index([repoId])
+  @@map("convergence_federated_contracts")
+}
+
+model ComplexityBudgetSnapshot {
+  id              String   @id @default(cuid())
+  snapshotKey     String   @unique
+  dimensionsJson  Json
+  breachesJson    Json?
+  createdAt       DateTime @default(now())
+
+  @@map("convergence_complexity_budget_snapshots")
+}
+
+model RuntimeComponent {
+  id              String   @id @default(cuid())
+  componentKey    String   @unique
+  name            String
+  environment     String
+  owner           String?
+  region          String?
+  dataClassification String?
+  healthCheck     String?
+  fallback        String?
+  deploymentVersion String?
+  credentialsPresent Boolean @default(false)
+  metadataJson    Json?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([environment])
+  @@map("convergence_runtime_components")
+}
+
+/// Temporary Starting Work mission projection — not CareOSMission SoR; not a Care/Transport/Billing writer.
+model StartingWorkJourneyProjection {
+  id                  String   @id @default(cuid())
+  journeyId           String   @unique @map("journey_id")
+  participantLabel    String   @map("participant_label")
+  venueLabel          String   @map("venue_label")
+  participantGoal     String   @map("participant_goal")
+  status              String
+  blocked             Boolean  @default(false)
+  blockReason         String?  @map("block_reason")
+  failureMode         String?  @map("failure_mode")
+  currentStep         String?  @map("current_step")
+  stepsCompletedJson  Json     @map("steps_completed_json")
+  dependencyGraphJson Json     @map("dependency_graph_json")
+  stateHonestyJson    Json     @map("state_honesty_json")
+  noticesJson         Json     @map("notices_json")
+  readinessJson       Json?    @map("readiness_json")
+  outcomeReceiptJson  Json?    @map("outcome_receipt_json")
+  regionalCandidatesJson Json  @map("regional_candidates_json")
+  regionalConfirmedJson  Json  @map("regional_confirmed_json")
+  entityRefsJson      Json     @map("entity_refs_json")
+  actorUserId         String?  @map("actor_user_id")
+  caseId              String?  @map("case_id")
+  synthetic           Boolean  @default(true)
+  productionClaim     String   @default("none") @map("production_claim")
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+  events              StartingWorkJourneyEvent[]
+
+  @@index([status, createdAt])
+  @@index([actorUserId])
+  @@map("starting_work_journey_projections")
+}
+
+model StartingWorkJourneyEvent {
+  id           String   @id @default(cuid())
+  projectionId String   @map("projection_id")
+  projection   StartingWorkJourneyProjection @relation(fields: [projectionId], references: [id], onDelete: Cascade)
+  eventType    String   @map("event_type")
+  stepId       String?  @map("step_id")
+  payloadJson  Json     @map("payload_json")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@index([projectionId, createdAt])
+  @@map("starting_work_journey_events")
 }

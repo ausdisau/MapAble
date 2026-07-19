@@ -7,8 +7,8 @@ import { cn } from "@/app/lib/utils";
 import { MapAbleProviderSearchForm } from "@/components/search/MapAbleProviderSearchForm";
 import { SuggestedSearchChips } from "@/components/search/SuggestedSearchChips";
 import { Badge } from "@/components/ui/badge";
-import { mapableEyebrowBadgeClass } from "@/lib/brand/styles";
 import { trackProductEvent } from "@/lib/analytics/product-analytics";
+import { mapableEyebrowBadgeClass } from "@/lib/brand/styles";
 import { useProactiveChipSuggestions } from "@/lib/hooks/use-proactive-chip-suggestions";
 import { ACCESS_NEEDS } from "@/lib/provider-finder/filters";
 import {

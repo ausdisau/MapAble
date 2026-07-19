@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { AccessFilterPanel } from "@/components/access/AccessFilterPanel";
@@ -140,9 +141,9 @@ export function MapAbleAccessShell({
         </noscript>
         <p className="text-sm">
           Prefer the competitor map landing?{" "}
-          <a href="/accessibility-map" className="font-semibold text-[#005B7F] underline">
+          <Link href="/accessibility-map" className="font-semibold text-[#005B7F] underline">
             Open Accessibility Map
-          </a>
+          </Link>
           .
         </p>
       </div>

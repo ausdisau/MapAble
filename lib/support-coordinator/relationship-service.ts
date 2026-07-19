@@ -3,7 +3,6 @@ import { Prisma } from "@prisma/client";
 import { createAuditEvent } from "@/lib/audit/audit-event-service";
 import { y2OrchestrationConfig } from "@/lib/config/y2-orchestration";
 import { recordMicroConsentGrant } from "@/lib/consent/micro-consent-service";
-import { notifyUser } from "@/lib/notifications/notification-service";
 import { prisma } from "@/lib/prisma";
 import { hasActiveConsentForCoordinator } from "@/lib/support-coordinator/consent-gate";
 

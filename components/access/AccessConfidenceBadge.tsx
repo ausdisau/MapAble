@@ -1,8 +1,9 @@
-import { confidenceLabel } from "@/lib/access-map/access-confidence-service";
 import type {
   AccessAccreditationTier,
   AccessConfidenceLevel,
 } from "@prisma/client";
+
+import { confidenceLabel } from "@/lib/access-map/access-confidence-service";
 
 export function AccessConfidenceBadge({
   level,

@@ -1,8 +1,8 @@
 import { payoutPolicyDefaults } from "@/lib/payouts/config";
+import type { PayoutReadinessResult } from "@/lib/payouts/types";
 import { prisma } from "@/lib/prisma";
 import { isSafeguardingTicket } from "@/lib/support/safeguarding-helpers";
 
-import type { PayoutReadinessResult } from "@/lib/payouts/types";
 
 export async function canReleasePayout(
   paymentId: string

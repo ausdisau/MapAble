@@ -92,7 +92,10 @@ export async function approveFederatedAgreement(
   return updated;
 }
 
-export async function activateFederatedAgreement(agreementId: string, actorUserId: string) {
+export async function activateFederatedAgreement(
+  agreementId: string,
+  _actorUserId: string
+) {
   const agreement = await prisma.federatedResearchAgreement.findUnique({
     where: { id: agreementId },
   });

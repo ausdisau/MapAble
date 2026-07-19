@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { startOfDay, endOfDay } from "date-fns";
+import Link from "next/link";
 
 import { requirePermission } from "@/lib/auth/guards";
 import { workerProfileForUser } from "@/lib/care/access-control";

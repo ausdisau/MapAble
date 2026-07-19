@@ -2,18 +2,18 @@ import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { requirePermission } from "@/lib/auth/guards";
-import { prisma } from "@/lib/prisma";
 import {
   approveInvoiceForPayment,
   raisePlanManagerQuery,
 } from "@/lib/plan-manager/invoice-review-service";
+import { prisma } from "@/lib/prisma";
 
 export default async function PlanManagerInvoiceDetailPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const user = await requirePermission("plan_manager:portal");
+  await requirePermission("plan_manager:portal");
   const { id } = await params;
 
   const invoice = await prisma.invoice.findUnique({

@@ -1,6 +1,6 @@
+import { forwardGeocodeAustralia } from "@/lib/map/nominatim-server";
 import { prisma } from "@/lib/prisma";
 
-import { forwardGeocodeAustralia } from "@/lib/map/nominatim-server";
 
 export type GeocodeInput = {
   suburb?: string;

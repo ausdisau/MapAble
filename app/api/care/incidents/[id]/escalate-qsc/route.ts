@@ -1,8 +1,8 @@
-import { requireApiPermission, requireApiSession } from "@/lib/api/auth-handler";
+import { requireApiSession } from "@/lib/api/auth-handler";
 import { jsonError, jsonOk } from "@/lib/api/response";
+import { isAdminRole } from "@/lib/auth/roles";
 import { assertProviderOrgAccess } from "@/lib/care/access-control";
 import { escalateToQualitySafeguards } from "@/lib/incidents/incident-service";
-import { isAdminRole } from "@/lib/auth/roles";
 import { prisma } from "@/lib/prisma";
 
 export async function POST(

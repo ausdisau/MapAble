@@ -3,10 +3,10 @@ import type { Prisma } from "@prisma/client";
 import type { CurrentUser } from "@/lib/auth/current-user";
 import { prisma } from "@/lib/prisma";
 import { assertAssignedDriver } from "@/lib/transport/transport-access-policy";
-import { recordTripEvent } from "@/lib/transport/transport-event-service";
-import { assertStatusTransition } from "@/lib/transport/transport-status-service";
 import { TransportApiError } from "@/lib/transport/transport-api-error";
+import { recordTripEvent } from "@/lib/transport/transport-event-service";
 import { buildTripResponse } from "@/lib/transport/transport-response";
+import { assertStatusTransition } from "@/lib/transport/transport-status-service";
 
 export async function submitTripEvidence(
   user: CurrentUser,

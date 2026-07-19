@@ -89,8 +89,13 @@ export function IncidentIntakeWizard({
               ["safeguarding", "Safeguarding — serious harm or abuse may be involved"],
             ] as const
           ).map(([value, label]) => (
-            <label key={value} className="flex min-h-11 items-start gap-2 text-sm">
+            <label
+              key={value}
+              htmlFor={`intake-path-${value}`}
+              className="flex min-h-11 items-start gap-2 text-sm"
+            >
               <input
+                id={`intake-path-${value}`}
                 type="radio"
                 name="intakePath"
                 checked={intakePath === value}
@@ -109,10 +114,11 @@ export function IncidentIntakeWizard({
 
       {step === 1 ? (
         <div className="space-y-4">
-          <label className="block text-sm font-medium">
+          <label htmlFor="participant-intent" className="block text-sm font-medium">
             What would you like us to do?
           </label>
           <select
+            id="participant-intent"
             className={formInputClass}
             value={participantIntent}
             onChange={(e) =>
@@ -185,8 +191,12 @@ export function IncidentIntakeWizard({
             <option value="high">High</option>
             <option value="critical">Critical</option>
           </select>
-          <label className="flex min-h-11 items-center gap-2 text-sm">
+          <label
+            htmlFor="immediate-risk"
+            className="flex min-h-11 items-center gap-2 text-sm"
+          >
             <input
+              id="immediate-risk"
               type="checkbox"
               checked={form.immediateRiskPresent}
               onChange={(e) =>

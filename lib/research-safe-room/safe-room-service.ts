@@ -1,5 +1,6 @@
 import { phase9Config } from "@/lib/config/phase9";
 import { isResearchSafeRoomPilotEnabled } from "@/lib/config/y4-civic-platform";
+import { prisma } from "@/lib/prisma";
 import {
   activateResearchProject,
   archiveResearchProject,
@@ -8,7 +9,6 @@ import {
   listResearchProjects as listPilotProjects,
   submitForEthicsReview,
 } from "@/lib/research-safe-room/safe-room-pilot-service";
-import { prisma } from "@/lib/prisma";
 
 export async function createResearchProject(params: {
   title: string;

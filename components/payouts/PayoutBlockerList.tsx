@@ -7,7 +7,7 @@ export function PayoutBlockerList({ blockers }: { blockers: string[] | Blocker[]
       <h2 id="payout-blockers-heading" className="text-lg font-semibold">
         Payout holds
       </h2>
-      <ul className="mt-2 list-disc space-y-1 pl-5" role="list">
+      <ul className="mt-2 list-disc space-y-1 pl-5">
         {blockers.map((b, i) => (
           <li key={i}>{typeof b === "string" ? b : b.message}</li>
         ))}

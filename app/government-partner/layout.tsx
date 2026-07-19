@@ -1,5 +1,5 @@
-import { GovernmentPartnerNav } from "@/components/layout/GovernmentPartnerNav";
 import { AuthenticatedRoleAppShell } from "@/components/layout/AuthenticatedRoleAppShell";
+import { GovernmentPartnerNav } from "@/components/layout/GovernmentPartnerNav";
 import { requireAuth } from "@/lib/auth/guards";
 
 export const dynamic = "force-dynamic";

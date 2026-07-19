@@ -5,8 +5,8 @@ import { VehicleSuitabilityWarning } from "@/components/phase3/VehicleSuitabilit
 import { TransportRouteAdvisory } from "@/components/transport/TransportRouteAdvisory";
 import { TransportTripActions } from "@/components/transport/TransportTripActions";
 import { TransportTripStatusBadge } from "@/components/transport/TransportTripStatusBadge";
-import { MOBILITY_FIELD_LABELS } from "@/lib/transport/mobility-schema";
 import { requireAuth } from "@/lib/auth/guards";
+import { MOBILITY_FIELD_LABELS } from "@/lib/transport/mobility-schema";
 import { TransportApiError } from "@/lib/transport/transport-api-error";
 import { getTransportTripForUser } from "@/lib/transport/transport-trip-service";
 import type { TransportAddressView } from "@/types/transport";

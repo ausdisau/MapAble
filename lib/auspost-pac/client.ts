@@ -1,8 +1,8 @@
-import { auspostPacConfig, isAuspostPacConfigured } from "@/lib/config/auspost-pac";
 import {
   auspostPacNotConfiguredError,
   auspostPacUpstreamError,
 } from "@/lib/auspost-pac/auspost-pac-api-error";
+import { auspostPacConfig, isAuspostPacConfigured } from "@/lib/config/auspost-pac";
 
 type AuspostPacFetchOptions = {
   path: string;

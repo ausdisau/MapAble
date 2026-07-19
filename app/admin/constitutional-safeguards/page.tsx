@@ -1,5 +1,5 @@
-import { listActiveSafeguards } from "@/lib/constitutional-safeguards/safeguards-service";
 import { requireAdmin } from "@/lib/auth/guards";
+import { listActiveSafeguards } from "@/lib/constitutional-safeguards/safeguards-service";
 
 export default async function ConstitutionalSafeguardsAdminPage() {
   await requireAdmin();

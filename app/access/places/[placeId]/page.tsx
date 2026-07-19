@@ -1,7 +1,7 @@
 import Link from "next/link";
 
-import { AccessPlaceProfile } from "@/components/access/AccessPlaceProfile";
 import { AccessMap } from "@/components/access/AccessMap";
+import { AccessPlaceProfile } from "@/components/access/AccessPlaceProfile";
 import { ReportPlaceIssueButton } from "@/components/access/ReportPlaceIssueButton";
 import { getAccreditationDisplayForPlace } from "@/lib/access-accreditation/accreditation-assessment-service";
 import { getPlaceById } from "@/lib/access-map/access-place-service";

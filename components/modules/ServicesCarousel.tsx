@@ -17,10 +17,10 @@ import { useCallback, useEffect, useState } from "react";
 import { useBrandSafe } from "@/app/contexts/BrandContext";
 import { modules, type MapAbleModule } from "@/app/lib/modules";
 import { cn } from "@/app/lib/utils";
-import { moduleAccentClass } from "@/lib/brand/module-accents";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { moduleAccentClass } from "@/lib/brand/module-accents";
 
 interface ServiceSlideProps {
   module: MapAbleModule;

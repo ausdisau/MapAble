@@ -1,8 +1,8 @@
 import { requireApiPermission } from "@/lib/api/auth-handler";
 import { jsonError, jsonOk } from "@/lib/api/response";
-import { providerAcceptTrip } from "@/lib/transport/transport-trip-service";
 import { requireProviderOrgId } from "@/lib/transport/transport-api-helpers";
 import { handleTransportRouteError } from "@/lib/transport/transport-route-handler";
+import { providerAcceptTrip } from "@/lib/transport/transport-trip-service";
 
 export async function POST(
   req: Request,

@@ -1,9 +1,9 @@
-import type { ProviderOutlet } from "@/data/provider-outlets.types";
 import type { Provider } from "@/app/provider-finder/providers";
 import { regGroupIndicesToCategories } from "@/app/provider-finder/regGroupOptions";
+import type { ProviderOutlet } from "@/data/provider-outlets.types";
 import { entitiesToGeoJSON } from "@/lib/map/geojson";
-import type { MapPointEntity } from "@/lib/map/types";
 import { MAP_LAYER_IDS } from "@/lib/map/map-layer-ids";
+import type { MapPointEntity } from "@/lib/map/types";
 
 function slugify(s: string): string {
   return s

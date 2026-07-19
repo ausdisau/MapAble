@@ -1,8 +1,9 @@
+import { z } from "zod";
+
 import { requireApiSession } from "@/lib/api/auth-handler";
 import { jsonOk } from "@/lib/api/response";
 import { recordSafetyCheck } from "@/lib/transport/handover-service";
 import { handleTransportRouteError } from "@/lib/transport/transport-route-handler";
-import { z } from "zod";
 
 const safetyCheckSchema = z.object({
   checkType: z.string().min(1).max(100),

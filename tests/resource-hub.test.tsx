@@ -4,13 +4,13 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
-import React from "react";
 import { render, screen } from "@testing-library/react";
+import React from "react";
 import { describe, expect, it } from "vitest";
 
-import { AccessGuidesSection } from "@/components/resources/AccessGuidesSection";
 import { PolicyResourceGrid } from "@/components/canvas/PolicyResourceGrid";
 import { ResourceModuleGrid } from "@/components/canvas/ResourceModuleGrid";
+import { AccessGuidesSection } from "@/components/resources/AccessGuidesSection";
 import {
   getParticipantJourneySteps,
   getResourceTrustPrinciples,

@@ -4,6 +4,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 
+import { GuidedSearchDialogue } from "@/components/guided-search/GuidedSearchDialogue";
+import type { GuidedSearchSessionFields } from "@/components/guided-search/types";
+import { MarketingPrimaryNav } from "@/components/marketing/home/MarketingPrimaryNav";
 import { ArrowIcon, ChevronDown, SearchIcon } from "@/components/marketing/mapable-care-icons";
 import {
   MAPABLE_LOGO_ALT,
@@ -20,14 +23,11 @@ import {
   type SponsoredPlacement,
   type SupportArea,
 } from "@/lib/marketing/mapable-care-combined-data";
-import { GuidedSearchDialogue } from "@/components/guided-search/GuidedSearchDialogue";
-import { MarketingPrimaryNav } from "@/components/marketing/home/MarketingPrimaryNav";
-import type { GuidedSearchSessionFields } from "@/components/guided-search/types";
-import { SUPPORT_TYPES } from "@/lib/provider-finder/filters";
 import {
   buildGuidedSearchUrl,
   supportAreaToSupportTypeId,
 } from "@/lib/marketing/mapable-care-routes";
+import { SUPPORT_TYPES } from "@/lib/provider-finder/filters";
 
 function useDismissOnOutsideAndEscape(
   open: boolean,

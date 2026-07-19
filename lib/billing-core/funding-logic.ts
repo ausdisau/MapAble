@@ -31,7 +31,12 @@ export function checkoutDecisionForFundingType(
     };
   }
 
-  if (type === "ndis_self_managed" || type === "private_card") {
+  // private_pay is checkout-compatible with private_card (card / self-pay).
+  if (
+    type === "ndis_self_managed" ||
+    type === "private_card" ||
+    type === "private_pay"
+  ) {
     return { allowed: true, method: "stripe_checkout" };
   }
 

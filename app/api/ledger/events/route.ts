@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 
 import { requireApiSession } from "@/lib/api/auth-handler";
+import type { CurrentUser } from "@/lib/auth/current-user";
 import { apiForbidden } from "@/lib/auth/guards";
+import { isAdminRole } from "@/lib/auth/roles";
 import {
   createLedgerEvent,
   listLedgerEvents,
@@ -11,8 +13,6 @@ import type {
   LedgerEventType,
   LedgerSubjectType,
 } from "@/lib/ledger/types";
-import type { CurrentUser } from "@/lib/auth/current-user";
-import { isAdminRole } from "@/lib/auth/roles";
 import {
   assertCanAccessParticipantData,
   ParticipantAccessError,

@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
-import { getStaticProactiveCatalog } from "@/lib/search/suggestion-fallback-catalog";
 import { keywordsMatchQuery, textMatchesQuery } from "@/lib/search/matches-query";
+import { getStaticProactiveCatalog } from "@/lib/search/suggestion-fallback-catalog";
 import type { AutocompleteSuggestion } from "@/types/search";
 
 function filterByQuery<T extends { keywords: string[] }>(
@@ -36,7 +36,7 @@ export async function searchServiceCategories(
       orderBy: { name: "asc" },
     });
 
-    let matched = rows;
+    const matched = rows;
     if (matched.length < limit) {
       const extra = await prisma.serviceCategory.findMany({
         take: 80,
@@ -112,7 +112,7 @@ export async function searchAccessibilityFeatures(
       orderBy: { label: "asc" },
     });
 
-    let matched = rows;
+    const matched = rows;
     if (matched.length < limit) {
       const extra = await prisma.searchAccessibilityFeature.findMany({
         take: 80,
@@ -156,7 +156,7 @@ export async function searchLanguages(
       orderBy: { label: "asc" },
     });
 
-    let matched = rows;
+    const matched = rows;
     if (matched.length < limit) {
       const extra = await prisma.searchLanguage.findMany({
         take: 40,

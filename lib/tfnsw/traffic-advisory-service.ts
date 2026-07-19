@@ -1,11 +1,11 @@
 import { tfnswConfig, isTfnswLiveTrafficAvailable } from "@/lib/config/tfnsw";
 import { getLiveTrafficHazards } from "@/lib/tfnsw/live-traffic-service";
-import type { LatLng } from "@/types/transport-routing";
 import type {
   LiveTrafficFeature,
   TrafficAdvisory,
   TrafficAdvisoryHazard,
 } from "@/types/tfnsw";
+import type { LatLng } from "@/types/transport-routing";
 
 export const TRAFFIC_ADVISORY_DISCLAIMER =
   "Road hazard information is indicative only, sourced from Live Traffic NSW. It does not replace driver judgement or official directions.";

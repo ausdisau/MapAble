@@ -1,13 +1,12 @@
 import { redirect } from "next/navigation";
 
 import { requireAuth } from "@/lib/auth/guards";
+import { canAccessBillingCentre } from "@/lib/billing/permissions";
 
-export const metadata = {
-  title: "Billing | MapAble",
-  description: "Participant billing — redirects to invoice and billing centre",
-};
-
-export default async function BillingPage() {
-  await requireAuth();
-  redirect("/dashboard/billing");
+export default async function BillingIndexPage() {
+  const user = await requireAuth();
+  if (!canAccessBillingCentre(user.primaryRole)) {
+    redirect("/dashboard");
+  }
+  redirect("/billing/overview");
 }

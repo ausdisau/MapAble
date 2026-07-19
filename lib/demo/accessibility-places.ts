@@ -9,6 +9,13 @@ export type DemoAccessPlace = {
   category: string;
   suburb: string;
   state: string;
+  /** Venue latitude (WGS84). Optional — places without coordinates appear in list view only. */
+  latitude?: number | null;
+  /** Venue longitude (WGS84). Optional — places without coordinates appear in list view only. */
+  longitude?: number | null;
+  /** Lightweight summary — whether a published floor plan exists (avoid fetching full document). */
+  hasFloorPlan?: boolean;
+  floorPlanCount?: number;
   accessScore: number;
   tier: DemoAccessTier;
   confidence: "high" | "medium" | "low" | "unknown";
@@ -31,6 +38,10 @@ export const DEMO_ACCESS_PLACES: DemoAccessPlace[] = [
     category: "library",
     suburb: "Parramatta",
     state: "NSW",
+    latitude: -33.8155,
+    longitude: 151.0031,
+    hasFloorPlan: true,
+    floorPlanCount: 2,
     accessScore: 82,
     tier: "Silver",
     confidence: "high",
@@ -83,6 +94,8 @@ export const DEMO_ACCESS_PLACES: DemoAccessPlace[] = [
     category: "cafe_restaurant",
     suburb: "Newtown",
     state: "NSW",
+    latitude: -33.898,
+    longitude: 151.179,
     accessScore: 64,
     tier: "Bronze",
     confidence: "medium",
@@ -130,6 +143,8 @@ export const DEMO_ACCESS_PLACES: DemoAccessPlace[] = [
     category: "public_toilet",
     suburb: "Newcastle",
     state: "NSW",
+    latitude: -32.928,
+    longitude: 151.782,
     accessScore: 71,
     tier: "Silver",
     confidence: "high",
@@ -177,6 +192,8 @@ export const DEMO_ACCESS_PLACES: DemoAccessPlace[] = [
     category: "other",
     suburb: "Southbank",
     state: "VIC",
+    latitude: -37.822,
+    longitude: 144.9685,
     accessScore: 88,
     tier: "Gold",
     confidence: "high",
@@ -219,6 +236,50 @@ export const DEMO_ACCESS_PLACES: DemoAccessPlace[] = [
       { name: "Information and sensory access", summary: "Quiet hours and hearing loop.", status: "known" },
       { name: "Staff and services", summary: "Sensory support training.", status: "known" },
       { name: "Online information", summary: "Detailed access guide published.", status: "known" },
+    ],
+  },
+  {
+    id: "demo-brisbane-community-centre",
+    slug: "south-brisbane-community-centre",
+    name: "South Brisbane Community Centre",
+    category: "other",
+    suburb: "South Brisbane",
+    state: "QLD",
+    accessScore: 55,
+    tier: "Bronze",
+    confidence: "low",
+    lastChecked: "2026-01-10",
+    source: "community",
+    topAccessFacts: ["Ramp at side entrance reported", "Assistance animal welcome"],
+    keyBarrier: "Coordinates not yet mapped",
+    isDemo: true,
+    profile: {
+      stepFreeEntry: true,
+      doorWidthMm: null,
+      internalStepFree: null,
+      accessibleToilet: null,
+      accessibleParking: false,
+      dropOffPoint: true,
+      lowSensoryOption: null,
+      hearingLoop: null,
+      staffTraining: null,
+      assistanceAnimalWelcome: true,
+      publicTransportNearby: true,
+      transportBookable: false,
+      lastVerified: "2026-01-10",
+      confidence: "low",
+    },
+    measurements: [],
+    sensoryNotes: [],
+    domains: [
+      { name: "External path of travel", summary: "Community report only.", status: "unknown" },
+      { name: "Parking / drop-off", summary: "Street parking only.", status: "unknown" },
+      { name: "Entry and exit", summary: "Side ramp reported.", status: "known" },
+      { name: "Internal movement", summary: "Not yet assessed.", status: "unknown" },
+      { name: "Toilets and amenities", summary: "Not yet assessed.", status: "unknown" },
+      { name: "Information and sensory access", summary: "Not yet assessed.", status: "unknown" },
+      { name: "Staff and services", summary: "Not yet assessed.", status: "unknown" },
+      { name: "Online information", summary: "No access page found.", status: "unknown" },
     ],
   },
 ];

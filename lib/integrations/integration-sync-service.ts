@@ -1,7 +1,8 @@
 import type { Prisma } from "@prisma/client";
-import { prisma } from "@/lib/prisma";
+
 import { auditIntegrationAction } from "@/lib/integrations/integration-audit-service";
 import { getIntegrationConnection } from "@/lib/integrations/integration-connection-service";
+import { prisma } from "@/lib/prisma";
 
 export async function createSyncJob(input: {
   integrationKey: string;

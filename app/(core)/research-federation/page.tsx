@@ -1,5 +1,5 @@
-import { listPublicFederationNodes } from "@/lib/research-federation-at-scale/federation-node-service";
 import { FEDERATED_RESEARCH_DISCLAIMER } from "@/lib/config/y5-rights-infrastructure";
+import { listPublicFederationNodes } from "@/lib/research-federation-at-scale/federation-node-service";
 
 export default async function ResearchFederationPage() {
   const nodes = await listPublicFederationNodes();

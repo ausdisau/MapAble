@@ -21,10 +21,10 @@ export default async function TransportTripsPage() {
           </p>
         </div>
         <Link
-          href="/dashboard/transport/new"
+          href="/transport/request"
           className="inline-flex min-h-11 items-center rounded-lg bg-primary px-4 font-medium text-primary-foreground hover:bg-primary/90 focus-visible:ring-2 focus-visible:ring-ring"
         >
-          New trip
+          Request transport
         </Link>
       </header>
 

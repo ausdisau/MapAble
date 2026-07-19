@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
 
+import { normalizeAuthEmail } from "@/lib/auth/auth-flow";
 import {
   buildPasswordResetUrl,
   isPasswordResetEmailConfigured,
   sendPasswordResetEmail,
 } from "@/lib/auth/password-reset-email";
 import { signPasswordResetToken } from "@/lib/auth/password-reset-token";
-import { normalizeAuthEmail } from "@/lib/auth/auth-flow";
 import { prisma } from "@/lib/prisma";
 
 const GENERIC_MESSAGE =

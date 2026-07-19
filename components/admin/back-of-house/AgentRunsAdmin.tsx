@@ -1,12 +1,12 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
 import { AdminOpsShell } from "@/components/admin/back-of-house/AdminOpsShell";
 import { AiRecommendationPanel } from "@/components/admin/back-of-house/AiRecommendationPanel";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/status-badge";
-import Link from "next/link";
 
 type Row = {
   id: string;

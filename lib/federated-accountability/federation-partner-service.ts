@@ -1,6 +1,6 @@
 import { createAuditEvent } from "@/lib/audit/audit-event-service";
-import { requireRatifiedCharter } from "@/lib/governance-charter/charter-gate-service";
 import { isFederatedAccountabilityV2Enabled } from "@/lib/config/y5-rights-infrastructure";
+import { requireRatifiedCharter } from "@/lib/governance-charter/charter-gate-service";
 import { publishAccountabilityReport } from "@/lib/national-accountability/accountability-service";
 import { prisma } from "@/lib/prisma";
 

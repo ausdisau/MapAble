@@ -1,5 +1,5 @@
-import type { SchedulingAdapter } from "@/lib/scheduling/scheduling-adapter";
 import { prisma } from "@/lib/prisma";
+import type { SchedulingAdapter } from "@/lib/scheduling/scheduling-adapter";
 
 export const internalSchedulingAdapter: SchedulingAdapter = {
   async listAvailability(practitionerId, from, to) {

@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 
+import type { Provider } from "@/app/provider-finder/providers";
+import type { NdisProviderSearchRow } from "@/lib/ingestion/ndis-providers-search";
 import {
   accessPlaceToMapPointEntity,
   ndisRowHasCoordinates,
@@ -7,8 +9,6 @@ import {
   ndisRowToProvider,
   providerToMapPointEntity,
 } from "@/lib/map/mappers";
-import type { Provider } from "@/app/provider-finder/providers";
-import type { NdisProviderSearchRow } from "@/lib/ingestion/ndis-providers-search";
 
 describe("ndis provider mapper", () => {
   const baseRow: NdisProviderSearchRow = {

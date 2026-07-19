@@ -1,6 +1,6 @@
-import { prisma } from "@/lib/prisma";
 import { requireApiAdmin } from "@/lib/api/auth-handler";
 import { jsonError, jsonOk } from "@/lib/api/response";
+import { prisma } from "@/lib/prisma";
 
 export async function GET(
   _req: Request,

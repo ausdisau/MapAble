@@ -1,3 +1,4 @@
+import { HERO_SUGGESTED_SEARCHES_FALLBACK } from "@/lib/provider-finder/filters";
 import { flattenSuggestions } from "@/lib/search/autocomplete-utils";
 import type {
   AutocompleteContext,
@@ -6,7 +7,6 @@ import type {
   SuggestionSignals,
 } from "@/types/search";
 
-import { HERO_SUGGESTED_SEARCHES_FALLBACK } from "@/lib/provider-finder/filters";
 
 export type ProactiveSuggestionsResponse = {
   groups: AutocompleteGroupedResult;

@@ -1,5 +1,5 @@
-import { DriverNav } from "@/components/layout/DriverNav";
 import { AuthenticatedRoleAppShell } from "@/components/layout/AuthenticatedRoleAppShell";
+import { DriverNav } from "@/components/layout/DriverNav";
 import { requireAuth } from "@/lib/auth/guards";
 
 export const dynamic = "force-dynamic";

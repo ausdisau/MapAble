@@ -1,7 +1,7 @@
 import { isErpnextEnabled } from "@/lib/finance/erpnext/erpnext-client";
 import { mapMapableInvoiceToErpNext } from "@/lib/finance/erpnext/erpnext-invoice-mapper";
-import { prisma } from "@/lib/prisma";
 import { createSyncJob, recordSyncError, completeSyncJob } from "@/lib/integrations/integration-sync-service";
+import { prisma } from "@/lib/prisma";
 
 export async function syncInvoiceToErpNext(input: {
   invoiceId: string;

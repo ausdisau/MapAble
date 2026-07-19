@@ -1,11 +1,11 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
 import type { CurrentUser } from "@/lib/auth/current-user";
+import { validateClaimLinesForBatch } from "@/lib/ndis/claiming/validation";
 import {
   assertParticipantLinkedToProvider,
   ParticipantProviderAccessError,
 } from "@/lib/ndis/participant-provider-relationship-service";
-import { validateClaimLinesForBatch } from "@/lib/ndis/claiming/validation";
 import {
   assertCanAccessSuggestionSource,
   SuggestionSourceAccessError,

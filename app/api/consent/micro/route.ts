@@ -1,15 +1,16 @@
+import { ZodError } from "zod";
+
 import { requireApiSession } from "@/lib/api/auth-handler";
-import { jsonError, jsonOk } from "@/lib/api/response";
+import { jsonError, jsonOk, zodErrorResponse } from "@/lib/api/response";
+import { isAdminRole } from "@/lib/auth/roles";
 import {
+  exportConsentAuditCsv,
   isMicroConsentV2Enabled,
   listMicroConsentsForParticipant,
-  MICRO_CONSENT_ACTIONS,
   recordMicroConsentGrant,
   revokeMicroConsent,
-  exportConsentAuditCsv,
-  type MicroConsentAction,
 } from "@/lib/consent/micro-consent-service";
-import { isAdminRole } from "@/lib/auth/roles";
+import { microConsentPostSchema } from "@/lib/validation/micro-consent";
 
 export async function GET(req: Request) {
   const user = await requireApiSession();
@@ -41,30 +42,37 @@ export async function POST(req: Request) {
   const user = await requireApiSession();
   if (user instanceof Response) return user;
 
-  const body = await req.json();
+  let body: unknown;
+  try {
+    body = await req.json();
+  } catch {
+    return jsonError("Invalid JSON body", 400);
+  }
 
-  if (body.action === "revoke") {
-    if (!body.consentId) return jsonError("consentId required", 400);
+  let parsed;
+  try {
+    parsed = microConsentPostSchema.parse(body);
+  } catch (err) {
+    if (err instanceof ZodError) return zodErrorResponse(err);
+    throw err;
+  }
+
+  if (parsed.action === "revoke") {
     const record = await revokeMicroConsent({
-      consentId: body.consentId,
+      consentId: parsed.consentId,
       revokedById: user.id,
     });
     return jsonOk({ record });
   }
 
-  const microAction = body.microAction as MicroConsentAction;
-  if (!microAction || !MICRO_CONSENT_ACTIONS.includes(microAction)) {
-    return jsonError("Invalid microAction", 400);
-  }
-
   const record = await recordMicroConsentGrant({
-    action: microAction,
+    action: parsed.microAction,
     subjectUserId: user.id,
     createdById: user.id,
-    purpose: body.purpose ?? `Consent for ${microAction}`,
-    grantedToUserId: body.grantedToUserId,
-    grantedToOrganisationId: body.grantedToOrganisationId,
-    shareMode: body.shareMode,
+    purpose: parsed.purpose ?? `Consent for ${parsed.microAction}`,
+    grantedToUserId: parsed.grantedToUserId,
+    grantedToOrganisationId: parsed.grantedToOrganisationId,
+    shareMode: parsed.shareMode,
   });
 
   return jsonOk({ record }, 201);

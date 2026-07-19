@@ -3,19 +3,19 @@ import type { TransportRouteEstimate, TransportTrip } from "@prisma/client";
 import type { CurrentUser } from "@/lib/auth/current-user";
 import { hasPermission } from "@/lib/auth/permissions";
 import { isAdminRole } from "@/lib/auth/roles";
+import { prisma } from "@/lib/prisma";
 import {
   getActiveAssignment,
   resolveTripAccess,
   type TripAccessLevel,
 } from "@/lib/transport/transport-access-policy";
+import { enrichTripResponseExtras } from "@/lib/transport/trip-enrichment-service";
 import type {
   TransportNextAction,
   TransportTripApiResponse,
   TransportTripDetail,
   TransportTripPermissions,
 } from "@/types/transport";
-import { enrichTripResponseExtras } from "@/lib/transport/trip-enrichment-service";
-import { prisma } from "@/lib/prisma";
 import { ROUTE_ADVISORY_DISCLAIMER } from "@/types/transport-routing";
 
 function shapeAddress(

@@ -1,19 +1,19 @@
 import { describe, expect, it } from "vitest";
 
 import { y1WedgeConfig } from "@/lib/config/y1-wedge";
+import { isMicroConsentEnabled } from "@/lib/consent/micro-consent-service";
+import {
+  validateIncidentIntakePath,
+  type IncidentIntakeWizardSteps,
+} from "@/lib/incidents/incident-service";
+import {
+  participantSafeCandidateSummary,
+} from "@/lib/matching/matching-service";
 import {
   defaultSupportProfileSections,
   mergeSupportProfileSections,
   participantSafeSupportProfileSummary,
 } from "@/lib/support-profile/types";
-import {
-  participantSafeCandidateSummary,
-} from "@/lib/matching/matching-service";
-import {
-  validateIncidentIntakePath,
-  type IncidentIntakeWizardSteps,
-} from "@/lib/incidents/incident-service";
-import { isMicroConsentEnabled } from "@/lib/consent/micro-consent-service";
 
 describe("Y1 wedge config", () => {
   it("disables all wedge features by default", () => {

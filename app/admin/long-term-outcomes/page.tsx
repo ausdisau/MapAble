@@ -1,10 +1,10 @@
 import { OutcomesWaveForm } from "@/app/admin/long-term-outcomes/OutcomesWaveForm";
 import { requireAdmin } from "@/lib/auth/guards";
+import { isLongTermOutcomesV2Enabled } from "@/lib/config/y5-rights-infrastructure";
 import {
   getOutcomesDisclaimer,
   listPublishedOutcomes,
 } from "@/lib/long-term-outcomes/outcomes-service";
-import { isLongTermOutcomesV2Enabled } from "@/lib/config/y5-rights-infrastructure";
 
 export default async function LongTermOutcomesAdminPage() {
   await requireAdmin();

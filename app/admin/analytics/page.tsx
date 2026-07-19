@@ -1,7 +1,7 @@
 import { AnalyticsPrivacyNotice } from "@/components/analytics/AnalyticsPrivacyNotice";
 import { DeidentificationBadge } from "@/components/data-governance/DeidentificationBadge";
-import { requireAdmin } from "@/lib/auth/guards";
 import { isMetabaseEnabled } from "@/lib/analytics/metabase/metabase-client";
+import { requireAdmin } from "@/lib/auth/guards";
 
 export default async function AdminAnalyticsPage() {
   await requireAdmin();

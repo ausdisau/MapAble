@@ -1,18 +1,18 @@
 import Link from "next/link";
 import React from "react";
 
-import { AccessGuidesSection } from "@/components/resources/AccessGuidesSection";
 import { PublicInfoPage } from "@/components/marketing/PublicInfoPage";
-import {
-  accessGuides,
-  getAccessGuidesByTier,
-  getCapitalAccessGuides,
-} from "@/lib/resources/access-guides-data";
+import { AccessGuidesSection } from "@/components/resources/AccessGuidesSection";
 import {
   mapablePublicCardClass,
   mapablePublicEyebrowClass,
   mapablePublicPageContainerClass,
 } from "@/lib/marketing/public-page-styles";
+import {
+  accessGuides,
+  getAccessGuidesByTier,
+  getCapitalAccessGuides,
+} from "@/lib/resources/access-guides-data";
 
 export const metadata = {
   title: "Access Guides | MapAble",

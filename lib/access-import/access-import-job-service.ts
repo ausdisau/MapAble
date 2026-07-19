@@ -2,9 +2,9 @@ import type { AccessImportSourceType } from "@prisma/client";
 
 import { parseAccessibleLocationsGeoJson } from "@/lib/access-import/geojson-parser-service";
 import { findDuplicatePlaceCandidates } from "@/lib/access-import/import-deduplication-service";
+import { MAX_IMPORT_ITEMS } from "@/lib/access-import/import-limits";
 import { resolveKmlDocument } from "@/lib/access-import/kml-networklink-service";
 import { sanitizeKmlDescription } from "@/lib/access-import/kml-parser-service";
-import { MAX_IMPORT_ITEMS } from "@/lib/access-import/import-limits";
 import { mapPlacemarkToImportItem } from "@/lib/access-import/kml-to-access-place-mapper";
 import { prisma } from "@/lib/prisma";
 

@@ -1,6 +1,6 @@
 import type { CurrentUser } from "@/lib/auth/current-user";
-import { prisma } from "@/lib/prisma";
 import { checkConsent } from "@/lib/consent/consent-service";
+import { prisma } from "@/lib/prisma";
 import {
   mobilityFromAccessibilityProfile,
   type MobilityRequirements,

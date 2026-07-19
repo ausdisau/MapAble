@@ -1,9 +1,9 @@
-import { requireApiAdmin } from "@/lib/api/auth-handler";
-import { jsonError, jsonOk } from "@/lib/api/response";
 import {
   publishAlgorithmById,
   submitAlgorithmForReview,
 } from "@/lib/algorithm-register/register-service";
+import { requireApiAdmin } from "@/lib/api/auth-handler";
+import { jsonError, jsonOk } from "@/lib/api/response";
 
 export async function PATCH(
   req: Request,

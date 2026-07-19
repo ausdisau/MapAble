@@ -1,9 +1,9 @@
 import { createHmac, timingSafeEqual } from "crypto";
 
-import { isAutomationEventAllowed } from "@/lib/integrations/integration-feature-policy";
-import { IntegrationSafetyBlockedError } from "@/lib/integrations/integration-error";
 import { getN8nConfig, isN8nEnabled } from "@/lib/automation/n8n/n8n-client";
 import { redactAutomationPayload } from "@/lib/automation/n8n/n8n-event-publisher";
+import { IntegrationSafetyBlockedError } from "@/lib/integrations/integration-error";
+import { isAutomationEventAllowed } from "@/lib/integrations/integration-feature-policy";
 import { prisma } from "@/lib/prisma";
 
 export function verifyN8nWebhookSignature(

@@ -1,10 +1,6 @@
 import { NextResponse } from "next/server";
 
 import {
-  consumeKeycloakOAuthState,
-  isSafeRedirect,
-} from "@/lib/auth/keycloak/keycloak-session-service";
-import {
   exchangeKeycloakCode,
   fetchKeycloakUserInfo,
 } from "@/lib/auth/keycloak/keycloak-client";
@@ -14,6 +10,10 @@ import {
   linkKeycloakIdentity,
 } from "@/lib/auth/keycloak/keycloak-profile-bridge";
 import { canAutoApproveRole, suggestRoleFromKeycloakGroup } from "@/lib/auth/keycloak/keycloak-role-mapper";
+import {
+  consumeKeycloakOAuthState,
+  isSafeRedirect,
+} from "@/lib/auth/keycloak/keycloak-session-service";
 import { auditIntegrationAction } from "@/lib/integrations/integration-audit-service";
 import { prisma } from "@/lib/prisma";
 
@@ -55,7 +55,7 @@ export async function GET(request: Request) {
     return NextResponse.redirect("/login?link=pending");
   }
 
-  let user = collision.existingUser;
+  const user = collision.existingUser;
   if (!user) {
     return NextResponse.redirect(
       `/login?error=no_account&hint=Register first then link Keycloak`

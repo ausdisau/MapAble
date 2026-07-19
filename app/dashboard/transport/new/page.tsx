@@ -24,7 +24,7 @@ export default function NewTransportTripPage() {
     <div className="space-y-4">
       <p>
         <Link
-          href="/dashboard/transport"
+          href="/transport/dashboard"
           className="text-sm font-medium text-primary hover:underline focus-visible:ring-2 focus-visible:ring-ring"
         >
           ← Back to transport trips
@@ -33,9 +33,12 @@ export default function NewTransportTripPage() {
       <header className="space-y-2">
         <h1 className="font-heading text-2xl font-bold">Book accessible transport</h1>
         <p className="text-sm text-muted-foreground">
-          Route estimates are advisory and are not a guarantee of timing or NDIS
-          payment approval. A provider will assign a verified driver and vehicle
-          that matches your access needs.
+          Compatibility route for the participant request flow. Prefer{" "}
+          <Link href="/transport/request" className="font-medium text-primary underline">
+            /transport/request
+          </Link>
+          . Route estimates are advisory and are not a guarantee of timing or
+          NDIS payment approval. Assignment still requires eligibility checks.
         </p>
       </header>
       <Suspense fallback={<TripFormFallback />}>

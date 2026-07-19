@@ -1,3 +1,4 @@
+import { createAuditEvent } from "@/lib/audit/audit-event-service";
 import { platformPatternsConfig } from "@/lib/config/platform-patterns";
 import {
   isMicroConsentActive,
@@ -9,7 +10,6 @@ import {
   listConsentsForParticipant,
   revokeConsent,
 } from "@/lib/consent/consent-service";
-import { createAuditEvent } from "@/lib/audit/audit-event-service";
 import { requireConsent } from "@/lib/consent/require-consent";
 import { prisma } from "@/lib/prisma";
 import type { ConsentScope } from "@/types/mapable";

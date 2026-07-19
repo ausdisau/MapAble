@@ -7,10 +7,7 @@ import {
   parseAddressFromNdisRecord,
   parseHeadOfficeLocation,
 } from "@/lib/ingestion/ndis-location-parse";
-import {
-  NDIS_LIST_PROVIDERS_URL,
-  parseNdisListProvidersJson,
-} from "@/lib/ndis/list-providers-source";
+import { NDIS_LIST_PROVIDERS_URL } from "@/lib/ndis/list-providers-source";
 import { prisma } from "@/lib/prisma";
 
 export const DEFAULT_NDIS_PROVIDER_SOURCE_URL = NDIS_LIST_PROVIDERS_URL;
@@ -330,7 +327,7 @@ export async function fetchNdisProviderPayload(
     }
   }
 
-  const { loadNdisListProviders, resolveNdisListProvidersPath } = await import(
+  const { resolveNdisListProvidersPath } = await import(
     "@/lib/ndis/list-providers-source"
   );
   const { readFile } = await import("node:fs/promises");
