@@ -103,4 +103,4 @@ jobs:
         run: pnpm build
 
       - name: API contract tests
-        run: pnpm exec vitest run tests/security tests/billing-policy.test.ts || pnpm exec vitest run tests/security
+        run: pnpm exec vitest run tests/security tests/billing-policy.test.ts

@@ -10,7 +10,7 @@ export const maplibreAdapter: IntegrationAdapter = {
   displayName: "MapLibre",
 
   isEnabled() {
-    return process.env.MAP_INTEGRATION_ENABLED !== "false";
+    return process.env.MAP_INTEGRATION_ENABLED === "true";
   },
 
   async healthCheck(): Promise<IntegrationHealthResult> {

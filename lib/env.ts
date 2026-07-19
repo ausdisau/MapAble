@@ -4,6 +4,11 @@ import {
   isVercelPreviewDeployment,
   isVercelProductionDeployment,
 } from "@/lib/auth/nextauth-env";
+import {
+  validateProductionDatabaseUrls,
+  validateProductionNextAuthSecret,
+  validateProductionPublicUrls,
+} from "@/lib/config/canonical-url";
 
 const coreSchema = z.object({
   NODE_ENV: z
@@ -64,12 +69,12 @@ const integrationRules: IntegrationEnvRule[] = [
   },
   {
     key: "maplibre",
-    enabledWhen: () => process.env.MAP_INTEGRATION_ENABLED !== "false",
+    enabledWhen: () => process.env.MAP_INTEGRATION_ENABLED === "true",
     requiredVars: ["NEXT_PUBLIC_MAP_STYLE_URL"],
   },
   {
     key: "openstreetmap",
-    enabledWhen: () => process.env.OPENSTREETMAP_ENABLED !== "false",
+    enabledWhen: () => process.env.OPENSTREETMAP_ENABLED === "true",
     requiredVars: [],
   },
   {
@@ -162,12 +167,8 @@ export function validateCoreEnv(): EnvValidationIssue[] {
   const isProd = process.env.NODE_ENV === "production";
 
   if (isProd) {
-    if (!process.env.DATABASE_URL) {
-      issues.push({
-        variable: "DATABASE_URL",
-        message: "Required in production",
-      });
-    }
+    issues.push(...validateProductionDatabaseUrls(process.env));
+    issues.push(...validateProductionPublicUrls(process.env));
 
     const hasPrimarySecret = Boolean(process.env.NEXTAUTH_SECRET?.trim());
     const hasPreviewSecret = Boolean(
@@ -189,15 +190,8 @@ export function validateCoreEnv(): EnvValidationIssue[] {
         message:
           "Required on Vercel preview (or set MAPABLE_PREVIEW_AUTH_SECRET in Preview env)",
       });
-    } else if (
-      isProd &&
-      !isVercelPreviewDeployment() &&
-      !hasPrimarySecret
-    ) {
-      issues.push({
-        variable: "NEXTAUTH_SECRET",
-        message: "Required in production",
-      });
+    } else {
+      issues.push(...validateProductionNextAuthSecret(process.env));
     }
   }
 

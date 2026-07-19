@@ -51,8 +51,8 @@ describe("search privacy", () => {
 });
 
 describe("phase 4 config", () => {
-  it("manual tracking enabled by default", () => {
-    expect(phase4Config.transportManualTrackingEnabled).toBe(true);
+  it("manual tracking disabled by default (Wave 0 fail-closed)", () => {
+    expect(phase4Config.transportManualTrackingEnabled).toBe(false);
   });
   it("NDIS auto claiming disabled", () => {
     expect(phase4Config.ndisAutoClaimingEnabled).toBe(false);

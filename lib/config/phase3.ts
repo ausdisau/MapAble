@@ -4,6 +4,6 @@ export const phase3Config = {
   transportLiveTrackingEnabled:
     process.env.TRANSPORT_LIVE_TRACKING_ENABLED === "true",
   transportRoutingEnabled: process.env.TRANSPORT_ROUTING_ENABLED === "true",
-  jobsPublicBoardEnabled: process.env.JOBS_PUBLIC_BOARD_ENABLED !== "false",
-  orchestrationEnabled: process.env.ORCHESTRATION_ENABLED !== "false",
+  jobsPublicBoardEnabled: process.env.JOBS_PUBLIC_BOARD_ENABLED === "true",
+  orchestrationEnabled: process.env.ORCHESTRATION_ENABLED === "true",
 };

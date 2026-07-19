@@ -1,5 +1,5 @@
 export const engagementConfig = {
-  enabled: process.env.ENGAGEMENT_PLATFORM_ENABLED !== "false",
+  enabled: process.env.ENGAGEMENT_PLATFORM_ENABLED === "true",
   providerInsightsEnabled:
     process.env.ENGAGEMENT_PROVIDER_INSIGHTS_ENABLED === "true",
   npsMinCohortSize: Number(process.env.ENGAGEMENT_NPS_MIN_COHORT ?? "5"),

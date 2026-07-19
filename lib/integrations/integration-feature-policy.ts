@@ -80,7 +80,6 @@ export function isIntegrationEnvEnabled(key: string): boolean {
   if (key === "jitsi") return val === "jitsi";
   if (key === "livekit") return val === "livekit";
   if (key === "calcom") return val === "calcom";
-  if (key === "maplibre") return val !== "false" && val !== undefined;
-  if (key === "openstreetmap") return val !== "false";
+  // Wave 0: map integrations fail closed (enable with === "true" for pilot).
   return val === "true";
 }

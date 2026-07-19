@@ -1,7 +1,7 @@
 /** OpenStreetMap-backed geocoding and tile infrastructure. */
 
 export const openStreetMapConfig = {
-  enabled: process.env.OPENSTREETMAP_ENABLED !== "false",
+  enabled: process.env.OPENSTREETMAP_ENABLED === "true",
   nominatimEnabled: process.env.MAP_GEOCODING_NOMINATIM_ENABLED === "true",
   nominatimBaseUrl: (
     process.env.OSM_NOMINATIM_BASE_URL ?? "https://nominatim.openstreetmap.org"
@@ -17,7 +17,7 @@ export const openStreetMapConfig = {
 };
 
 export function isOpenStreetMapConfigured(): boolean {
-  return process.env.OPENSTREETMAP_ENABLED !== "false";
+  return process.env.OPENSTREETMAP_ENABLED === "true";
 }
 
 export function isNominatimGeocodingConfigured(): boolean {

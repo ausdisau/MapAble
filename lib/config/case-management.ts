@@ -11,8 +11,8 @@
  *   before they influence escalation.
  */
 export const caseManagementConfig = {
-  enabled: process.env.CASE_MANAGEMENT_ENABLED !== "false",
-  aiEnabled: process.env.CASE_MANAGEMENT_AI_ENABLED !== "false",
+  enabled: process.env.CASE_MANAGEMENT_ENABLED === "true",
+  aiEnabled: process.env.CASE_MANAGEMENT_AI_ENABLED === "true",
   aiAutoRunOnCreate: process.env.CASE_MANAGEMENT_AI_AUTORUN === "true",
   /**
    * Engine identifier embedded into AIInsight rows. When a real LLM

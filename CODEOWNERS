@@ -1,64 +1,71 @@
-# MapAble CODEOWNERS — remediation programme
+# MapAble CODEOWNERS — Wave 0 (user-owned repository)
 # See docs/remediation/DOMAIN_OWNERSHIP.md and docs/operations/branch-protection.md
-# Teams must exist in the ausdisau GitHub org (or reviews are requested manually).
+#
+# Immediate recommendation: assign @ausdisau (repository owner). GitHub teams
+# under @ausdisau/* cannot exist while the owner is a personal User account.
+# Longer-term: migrate to a GitHub Organisation and restore specialist teams
+# (mapable-maintainers, mapable-security, mapable-privacy, mapable-safeguarding,
+# mapable-billing). Until then, specialist second review is a human process
+# recorded on the PR — CODEOWNERS cannot enforce non-existent teams.
 
 # Default
-* @ausdisau/mapable-maintainers
+* @ausdisau
 
 # Auth, sessions, permissions
-/lib/auth/ @ausdisau/mapable-security @ausdisau/mapable-maintainers
-/app/api/auth/ @ausdisau/mapable-security @ausdisau/mapable-maintainers
-/middleware.ts @ausdisau/mapable-security @ausdisau/mapable-maintainers
+/lib/auth/ @ausdisau
+/app/api/auth/ @ausdisau
+/middleware.ts @ausdisau
 
 # Consent
-/lib/consent/ @ausdisau/mapable-privacy @ausdisau/mapable-maintainers
-/app/api/consent/ @ausdisau/mapable-privacy @ausdisau/mapable-maintainers
-/app/api/consents/ @ausdisau/mapable-privacy @ausdisau/mapable-maintainers
+/lib/consent/ @ausdisau
+/app/api/consent/ @ausdisau
+/app/api/consents/ @ausdisau
 
 # Safeguarding / incidents
-/lib/incidents/ @ausdisau/mapable-safeguarding @ausdisau/mapable-maintainers
-/lib/safety/ @ausdisau/mapable-safeguarding @ausdisau/mapable-maintainers
-/app/api/incidents/ @ausdisau/mapable-safeguarding @ausdisau/mapable-maintainers
+/lib/incidents/ @ausdisau
+/lib/safety/ @ausdisau
+/app/api/incidents/ @ausdisau
 
 # Billing
-/lib/billing/ @ausdisau/mapable-billing @ausdisau/mapable-maintainers
-/lib/billing-core/ @ausdisau/mapable-billing @ausdisau/mapable-maintainers
-/lib/invoices/ @ausdisau/mapable-billing @ausdisau/mapable-maintainers
-/app/api/billing/ @ausdisau/mapable-billing @ausdisau/mapable-maintainers
-/app/api/invoices/ @ausdisau/mapable-billing @ausdisau/mapable-maintainers
+/lib/billing/ @ausdisau
+/lib/billing-core/ @ausdisau
+/lib/invoices/ @ausdisau
+/app/api/billing/ @ausdisau
+/app/api/invoices/ @ausdisau
 
 # Payments
-/lib/stripe/ @ausdisau/mapable-billing @ausdisau/mapable-maintainers
-/app/api/stripe/ @ausdisau/mapable-billing @ausdisau/mapable-maintainers
-/app/api/payments/ @ausdisau/mapable-billing @ausdisau/mapable-maintainers
-/app/api/payouts/ @ausdisau/mapable-billing @ausdisau/mapable-maintainers
-/app/api/webhooks/ @ausdisau/mapable-billing @ausdisau/mapable-security
+/lib/stripe/ @ausdisau
+/app/api/stripe/ @ausdisau
+/app/api/payments/ @ausdisau
+/app/api/payouts/ @ausdisau
+/app/api/webhooks/ @ausdisau
 
 # Tenancy / organisations
-/app/api/organisations/ @ausdisau/mapable-security @ausdisau/mapable-maintainers
-/lib/enterprise-provider/ @ausdisau/mapable-security @ausdisau/mapable-maintainers
+/app/api/organisations/ @ausdisau
+/lib/enterprise-provider/ @ausdisau
 
 # Encryption / participant identifiers
-/lib/crypto/ @ausdisau/mapable-security @ausdisau/mapable-maintainers
-/app/api/participant-profile/ @ausdisau/mapable-privacy @ausdisau/mapable-security
-/app/api/data-vault/ @ausdisau/mapable-privacy @ausdisau/mapable-security
-/lib/documents/ @ausdisau/mapable-privacy @ausdisau/mapable-maintainers
+/lib/crypto/ @ausdisau
+/app/api/participant-profile/ @ausdisau
+/app/api/data-vault/ @ausdisau
+/lib/documents/ @ausdisau
 
 # Prisma schema and migrations
-/prisma/schema.prisma @ausdisau/mapable-maintainers @ausdisau/mapable-security
-/prisma/migrations/ @ausdisau/mapable-maintainers @ausdisau/mapable-security
+/prisma/schema.prisma @ausdisau
+/prisma/migrations/ @ausdisau
 
 # Remediation controls
-/docs/remediation/ @ausdisau/mapable-maintainers
-/CODEOWNERS @ausdisau/mapable-maintainers @ausdisau/mapable-security
-/.github/workflows/ @ausdisau/mapable-maintainers @ausdisau/mapable-security
-/scripts/ci/ @ausdisau/mapable-maintainers @ausdisau/mapable-security
+/docs/remediation/ @ausdisau
+/CODEOWNERS @ausdisau
+/.github/workflows/ @ausdisau
+/scripts/ci/ @ausdisau
+/security/ @ausdisau
 
 # Access Intelligence Next — Living Access Fabric (contracts / synthetic only)
-/lib/access-intelligence-next/ @ausdisau/mapable-maintainers @ausdisau/mapable-privacy
-/app/api/access-intelligence-next/ @ausdisau/mapable-maintainers @ausdisau/mapable-privacy
-/app/access-intelligence/living-graph/ @ausdisau/mapable-maintainers
-/app/access-intelligence/journey-preflight/ @ausdisau/mapable-maintainers
-/docs/access-intelligence-next/ @ausdisau/mapable-maintainers
-/components/access-intelligence-next/ @ausdisau/mapable-maintainers
-/tests/access-intelligence-next/ @ausdisau/mapable-maintainers
+/lib/access-intelligence-next/ @ausdisau
+/app/api/access-intelligence-next/ @ausdisau
+/app/access-intelligence/living-graph/ @ausdisau
+/app/access-intelligence/journey-preflight/ @ausdisau
+/docs/access-intelligence-next/ @ausdisau
+/components/access-intelligence-next/ @ausdisau
+/tests/access-intelligence-next/ @ausdisau
