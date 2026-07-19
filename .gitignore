@@ -80,3 +80,7 @@ yarn.lock
 # Logs
 logs
 *.log
+
+# Playwright
+test-results/
+playwright-report/
