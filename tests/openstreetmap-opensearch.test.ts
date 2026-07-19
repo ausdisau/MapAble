@@ -24,11 +24,11 @@ function restoreEnv(key: string, value: string | undefined) {
 }
 
 describe("OpenStreetMap config", () => {
-  it("is enabled by default", () => {
+  it("is disabled by default (Wave 0 fail-closed)", () => {
     const orig = process.env.OPENSTREETMAP_ENABLED;
     delete process.env.OPENSTREETMAP_ENABLED;
     try {
-      expect(isOpenStreetMapConfigured()).toBe(true);
+      expect(isOpenStreetMapConfigured()).toBe(false);
     } finally {
       restoreEnv("OPENSTREETMAP_ENABLED", orig);
     }

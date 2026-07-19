@@ -4,14 +4,14 @@ import { hasPermission } from "@/lib/auth/permissions";
 import { phase8Config } from "@/lib/config/phase8";
 
 describe("Phase 8 config", () => {
-  it("national insights on by default", () => {
-    expect(phase8Config.nationalInsightsEnabled).toBe(true);
+  it("national insights off by default (Wave 0 fail-closed)", () => {
+    expect(phase8Config.nationalInsightsEnabled).toBe(false);
   });
   it("partner marketplace off by default", () => {
     expect(phase8Config.partnerMarketplaceEnabled).toBe(false);
   });
-  it("public API versioning on by default", () => {
-    expect(phase8Config.publicApiVersioningEnabled).toBe(true);
+  it("public API versioning off by default (Wave 0 fail-closed)", () => {
+    expect(phase8Config.publicApiVersioningEnabled).toBe(false);
   });
 });
 
@@ -36,7 +36,7 @@ describe("API version policy", () => {
       const policy = await getApiVersionPolicy();
       expect(policy.defaultVersion).toBe("v1");
     } catch {
-      expect(phase8Config.publicApiVersioningEnabled).toBe(true);
+      expect(phase8Config.publicApiVersioningEnabled).toBe(false);
     }
   });
 });
@@ -50,7 +50,7 @@ describe("national insights guard", () => {
       const list = await listPublishedNationalInsights();
       expect(Array.isArray(list)).toBe(true);
     } catch {
-      expect(phase8Config.nationalInsightsEnabled).toBe(true);
+      expect(phase8Config.nationalInsightsEnabled).toBe(false);
     }
   });
 });

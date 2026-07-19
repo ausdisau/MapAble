@@ -6,5 +6,5 @@ export const transportRoutingConfig = {
   osrmBaseUrl: process.env.OSRM_BASE_URL ?? "http://router.project-osrm.org",
   graphhopperApiKey: process.env.GRAPHHOPPER_API_KEY,
   openRouteServiceApiKey: process.env.OPENROUTESERVICE_API_KEY,
-  routingEnabled: process.env.TRANSPORT_ROUTING_ENABLED !== "false",
+  routingEnabled: process.env.TRANSPORT_ROUTING_ENABLED === "true",
 };

@@ -4,8 +4,8 @@ import { hasPermission } from "@/lib/auth/permissions";
 import { phase10Config } from "@/lib/config/phase10";
 
 describe("Phase 10 config", () => {
-  it("algorithm register on by default", () => {
-    expect(phase10Config.publicAlgorithmRegisterEnabled).toBe(true);
+  it("algorithm register off by default (Wave 0 fail-closed)", () => {
+    expect(phase10Config.publicAlgorithmRegisterEnabled).toBe(false);
   });
   it("API certification off by default", () => {
     expect(phase10Config.apiCertificationProgramEnabled).toBe(false);
@@ -13,8 +13,8 @@ describe("Phase 10 config", () => {
   it("federated research off by default", () => {
     expect(phase10Config.federatedResearchEnabled).toBe(false);
   });
-  it("oversight board on by default", () => {
-    expect(phase10Config.oversightBoardPortalEnabled).toBe(true);
+  it("oversight board off by default (Wave 0 fail-closed)", () => {
+    expect(phase10Config.oversightBoardPortalEnabled).toBe(false);
   });
 });
 
@@ -43,7 +43,7 @@ describe("algorithm register", () => {
       const list = await listPublishedAlgorithms();
       expect(Array.isArray(list)).toBe(true);
     } catch {
-      expect(phase10Config.publicAlgorithmRegisterEnabled).toBe(true);
+      expect(phase10Config.publicAlgorithmRegisterEnabled).toBe(false);
     }
   });
 });

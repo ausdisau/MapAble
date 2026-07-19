@@ -6,8 +6,8 @@ import { validatePriceRows } from "@/lib/ndis-pricing/catalogue-import-service";
 import { sandboxDataGuard } from "@/lib/partner-sandbox/sandbox-service";
 
 describe("Phase 6 config", () => {
-  it("dispatch enabled by default", () => {
-    expect(phase6Config.dispatchConsoleEnabled).toBe(true);
+  it("dispatch disabled by default (Wave 0 fail-closed)", () => {
+    expect(phase6Config.dispatchConsoleEnabled).toBe(false);
   });
   it("open data export off by default", () => {
     expect(phase6Config.openDataExportEnabled).toBe(false);

@@ -12,6 +12,9 @@ import {
 } from "@/components/ads/GoogleAdSense";
 import { Providers } from "@/components/providers";
 import { MAPABLE_LOGO_MARK_SRC } from "@/lib/brand/constants";
+import { getCanonicalPublicOrigin } from "@/lib/config/canonical-url";
+
+const canonicalOrigin = getCanonicalPublicOrigin();
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -28,9 +31,7 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_APP_URL || "https://www.mapable.com.au",
-  ),
+  metadataBase: new URL(canonicalOrigin),
   title: {
     default: "MapAble | Disability support platform",
     template: "%s | MapAble",
@@ -38,6 +39,9 @@ export const metadata: Metadata = {
   description:
     "MapAble helps people explore disability support, provider discovery, accessible transport, employment pathways and consent-aware service tools.",
   applicationName: "MapAble",
+  alternates: {
+    canonical: canonicalOrigin,
+  },
   icons: {
     icon: [{ url: MAPABLE_LOGO_MARK_SRC, type: "image/svg+xml" }],
     shortcut: [{ url: MAPABLE_LOGO_MARK_SRC, type: "image/svg+xml" }],
@@ -45,6 +49,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: "website",
+    url: canonicalOrigin,
     siteName: "MapAble",
     title: "MapAble | Disability support platform",
     description:
