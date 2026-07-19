@@ -23,6 +23,8 @@
 6. #328 — Trust Fabric access receipts
 7. #329 — Persistent Access Evidence Envelope
 
+Closed drafts **#315 / #316 / #317** failed CI on an obsolete stack; content was consolidated via #327. See [PR_315_317_REPAIR.md](./PR_315_317_REPAIR.md).
+
 ## Active leadership train (max 3)
 
 1. Database-backed Starting Work projection — this PR (#330)

@@ -72,6 +72,7 @@ export default function App() {
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="Stop AURA on this device"
+            accessibilityHint="Stops agent proposals immediately. Does not change consent or bookings."
             style={[styles.button, styles.danger]}
             onPress={() => {
               stopAura();
