@@ -29,7 +29,7 @@ No other module may directly mutate another domain’s aggregate tables except t
 
 CI ownership check (`scripts/ci/check-domain-ownership.ts`) flags changed files that touch foreign aggregate write paths without going through the owner package (heuristic; expands in later PRs).
 
-Cross-domain **read/orchestration** adapters allowlisted in that script (not second SoTs): `lib/matching/`, `lib/ai-matching/`, `lib/ai-platform/`, `lib/mission-portfolio/`, `lib/mission-copilot/`, `lib/case-copilot/`, plus existing orchestration/booking-graph packages. They must not become care/transport/billing writers.
+Cross-domain **read/orchestration** adapters allowlisted in that script (not second SoTs): `lib/matching/`, `lib/ai-matching/`, `lib/ai-platform/`, `lib/mission-portfolio/`, `lib/mission-copilot/`, `lib/case-copilot/`, `lib/programmes/`, plus existing orchestration/booking-graph packages. They must not become care/transport/billing writers. Programme services may store foreign-key references (e.g. `consentRecordId`, `careRequestId`) without owning those aggregates.
 
 ## CODEOWNERS mapping
 

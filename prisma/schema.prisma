@@ -150,6 +150,22 @@ model User {
   accessReceiptsAsActor       ParticipantAccessReceipt[] @relation("AccessReceiptActor")
   breakGlassSessionsOpened    BreakGlassAccessSession[]  @relation("BreakGlassOpenedBy")
   decisionNoticesOwned        DecisionNoticeRecord[]     @relation("DecisionNoticeHumanOwner")
+
+  // Shared programme foundation (Prompt 0)
+  participantAuthorityGrantsAsParticipant ParticipantAuthorityGrant[] @relation("AuthorityGrantParticipant")
+  participantAuthorityGrantsAsGrantee     ParticipantAuthorityGrant[] @relation("AuthorityGrantGrantee")
+  participantAuthorityGrantsCreated       ParticipantAuthorityGrant[] @relation("AuthorityGrantCreatedBy")
+  participantAuthorityGrantsRevoked       ParticipantAuthorityGrant[] @relation("AuthorityGrantRevokedBy")
+  navigatorProfiles                       NavigatorProfile[]          @relation("NavigatorProfileUser")
+  navigatorRequestsAsParticipant          NavigatorRequest[]          @relation("NavigatorRequestParticipant")
+  navigatorAssignmentsAsParticipant       NavigatorAssignment[]       @relation("NavigatorAssignmentParticipant")
+  navigatorAssignmentsAsNavigator         NavigatorAssignment[]       @relation("NavigatorAssignmentNavigator")
+  navigatorHandoversFrom                  NavigatorHandover[]         @relation("NavigatorHandoverFrom")
+  navigatorHandoversTo                    NavigatorHandover[]         @relation("NavigatorHandoverTo")
+  navigatorFeedbackGiven                  NavigatorFeedback[]         @relation("NavigatorFeedbackParticipant")
+  programmeSourceRecordsOwned             ProgrammeSourceRecord[]     @relation("ProgrammeSourceRecordReviewOwner")
+  programmeSourceImpactReviewsOwned       ProgrammeSourceImpactReview[] @relation("ProgrammeSourceImpactReviewOwner")
+  trustRelationshipRecordsAsParticipant   ServiceRelationshipRecord[] @relation("TrustRelationshipParticipant")
 }
 
 model PasskeyCredential {
@@ -734,6 +750,11 @@ model Organisation {
   billingIntegrationConnections BillingIntegrationConnection[]
   billingReconSessions   BillingReconciliationSession[]
   accessReceipts         ParticipantAccessReceipt[] @relation("AccessReceiptOrganisation")
+
+  // Shared programme foundation (Prompt 0)
+  navigatorOrganisations               NavigatorOrganisation[]
+  serviceRelationshipRecordsAsProvider ServiceRelationshipRecord[] @relation("TrustRelationshipProvider")
+  serviceRelationshipRecordsAsPlatform ServiceRelationshipRecord[] @relation("TrustRelationshipPlatform")
 }
 
 model OrganisationMember {
@@ -10556,4 +10577,445 @@ model StartingWorkJourneyEvent {
 
   @@index([projectionId, createdAt])
   @@map("starting_work_journey_events")
+}
+
+// ---------------------------------------------------------------------------
+// Shared programme foundation (Prompt 0) — reconciled onto main
+// ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+// Shared programme foundation (Prompt 0)
+// ---------------------------------------------------------------------------
+
+enum ProgrammeSourceType {
+  legislation
+  regulation
+  government_guidance
+  standard
+  scheme_rule
+  service_directory
+  government_dataset
+  partner_api
+  organisational_policy
+  clinical_document
+  community_observation
+}
+
+enum ProgrammeSourceAuthorityStatus {
+  authoritative
+  draft
+  consultation
+  superseded
+  organisational_interpretation
+  requires_human_review
+}
+
+enum ProgrammeSourceImpactReviewStatus {
+  pending
+  in_review
+  no_action_required
+  rule_update_proposed
+  completed
+}
+
+enum ParticipantAuthorityGrantStatus {
+  active
+  revoked
+  expired
+}
+
+enum NavigatorVisibility {
+  public
+  community
+  private
+}
+
+enum NavigatorRequestStatus {
+  draft
+  pending_participant_approval
+  submitted
+  assigned
+  in_progress
+  completed
+  cancelled
+}
+
+enum NavigatorAssignmentStatus {
+  pending
+  active
+  handover_pending
+  completed
+  revoked
+}
+
+enum ServiceRelationshipRole {
+  service_provider
+  worker_employer
+  worker_engager
+  platform
+  property_owner
+  property_manager
+  tenancy_manager
+  maintenance_provider
+  support_provider
+  payment_processor
+}
+
+enum TrustSnapshotStatus {
+  draft
+  active
+  superseded
+}
+
+model ProgrammeSourceRecord {
+  id                         String                         @id @default(cuid())
+  sourceOrganisation         String
+  jurisdiction               String
+  title                      String
+  sourceType                 ProgrammeSourceType
+  version                    String
+  effectiveDate              DateTime?
+  expiryDate                 DateTime?
+  retrievalDate              DateTime                       @default(now())
+  authorityStatus            ProgrammeSourceAuthorityStatus @default(authoritative)
+  licence                    String?
+  attribution                String?
+  sourceHash                 String?
+  affectedProgrammes         String[]                       @default([])
+  reviewOwnerId              String?
+  reviewOwner                User?                          @relation("ProgrammeSourceRecordReviewOwner", fields: [reviewOwnerId], references: [id], onDelete: SetNull)
+  nextReviewAt               DateTime?
+  supersedingSourceId        String?
+  supersedingSource          ProgrammeSourceRecord?         @relation("ProgrammeSourceSupersession", fields: [supersedingSourceId], references: [id], onDelete: SetNull)
+  supersededBy               ProgrammeSourceRecord[]        @relation("ProgrammeSourceSupersession")
+  regulatorySourceVersionId  String?
+  metadataJson               Json                           @default("{}")
+  createdAt                  DateTime                       @default(now())
+  updatedAt                  DateTime                       @updatedAt
+
+  impactReviews ProgrammeSourceImpactReview[]
+
+  @@index([jurisdiction, sourceType])
+  @@index([authorityStatus])
+  @@index([supersedingSourceId])
+  @@map("programme_source_records")
+}
+
+model ProgrammeSourceImpactReview {
+  id              String                            @id @default(cuid())
+  sourceRecordId  String
+  sourceRecord    ProgrammeSourceRecord             @relation(fields: [sourceRecordId], references: [id], onDelete: Cascade)
+  status          ProgrammeSourceImpactReviewStatus @default(pending)
+  summary         String
+  findingsJson    Json                              @default("{}")
+  reviewOwnerId   String?
+  reviewOwner     User?                             @relation("ProgrammeSourceImpactReviewOwner", fields: [reviewOwnerId], references: [id], onDelete: SetNull)
+  completedAt     DateTime?
+  createdAt       DateTime                          @default(now())
+  updatedAt       DateTime                          @updatedAt
+
+  @@index([sourceRecordId, status])
+  @@map("programme_source_impact_reviews")
+}
+
+model ParticipantAuthorityGrant {
+  id              String                          @id @default(cuid())
+  participantId   String
+  participant     User                            @relation("AuthorityGrantParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  granteeUserId   String?
+  granteeUser     User?                           @relation("AuthorityGrantGrantee", fields: [granteeUserId], references: [id], onDelete: SetNull)
+  granteeOrganisationId String?
+  purpose         String
+  allowedFields   String[]                        @default([])
+  allowedActions  String[]                        @default([])
+  status          ParticipantAuthorityGrantStatus @default(active)
+  consentRecordId String?
+  expiresAt       DateTime?
+  createdById     String
+  createdBy       User                            @relation("AuthorityGrantCreatedBy", fields: [createdById], references: [id])
+  revokedById     String?
+  revokedBy       User?                           @relation("AuthorityGrantRevokedBy", fields: [revokedById], references: [id], onDelete: SetNull)
+  revokedAt       DateTime?
+  correlationId   String                          @default(cuid())
+  createdAt       DateTime                        @default(now())
+  updatedAt       DateTime                        @updatedAt
+
+  @@index([participantId, status])
+  @@index([granteeUserId])
+  @@index([expiresAt])
+  @@map("participant_authority_grants")
+}
+
+model NavigatorOrganisation {
+  id             String   @id @default(cuid())
+  organisationId String   @unique
+  organisation   Organisation @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+  displayName    String
+  description    String?
+  visibility     NavigatorVisibility @default(community)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  navigators NavigatorProfile[]
+  assignments NavigatorAssignment[] @relation("NavigatorAssignmentOrganisation")
+
+  @@map("navigator_organisations")
+}
+
+model NavigatorProfile {
+  id                      String   @id @default(cuid())
+  userId                  String
+  user                    User     @relation("NavigatorProfileUser", fields: [userId], references: [id], onDelete: Cascade)
+  navigatorOrganisationId String?
+  navigatorOrganisation   NavigatorOrganisation? @relation(fields: [navigatorOrganisationId], references: [id], onDelete: SetNull)
+  displayName             String
+  bio                     String?
+  visibility              NavigatorVisibility @default(public)
+  isActive                Boolean  @default(true)
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+
+  specialisms              NavigatorSpecialism[]
+  availability             NavigatorAvailability[]
+  regions                  NavigatorRegion[]
+  languages                NavigatorLanguage[]
+  communicationCapabilities NavigatorCommunicationCapability[]
+  credentialReferences     NavigatorCredentialReference[]
+  assignments              NavigatorAssignment[]
+
+  @@index([userId])
+  @@index([isActive, visibility])
+  @@map("navigator_profiles")
+}
+
+model NavigatorSpecialism {
+  id          String           @id @default(cuid())
+  navigatorId String
+  navigator   NavigatorProfile @relation(fields: [navigatorId], references: [id], onDelete: Cascade)
+  specialism  String
+  createdAt   DateTime         @default(now())
+
+  @@index([navigatorId])
+  @@map("navigator_specialisms")
+}
+
+model NavigatorAvailability {
+  id          String           @id @default(cuid())
+  navigatorId String
+  navigator   NavigatorProfile @relation(fields: [navigatorId], references: [id], onDelete: Cascade)
+  dayOfWeek   Int?
+  startTime   String?
+  endTime     String?
+  timezone    String           @default("Australia/Sydney")
+  notes       String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@index([navigatorId])
+  @@map("navigator_availability")
+}
+
+model NavigatorRegion {
+  id          String           @id @default(cuid())
+  navigatorId String
+  navigator   NavigatorProfile @relation(fields: [navigatorId], references: [id], onDelete: Cascade)
+  regionCode  String
+  regionName  String
+  createdAt   DateTime         @default(now())
+
+  @@index([navigatorId, regionCode])
+  @@map("navigator_regions")
+}
+
+model NavigatorLanguage {
+  id          String           @id @default(cuid())
+  navigatorId String
+  navigator   NavigatorProfile @relation(fields: [navigatorId], references: [id], onDelete: Cascade)
+  languageCode String
+  proficiency  String          @default("fluent")
+  createdAt   DateTime         @default(now())
+
+  @@index([navigatorId])
+  @@map("navigator_languages")
+}
+
+model NavigatorCommunicationCapability {
+  id          String           @id @default(cuid())
+  navigatorId String
+  navigator   NavigatorProfile @relation(fields: [navigatorId], references: [id], onDelete: Cascade)
+  mode        String
+  notes       String?
+  createdAt   DateTime         @default(now())
+
+  @@index([navigatorId])
+  @@map("navigator_communication_capabilities")
+}
+
+model NavigatorCredentialReference {
+  id             String           @id @default(cuid())
+  navigatorId    String
+  navigator      NavigatorProfile @relation(fields: [navigatorId], references: [id], onDelete: Cascade)
+  credentialType String
+  issuer         String?
+  referenceId    String?
+  verifiedAt     DateTime?
+  notes          String?
+  createdAt      DateTime         @default(now())
+
+  @@index([navigatorId])
+  @@map("navigator_credential_references")
+}
+
+model NavigatorRequest {
+  id              String                 @id @default(cuid())
+  participantId   String
+  participant     User                   @relation("NavigatorRequestParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  missionId       String?
+  caseId          String?
+  status          NavigatorRequestStatus @default(draft)
+  goalSummary     String
+  sharedFields    String[]               @default([])
+  preferredModes  String[]               @default([])
+  correlationId   String                 @default(cuid())
+  approvedAt      DateTime?
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
+
+  assignments NavigatorAssignment[]
+
+  @@index([participantId, status])
+  @@map("navigator_requests")
+}
+
+model NavigatorAssignment {
+  id                    String                    @id @default(cuid())
+  requestId             String
+  request               NavigatorRequest          @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  participantId         String
+  participant           User                      @relation("NavigatorAssignmentParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  navigatorId           String
+  navigator             User                      @relation("NavigatorAssignmentNavigator", fields: [navigatorId], references: [id], onDelete: Cascade)
+  navigatorProfileId    String?
+  navigatorProfile      NavigatorProfile?         @relation(fields: [navigatorProfileId], references: [id], onDelete: SetNull)
+  navigatorOrganisationId String?
+  navigatorOrganisation NavigatorOrganisation?    @relation("NavigatorAssignmentOrganisation", fields: [navigatorOrganisationId], references: [id], onDelete: SetNull)
+  status                NavigatorAssignmentStatus @default(pending)
+  sharedFields          String[]                  @default([])
+  participantApprovedAt DateTime?
+  correlationId         String                    @default(cuid())
+  createdAt             DateTime                  @default(now())
+  updatedAt             DateTime                  @updatedAt
+
+  handovers NavigatorHandover[]
+  outcomes  NavigatorOutcome[]
+  feedback  NavigatorFeedback[]
+
+  @@index([participantId, status])
+  @@index([navigatorId, status])
+  @@map("navigator_assignments")
+}
+
+model NavigatorHandover {
+  id             String              @id @default(cuid())
+  assignmentId   String
+  assignment     NavigatorAssignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  fromNavigatorId String
+  fromNavigator  User                @relation("NavigatorHandoverFrom", fields: [fromNavigatorId], references: [id])
+  toNavigatorId  String
+  toNavigator    User                @relation("NavigatorHandoverTo", fields: [toNavigatorId], references: [id])
+  sharedFields   String[]            @default([])
+  summary        String
+  participantApprovedAt DateTime?
+  createdAt      DateTime            @default(now())
+
+  @@index([assignmentId])
+  @@map("navigator_handovers")
+}
+
+model NavigatorOutcome {
+  id           String              @id @default(cuid())
+  assignmentId String
+  assignment   NavigatorAssignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  summary      String
+  outcomeJson  Json                @default("{}")
+  recordedAt   DateTime            @default(now())
+
+  @@index([assignmentId])
+  @@map("navigator_outcomes")
+}
+
+model NavigatorFeedback {
+  id             String              @id @default(cuid())
+  assignmentId   String
+  assignment     NavigatorAssignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  participantId  String
+  participant    User                @relation("NavigatorFeedbackParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  rating         Int?
+  comment        String?
+  createdAt      DateTime            @default(now())
+
+  @@index([assignmentId])
+  @@map("navigator_feedback")
+}
+
+model ServiceRelationshipRecord {
+  id                String   @id @default(cuid())
+  participantId     String
+  participant       User     @relation("TrustRelationshipParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  providerOrganisationId String?
+  providerOrganisation Organisation? @relation("TrustRelationshipProvider", fields: [providerOrganisationId], references: [id], onDelete: SetNull)
+  platformOrganisationId String?
+  platformOrganisation Organisation? @relation("TrustRelationshipPlatform", fields: [platformOrganisationId], references: [id], onDelete: SetNull)
+  bookingId         String?
+  careRequestId     String?
+  title             String
+  summary           String?
+  correlationId     String   @default(cuid())
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  roleDisclosures ServiceRoleDisclosure[]
+  snapshots       TrustRelationshipSnapshot[]
+
+  @@index([participantId])
+  @@map("service_relationship_records")
+}
+
+model ServiceRoleDisclosure {
+  id              String                  @id @default(cuid())
+  relationshipId  String
+  relationship    ServiceRelationshipRecord @relation(fields: [relationshipId], references: [id], onDelete: Cascade)
+  role            ServiceRelationshipRole
+  organisationName String?
+  description     String
+  isMapAble       Boolean                 @default(false)
+  paymentPathway  String?
+  complaintPathway String?
+  insuranceNotes  String?
+  credentialChecked Boolean               @default(false)
+  credentialNotes String?
+  conflictFlag    Boolean                 @default(false)
+  consentRecordId String?
+  createdAt       DateTime                @default(now())
+
+  @@index([relationshipId])
+  @@map("service_role_disclosures")
+}
+
+model TrustRelationshipSnapshot {
+  id             String              @id @default(cuid())
+  relationshipId String
+  relationship   ServiceRelationshipRecord @relation(fields: [relationshipId], references: [id], onDelete: Cascade)
+  status         TrustSnapshotStatus @default(active)
+  feeComponentsJson Json             @default("[]")
+  quoteSnapshotJson Json?
+  agreementSnapshotJson Json?
+  invoiceSnapshotJson Json?
+  disclosureJson Json                @default("{}")
+  informationalOnly Boolean           @default(true)
+  correlationId  String              @default(cuid())
+  capturedAt     DateTime            @default(now())
+
+  @@index([relationshipId, status])
+  @@map("trust_relationship_snapshots")
 }
