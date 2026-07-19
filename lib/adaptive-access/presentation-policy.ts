@@ -1,7 +1,7 @@
 import { adaptiveAccessConfig } from "@/lib/config/adaptive-access";
 
-import { getEffectiveFieldValue } from "./profile";
 import { resolveLayoutVersion } from "./familiar-interface";
+import { getEffectiveFieldValue } from "./profile";
 import type {
   AdaptiveMode,
   ContentRendition,
