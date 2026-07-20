@@ -166,6 +166,13 @@ model User {
   programmeSourceRecordsOwned             ProgrammeSourceRecord[]     @relation("ProgrammeSourceRecordReviewOwner")
   programmeSourceImpactReviewsOwned       ProgrammeSourceImpactReview[] @relation("ProgrammeSourceImpactReviewOwner")
   trustRelationshipRecordsAsParticipant   ServiceRelationshipRecord[] @relation("TrustRelationshipParticipant")
+
+  // AT Continuity (NDIS Expansion Wave 1)
+  atEquipmentAssets                       AtEquipmentAsset[]          @relation("AtEquipmentAssetParticipant")
+  atEquipmentOutages                      AtEquipmentOutage[]         @relation("AtEquipmentOutageParticipant")
+  atBackupPlans                           AtBackupPlan[]              @relation("AtBackupPlanParticipant")
+  atRepairPartnerRefs                     AtRepairPartnerRef[]        @relation("AtRepairPartnerRefParticipant")
+  atDependencyLinks                       AtDependencyLink[]          @relation("AtDependencyLinkParticipant")
 }
 
 model PasskeyCredential {
@@ -755,6 +762,9 @@ model Organisation {
   navigatorOrganisations               NavigatorOrganisation[]
   serviceRelationshipRecordsAsProvider ServiceRelationshipRecord[] @relation("TrustRelationshipProvider")
   serviceRelationshipRecordsAsPlatform ServiceRelationshipRecord[] @relation("TrustRelationshipPlatform")
+
+  // AT Continuity (NDIS Expansion Wave 1)
+  atRepairPartnerRefs                  AtRepairPartnerRef[] @relation("AtRepairPartnerOrganisation")
 }
 
 model OrganisationMember {
@@ -11019,3 +11029,131 @@ model TrustRelationshipSnapshot {
   @@index([relationshipId, status])
   @@map("trust_relationship_snapshots")
 }
+
+// ---------------------------------------------------------------------------
+// Assistive Technology Continuity (NDIS Expansion Wave 1)
+// Equipment continuity register — not clinical suitability SoT.
+// Flag: MAPABLE_AT_CONTINUITY_ENABLED (default false).
+// ---------------------------------------------------------------------------
+
+enum AtEquipmentCategory {
+  mobility
+  communication
+  daily_living
+  other
+}
+
+enum AtOutageStatus {
+  draft
+  reported
+  active
+  resolved
+  closed
+  withdrawn
+}
+
+enum AtDependencyTargetType {
+  care_request
+  transport_trip
+  transport_trip_request
+  job
+  job_application
+  calendar_event
+}
+
+model AtEquipmentAsset {
+  id                      String              @id @default(cuid())
+  participantUserId       String
+  participant             User                @relation("AtEquipmentAssetParticipant", fields: [participantUserId], references: [id], onDelete: Cascade)
+  displayName             String
+  category                AtEquipmentCategory
+  mobilityAidHint         String?
+  marketplaceCategoryHint String?
+  externalAssessmentRef   String?
+  notes                   String?
+  active                  Boolean             @default(true)
+  createdAt               DateTime            @default(now())
+  updatedAt               DateTime            @updatedAt
+
+  outages       AtEquipmentOutage[]
+  backupPlans   AtBackupPlan[]
+  repairPartners AtRepairPartnerRef[]
+  dependencies  AtDependencyLink[]
+
+  @@index([participantUserId, active])
+  @@index([participantUserId, category])
+  @@map("at_equipment_assets")
+}
+
+model AtEquipmentOutage {
+  id                String         @id @default(cuid())
+  assetId           String
+  asset             AtEquipmentAsset @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  participantUserId String
+  participant       User           @relation("AtEquipmentOutageParticipant", fields: [participantUserId], references: [id], onDelete: Cascade)
+  summary           String
+  status            AtOutageStatus @default(reported)
+  impactNotes       String?
+  reportedAt        DateTime       @default(now())
+  resolvedAt        DateTime?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  @@index([assetId, status])
+  @@index([participantUserId, status])
+  @@map("at_equipment_outages")
+}
+
+model AtBackupPlan {
+  id                String   @id @default(cuid())
+  assetId           String
+  asset             AtEquipmentAsset @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  participantUserId String
+  participant       User     @relation("AtBackupPlanParticipant", fields: [participantUserId], references: [id], onDelete: Cascade)
+  title             String
+  instructions      String
+  active            Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([assetId, active])
+  @@index([participantUserId])
+  @@map("at_backup_plans")
+}
+
+model AtRepairPartnerRef {
+  id                 String   @id @default(cuid())
+  assetId            String
+  asset              AtEquipmentAsset @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  participantUserId  String
+  participant        User     @relation("AtRepairPartnerRefParticipant", fields: [participantUserId], references: [id], onDelete: Cascade)
+  organisationId     String
+  organisation       Organisation @relation("AtRepairPartnerOrganisation", fields: [organisationId], references: [id], onDelete: Cascade)
+  externalPartnerRef String?
+  notes              String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@index([assetId])
+  @@index([participantUserId])
+  @@index([organisationId])
+  @@map("at_repair_partner_refs")
+}
+
+model AtDependencyLink {
+  id                String                 @id @default(cuid())
+  assetId           String
+  asset             AtEquipmentAsset       @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  participantUserId String
+  participant       User                   @relation("AtDependencyLinkParticipant", fields: [participantUserId], references: [id], onDelete: Cascade)
+  targetType        AtDependencyTargetType
+  targetEntityId    String
+  notes             String?
+  createdAt         DateTime               @default(now())
+
+  @@index([assetId, targetType])
+  @@index([participantUserId])
+  @@index([targetType, targetEntityId])
+  @@map("at_dependency_links")
+}
+

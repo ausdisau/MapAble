@@ -55,7 +55,7 @@
 
 | System | Planned owner path | Reuses | Must not create |
 |--------|-------------------|--------|-----------------|
-| AT Continuity | `lib/at-continuity/**` (planned; **no writers yet**) | ParticipantProfile, ConsentRecord, AuditEvent, Care/Transport/Jobs links, provider refs | Clinical suitability SoT; second participant identity |
+| AT Continuity | `lib/at-continuity/**` (Wave 1 scaffold; writers flag-gated) | ParticipantProfile, ConsentRecord, AuditEvent, Care/Transport/Jobs links, Organisation refs | Clinical suitability SoT; second participant identity |
 | Plan & Evidence Navigator | `lib/plan-evidence/**` (planned) | Personal data vault patterns, ProgrammeSourceRecord, ConsentRecord, AuditEvent, ParticipantAuthorityGrant | Eligibility engine; fabricated budgets |
 | Support Coordination Outcomes | `lib/support-coordinator/**` (extend) | Existing SC relationships/tasks/plan summaries | Second SC relationship model |
 | Home & Living Navigator | `lib/home-living/**` (planned) | AccessPlace, Care, Transport, AT links, service agreements | Duplicate property registry; housemate compatibility scores |

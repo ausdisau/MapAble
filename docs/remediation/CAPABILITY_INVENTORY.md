@@ -47,7 +47,7 @@ see `lib/convergence-os/seed/capabilities.ts` and
 | pilot.starting_work              | Starting Work controlled pilot    | pilot          | synthetic_demo     | false              | verified              | Synthetic journey on main (#327); DB-backed journey is programme PR 4                  |
 | managed.support_delivery         | MapAble Managed Support           | provider       | concept            | false              | verified              | **blocked_by_registration** — do not fabricate                                         |
 | ndis.expansion_foundation        | NDIS Expansion Wave 0 docs        | programmes     | concept            | false              | verified              | Docs/registry only; product waves blocked by migrate-from-zero                         |
-| ndis.at_continuity               | Assistive Technology Continuity   | programmes     | concept            | false              | verified              | Planned Wave 1; flag default false; not implemented                                    |
+| ndis.at_continuity               | Assistive Technology Continuity   | programmes     | scaffolded         | false              | verified              | Wave 1 scaffold + `at_*` tables; writers flag-gated; not production-supported          |
 | ndis.plan_manager_infrastructure | Plan Management Infrastructure    | billing        | concept            | false              | verified              | Planned Wave 10; NDIA submit + auto payment approval must stay false                   |
 
 See also ConvergenceOS `CAPABILITY_SEEDS` and [PUBLIC_CLAIM_REGISTRY](../convergence-os/PUBLIC_CLAIM_REGISTRY.md).

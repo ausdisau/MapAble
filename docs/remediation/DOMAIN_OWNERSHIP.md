@@ -35,7 +35,7 @@ until their wave lands behind default-false flags. See
 
 | Planned domain                    | Planned owner path              | Status                       |
 | --------------------------------- | ------------------------------- | ---------------------------- |
-| AT Continuity                     | `lib/at-continuity/**`          | planned — **no writers yet** |
+| AT Continuity                     | `lib/at-continuity/**`          | Wave 1 scaffold — writers flag-gated (`MAPABLE_AT_CONTINUITY_ENABLED=false`) |
 | Plan & Evidence Navigator         | `lib/plan-evidence/**`          | planned — **no writers yet** |
 | Home & Living Navigator           | `lib/home-living/**`            | planned — **no writers yet** |
 | Psychosocial Recovery             | `lib/psychosocial-recovery/**`  | planned — **no writers yet** |
