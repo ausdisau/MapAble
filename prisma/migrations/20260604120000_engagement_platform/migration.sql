@@ -11,8 +11,8 @@ CREATE TYPE "EngagementImprovementActionStatus" AS ENUM ('planned', 'in_progress
 CREATE TYPE "EngagementSurveyStatus" AS ENUM ('draft', 'active', 'closed');
 
 -- AlterEnum
-ALTER TYPE "ConsentScope" ADD VALUE 'engagement_read_delegate';
-ALTER TYPE "ConsentScope" ADD VALUE 'engagement_submit_delegate';
+ALTER TYPE "ConsentScope" ADD VALUE IF NOT EXISTS 'engagement_read_delegate';
+ALTER TYPE "ConsentScope" ADD VALUE IF NOT EXISTS 'engagement_submit_delegate';
 
 -- CreateTable
 CREATE TABLE "engagement_submissions" (

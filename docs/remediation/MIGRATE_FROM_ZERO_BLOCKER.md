@@ -1,7 +1,12 @@
 # Migrate-from-zero blocker
 
-**Status:** partial repair landed on `cursor/migration-trust-repair-0a20` — see [MIGRATE_FROM_ZERO_REPAIR.md](./MIGRATE_FROM_ZERO_REPAIR.md).  
-Do not rewrite additional historical migrations without allowlisting and environment evidence.
+**Status:** resolved on branch `cursor/migration-trust-repair-0a20` — empty-DB
+`prisma migrate deploy` applies all **57** migrations (PostgreSQL 16 verified).  
+See [MIGRATE_FROM_ZERO_REPAIR.md](./MIGRATE_FROM_ZERO_REPAIR.md) for checksums,
+allowlist, and production checksum update runbook.
+
+Do not rewrite additional historical migrations without allowlisting and
+environment evidence.
 
 ## Original verified failure (pre-repair)
 
@@ -29,32 +34,15 @@ Production branch of Neon project `mapableau` recorded checksum
 `20260525000000_mapable_access_phase_1` — identical to the broken file.
 `applied_steps_count` was `0` with `finished_at` set.
 
-Full dump and production checksum update runbook:
-[MIGRATE_FROM_ZERO_REPAIR.md](./MIGRATE_FROM_ZERO_REPAIR.md).
+## Repair summary (allowlisted)
 
-## Repair applied (allowlisted)
+1. Close `access_trust_events`; reduce `access_phase_1` to AccessPlace DDL only.
+2. Bootstrap `mapable_core_phase_3` and `mapable_care_mvp` stubs for empty-DB deps.
+3. Create `IntegrationType` before `ADD VALUE 'search'`.
+4. Use `ADD VALUE IF NOT EXISTS` where bootstrap / same-transaction enum rules require it.
 
-- Close `access_trust_events` with `);`
-- New checksum: `277560a68f359fcdc756791eb51446108cdbee24214e39f5504443c3d9a1812b`
-- Allowlisted in `scripts/ci/allowed-migration-repairs.json`
-
-## Current remaining blocker (post-syntax repair)
-
-Empty-DB `migrate deploy` now applies through prior migrations, enters
-`20260525000000_mapable_access_phase_1`, then fails:
-
-- Prisma: `P3018`
-- Database: `ERROR: relation "User" already exists` (SQLSTATE `42P07`)
-
-`mapable_access_phase_1` still contains a near-full schema dump that conflicts with
-`init` and earlier migrations. Stub/comment-only core-phase migrations remain
-documented in `MIGRATION_INVENTORY.md`.
-
-## Account-owner actions still required
-
-1. After merging the syntax repair: update production `_prisma_migrations.checksum` per the runbook (do not re-run the migration SQL).
-2. Resolve `ndis_direct_claiming` rename drift (`20260525000000_*` on prod vs `20260525010000_*` in repo).
-3. Approve follow-up baseline / dump de-duplication work before claiming migrate-from-zero green.
+Production still needs an **owner-run checksum update** (do not re-run SQL) and
+`ndis_direct_claiming` rename-drift reconciliation — see the repair runbook.
 
 ## CI policy
 

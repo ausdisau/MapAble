@@ -18,15 +18,15 @@ CREATE TYPE "PayoutBlockStatus" AS ENUM ('active', 'resolved', 'canceled');
 CREATE TYPE "AccountingExportStatus" AS ENUM ('pending', 'exported', 'failed', 'skipped');
 CREATE TYPE "AccountingExternalSystem" AS ENUM ('xero', 'csv', 'other');
 
--- AlterEnum
-ALTER TYPE "BillingAccountRole" ADD VALUE 'support_worker';
-ALTER TYPE "BillingAccountRole" ADD VALUE 'transport_operator';
-ALTER TYPE "BillingPaymentMethod" ADD VALUE 'external_received';
-ALTER TYPE "BillingPaymentSplitStatus" ADD VALUE 'pending_service';
-ALTER TYPE "BillingPaymentSplitStatus" ADD VALUE 'ready';
-ALTER TYPE "BillingPaymentSplitStatus" ADD VALUE 'blocked';
-ALTER TYPE "BillingPaymentSplitStatus" ADD VALUE 'transfer_created';
-ALTER TYPE "BillingPaymentSplitStatus" ADD VALUE 'canceled';
+-- AlterEnum (IF NOT EXISTS: empty-DB bootstrap may already include these labels)
+ALTER TYPE "BillingAccountRole" ADD VALUE IF NOT EXISTS 'support_worker';
+ALTER TYPE "BillingAccountRole" ADD VALUE IF NOT EXISTS 'transport_operator';
+ALTER TYPE "BillingPaymentMethod" ADD VALUE IF NOT EXISTS 'external_received';
+ALTER TYPE "BillingPaymentSplitStatus" ADD VALUE IF NOT EXISTS 'pending_service';
+ALTER TYPE "BillingPaymentSplitStatus" ADD VALUE IF NOT EXISTS 'ready';
+ALTER TYPE "BillingPaymentSplitStatus" ADD VALUE IF NOT EXISTS 'blocked';
+ALTER TYPE "BillingPaymentSplitStatus" ADD VALUE IF NOT EXISTS 'transfer_created';
+ALTER TYPE "BillingPaymentSplitStatus" ADD VALUE IF NOT EXISTS 'canceled';
 
 -- AlterTable BillingInvoice
 ALTER TABLE "BillingInvoice" ADD COLUMN "transferGroup" TEXT,

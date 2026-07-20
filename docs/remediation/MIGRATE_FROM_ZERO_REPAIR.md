@@ -1,59 +1,51 @@
 # Migrate-from-zero repair (migration trust)
 
-**Status:** in progress — first syntax blocker repaired; full from-zero still red  
+**Status:** green on disposable empty PostgreSQL 16 (all 57 migrations apply)  
 **Branch:** `cursor/migration-trust-repair-0a20`  
 **Base `main` tip at start:** `8f64dc38`  
-**Does not enable NDIS Expansion product waves.** Wave 1 remains blocked until migrate-from-zero is green end-to-end.
+**Does not enable NDIS Expansion product waves.** Wave 1 remains blocked until this lands on `main` and PR #380 is merged.
 
 ## Neon production evidence (fetched 2026-07-20)
 
 Project: `mapableau` (`cold-paper-45965334`)  
 Branch: `production` (`br-rough-bush-a7mlsbdx`, default/primary)
 
-Query:
+Production `_prisma_migrations` still records the **pre-repair** checksum for
+`20260525000000_mapable_access_phase_1` and shows rename drift
+(`20260525000000_ndis_direct_claiming` vs repo `20260525010000_…`). Treat prod
+history and repo history as **drifted**. Do **not** re-run repaired SQL on
+production; update checksums only after review (runbook below).
 
-```sql
-SELECT migration_name, checksum, finished_at, rolled_back_at, applied_steps_count
-FROM "_prisma_migrations"
-ORDER BY finished_at NULLS LAST, migration_name;
+## What was repaired (allowlisted)
+
+All paths are listed in `scripts/ci/allowed-migration-repairs.json`.
+
+| Migration | Change | sha256 (this PR) |
+| --------- | ------ | ---------------- |
+| `20260525000000_mapable_access_phase_1` | Close `access_trust_events` with `);`; reduce dump to AccessPlace-domain DDL only | `4e6d7d1fc629e3e3ad7e459bcb3409f45a81086a448e859ced11336849b8d357` |
+| `20260525120000_mapable_care_mvp` | Replace comment stub with Incident\* enums + `IncidentReport` | `b71b9ad56d6d1abf392d034b6a17cea88ab24cb8e4c3610b555035779d24271e` |
+| `20260521180000_mapable_core_phase_3` | Bootstrap core DDL: `@@map` table names, stub enrichment (`WorkerProfile` / `Vehicle` / `DriverProfile`), `care_bookings` / `care_service_*` pre-ALTER shapes; enums omit labels later migrations `ADD VALUE` (except same-transaction-safe labels) | `1c286a3be61f60f752003b3071dc6b399418950c657695d929aa3465d442f96c` |
+| `20260611120000_integration_type_search` | Create `IntegrationType` before `ALTER TYPE … ADD VALUE 'search'` | `998a7bec20978057147c0dde0426b01cc8b04d972e69ceffbe5781991d9503dd` |
+| `20260626120000_payout_ledger` | `ADD VALUE IF NOT EXISTS` for labels that may already exist | `8c9daf859e1807f02cd77786ae673abf7729e5406e585c1ffcb1f3c70494eae6` |
+| `20260527120000_transport_scheduling_routing` | `ADD VALUE IF NOT EXISTS` | `10188a38cf53b12748f17979fcb270ca54a07f079f66168c8b4f381ec82f1fcf` |
+| `20260603120000_y1_wedge` | `ADD VALUE IF NOT EXISTS` | `3b64acfaa16e5082941b20330366c392c3b359c7c08fe5d0cd8b89b93fab7bda` |
+| `20260604120000_engagement_platform` | `ADD VALUE IF NOT EXISTS` | `60313d968f1d94afad73b0ad60ff7af857badecf6a620e22d3ca9cdab116e510` |
+| `20260717020000_billing_centre_foundations` | `ADD VALUE IF NOT EXISTS` | `316ad71cb1ee22396a44516a94bfc9408dae24714f99168ff7b34b86049413af` |
+
+Prod recorded checksum for broken `access_phase_1` (pre-repair):
+`52ecc3b73328a905db0d35028d6e3f7f22ac7d8dbfc2445c171039f96b121f2d`.
+
+## Disposable PostgreSQL verification
+
+```bash
+# empty DB
+DATABASE_URL=postgresql://postgres@localhost:5432/mapable_mfz npx prisma migrate deploy
+# → All 57 migrations have been successfully applied.
+npx prisma migrate status
+# → Database schema is up to date!
 ```
 
-### Critical rows
-
-| migration_name                          | checksum (sha256)                                                  | finished_at          | applied_steps_count | Notes                                                        |
-| --------------------------------------- | ------------------------------------------------------------------ | -------------------- | ------------------- | ------------------------------------------------------------ |
-| `20260525000000_mapable_access_phase_1` | `52ecc3b73328a905db0d35028d6e3f7f22ac7d8dbfc2445c171039f96b121f2d` | 2026-05-30T01:42:38Z | 0                   | Matched **broken** repo SQL before this repair               |
-| `20260525000000_ndis_direct_claiming`   | `634372b56ad57acb27cbdd73a2a1bdab357137ad6076a8ac53feef6f8c48ec52` | 2026-05-30T01:42:43Z | 0                   | Repo folder renamed to `20260525010000_ndis_direct_claiming` |
-
-Many early rows show `applied_steps_count = 0` while `finished_at` is set — consistent with historical resolve / non-statement apply, not a clean multi-statement `migrate deploy` on an empty DB.
-
-Production also records migration names absent from current `main` (e.g. `abilitypay_mvp`, `donations`, `go_live_roadmap`) and is missing many July `main` migrations. Treat prod history and repo history as **drifted**.
-
-## Repair in this PR
-
-### 1. Allowlisted SQL fix — `access_trust_events`
-
-File: `prisma/migrations/20260525000000_mapable_access_phase_1/migration.sql`
-
-Change: close `CREATE TABLE "access_trust_events"` with `);` before the next `CREATE INDEX`.
-
-|                            | sha256                                                             |
-| -------------------------- | ------------------------------------------------------------------ |
-| **Before** (prod recorded) | `52ecc3b73328a905db0d35028d6e3f7f22ac7d8dbfc2445c171039f96b121f2d` |
-| **After** (this PR)        | `277560a68f359fcdc756791eb51446108cdbee24214e39f5504443c3d9a1812b` |
-
-Allowlist entry: `scripts/ci/allowed-migration-repairs.json`.
-
-### 2. Disposable PostgreSQL verification (this agent)
-
-Command: `prisma migrate deploy` on empty local PostgreSQL 16.
-
-| Stage       | Result                                                                                        |
-| ----------- | --------------------------------------------------------------------------------------------- |
-| Pre-repair  | **P3018 / 42601** syntax error at `access_trust_events_pkey` → `CREATE INDEX`                 |
-| Post-repair | Syntax cleared; migration **starts**; then **P3018 / 42P07** `relation "User" already exists` |
-
-Conclusion: the documented first failure is fixed. `mapable_access_phase_1` is still a near-full schema dump that re-creates objects already created by earlier migrations (`init` …). Full migrate-from-zero requires a **follow-up baseline / dump de-duplication** pass (separate commits after this PR or stacked trust PR #2), plus stub-phase DDL reconciliation (`MIGRATION_INVENTORY.md`).
+Verified on PostgreSQL 16 (`mapable_mfz`) during this repair.
 
 ## Production checksum update runbook (account-owner)
 
@@ -62,52 +54,31 @@ Do **not** run against production until this PR is reviewed. Prefer a staging re
 After this repair is on the deploy branch that production will pull:
 
 1. Take a DB snapshot / Neon point-in-time restore point.
-2. Confirm the applied row still has the old checksum:
-
-   ```sql
-   SELECT migration_name, checksum, finished_at, applied_steps_count
-   FROM "_prisma_migrations"
-   WHERE migration_name = '20260525000000_mapable_access_phase_1';
-   ```
-
-3. Update checksum to the repaired file hash (only if the row is already finished and schema objects are already present — do **not** re-run the migration SQL):
+2. Confirm the applied row still has the old checksum for each repaired migration that production already recorded as finished.
+3. Update `_prisma_migrations.checksum` to the new file hash **only** when:
+   - the row is already finished, and
+   - schema objects are already present — do **not** re-run the migration SQL.
+4. Example for `access_phase_1` (adjust hash if the landed file differs):
 
    ```sql
    UPDATE "_prisma_migrations"
-   SET checksum = '277560a68f359fcdc756791eb51446108cdbee24214e39f5504443c3d9a1812b'
+   SET checksum = '4e6d7d1fc629e3e3ad7e459bcb3409f45a81086a448e859ced11336849b8d357'
    WHERE migration_name = '20260525000000_mapable_access_phase_1'
      AND checksum = '52ecc3b73328a905db0d35028d6e3f7f22ac7d8dbfc2445c171039f96b121f2d';
    ```
 
-4. Confirm `prisma migrate status` no longer reports a modified checksum for that migration.
-5. **Never** `prisma db push` against production.
+5. Confirm `prisma migrate status` no longer reports modified checksums for repaired rows.
+6. Never use `prisma db push` on production.
 
-### Rename drift — `ndis_direct_claiming`
+## Rollback notes
 
-Production recorded `20260525000000_ndis_direct_claiming`. Repo folder is `20260525010000_ndis_direct_claiming`.
+- Revert this PR’s migration SQL and allowlist entries together.
+- If production checksum was updated, restore the previous checksum from snapshot notes (only if rolling back the SQL repair as well).
 
-Owner options (choose one after inspection):
+## Gate for NDIS Expansion Wave 1
 
-- If SQL bodies are equivalent and only the folder name changed: insert/resolve the new name as applied and leave the old row (or document both), following the rename procedure in `MIGRATION_INVENTORY.md`.
-- Do not re-execute claiming DDL on production.
+Sequence (human merges; agent does not merge):
 
-## Remaining work before “migrate-from-zero green”
-
-1. De-duplicate / repair `20260525000000_mapable_access_phase_1` so it does not recreate `User` and other objects from `init` (or replace with additive AccessPlace DDL only).
-2. Replace comment-only stub migrations with real additive DDL or an approved baseline squash.
-3. Re-run empty-DB `prisma migrate deploy` until all migrations apply.
-4. CI job `Migrate from zero` green on the repair tip.
-5. Then merge Wave 0 [#380](https://github.com/ausdisau/mapableau-new/pull/380) (or rebase it) and only then start NDIS Expansion Wave 1.
-
-## Rollback
-
-- Revert this PR’s commit(s).
-- If production checksum was updated, restore the previous checksum `52ecc3b7…` from snapshot notes (only if rolling back the SQL repair as well).
-- No product feature flags or NDIS Expansion schema are introduced here.
-
-## Related
-
-- [MIGRATE_FROM_ZERO_BLOCKER.md](./MIGRATE_FROM_ZERO_BLOCKER.md)
-- [MIGRATION_INVENTORY.md](./MIGRATION_INVENTORY.md)
-- [neon-prisma-migrations.md](../operations/neon-prisma-migrations.md)
-- [NDIS_EXPANSION_DELIVERY_SEQUENCE.md](../programmes/NDIS_EXPANSION_DELIVERY_SEQUENCE.md)
+1. Land this PR → migrate-from-zero green on `main`
+2. Merge Wave 0 docs PR #380
+3. Start Wave 1 (AT Continuity) from fresh `main` with flags off
