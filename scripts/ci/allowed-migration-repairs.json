@@ -5,6 +5,11 @@
       "path": "prisma/migrations/20260521120000_mapable_core_phase_2/migration.sql",
       "reason": "Create ProviderResponseStatus before ALTER TABLE so migrate-from-zero does not fail (P3018/42704).",
       "pr": "cursor/remediation-repo-controls-5fc8"
+    },
+    {
+      "path": "prisma/migrations/20260525000000_mapable_access_phase_1/migration.sql",
+      "reason": "Close CREATE TABLE access_trust_events with ); before CREATE INDEX so migrate-from-zero does not fail (P3018/42601). Neon production checksum matched the broken file; owner must update _prisma_migrations.checksum after deploy per docs/remediation/MIGRATE_FROM_ZERO_REPAIR.md.",
+      "pr": "cursor/migration-trust-repair-0a20"
     }
   ]
 }

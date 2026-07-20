@@ -96,8 +96,9 @@ Examples: `mapable_core_phase_3`–`5`, `mapable_care_mvp`, `mapable_core_phase_
 
 - Required **Migrations** job: order + integrity + ephemeral schema coherence via CI-only `db push`
 - **Migrate from zero** job: hard-fails on `prisma migrate deploy` from empty DB (no `continue-on-error`, no masked `exit 0`)
-- First failing migration: `20260525000000_mapable_access_phase_1` (missing `);` before `CREATE INDEX`) — see `MIGRATE_FROM_ZERO_BLOCKER.md`
-- SQL rewrite deferred until account-owner provides `_prisma_migrations` evidence
+- First failing migration was `20260525000000_mapable_access_phase_1` (missing `);` before `CREATE INDEX`) — **syntax repaired** on `cursor/migration-trust-repair-0a20` (allowlisted); see `MIGRATE_FROM_ZERO_REPAIR.md`
+- Neon production evidence fetched 2026-07-20; checksum update runbook required before/after deploy of the repaired SQL
+- Post-syntax empty-DB failure: same migration recreates `User` (`42P07`) — baseline/de-dupe still required
 - Production remains `prisma migrate deploy` only — never `db push`
 
 ## Approved historical repairs

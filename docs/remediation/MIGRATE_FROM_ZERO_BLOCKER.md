@@ -1,8 +1,9 @@
 # Migrate-from-zero blocker
 
-**Status:** hard CI failure (truthful). Do not rewrite historical migrations without verified `_prisma_migrations` evidence from every persistent environment.
+**Status:** partial repair landed on `cursor/migration-trust-repair-0a20` — see [MIGRATE_FROM_ZERO_REPAIR.md](./MIGRATE_FROM_ZERO_REPAIR.md).  
+Do not rewrite additional historical migrations without allowlisting and environment evidence.
 
-## Verified reproduction (disposable PostgreSQL)
+## Original verified failure (pre-repair)
 
 Command: `pnpm exec prisma migrate deploy` on an empty database.
 
@@ -11,45 +12,49 @@ First failure:
 - Migration: `20260525000000_mapable_access_phase_1`
 - Prisma: `P3018`
 - Database: `ERROR: syntax error at or near "CREATE"` (SQLSTATE `42601`)
-- Character offset ≈ `127592` in `migration.sql`
 
-Root cause in repository file (not applied successfully on a fresh DB):
+Root cause in repository file:
 
 ```sql
 CONSTRAINT "access_trust_events_pkey" PRIMARY KEY ("id")
 CREATE INDEX "access_places_status_idx" ON "access_places"("status");
 ```
 
-The `CREATE TABLE "access_trust_events"` statement is missing the closing `);` before the next `CREATE INDEX`.
+The `CREATE TABLE "access_trust_events"` statement was missing the closing `);` before the next `CREATE INDEX`.
 
-## Why this PR does not rewrite the SQL
+## Neon evidence (2026-07-20)
 
-Hard stop: production/staging migration history and checksums were **not** available to this agent (no database credentials; Neon/Vercel account-owner access required). Editing an already-shipped migration folder changes the Prisma checksum and can break environments that recorded a different history (including `migrate resolve --applied` after a failed attempt).
+Production branch of Neon project `mapableau` recorded checksum
+`52ecc3b73328a905db0d35028d6e3f7f22ac7d8dbfc2445c171039f96b121f2d` for
+`20260525000000_mapable_access_phase_1` — identical to the broken file.
+`applied_steps_count` was `0` with `finished_at` set.
 
-## Additional blockers after the syntax fix
+Full dump and production checksum update runbook:
+[MIGRATE_FROM_ZERO_REPAIR.md](./MIGRATE_FROM_ZERO_REPAIR.md).
 
-Even after closing `access_trust_events`, migrate-from-zero remains blocked by multiple **stub** migrations (comments-only / incomplete DDL) documented in `MIGRATION_INVENTORY.md` (Core phase folders, care MVP, case management, etc.). A full baseline/squash or verified forward-repair plan is required (Wave 1).
+## Repair applied (allowlisted)
 
-## Account-owner evidence required
+- Close `access_trust_events` with `);`
+- New checksum: `277560a68f359fcdc756791eb51446108cdbee24214e39f5504443c3d9a1812b`
+- Allowlisted in `scripts/ci/allowed-migration-repairs.json`
 
-From each persistent environment (production, staging, any shared Neon branch used as truth):
+## Current remaining blocker (post-syntax repair)
 
-```sql
-SELECT migration_name, checksum, finished_at, rolled_back_at, applied_steps_count
-FROM "_prisma_migrations"
-ORDER BY finished_at;
-```
+Empty-DB `migrate deploy` now applies through prior migrations, enters
+`20260525000000_mapable_access_phase_1`, then fails:
 
-Also provide whether production schema was historically created via `db push` rather than `migrate deploy`.
+- Prisma: `P3018`
+- Database: `ERROR: relation "User" already exists` (SQLSTATE `42P07`)
 
-## Safe reconciliation strategies (do not execute without evidence)
+`mapable_access_phase_1` still contains a near-full schema dump that conflicts with
+`init` and earlier migrations. Stub/comment-only core-phase migrations remain
+documented in `MIGRATION_INVENTORY.md`.
 
-| Environment          | Strategy                                                                                                                                 |
-| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| Completely fresh DB  | After verified repair/squash, `prisma migrate deploy` must succeed end-to-end; CI job `Migrate from zero` is the gate                    |
-| Existing deployed DB | Compare checksums; if broken file never applied, prefer a **new** forward migration or baseline squash — do not silently rewrite history |
-| Staging rehearsal    | Restore prod-like backup → apply proposed repair → run app smoke + migrate status                                                        |
-| Rollback / recovery  | Keep pre-change DB snapshot; use `migrate resolve` only with written runbook                                                             |
+## Account-owner actions still required
+
+1. After merging the syntax repair: update production `_prisma_migrations.checksum` per the runbook (do not re-run the migration SQL).
+2. Resolve `ndis_direct_claiming` rename drift (`20260525000000_*` on prod vs `20260525010000_*` in repo).
+3. Approve follow-up baseline / dump de-duplication work before claiming migrate-from-zero green.
 
 ## CI policy
 
