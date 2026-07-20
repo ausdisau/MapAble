@@ -7,16 +7,15 @@ access blocks deployment.
 ## Current hosting status
 
 - Primary target: Vercel.
-- Canonical public host: `https://www.mapable.com.au`.
-- Apex host: `https://mapable.com.au` should redirect or canonicalise to
-  `https://www.mapable.com.au`.
-- Known blocker: Vercel CLI access for the current agent account cannot deploy
-  because the `ausdisau` team is suspended for billing, and the CLI account does
-  not have access to `mapable.com.au`/`www.mapable.com.au`.
+- **Canonical public host:** `https://mapable.com.au` (apex).
+- `www.mapable.com.au` should redirect to apex (account-owner DNS/TLS). Verified
+  2026-07-20 edge scan: www returned `307` to apex.
+- Deploy/env gate requires exact apex origins for `NEXTAUTH_URL` /
+  `NEXT_PUBLIC_APP_URL` (rejects www, localhost, HTTP, paths, ports).
+- Non-Vercel production hosts must set `MAPABLE_ENFORCE_PRODUCTION_ENV=true`.
 
-Do not treat a successful local build as production deployment proof until the
-Vercel billing/domain blocker is cleared and a production deployment URL is
-verified.
+Do not treat a successful local build as production deployment proof until a
+production deployment URL is verified with the smoke checks below.
 
 ## Required production environment variables
 
@@ -24,9 +23,10 @@ verified.
 | ------------------------------------------------------ | ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
 | `DATABASE_URL`                                         | Yes                           | Pooled Neon/Postgres URL for runtime Prisma queries.                                                                                          |
 | `DIRECT_URL`                                           | Yes                           | Direct Neon/Postgres URL for migrations. Do not use the pooler host.                                                                          |
-| `NEXTAUTH_SECRET`                                      | Yes                           | Stable private value, at least 16 characters. The code has a fallback only to keep auth endpoints from returning 500 during misconfiguration. |
-| `NEXTAUTH_URL`                                         | Yes                           | `https://www.mapable.com.au` in production.                                                                                                   |
-| `NEXT_PUBLIC_APP_URL`                                  | Yes                           | `https://www.mapable.com.au` for canonical links and client-safe app URL.                                                                     |
+| `NEXTAUTH_SECRET`                                      | Yes                           | Canonical signing secret (≥16). Deploy gate does not accept AUTH_SECRET/SESSION_SECRET aliases.                                              |
+| `NEXTAUTH_URL`                                         | Yes                           | Exactly `https://mapable.com.au` (optional trailing `/`).                                                                                    |
+| `NEXT_PUBLIC_APP_URL`                                  | Yes                           | Exactly `https://mapable.com.au` (must match NEXTAUTH_URL origin).                                                                           |
+| `MAPABLE_ENFORCE_PRODUCTION_ENV`                       | Non-Vercel prod               | Set `true` so next.config + instrumentation run the production env gate.                                                                    |
 | `NDIS_ENCRYPTION_KEY`                                  | Recommended                   | Separate stable secret for encrypted NDIS identifiers.                                                                                        |
 | `SENDGRID_API_KEY` / `SENDGRID_FROM_EMAIL`             | If email enabled              | Required for production email delivery.                                                                                                       |
 | `DOCUMENT_STORAGE_MODE`                                | Yes                           | Use a production-safe mode once document upload workflows are live.                                                                           |
@@ -68,11 +68,15 @@ verified.
 8. Smoke-check production:
 
    ```bash
+   curl -I https://mapable.com.au/
    curl -I https://www.mapable.com.au/
-   curl https://www.mapable.com.au/api/auth/session
-   curl https://www.mapable.com.au/api/auth/providers
-   curl -I https://www.mapable.com.au/robots.txt
-   curl -I https://www.mapable.com.au/sitemap.xml
+   curl -sS https://mapable.com.au/api/health/live
+   curl -sS https://mapable.com.au/api/health/ready
+   curl https://mapable.com.au/api/auth/session
+   curl https://mapable.com.au/api/auth/providers
+   curl -I https://mapable.com.au/robots.txt
+   curl -I https://mapable.com.au/sitemap.xml
+   curl -I https://mapable.com.au/jobs
    ```
 
 ## Database and migrations

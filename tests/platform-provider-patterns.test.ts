@@ -9,8 +9,8 @@ import {
 } from "@/lib/onboarding/onboarding-evaluator";
 
 describe("platformPatternsConfig", () => {
-  it("enables onboarding gate by default", () => {
-    expect(platformPatternsConfig.onboardingGateEnabled).toBe(true);
+  it("disables onboarding gate by default (Wave 0 fail-closed)", () => {
+    expect(platformPatternsConfig.onboardingGateEnabled).toBe(false);
   });
 });
 

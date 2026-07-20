@@ -28,6 +28,7 @@
     "ci:production-claims": "tsx scripts/ci/check-production-claims.ts",
     "ci:feature-dependencies": "tsx scripts/ci/check-feature-dependencies.ts",
     "ci:merge-train-integrity": "tsx scripts/ci/check-merge-train-integrity.ts",
+    "ci:prod-audit": "tsx scripts/ci/check-prod-audit.ts",
     "setup:cloud-agent": "bash scripts/setup-cloud-agent.sh",
     "mcp:av": "tsx mcp/av/server.ts",
     "neon:configure": "python3 scripts/configure-neon-env.py",
@@ -36,6 +37,7 @@
     "fetch:ndis-list-providers": "tsx scripts/fetch-ndis-list-providers.ts",
     "seed:ndis-provider-outlets": "tsx prisma/seed-ndis-provider-outlets.ts",
     "seed:billing-centre": "tsx prisma/seed-billing-centre.ts",
+    "seed:a11y-pilot": "tsx prisma/seed-a11y-pilot.ts",
     "db:generate": "prisma generate",
     "db:migrate:deploy": "prisma migrate deploy",
     "db:migrate:status": "prisma migrate status",
@@ -68,7 +70,6 @@
   "dependencies": {
     "@ai-sdk/google": "^3.0.80",
     "@ai-sdk/react": "^3.0.198",
-    "@better-auth/infra": "^0.2.13",
     "@chat-adapter/slack": "^4.30.0",
     "@chat-adapter/state-memory": "^4.30.0",
     "@prisma/client": "6.19.2",
@@ -92,7 +93,7 @@
     "leaflet": "^1.9.4",
     "lucide-react": "^0.562.0",
     "maplibre-gl": "^5.24.0",
-    "next": "15.5.7",
+    "next": "15.5.20",
     "next-auth": "^4.24.13",
     "posthog-node": "^5.36.7",
     "react": "^18.0.0",
@@ -121,7 +122,7 @@
     "autoprefixer": "^10.4.20",
     "dotenv": "^16.4.7",
     "eslint": "^8.57.0",
-    "eslint-config-next": "15.5.7",
+    "eslint-config-next": "15.5.20",
     "eslint-config-prettier": "^10.1.8",
     "eslint-import-resolver-typescript": "^3.6.1",
     "eslint-plugin-import": "^2.32.0",
@@ -140,7 +141,15 @@
   },
   "pnpm": {
     "overrides": {
-      "vitest": "^3.2.7"
+      "vitest": "^3.2.7",
+      "axios": ">=1.16.0",
+      "form-data": ">=4.0.6",
+      "ws": ">=8.21.0",
+      "undici": "7.28.0",
+      "picomatch": "4.0.5",
+      "picomatch@^2": "2.3.2",
+      "defu": ">=6.1.5",
+      "effect": ">=3.20.0"
     }
   }
 }

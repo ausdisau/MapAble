@@ -79,6 +79,8 @@ describe("Provider Operations attention queue", () => {
       organisationId: "org-1",
     });
     expect(queue.readOnly).toBe(true);
+    expect(queue.autoEscalation).toBe(false);
+    expect(queue.providerRanking).toBe(false);
     expect(queue.items.some((i) => i.kind === "essential_shift_unfilled")).toBe(
       true,
     );
@@ -89,5 +91,30 @@ describe("Provider Operations attention queue", () => {
     expect(shift?.participantRef).toMatch(/^participant:/);
     expect(shift?.participantRef).not.toContain("participant-abc123");
     expect(shift?.deepLink).toContain("/care/shifts/");
+  });
+
+  it("orders by deadline before severity and never fabricates rankings", async () => {
+    careShiftFindMany.mockResolvedValue([
+      {
+        id: "s-later",
+        participantId: "participant-later",
+        startAt: new Date("2026-07-20T01:00:00.000Z"),
+        status: "scheduled",
+      },
+      {
+        id: "s-soon",
+        participantId: "participant-soon",
+        startAt: new Date("2026-07-18T01:00:00.000Z"),
+        status: "scheduled",
+      },
+    ]);
+    workerFindMany.mockResolvedValue([]);
+    const queue = await buildProviderAttentionQueue({
+      user: provider,
+      organisationId: "org-1",
+    });
+    const shifts = queue.items.filter((i) => i.kind === "essential_shift_unfilled");
+    expect(shifts[0]?.id).toBe("shift_unfilled_s-soon");
+    expect(shifts[1]?.id).toBe("shift_unfilled_s-later");
   });
 });

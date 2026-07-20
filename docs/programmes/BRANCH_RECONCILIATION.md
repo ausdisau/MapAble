@@ -1,78 +1,75 @@
-# Branch reconciliation — MapAble programme foundation
+# Prompt 0 — Branch reconciliation (current main)
 
-**Generated:** 2026-07-16  
-**Base commit:** `fdd22bb3` (`main`)  
-**Foundation branch:** `cursor/shared-programme-foundation-7fa5`
+**Inspection timestamp (UTC):** 2026-07-19T01:34:00Z  
+**Original PR:** #279 (`cursor/shared-programme-foundation-7fa5` @ `ba6f77fd`)  
+**Original merge-base:** `fdd22bb3`  
+**Current `main`:** `6db2e961`  
+**Reconciliation branch:** `cursor/shared-programme-foundation-reconcile-6ea8`  
+**Strategy:** Fresh branch from `main` (no force-push of #279). Do not start Prompt 11.
 
-## Repository state at inspection
+## Reconciliation table (pre-edit)
 
-| Item           | Value                                                       |
-| -------------- | ----------------------------------------------------------- |
-| Branch         | `main` (clean working tree)                                 |
-| Remote         | `origin` → `github.com/ausdisau/mapableau-new`              |
-| Workspace      | Root Next.js app + `apps/realtime-server` only              |
-| Schema         | Single `prisma/schema.prisma` (~455 models)                 |
-| Programme docs | **Absent** before this PR (`docs/programmes/` created here) |
+| Area                                          | Original Prompt 0 assumption      | Current-main fact                                                    | Action                                                                                |
+| --------------------------------------------- | --------------------------------- | -------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| `CareOSMission`                               | Target via PR #252                | **Absent**; #252 closed unmerged                                     | Keep interim `CaseMissionAdapter`; interface-replaceable; no speculative mission DDL  |
+| `AccessPassport`                              | Target via PR #273                | **Absent**; #273 closed unmerged                                     | Passport adapter over `AccessibilityProfile` + Communication Passport projection      |
+| `AccessPlace` / `AccessiblePlace`             | Prefer AccessPlace                | Both present; AccessPlace canonical                                  | New programme writes → AccessPlace only; tests forbid AccessiblePlace creates         |
+| `ProgrammeSourceRecord`                       | New on Prompt 0                   | Absent                                                               | **Keep** as programme evidence spine                                                  |
+| `RegulatorySourceVersion` (#278)              | Optional FK                       | #278 open, not mergeable; model absent                               | No copy of #278 model; string/opaque adapter hook + Platform Assurance future adapter |
+| `ParticipantAuthorityGrant`                   | New                               | Absent                                                               | **Keep**                                                                              |
+| Navigator family (11 models)                  | New                               | Absent                                                               | **Keep** (Rights Navigator foundation)                                                |
+| Trust ledger (3 models)                       | New                               | Absent                                                               | **Keep**                                                                              |
+| `ConsentRecord` / `AuditEvent`                | Extend via services               | Present                                                              | Extend via `lib/programmes/audit.ts` + consent linkage; no parallel ledgers           |
+| AURA                                          | L3_PROPOSE on open PRs / fixtures | No `lib/aura/`; companion `stopAura`; AI-platform authority ceilings | Revalidate against AI-platform + companion stop; proposal-only boundary tests         |
+| Migration `20260716120000_shared_programme_*` | Additive                          | **Collides** with indoor `20260716120000` on main                    | Replace with `20260719120000_shared_programme_foundation` (not deployed)              |
+| Programme flags                               | 12 `MAPABLE_*_ENABLED`            | Absent on main                                                       | Retain server-side, default false                                                     |
+| Mission portfolio / Starting Work             | Not in Prompt 0                   | Present on main (projections)                                        | Do not duplicate; Case adapter remains mission interim                                |
 
-### Naming collision
+## Model classification (20 Prisma artefacts)
 
-Existing repo **Phase 0** = public marketing site stabilisation (`docs/mapable/phase-0-implementation-report.md`).  
-Programme **Prompt 0** = shared programme foundation (`docs/programmes/`). Do not conflate.
+| Model / enum family                                | Classification           | Rationale                                         |
+| -------------------------------------------------- | ------------------------ | ------------------------------------------------- |
+| `ProgrammeSourceRecord`                            | **Keep**                 | Programme evidence spine; not Platform Assurance  |
+| `ProgrammeSourceImpactReview`                      | **Keep**                 | Impact workflow for programme sources             |
+| `ParticipantAuthorityGrant`                        | **Keep**                 | Scoped delegation beyond ConsentRecord fields     |
+| `NavigatorOrganisation` … `NavigatorFeedback` (11) | **Keep**                 | Rights Navigator foundation; no existing SoT      |
+| `ServiceRelationshipRecord`                        | **Keep**                 | Trust role disclosure spine                       |
+| `ServiceRoleDisclosure`                            | **Keep**                 | Field-level disclosure on relationship            |
+| `TrustRelationshipSnapshot`                        | **Keep**                 | Versioned trust view                              |
+| `RegulatorySourceVersion`                          | **Defer** (adapter only) | Owned by Platform Assurance (#278 unmerged)       |
+| Speculative `CareOSMission*`                       | **Remove as dependency** | Absent; adapter interface only                    |
+| Second passport table                              | **Remove**               | Use AccessibilityProfile / Communication Passport |
 
-## Open pull requests (priority for later merges)
+## Migration decision
 
-| PR                                                         | Branch                                      | State | Relevance to foundation                                             |
-| ---------------------------------------------------------- | ------------------------------------------- | ----- | ------------------------------------------------------------------- |
-| [#238](https://github.com/ausdisau/mapableau-new/pull/238) | `agent/careos-cloud-platform`               | OPEN  | CareOS cloud platform base                                          |
-| [#252](https://github.com/ausdisau/mapableau-new/pull/252) | `agent/careos-platform-completion`          | DRAFT | **Canonical `CareOSMission`**, outbox relay, mission events         |
-| [#264](https://github.com/ausdisau/mapableau-new/pull/264) | `cursor/access-intelligence-module-4b25`    | DRAFT | `AiAccessPassport`, Living Twin, fit engine                         |
-| [#273](https://github.com/ausdisau/mapableau-new/pull/273) | `cursor/access-intelligence-expansion-6ea8` | OPEN  | Access Intelligence Waves 0–5 production expansion                  |
-| [#275](https://github.com/ausdisau/mapableau-new/pull/275) | `cursor/mapable-aura-wave6-7-6ea8`          | OPEN  | AURA Waves 6–7 (fixtures, in-memory stores)                         |
-| [#272](https://github.com/ausdisau/mapableau-new/pull/272) | `cursor/mapable-aura-wave4-5-6ea8`          | OPEN  | AURA proposal/execution gates                                       |
-| [#278](https://github.com/ausdisau/mapableau-new/pull/278) | `cursor/platform-assurance-registry-ccbf`   | OPEN  | `RegulatorySourceVersion` — coordinate with `ProgrammeSourceRecord` |
+Migration **has not been deployed** on main (model absent; timestamp unused for programmes).  
+**Replace** colliding `20260716120000_shared_programme_foundation` with:
 
-### Remote branches (not yet PRs or stacked)
+`prisma/migrations/20260719120000_shared_programme_foundation/migration.sql`
 
-- `origin/cursor/careos-foundation-c70a` — early CareOSMission slice
-- `origin/agent/mapable-intelligence-fabric` — intelligence kernel + CareOS MCP
-- `origin/cursor/access-intelligence-physical-4b25` — physical systems simulator
-- Multiple `agent/careos-*` opportunity branches
+## Prompt 11 readiness gate (evaluated after reconciliation)
 
-## What exists on `main` vs open branches
+| Gate | Status |
+| --- | --- |
+| Mergeable Prompt 0 reconciliation branch | **Pending human review / CI** — branch created; do not mark ready automatically |
+| Green required CI | **Pending** — push triggers CI |
+| Reviewed schema | **Pending human review** |
+| Resolved source-registry ownership | **Documented** (programme spine vs deferred Platform Assurance) |
+| Current AURA/AI-platform boundary tests | **Pass locally** (`tests/programmes/current-main-compatibility.test.ts`) |
+| No duplicate mission/passport/place/consent/audit SoT | **Pass** (adapters only) |
 
-| Domain          | On `main`                             | Target canonical (post-merge)                                |
-| --------------- | ------------------------------------- | ------------------------------------------------------------ |
-| Mission / case  | `Case`, `CaseTask`, `CaseLink`        | `CareOSMission` (PR #252)                                    |
-| Access passport | `AccessibilityProfile` (presentation) | `AccessPassport` (rename from `AiAccessPassport`, PR #273)   |
-| Places          | `AccessPlace*` (new stack)            | `AccessPlace` + Living Access Twin extension                 |
-| Consent         | `ConsentRecord`                       | `ConsentRecord` + `ParticipantAuthorityGrant`                |
-| Audit           | `AuditEvent`                          | `AuditEvent` + transactional outbox (PR #252)                |
-| AURA            | Not present                           | Waves 1–7 (proposal-only boundary regardless of maturity)    |
-| Navigator       | `SupportCoordinatorRelationship`      | `NavigatorProfile` family (this PR)                          |
-| Source registry | Not present                           | `ProgrammeSourceRecord` (this PR) + optional link to PR #278 |
+### Local verification (2026-07-19)
 
-## Merge risks
+| Check | Result |
+| --- | --- |
+| `prisma validate` / `db:generate` | Pass |
+| `pnpm type-check` | Pass |
+| `vitest run tests/programmes` | Pass (35) |
+| Migration order / integrity | Pass (57 migrations) |
+| Domain ownership / feature deps / merge-train | Pass |
+| ESLint on changed programme TS | Pass (batched; full `pnpm lint` OOM historically) |
+| `next build --no-lint` | Pass |
+| Full `pnpm build` (includes lint) | **Fail OOM** — also fails on current `main` under same heap |
+| Disposable DB migrate deploy | **Blocked** — no reachable Postgres/docker in environment |
 
-1. **`CareOSMission` schema conflict** — Do not add `CareOSMission` on foundation branch; use `MissionDependencyAdapter` bridging `Case` until PR #252 merges.
-2. **`AiAccessPassport` vs `AccessPassport`** — Document rename target; programmes use adapter until PR #273 merges.
-3. **PR #278 overlap** — `ProgrammeSourceRecord.regulatorySourceVersionId` reserved for optional FK when #278 lands.
-4. **`AccessiblePlace` / `AccessPlace` drift** — New programme writes target `AccessPlace` only.
-5. **AURA Waves 6–7** — Fixtures and in-memory stores; programmes must enforce proposal-only AI boundary independently.
-
-## Recommended merge sequence onto `main` (before Prompt 1)
-
-1. CareOS canonical mission + outbox (PR #252 chain)
-2. Access Intelligence core + passport rename (PR #273)
-3. AURA proposal/execution gates (PR #272+ when stable)
-4. Platform assurance registry (PR #278) — link to programme source registry
-
-## Prompt 0 branch strategy
-
-This PR branches from `main` and adds:
-
-- Documentation under `docs/programmes/`
-- Additive Prisma models (navigator, source registry, trust ledger, authority grants)
-- `lib/programmes/` contracts, adapters, invariants, flags
-- Tests — no programme product UIs
-
-Adapter bridges (`Case` → mission, fixture source/navigator) allow Prompts 1–12 to start without waiting for all open PRs to merge.
+**Prompt 11 must not begin** until mergeable + green CI + human schema review complete.

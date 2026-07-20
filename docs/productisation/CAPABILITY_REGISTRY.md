@@ -2,7 +2,7 @@
 
 **Authoritative runtime seed:** `lib/convergence-os/seed/capabilities.ts`  
 **Remediation inventory:** `docs/remediation/CAPABILITY_INVENTORY.md`  
-**Inspection date:** 2026-07-17 — post #327 on `main`  
+**Inspection date:** 2026-07-20 — post #378 on `main` + NDIS Expansion Wave 0 docs  
 **Public claim allowed:** false for all rows below unless registry + evidence say otherwise.
 
 This table reconciles documentation with verified source. It does **not** enable flags
@@ -31,12 +31,31 @@ or assert registration.
 | accountability.appeals | Appeals / accountability | open_pr / scaffold | — | — | #307/#311 tips |
 | ndis.claim_submission | NDIA live submit | blocked_by_external_approval | mock gateway | off | Must stay disabled |
 | managed.support_delivery | MapAble Managed Support | blocked_by_registration | — | — | Do not fabricate registration |
+| ndis.expansion_foundation | NDIS Expansion Wave 0 foundation | documented | docs only | — | No product schema; migrate-from-zero still blocks product waves |
+| ndis.at_continuity | Assistive Technology Continuity | documented / planned Wave 1 | none yet | `MAPABLE_AT_CONTINUITY_ENABLED=false` (planned); precursor `MAPABLE_AT_LIFECYCLE_ENABLED=false` | Partner assessment/repair; no clinical suitability SoT |
+| ndis.plan_evidence_navigator | Plan and Evidence Navigator | documented / planned Wave 2 | none yet | `MAPABLE_PLAN_EVIDENCE_NAVIGATOR_ENABLED=false` (planned) | No eligibility/funding determination |
+| ndis.support_coordination_outcomes | Support Coordination Outcomes | documented / planned Wave 3 | reuse SC on main | `MAPABLE_SUPPORT_COORDINATION_OUTCOMES_ENABLED=false` (planned) | #188/#243 not landed SoT |
+| ndis.home_living_navigator | Home and Living Navigator | documented / planned Wave 4 | none yet | `MAPABLE_HOME_LIVING_NAVIGATOR_ENABLED=false` (planned) | No SDA/SIL eligibility decisions |
+| ndis.workforce_assurance | Workforce Assurance | documented / planned Wave 5 | extends readiness | `MAPABLE_WORKFORCE_ASSURANCE_ENABLED=false` (planned) | No scores; no auto-assign |
+| ndis.psychosocial_recovery | Psychosocial Recovery Continuity | documented / planned Wave 6 | none yet | `MAPABLE_PSYCHOSOCIAL_RECOVERY_ENABLED=false` (planned) | No crisis prediction |
+| ndis.pbs_operations | PBS Practice Operations | documented / planned Wave 7 | none yet | `MAPABLE_PBS_*=false` (planned) | High-risk; partner clinical governance |
+| ndis.early_childhood_workspace | Early Childhood Family Workspace | documented / planned Wave 8 | none yet | `MAPABLE_EARLY_CHILDHOOD_WORKSPACE_ENABLED=false` (planned) | Strict child privacy |
+| ndis.allied_health_exchange | Allied Health / Home Modification | documented / planned Wave 9 | none yet | exchange flags false (planned) | Adapters off until agreements |
+| ndis.plan_manager_infrastructure | Plan Management Infrastructure | documented / planned Wave 10 | extend PM/Billing | PM infra false; **NDIA submit false**; **auto payment approval false** | Infrastructure for registered PMs |
+| ndis.regional_capacity_exchange | Regional Capacity Exchange | documented / planned Wave 11 | CapacityBlock ≠ exchange | `MAPABLE_REGIONAL_CAPACITY_EXCHANGE_ENABLED=false` (planned) | One-region readiness before national |
 
 ## Operating lanes
 
 See [docs/strategy/OPERATING_LANES.md](../strategy/OPERATING_LANES.md). Managed Support and
 Network must remain separated in every public surface.
 
+## NDIS Expansion programme
+
+See [docs/programmes/NDIS_EXPANSION_MASTER_PLAN.md](../programmes/NDIS_EXPANSION_MASTER_PLAN.md)
+and [docs/programmes/NDIS_EXPANSION_DELIVERY_SEQUENCE.md](../programmes/NDIS_EXPANSION_DELIVERY_SEQUENCE.md).
+Product waves are **not** eligible while migrate-from-zero fails.
+
 ## Next implementation PRs
 
-See [docs/strategy/STRATEGIC_OPPORTUNITIES.md](../strategy/STRATEGIC_OPPORTUNITIES.md).
+See [docs/strategy/STRATEGIC_OPPORTUNITIES.md](../strategy/STRATEGIC_OPPORTUNITIES.md)
+and the NDIS Expansion delivery sequence (Wave 1 AT Continuity only after gates clear).

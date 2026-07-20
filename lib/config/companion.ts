@@ -1,6 +1,17 @@
+/**
+ * Native Companion foundation flags.
+ * Defaults false — no App Store production claim; web remains the essential pathway.
+ */
 export const companionConfig = {
-  enabled: process.env.MAPABLE_COMPANION_ENABLED === "true",
-  visitPackEnabled: process.env.MAPABLE_COMPANION_VISIT_PACK_ENABLED === "true",
+  get enabled() {
+    return process.env.MAPABLE_COMPANION_ENABLED === "true";
+  },
+  get visitPackEnabled() {
+    return process.env.MAPABLE_COMPANION_VISIT_PACK_ENABLED === "true";
+  },
+  authorityCeiling: "DEVICE_LOCAL_AND_FLAGGED_COMPILE" as const,
+  productionClaimStatus: "not_claimable" as const,
+  maturity: "controlled_pilot" as const,
 };
 
 export function isCompanionEnabled(): boolean {

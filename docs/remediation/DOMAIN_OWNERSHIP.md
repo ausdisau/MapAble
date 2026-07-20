@@ -22,6 +22,27 @@
 | Access place identity       | `lib/access-map/**`                                      | **`AccessPlace`**                            | Sole public place writer                                                |
 | Access Intelligence Next    | `lib/access-intelligence-next/**`                        | Deterministic fit / proof / graph projection | Synthetic contracts only in foundation; must not become AccessPlace SoT |
 | Public accountability       | `lib/national-accountability/**`                         | National accountability publications         | Evolve to governed pipeline (PR 11); no second portal                   |
+| Support coordination        | `lib/support-coordinator/**`                             | `SupportCoordinatorRelationship` + tasks     | Outcomes reporting extends this owner — no second SC SoT                |
+| Plan manager workflows      | `lib/plan-manager/**`                                    | PM relationships + invoice review            | Wave 10 infrastructure extends; NDIA submit stays off                   |
+| Provider quality            | `lib/provider-quality/**`                                | Quality / safeguard review services          | No worker worthiness scores                                             |
+| Workforce readiness         | `lib/workforce-readiness/**`                             | Reason-coded readiness evaluation            | Auto-assign permanently forbidden                                       |
+
+### NDIS Expansion — planned owners (no writers on main yet)
+
+Declared for programme control. Paths must not be treated as existing SoT writers
+until their wave lands behind default-false flags. See
+[docs/programmes/NDIS_EXPANSION_DOMAIN_MAP.md](../programmes/NDIS_EXPANSION_DOMAIN_MAP.md).
+
+| Planned domain                    | Planned owner path              | Status                       |
+| --------------------------------- | ------------------------------- | ---------------------------- |
+| AT Continuity                     | `lib/at-continuity/**`          | planned — **no writers yet** |
+| Plan & Evidence Navigator         | `lib/plan-evidence/**`          | planned — **no writers yet** |
+| Home & Living Navigator           | `lib/home-living/**`            | planned — **no writers yet** |
+| Psychosocial Recovery             | `lib/psychosocial-recovery/**`  | planned — **no writers yet** |
+| PBS Operations                    | `lib/pbs-operations/**`         | planned — **no writers yet** |
+| Early Childhood                   | `lib/early-childhood/**`        | planned — **no writers yet** |
+| Allied Health / Home Mod Exchange | `lib/allied-health-exchange/**` | planned — **no writers yet** |
+| Regional Capacity Exchange        | `lib/regional-capacity/**`      | planned — **no writers yet** |
 
 ## Mutation rule
 
@@ -29,7 +50,7 @@ No other module may directly mutate another domain’s aggregate tables except t
 
 CI ownership check (`scripts/ci/check-domain-ownership.ts`) flags changed files that touch foreign aggregate write paths without going through the owner package (heuristic; expands in later PRs).
 
-Cross-domain **read/orchestration** adapters allowlisted in that script (not second SoTs): `lib/matching/`, `lib/ai-matching/`, `lib/ai-platform/`, `lib/mission-portfolio/`, `lib/mission-copilot/`, `lib/case-copilot/`, plus existing orchestration/booking-graph packages. They must not become care/transport/billing writers.
+Cross-domain **read/orchestration** adapters allowlisted in that script (not second SoTs): `lib/matching/`, `lib/ai-matching/`, `lib/ai-platform/`, `lib/mission-portfolio/`, `lib/mission-copilot/`, `lib/case-copilot/`, `lib/programmes/`, plus existing orchestration/booking-graph packages. They must not become care/transport/billing writers. Programme services may store foreign-key references (e.g. `consentRecordId`, `careRequestId`) without owning those aggregates.
 
 ## CODEOWNERS mapping
 

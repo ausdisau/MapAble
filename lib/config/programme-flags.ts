@@ -1,24 +1,52 @@
 import type { ProgrammeId } from "@/lib/programmes/safety-invariants";
 
+function envFlag(name: string): boolean {
+  return process.env[name] === "true";
+}
+
+/**
+ * Programme foundation flags — server-side only, default false.
+ * A flag does not grant entitlement, authority, or production claims.
+ */
 export const programmeFlagsConfig = {
-  pathwaysEnabled: process.env.MAPABLE_PATHWAYS_ENABLED === "true",
-  transitionHomeEnabled: process.env.MAPABLE_TRANSITION_HOME_ENABLED === "true",
-  kidsEnabled: process.env.MAPABLE_KIDS_ENABLED === "true",
-  lifespanEnabled: process.env.MAPABLE_LIFESPAN_ENABLED === "true",
-  homeEnabled: process.env.MAPABLE_HOME_ENABLED === "true",
-  atLifecycleEnabled: process.env.MAPABLE_AT_LIFECYCLE_ENABLED === "true",
-  workRetentionEnabled: process.env.MAPABLE_WORK_RETENTION_ENABLED === "true",
-  carerContinuityEnabled:
-    process.env.MAPABLE_CARER_CONTINUITY_ENABLED === "true",
-  regionalCapacityEnabled:
-    process.env.MAPABLE_REGIONAL_CAPACITY_ENABLED === "true",
-  rightsNavigatorEnabled:
-    process.env.MAPABLE_RIGHTS_NAVIGATOR_ENABLED === "true",
-  integrationFoundryEnabled:
-    process.env.MAPABLE_INTEGRATION_FOUNDRY_ENABLED === "true",
-  dataCooperativeEnabled:
-    process.env.MAPABLE_DATA_COOPERATIVE_ENABLED === "true",
-} as const;
+  get pathwaysEnabled() {
+    return envFlag("MAPABLE_PATHWAYS_ENABLED");
+  },
+  get transitionHomeEnabled() {
+    return envFlag("MAPABLE_TRANSITION_HOME_ENABLED");
+  },
+  get kidsEnabled() {
+    return envFlag("MAPABLE_KIDS_ENABLED");
+  },
+  get lifespanEnabled() {
+    return envFlag("MAPABLE_LIFESPAN_ENABLED");
+  },
+  get homeEnabled() {
+    return envFlag("MAPABLE_HOME_ENABLED");
+  },
+  get atLifecycleEnabled() {
+    return envFlag("MAPABLE_AT_LIFECYCLE_ENABLED");
+  },
+  get workRetentionEnabled() {
+    return envFlag("MAPABLE_WORK_RETENTION_ENABLED");
+  },
+  get carerContinuityEnabled() {
+    return envFlag("MAPABLE_CARER_CONTINUITY_ENABLED");
+  },
+  get regionalCapacityEnabled() {
+    return envFlag("MAPABLE_REGIONAL_CAPACITY_ENABLED");
+  },
+  get rightsNavigatorEnabled() {
+    return envFlag("MAPABLE_RIGHTS_NAVIGATOR_ENABLED");
+  },
+  get integrationFoundryEnabled() {
+    return envFlag("MAPABLE_INTEGRATION_FOUNDRY_ENABLED");
+  },
+  get dataCooperativeEnabled() {
+    return envFlag("MAPABLE_DATA_COOPERATIVE_ENABLED");
+  },
+  productionClaimStatus: "not_claimable" as const,
+};
 
 const PROGRAMME_FLAG_MAP: Record<
   ProgrammeId,
@@ -46,7 +74,9 @@ export class ProgrammeDisabledError extends Error {
 }
 
 export function isProgrammeEnabled(programmeId: ProgrammeId): boolean {
-  return programmeFlagsConfig[PROGRAMME_FLAG_MAP[programmeId]];
+  const key = PROGRAMME_FLAG_MAP[programmeId];
+  const value = programmeFlagsConfig[key];
+  return typeof value === "boolean" ? value : false;
 }
 
 export function requireProgrammeEnabled(programmeId: ProgrammeId): void {

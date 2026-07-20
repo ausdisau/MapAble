@@ -1,7 +1,7 @@
 /** Natural-language search interpreter (AI SDK + catalog resolution). */
 
 export const searchInterpreterConfig = {
-  enabled: process.env.SEARCH_INTERPRETER_ENABLED !== "false",
+  enabled: process.env.SEARCH_INTERPRETER_ENABLED === "true",
   aiGatewayApiKey:
     process.env.AI_GATEWAY_API_KEY ?? process.env.VERCEL_AI_GATEWAY_API_KEY ?? "",
   googleApiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY ?? "",
@@ -17,7 +17,7 @@ export const searchInterpreterConfig = {
     process.env.ES_SERVICE_CATEGORY_ALIAS ?? "mapable_service_categories_current",
   /** Dedicated LLM step when keyword needs resolution returns empty but access text is set. */
   needsInterpreterLlm:
-    process.env.SEARCH_NEEDS_INTERPRETER_LLM !== "false",
+    process.env.SEARCH_NEEDS_INTERPRETER_LLM === "true",
 };
 
 export function isSearchInterpreterConfigured(): boolean {

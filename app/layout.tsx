@@ -12,6 +12,14 @@ import {
 } from "@/components/ads/GoogleAdSense";
 import { Providers } from "@/components/providers";
 import { MAPABLE_LOGO_MARK_SRC } from "@/lib/brand/constants";
+import { getCanonicalPublicOrigin } from "@/lib/config/canonical-url";
+import {
+  buildPublicJsonLd,
+  serializeJsonLdForScript,
+} from "@/lib/config/json-ld";
+
+const canonicalOrigin = getCanonicalPublicOrigin();
+const publicJsonLd = buildPublicJsonLd();
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -28,9 +36,7 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_APP_URL || "https://www.mapable.com.au",
-  ),
+  metadataBase: new URL(canonicalOrigin),
   title: {
     default: "MapAble | Disability support platform",
     template: "%s | MapAble",
@@ -38,6 +44,9 @@ export const metadata: Metadata = {
   description:
     "MapAble helps people explore disability support, provider discovery, accessible transport, employment pathways and consent-aware service tools.",
   applicationName: "MapAble",
+  alternates: {
+    canonical: canonicalOrigin,
+  },
   icons: {
     icon: [{ url: MAPABLE_LOGO_MARK_SRC, type: "image/svg+xml" }],
     shortcut: [{ url: MAPABLE_LOGO_MARK_SRC, type: "image/svg+xml" }],
@@ -45,6 +54,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: "website",
+    url: canonicalOrigin,
     siteName: "MapAble",
     title: "MapAble | Disability support platform",
     description:
@@ -81,41 +91,14 @@ export default function RootLayout({
           type="application/ld+json"
           suppressHydrationWarning
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "Organization",
-              name: "MapAble",
-              url:
-                process.env.NEXT_PUBLIC_APP_URL || "https://www.mapable.com.au",
-              contactPoint: {
-                "@type": "ContactPoint",
-                contactType: "customer support",
-                email: "support@mapable.com.au",
-                areaServed: "AU",
-              },
-              sameAs: ["https://www.mapable.com.au"],
-            }),
+            __html: serializeJsonLdForScript(publicJsonLd.organization),
           }}
         />
         <script
           type="application/ld+json"
           suppressHydrationWarning
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "WebSite",
-              name: "MapAble",
-              url:
-                process.env.NEXT_PUBLIC_APP_URL || "https://www.mapable.com.au",
-              potentialAction: {
-                "@type": "SearchAction",
-                target:
-                  (process.env.NEXT_PUBLIC_APP_URL ||
-                    "https://www.mapable.com.au") +
-                  "/provider-finder?q={search_term_string}",
-                "query-input": "required name=search_term_string",
-              },
-            }),
+            __html: serializeJsonLdForScript(publicJsonLd.website),
           }}
         />
         <Providers>{children}</Providers>

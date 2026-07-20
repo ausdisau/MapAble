@@ -1,6 +1,6 @@
-import { prisma } from "@/lib/prisma";
 import type { ProgrammeSourceType } from "@prisma/client";
 
+import { prisma } from "@/lib/prisma";
 import { emitProgrammeAuditEvent } from "@/lib/programmes/audit";
 import type {
   ProgrammeSourceRecordView,

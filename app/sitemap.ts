@@ -1,9 +1,10 @@
 import type { MetadataRoute } from "next";
 
+import { getCanonicalPublicOrigin } from "@/lib/config/canonical-url";
 import { DEMO_ACCESS_PLACES } from "@/lib/demo/accessibility-places";
 import { LOCAL_ACCESS_LOCATIONS } from "@/lib/demo/local-access-pages";
 
-const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.mapable.com.au";
+const baseUrl = getCanonicalPublicOrigin();
 
 const publicRoutes = [
   "",

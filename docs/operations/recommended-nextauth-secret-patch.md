@@ -4,12 +4,21 @@
 
 MapAble uses a **hybrid** auth secret policy:
 
-| Environment | Behavior |
-| --- | --- |
-| **Vercel production** (`VERCEL_ENV=production`) | Fail closed. `NEXTAUTH_SECRET` (min 16 chars) is required. No repo fallback. |
-| **Vercel preview** (`VERCEL_ENV=preview`) | Fail closed unless a **platform-injected** preview secret is set: `NEXTAUTH_SECRET` or `MAPABLE_PREVIEW_AUTH_SECRET` in the Vercel **Preview** env group. |
-| **Local development / tests** | Dev-only fallback so `/api/auth/*` stays usable without Vercel env. Not used on deployed builds. |
-| **Other production hosts** | Fail closed unless `NEXTAUTH_SECRET` is configured. |
+| Environment                                     | Behavior                                                                                                                                                  |
+| ----------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Vercel production** (`VERCEL_ENV=production`) | Fail closed. `NEXTAUTH_SECRET` (min 16 chars) is required. No repo fallback.                                                                              |
+| **Vercel preview** (`VERCEL_ENV=preview`)       | Fail closed unless a **platform-injected** preview secret is set: `NEXTAUTH_SECRET` or `MAPABLE_PREVIEW_AUTH_SECRET` in the Vercel **Preview** env group. |
+| **Local development / tests**                   | Dev-only fallback so `/api/auth/*` stays usable without Vercel env. Not used on deployed builds.                                                          |
+| **Other production hosts**                      | Set `MAPABLE_ENFORCE_PRODUCTION_ENV=true` and `NEXTAUTH_SECRET` (≥16). Deploy gate does **not** accept `AUTH_SECRET` / `SESSION_SECRET` aliases.          |
+
+## Canonical secret contract (2026-07-20)
+
+| Variable                                           | Role                                                                                                                 |
+| -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `NEXTAUTH_SECRET`                                  | **Canonical** JWT/session signing secret for production deploy gate and preferred runtime secret                     |
+| `MAPABLE_PREVIEW_AUTH_SECRET`                      | Preview-only signing secret (Vercel Preview env group)                                                               |
+| `AUTH_SECRET` / `SESSION_SECRET`                   | Legacy **runtime signing aliases** in `resolveNextAuthSecret()` only — not accepted by `assertDeployedProductionEnv` |
+| Data encryption keys (`NDIS_ENCRYPTION_KEY`, etc.) | Dedicated keys only — never fall back to session secrets                                                             |
 
 ## Vercel setup
 

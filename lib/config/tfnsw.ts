@@ -18,10 +18,10 @@ export const tfnswConfig = {
     );
   },
   get liveTrafficEnabled() {
-    return process.env.TFNSW_LIVE_TRAFFIC_ENABLED !== "false";
+    return process.env.TFNSW_LIVE_TRAFFIC_ENABLED === "true";
   },
   get tripPlannerEnabled() {
-    return process.env.TFNSW_TRIP_PLANNER_ENABLED !== "false";
+    return process.env.TFNSW_TRIP_PLANNER_ENABLED === "true";
   },
   get cacheTtlSeconds() {
     return Number(process.env.TFNSW_CACHE_TTL_SECONDS ?? "120");

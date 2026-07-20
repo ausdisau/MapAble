@@ -1,3 +1,4 @@
+import { adaptWhatChanged } from "@/lib/adaptive-access";
 import { missionPortfolioConfig } from "@/lib/config/mission-portfolio";
 
 import type { SharedMissionProjection } from "./types";
@@ -45,4 +46,16 @@ export function diffMissionProjections(
     }
   }
   return changes;
+}
+
+/**
+ * Optional Adaptive Access presentation hint for What Changed.
+ * Diff content is unchanged — only presentation metadata when runtime flags are on.
+ */
+export function presentWhatChangedEntries(entries: WhatChangedEntry[]) {
+  const presentation = adaptWhatChanged({ profile: null });
+  return {
+    entries,
+    presentation,
+  };
 }

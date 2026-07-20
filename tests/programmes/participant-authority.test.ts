@@ -1,8 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { evaluateParticipantAuthority } from "@/lib/programmes/authority/participant-authority-service";
-import { programmeFoundationFixtures } from "@/tests/fixtures/programme-foundation";
-
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     participantAuthorityGrant: {
@@ -19,6 +16,8 @@ vi.mock("@/lib/programmes/audit", () => ({
 }));
 
 import { prisma } from "@/lib/prisma";
+import { evaluateParticipantAuthority } from "@/lib/programmes/authority/participant-authority-service";
+import { programmeFoundationFixtures } from "@/tests/fixtures/programme-foundation";
 
 describe("participant authority evaluation", () => {
   beforeEach(() => {
@@ -89,7 +88,8 @@ describe("participant authority evaluation", () => {
 
 describe("source registry fixtures", () => {
   it("warns on draft mock sources", async () => {
-    const { getFixtureProgrammeSourceAdapter } = await import("@/lib/programmes");
+    const { getFixtureProgrammeSourceAdapter } =
+      await import("@/lib/programmes");
     const adapter = getFixtureProgrammeSourceAdapter();
     const sources = await adapter.searchSources({ programmeId: "pathways" });
     expect(sources.length).toBeGreaterThan(0);

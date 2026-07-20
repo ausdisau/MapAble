@@ -1,6 +1,6 @@
-import { prisma } from "@/lib/prisma";
 import type { CaseLinkType } from "@prisma/client";
 
+import { prisma } from "@/lib/prisma";
 import {
   createCorrelationId,
   emitProgrammeAuditEvent,
@@ -32,8 +32,14 @@ function mapTaskToDependency(task: {
   };
 }
 
+/**
+ * Interim mission adapter — `CareOSMission` is **absent** on main (#252 closed unmerged).
+ * Bridges `Case` until a reviewed mission SoT lands. Replace via `MissionDependencyAdapter`.
+ * Programme code must not write speculative CareOSMission tables.
+ */
 export class CaseMissionAdapter implements MissionDependencyAdapter {
   readonly isMock = false;
+  readonly interimLabel = "Case_bridge_CareOSMission_absent" as const;
 
   async createMission(input: CreateMissionInput): Promise<MissionView> {
     const correlationId = input.correlationId ?? createCorrelationId();

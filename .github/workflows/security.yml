@@ -46,16 +46,8 @@ jobs:
       - name: Install
         run: pnpm install --frozen-lockfile
 
-      - name: Dependency audit
-        run: |
-          set +e
-          pnpm audit --audit-level=high
-          code=$?
-          set -e
-          if [ "$code" -ne 0 ]; then
-            echo "WARN: pnpm audit reported high+ issues (code $code). Failing on critical prod deps only."
-            pnpm audit --prod --audit-level=critical
-          fi
+      - name: Dependency audit (prod high+)
+        run: pnpm ci:prod-audit
 
       - name: Secret pattern scanning
         run: pnpm exec tsx scripts/ci/check-secret-patterns.ts

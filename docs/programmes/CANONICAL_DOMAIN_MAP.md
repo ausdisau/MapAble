@@ -1,109 +1,86 @@
-# Canonical domain map — MapAble programmes
+# Canonical domain map — MapAble programmes (reconciled)
 
-This document records canonical domain decisions for the twelve connected MapAble programmes. Use **accepted repository implementations** where they exist; do not create parallel systems.
+Authoritative source: **repository code on current `main`**, not closed PR descriptions.
+
+## Status vocabulary
+
+| Status            | Meaning                                                 |
+| ----------------- | ------------------------------------------------------- |
+| available on main | Model/service present and usable                        |
+| adapter-backed    | Absent or interim; programmes use a replaceable adapter |
+| open PR           | Proposed elsewhere; not a dependency                    |
+| closed/unmerged   | Must not be treated as landed                           |
+| deferred          | Intentionally out of Prompt 0                           |
+| blocked           | External/human gate                                     |
 
 ## Identity and tenancy
 
-| Concept                 | Canonical model                               | Location                                        | Notes                                                |
-| ----------------------- | --------------------------------------------- | ----------------------------------------------- | ---------------------------------------------------- |
-| Person identity         | `User`                                        | `prisma/schema.prisma`                          | Single auth identity                                 |
-| Tenancy                 | `Organisation` + `OrganisationMember`         | schema                                          | Care/transport org spine                             |
-| Roles                   | `UserRoleAssignment`, `MapAbleUserRole`       | schema + `lib/auth/permissions.ts`              | Multi-role table ready                               |
-| Participant profile     | `ParticipantProfile`                          | schema                                          | Demographics, NDIS refs                              |
-| Presentation prefs      | `AccessibilityProfile`                        | schema                                          | Stable cross-module UI/access prefs                  |
-| Functional requirements | `AccessPassport`                              | **Target:** PR #273 (`AiAccessPassport` rename) | Participant-selected functional needs; not diagnosis |
-| Delegation              | `ConsentRecord` + `ParticipantAuthorityGrant` | schema + this PR                                | Field/purpose/expiry-specific sharing                |
+| Concept                    | Canonical                             | Status                     | Notes                                                                   |
+| -------------------------- | ------------------------------------- | -------------------------- | ----------------------------------------------------------------------- |
+| Person identity            | `User`                                | available on main          | Single auth identity                                                    |
+| Tenancy                    | `Organisation` + `OrganisationMember` | available on main          | Server-derived tenant only                                              |
+| Participant profile        | `ParticipantProfile`                  | available on main          | Demographics                                                            |
+| Presentation prefs         | `AccessibilityProfile`                | available on main          | Operational UI/access prefs                                             |
+| Functional access passport | `AccessPassport`                      | **closed/unmerged** (#273) | **Adapter-backed** via Communication Passport over AccessibilityProfile |
+| Communication Passport     | TS projection                         | available on main          | `lib/communication-passport/` — not a second SoT                        |
+| Consent                    | `ConsentRecord`                       | available on main          | Extend via services; no parallel ledger                                 |
+| Scoped delegation          | `ParticipantAuthorityGrant`           | **this PR**                | Purpose/field/action/expiry grants                                      |
+| Audit                      | `AuditEvent`                          | available on main          | Programme correlation via metadata; no sensitive payloads               |
 
-### Duplicates — do not extend for new programmes
+### Duplicates — do not extend
 
-| Legacy                             | Canonical                   | Rule                                |
-| ---------------------------------- | --------------------------- | ----------------------------------- |
-| `Provider`, `ProviderProfile`      | `Organisation` + membership | Application services remain writers |
-| `AccessiblePlace`                  | `AccessPlace`               | New writes to `AccessPlace` only    |
-| `FhirConsentRecord`, micro-consent | `ConsentRecord`             | Extend scopes; don't fork           |
+| Legacy                                     | Canonical              | Rule                                                      |
+| ------------------------------------------ | ---------------------- | --------------------------------------------------------- |
+| `AccessiblePlace`                          | `AccessPlace`          | New programme writes → `AccessPlace` only                 |
+| `FhirConsentRecord` / micro-consent as SoT | `ConsentRecord`        | Micro-consent gates actions; ConsentRecord is sharing SoT |
+| Speculative `CareOSMission` tables         | Interim `Case` adapter | No DDL until reviewed mission SoT lands                   |
 
 ## Mission and coordination
 
-| Concept                    | Canonical (target)   | Interim on `main`                | Notes                                 |
-| -------------------------- | -------------------- | -------------------------------- | ------------------------------------- |
-| Mission / dependency graph | `CareOSMission`      | `Case` + `CaseLink`              | Bridge via `MissionDependencyAdapter` |
-| Mission events             | `CareOSMissionEvent` | `CaseNote`, `OrchestrationEvent` | Post-merge: single event stream       |
-| Cross-module orchestration | `OrchestrationEvent` | `lib/orchestration/`             | Idempotency keys preserved            |
+| Concept                  | Target          | Current                           | Status                                                                 |
+| ------------------------ | --------------- | --------------------------------- | ---------------------------------------------------------------------- |
+| Mission graph            | `CareOSMission` | **Absent** (#252 closed/unmerged) | **adapter-backed** — `CaseMissionAdapter` / `MissionDependencyAdapter` |
+| Starting Work projection | —               | `StartingWorkJourneyProjection`   | available on main — temporary; not CareOSMission                       |
+| Mission portfolio        | —               | `lib/mission-portfolio/`          | available on main — read-only projection                               |
 
-**Rule:** No new programme may create a parallel case-management system when mission models can be extended.
+**Rule:** Programme code must not write speculative mission tables. Replace the Case adapter through the interface when a mission SoT is accepted.
 
-## Consent and authority
+## Places
 
-| Concept              | Canonical                        | Service                                                     |
-| -------------------- | -------------------------------- | ----------------------------------------------------------- |
-| Sharing records      | `ConsentRecord`                  | `lib/consent/consent-service.ts`                            |
-| Micro-consent gates  | `MICRO_CONSENT_ACTIONS`          | `lib/consent/micro-consent-service.ts`                      |
-| Scoped delegation    | `ParticipantAuthorityGrant`      | `lib/programmes/authority/participant-authority-service.ts` |
-| Coordinator (legacy) | `SupportCoordinatorRelationship` | Link optional to `NavigatorAssignment`                      |
+| Concept               | Canonical         | Status                                   |
+| --------------------- | ----------------- | ---------------------------------------- |
+| Public place identity | `AccessPlace`     | available on main — `lib/access-map/`    |
+| Legacy place          | `AccessiblePlace` | available on main — **read/legacy only** |
 
-## Audit and events
+Why `AccessiblePlace` still exists: historical data and older routes. Paths that could dual-write must be inventoried in Access domain ownership; **programme services are forbidden from creating `AccessiblePlace`**.
 
-| Concept               | Canonical                         | Notes                                       |
-| --------------------- | --------------------------------- | ------------------------------------------- |
-| Audit trail           | `AuditEvent`                      | `lib/audit/audit-event-service.ts`          |
-| Programme correlation | `correlationId` in audit metadata | `lib/programmes/audit.ts`                   |
-| Outbox (target)       | PR #252                           | Not on `main`; don't duplicate              |
-| In-memory ledger      | `lib/ledger/`                     | Hash chain for copilot drafts only; not SoR |
+## Source registry ownership
 
-## Places and access intelligence
+| Concern                               | Owner                                      | Status                                   |
+| ------------------------------------- | ------------------------------------------ | ---------------------------------------- |
+| Programme evidence / guidance sources | `ProgrammeSourceRecord` (+ impact reviews) | **this PR**                              |
+| Regulatory versioning for assurance   | `RegulatorySourceVersion` (proposed #278)  | open PR / not mergeable — **deferred**   |
+| Bridge                                | `PlatformAssuranceSourceAdapter`           | adapter-backed, `productionReady: false` |
 
-| Concept               | Canonical                     | Extension                                          |
-| --------------------- | ----------------------------- | -------------------------------------------------- |
-| Public place identity | `AccessPlace`                 | `AccessPlaceSource` for provenance                 |
-| Living Access Twin    | `AccessPlace` + twin metadata | PR #273 `AiLivingTwinMeta`                         |
-| Route/fit evidence    | Access Intelligence engines   | AURA may explain; deterministic services authorise |
+Prefer one shared source/version spine later; do **not** copy #278’s model into programmes.
 
-## Care, transport, jobs, calendar
+## AI / AURA boundary (current main)
 
-Existing application-service writers — **reuse, don't duplicate:**
+| Layer                          | Status            | Role                                                   |
+| ------------------------------ | ----------------- | ------------------------------------------------------ |
+| `lib/aura/` Agent OS           | absent            | Not a dependency                                       |
+| AI-platform authority ceilings | available on main | `READ_ONLY_EXPLAIN` … `NO_OPERATIONAL_AUTHORITY`       |
+| Companion Stop AURA            | available on main | Device-local stop                                      |
+| Programme execution gate       | **this PR**       | Proposal-only models; stop + authority + tenant checks |
 
-- Care: `CareRequest`, `CareShift`, `CareBooking` — `lib/care/`
-- Transport: `TransportTripRequest`, `TransportTrip` — `lib/transport/`
-- Jobs: `Job`, `JobApplication` — existing jobs domain
-- Calendar: `CalendarEvent`
-- Billing: `BillingInvoice`, `Invoice`, NDIS claiming
-- Incidents: `IncidentReport` — safeguarding escalation
-- Complaints: `Complaint`, engagement submissions
-- Messaging: `Conversation`, `Message`
-- Provider verification: `ProviderVerificationCase`
+Programme adapters may read governed proposals. Models cannot publish, certify, approve, consent, refer, book, pay, or execute. Executable paths require participant authority and deterministic services. Stop state invalidates execution eligibility.
 
-## AI boundary (AURA)
+## Care, transport, billing, jobs
 
-| Layer                  | Role                                                        |
-| ---------------------- | ----------------------------------------------------------- |
-| AURA                   | Explain, simulate, propose (L3_PROPOSE ceiling on open PRs) |
-| Deterministic services | Authorise consequential outcomes                            |
-| Application services   | Execute writes                                              |
-| AI tools               | **Never** write directly to production records              |
+Reuse existing writers — do not fork:
 
-## Programme-specific foundations (this PR)
+- Care / Transport / Billing / Jobs / Calendar / Incidents / Complaints / Messaging
 
-| Foundation          | Models / services                                        |
-| ------------------- | -------------------------------------------------------- |
-| Source registry     | `ProgrammeSourceRecord`, `ProgrammeSourceImpactReview`   |
-| Human navigator     | `NavigatorProfile` … `NavigatorFeedback`                 |
-| Trust ledger        | `ServiceRelationshipRecord`, `TrustRelationshipSnapshot` |
-| Programme contracts | `lib/programmes/contracts/*`                             |
-| Feature flags       | `MAPABLE_*_ENABLED` — server-side only                   |
+## Programmes introduced here
 
-## Twelve programmes — domain extension points (not implemented in Prompt 0)
-
-Each programme extends shared foundations; see `DELIVERY_SEQUENCE.md`:
-
-1. Pathways — pathway programmes, referrals, navigator exchange
-2. Transition Home — discharge coordination, home readiness
-3. Kids — family authority, child participation
-4. Lifespan — scheme transitions, continuity
-5. Home — property access twin, tenancy
-6. AT Lifecycle — equipment passport, repair/loan
-7. Work Retention — employment mission, adjustments
-8. Carer Continuity — backup/respite, handover
-9. Regional Capacity — hub/spoke, mutual aid
-10. Rights Navigator — fee comparison, complaints
-11. Integration Foundry — partner certification
-12. Data Cooperative — contributor governance
+Source registry, participant authority grants, navigator foundation, trust relationship ledger — additive, flag-gated, default false.

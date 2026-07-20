@@ -1,4 +1,5 @@
 import { CoreHubCard } from "@/components/core/CoreHubCard";
+import { adaptParticipantDashboard } from "@/lib/adaptive-access";
 import { requireAuth } from "@/lib/auth/guards";
 import { roleLabel } from "@/lib/auth/roles";
 import { caseListWhereForUser } from "@/lib/cases/case-access";
@@ -56,8 +57,20 @@ export default async function DashboardPage() {
       : Promise.resolve(0),
   ]);
 
+  // Presentation adapter only — flags default off; does not alter dashboard meaning.
+  const presentation = adaptParticipantDashboard({ profile: null });
+  const densityClass =
+    presentation.applied &&
+    presentation.policy?.informationDensity === "low"
+      ? "max-w-2xl space-y-10"
+      : "space-y-8";
+
   return (
-    <div className="space-y-8">
+    <div
+      className={densityClass}
+      data-adapt-runtime={presentation.applied ? "on" : "off"}
+      data-adapt-variant={presentation.policy?.componentVariant ?? "default"}
+    >
       <header>
         <h1 className="font-heading text-3xl font-bold">Your control panel</h1>
         <p className="mt-2 max-w-2xl text-muted-foreground">

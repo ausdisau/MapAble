@@ -1,0 +1,4 @@
+{
+  "$schema_comment": "High/critical production audit exceptions. Each entry must include advisoryId, package, path, rationale, owner, compensatingControl, and expiry (ISO date). Expired entries fail CI.",
+  "exceptions": []
+}

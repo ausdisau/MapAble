@@ -1,5 +1,12 @@
 import type { NextConfig } from "next";
 
+import { assertDeployedProductionEnv } from "./lib/env/assert-deployed-production-env";
+import { getBaselineSecurityHeaders } from "./lib/security/headers";
+
+// Fail closed on real Vercel production builds when env is invalid.
+// Local/CI builds (no VERCEL_ENV=production) remain usable.
+assertDeployedProductionEnv(process.env);
+
 const nextConfig: NextConfig = {
   reactStrictMode: true, // Enables additional React checks in dev
   // Vercel default build machines are 8 GB; leave headroom so lint+tsc
@@ -7,9 +14,22 @@ const nextConfig: NextConfig = {
   experimental: {
     cpus: 1,
   },
-  // todo: check where this is applied and how it works
+  async redirects() {
+    return [
+      {
+        // Public employment module is canonical; keep /jobs as a compatibility alias.
+        source: "/jobs",
+        destination: "/employment",
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
+      {
+        source: "/:path*",
+        headers: getBaselineSecurityHeaders(),
+      },
       {
         source: "/data/:path*",
         headers: [

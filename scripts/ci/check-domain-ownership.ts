@@ -70,6 +70,7 @@ const CROSS_DOMAIN_ALLOWLIST = [
   "lib/mission-portfolio/",
   "lib/mission-copilot/",
   "lib/case-copilot/",
+  "lib/programmes/",
   "lib/payouts/",
   "lib/national-insights/",
   "lib/ndis/",

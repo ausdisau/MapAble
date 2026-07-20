@@ -1,11 +1,10 @@
 import { prisma } from "@/lib/prisma";
-
 import { emitProgrammeAuditEvent } from "@/lib/programmes/audit";
-import { assertDisclosureScope } from "@/lib/programmes/safety-invariants";
 import type {
   NavigatorProfileView,
   NavigatorSearchInput,
 } from "@/lib/programmes/contracts/human-navigator-adapter";
+import { assertDisclosureScope } from "@/lib/programmes/safety-invariants";
 
 export async function searchNavigatorProfiles(
   input: NavigatorSearchInput,

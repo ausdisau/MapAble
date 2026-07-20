@@ -62,6 +62,8 @@ export async function GET(req: Request) {
     participant: "Taylor (synthetic)",
     syntheticOnly: startingWorkPilotConfig.syntheticOnly,
     dbPersistence: startingWorkPilotConfig.dbPersistence,
+    productionClaim: startingWorkPilotConfig.productionClaimStatus,
+    isLiveBookingEngine: startingWorkPilotConfig.isLiveBookingEngine,
     loops: getStartingWorkLoopStatus(),
     page: "/pilot/starting-work",
     prohibitions: [
@@ -99,6 +101,8 @@ export async function POST(req: Request) {
       state,
       persisted,
       actorUserId: user.id,
+      productionClaim: startingWorkPilotConfig.productionClaimStatus,
+      isLiveBookingEngine: startingWorkPilotConfig.isLiveBookingEngine,
       notice:
         "Synthetic controlled-pilot simulation — not a live booking engine; projection is not CareOSMission",
     });

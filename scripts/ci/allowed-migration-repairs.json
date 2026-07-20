@@ -5,6 +5,51 @@
       "path": "prisma/migrations/20260521120000_mapable_core_phase_2/migration.sql",
       "reason": "Create ProviderResponseStatus before ALTER TABLE so migrate-from-zero does not fail (P3018/42704).",
       "pr": "cursor/remediation-repo-controls-5fc8"
+    },
+    {
+      "path": "prisma/migrations/20260525000000_mapable_access_phase_1/migration.sql",
+      "reason": "Close access_trust_events with ); and reduce dump to AccessPlace-domain DDL so migrate-from-zero does not fail (P3018/42601 then 42P07 User exists). Neon production checksum matched the pre-repair file; owner must update _prisma_migrations.checksum per docs/remediation/MIGRATE_FROM_ZERO_REPAIR.md.",
+      "pr": "cursor/migration-trust-repair-0a20"
+    },
+    {
+      "path": "prisma/migrations/20260525120000_mapable_care_mvp/migration.sql",
+      "reason": "Replace comment-only stub with Incident* enums and IncidentReport table required by transport_scheduling_routing FK on empty-DB migrate deploy.",
+      "pr": "cursor/migration-trust-repair-0a20"
+    },
+    {
+      "path": "prisma/migrations/20260521180000_mapable_core_phase_3/migration.sql",
+      "reason": "Replace comment-only stub with core domain bootstrap DDL (@@map table names, stub enrichment for WorkerProfile/Vehicle/DriverProfile, care_bookings/care_service_* pre-ALTER shapes) so empty-DB migrate deploy can satisfy later FK/ALTER dependencies.",
+      "pr": "cursor/migration-trust-repair-0a20"
+    },
+    {
+      "path": "prisma/migrations/20260611120000_integration_type_search/migration.sql",
+      "reason": "Create IntegrationType enum before ALTER TYPE ADD VALUE search; enum was historically introduced via db push without a CREATE TYPE migration.",
+      "pr": "cursor/migration-trust-repair-0a20"
+    },
+    {
+      "path": "prisma/migrations/20260626120000_payout_ledger/migration.sql",
+      "reason": "Use ADD VALUE IF NOT EXISTS for BillingAccountRole/BillingPaymentMethod/BillingPaymentSplitStatus labels already present when core_phase_3 bootstraps current schema enum shapes on empty DB.",
+      "pr": "cursor/migration-trust-repair-0a20"
+    },
+    {
+      "path": "prisma/migrations/20260527120000_transport_scheduling_routing/migration.sql",
+      "reason": "Use ADD VALUE IF NOT EXISTS so empty-DB deploy succeeds when bootstrap already contains labels.",
+      "pr": "cursor/migration-trust-repair-0a20"
+    },
+    {
+      "path": "prisma/migrations/20260603120000_y1_wedge/migration.sql",
+      "reason": "Use ADD VALUE IF NOT EXISTS so empty-DB deploy succeeds when bootstrap already contains labels.",
+      "pr": "cursor/migration-trust-repair-0a20"
+    },
+    {
+      "path": "prisma/migrations/20260604120000_engagement_platform/migration.sql",
+      "reason": "Use ADD VALUE IF NOT EXISTS so empty-DB deploy succeeds when bootstrap already contains labels.",
+      "pr": "cursor/migration-trust-repair-0a20"
+    },
+    {
+      "path": "prisma/migrations/20260717020000_billing_centre_foundations/migration.sql",
+      "reason": "Use ADD VALUE IF NOT EXISTS so empty-DB deploy succeeds when bootstrap already contains labels.",
+      "pr": "cursor/migration-trust-repair-0a20"
     }
   ]
 }

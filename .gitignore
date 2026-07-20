@@ -80,3 +80,12 @@ yarn.lock
 # Logs
 logs
 *.log
+
+# Playwright
+test-results/
+playwright-report/
+tests/a11y/.auth/
+
+# Local Replit import working tree (must not be a gitlink/submodule)
+/tmp/mapable-unified-replit/
+/tmp/mapable-unified-replit

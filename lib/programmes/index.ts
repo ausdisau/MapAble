@@ -71,6 +71,32 @@ export {
   getFixtureHumanNavigatorAdapter,
   FixtureHumanNavigatorAdapter,
 } from "@/lib/programmes/adapters/fixture-navigator-adapter";
+export {
+  getProgrammePlaceAdapter,
+  __setProgrammePlaceAdapterForTests,
+} from "@/lib/programmes/adapters/access-place-adapter";
+export type { ProgrammePlaceAdapter } from "@/lib/programmes/adapters/access-place-adapter";
+export {
+  getProgrammeAccessPassportAdapter,
+  __setProgrammeAccessPassportAdapterForTests,
+} from "@/lib/programmes/adapters/access-passport-adapter";
+export type {
+  ProgrammeAccessPassportAdapter,
+  ProgrammeAccessPassportView,
+} from "@/lib/programmes/adapters/access-passport-adapter";
+export { getPlatformAssuranceSourceAdapter } from "@/lib/programmes/adapters/platform-assurance-source-adapter";
+export {
+  PROGRAMME_AURA_CEILING,
+  assertProposalOnlyModelBoundary,
+  assertProgrammeExecutionEligibility,
+  assertCrossTenantDenied,
+  assertCrossParticipantDenied,
+  refuseDirectAuraWriter,
+  stopProgrammeAura,
+  isProgrammeAuraStopped,
+  __resetProgrammeAuraStopForTests,
+} from "@/lib/programmes/aura/execution-gate";
+export { sanitiseProgrammeAuditMetadata } from "@/lib/programmes/audit";
 
 export {
   applicationPreflightService,

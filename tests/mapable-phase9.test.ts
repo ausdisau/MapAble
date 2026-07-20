@@ -4,8 +4,8 @@ import { hasPermission } from "@/lib/auth/permissions";
 import { phase9Config } from "@/lib/config/phase9";
 
 describe("Phase 9 config", () => {
-  it("personal data vault on by default", () => {
-    expect(phase9Config.personalDataVaultEnabled).toBe(true);
+  it("personal data vault off by default (Wave 0 fail-closed)", () => {
+    expect(phase9Config.personalDataVaultEnabled).toBe(false);
   });
   it("research safe room off by default", () => {
     expect(phase9Config.researchSafeRoomEnabled).toBe(false);
@@ -13,8 +13,8 @@ describe("Phase 9 config", () => {
   it("partner API program off by default", () => {
     expect(phase9Config.publicApiPartnerProgramEnabled).toBe(false);
   });
-  it("public decision register on by default", () => {
-    expect(phase9Config.publicDecisionRegisterEnabled).toBe(true);
+  it("public decision register off by default (Wave 0 fail-closed)", () => {
+    expect(phase9Config.publicDecisionRegisterEnabled).toBe(false);
   });
 });
 
@@ -41,7 +41,7 @@ describe("public decisions", () => {
       const list = await listPublicDecisions();
       expect(Array.isArray(list)).toBe(true);
     } catch {
-      expect(phase9Config.publicDecisionRegisterEnabled).toBe(true);
+      expect(phase9Config.publicDecisionRegisterEnabled).toBe(false);
     }
   });
 });

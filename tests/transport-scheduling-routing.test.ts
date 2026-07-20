@@ -494,14 +494,21 @@ describe("audit and safety", () => {
     } as never);
     vi.mocked(prisma.transportTripEvent.create).mockResolvedValue({} as never);
 
-    const result = await reportTripSafetyIssue(driverUser, "trip-1", {
-      category: "vehicle_issue",
-      description: "Brake warning light on",
-      severity: "high",
-      escalateToIncident: true,
-    });
-    expect(result.safetyEvent.id).toBe("se-1");
-    expect(createIncident).toHaveBeenCalled();
+    const { phase4Config } = await import("@/lib/config/phase4");
+    const previousIncidentReporting = phase4Config.incidentReportingEnabled;
+    phase4Config.incidentReportingEnabled = true;
+    try {
+      const result = await reportTripSafetyIssue(driverUser, "trip-1", {
+        category: "vehicle_issue",
+        description: "Brake warning light on",
+        severity: "high",
+        escalateToIncident: true,
+      });
+      expect(result.safetyEvent.id).toBe("se-1");
+      expect(createIncident).toHaveBeenCalled();
+    } finally {
+      phase4Config.incidentReportingEnabled = previousIncidentReporting;
+    }
   });
 
   it("data access log on sensitive read", async () => {

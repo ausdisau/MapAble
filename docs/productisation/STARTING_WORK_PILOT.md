@@ -39,3 +39,9 @@ Stop if unsupervised, AI gains operational authority, mock marketed as live, sma
 ## Rollback
 
 Disable flags; no live NDIA or physical actuation was enabled. Projection rows remain for audit when persistence was used.
+
+## Honesty / claims
+
+- `productionClaimStatus: not_claimable`
+- Not a live booking engine; projection is not CareOSMission SoR
+- Closed draft **#317** failed CI on an obsolete stack; content consolidated via #327/#330 — see [PR_315_317_REPAIR.md](./PR_315_317_REPAIR.md)

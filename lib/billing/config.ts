@@ -70,7 +70,7 @@ export function isConnectPayoutsEnabled(): boolean {
 }
 
 export function isBillingCopilotEnabled(): boolean {
-  return process.env.BILLING_COPILOT_ENABLED !== "false";
+  return process.env.BILLING_COPILOT_ENABLED === "true";
 }
 
 export function describeIntegrationReadiness(): {

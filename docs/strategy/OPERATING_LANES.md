@@ -93,5 +93,6 @@ Regional Capacity; Developer Platform; evidence-to-payment tooling; public accou
 - [COMPETITIVE_POSITION.md](./COMPETITIVE_POSITION.md)
 - [BUILD_PARTNER_DEFER.md](./BUILD_PARTNER_DEFER.md)
 - [STRATEGIC_OPPORTUNITIES.md](./STRATEGIC_OPPORTUNITIES.md)
+- NDIS Expansion lanes application: [../programmes/NDIS_EXPANSION_MASTER_PLAN.md](../programmes/NDIS_EXPANSION_MASTER_PLAN.md)
 - Capability registry: `lib/convergence-os/seed/capabilities.ts`
 - Public claims: `docs/convergence-os/PUBLIC_CLAIM_REGISTRY.md`

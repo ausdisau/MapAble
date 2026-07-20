@@ -67,7 +67,7 @@ describe("adjustment privacy", () => {
 });
 
 describe("phase 3 config", () => {
-  it("orchestration enabled by default in dev", () => {
+  it("orchestration flag is boolean (Wave 0 fail-closed when unset)", () => {
     expect(typeof phase3Config.orchestrationEnabled).toBe("boolean");
   });
 });

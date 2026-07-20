@@ -1,6 +1,6 @@
-import { prisma } from "@/lib/prisma";
 import type { Prisma, ServiceRelationshipRole } from "@prisma/client";
 
+import { prisma } from "@/lib/prisma";
 import { emitProgrammeAuditEvent } from "@/lib/programmes/audit";
 
 export interface CreateServiceRelationshipInput {

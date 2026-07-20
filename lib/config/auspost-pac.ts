@@ -13,7 +13,7 @@ export const auspostPacConfig = {
     );
   },
   get enabled() {
-    return process.env.AUSPOST_PAC_ENABLED !== "false";
+    return process.env.AUSPOST_PAC_ENABLED === "true";
   },
   get cacheTtlSeconds() {
     return Number(process.env.AUSPOST_PAC_CACHE_TTL_SECONDS ?? "3600");
@@ -35,7 +35,7 @@ export function getAuspostPacDiagnostics() {
   const aliasKey = process.env.AUSPOST_API_KEY;
   const pacKeyTrimmed = pacKey?.trim() ?? "";
   const aliasKeyTrimmed = aliasKey?.trim() ?? "";
-  const pacEnabled = process.env.AUSPOST_PAC_ENABLED !== "false";
+  const pacEnabled = process.env.AUSPOST_PAC_ENABLED === "true";
 
   return {
     pacEnabled,
