@@ -1,8 +1,14 @@
 # Migrate-from-zero blocker
 
-**Status:** hard CI failure (truthful). Do not rewrite historical migrations without verified `_prisma_migrations` evidence from every persistent environment.
+**Status:** resolved on branch `cursor/migration-trust-repair-0a20` — empty-DB
+`prisma migrate deploy` applies all **57** migrations (PostgreSQL 16 verified).  
+See [MIGRATE_FROM_ZERO_REPAIR.md](./MIGRATE_FROM_ZERO_REPAIR.md) for checksums,
+allowlist, and production checksum update runbook.
 
-## Verified reproduction (disposable PostgreSQL)
+Do not rewrite additional historical migrations without allowlisting and
+environment evidence.
+
+## Original verified failure (pre-repair)
 
 Command: `pnpm exec prisma migrate deploy` on an empty database.
 
@@ -11,45 +17,32 @@ First failure:
 - Migration: `20260525000000_mapable_access_phase_1`
 - Prisma: `P3018`
 - Database: `ERROR: syntax error at or near "CREATE"` (SQLSTATE `42601`)
-- Character offset ≈ `127592` in `migration.sql`
 
-Root cause in repository file (not applied successfully on a fresh DB):
+Root cause in repository file:
 
 ```sql
 CONSTRAINT "access_trust_events_pkey" PRIMARY KEY ("id")
 CREATE INDEX "access_places_status_idx" ON "access_places"("status");
 ```
 
-The `CREATE TABLE "access_trust_events"` statement is missing the closing `);` before the next `CREATE INDEX`.
+The `CREATE TABLE "access_trust_events"` statement was missing the closing `);` before the next `CREATE INDEX`.
 
-## Why this PR does not rewrite the SQL
+## Neon evidence (2026-07-20)
 
-Hard stop: production/staging migration history and checksums were **not** available to this agent (no database credentials; Neon/Vercel account-owner access required). Editing an already-shipped migration folder changes the Prisma checksum and can break environments that recorded a different history (including `migrate resolve --applied` after a failed attempt).
+Production branch of Neon project `mapableau` recorded checksum
+`52ecc3b73328a905db0d35028d6e3f7f22ac7d8dbfc2445c171039f96b121f2d` for
+`20260525000000_mapable_access_phase_1` — identical to the broken file.
+`applied_steps_count` was `0` with `finished_at` set.
 
-## Additional blockers after the syntax fix
+## Repair summary (allowlisted)
 
-Even after closing `access_trust_events`, migrate-from-zero remains blocked by multiple **stub** migrations (comments-only / incomplete DDL) documented in `MIGRATION_INVENTORY.md` (Core phase folders, care MVP, case management, etc.). A full baseline/squash or verified forward-repair plan is required (Wave 1).
+1. Close `access_trust_events`; reduce `access_phase_1` to AccessPlace DDL only.
+2. Bootstrap `mapable_core_phase_3` and `mapable_care_mvp` stubs for empty-DB deps.
+3. Create `IntegrationType` before `ADD VALUE 'search'`.
+4. Use `ADD VALUE IF NOT EXISTS` where bootstrap / same-transaction enum rules require it.
 
-## Account-owner evidence required
-
-From each persistent environment (production, staging, any shared Neon branch used as truth):
-
-```sql
-SELECT migration_name, checksum, finished_at, rolled_back_at, applied_steps_count
-FROM "_prisma_migrations"
-ORDER BY finished_at;
-```
-
-Also provide whether production schema was historically created via `db push` rather than `migrate deploy`.
-
-## Safe reconciliation strategies (do not execute without evidence)
-
-| Environment          | Strategy                                                                                                                                 |
-| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| Completely fresh DB  | After verified repair/squash, `prisma migrate deploy` must succeed end-to-end; CI job `Migrate from zero` is the gate                    |
-| Existing deployed DB | Compare checksums; if broken file never applied, prefer a **new** forward migration or baseline squash — do not silently rewrite history |
-| Staging rehearsal    | Restore prod-like backup → apply proposed repair → run app smoke + migrate status                                                        |
-| Rollback / recovery  | Keep pre-change DB snapshot; use `migrate resolve` only with written runbook                                                             |
+Production still needs an **owner-run checksum update** (do not re-run SQL) and
+`ndis_direct_claiming` rename-drift reconciliation — see the repair runbook.
 
 ## CI policy
 

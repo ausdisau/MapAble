@@ -1,5 +1,5 @@
 -- AlterEnum
-ALTER TYPE "ConsentScope" ADD VALUE 'transport_trip_access';
+ALTER TYPE "ConsentScope" ADD VALUE IF NOT EXISTS 'transport_trip_access';
 
 -- CreateEnum
 CREATE TYPE "TransportTripStatus" AS ENUM ('requested', 'provider_review', 'accepted', 'dispatch_pending', 'driver_vehicle_assigned', 'driver_accepted', 'pre_start_check_required', 'en_route_to_pickup', 'arrived_at_pickup', 'participant_boarded', 'en_route_to_dropoff', 'arrived_at_dropoff', 'handover_completed', 'trip_completed', 'evidence_submitted', 'participant_review', 'closed', 'cancelled', 'declined', 'driver_no_show', 'participant_no_show', 'handover_failed', 'unsafe_to_continue', 'disputed', 'service_recovery_required');

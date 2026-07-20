@@ -39,13 +39,13 @@ CREATE TYPE "BillingReconciliationMatchStatus" AS ENUM ('suggested', 'confirmed'
 -- the enum.
 
 
-ALTER TYPE "BillingFundingSourceType" ADD VALUE 'ndis_agency_managed';
-ALTER TYPE "BillingFundingSourceType" ADD VALUE 'private_pay';
-ALTER TYPE "BillingFundingSourceType" ADD VALUE 'employer_funded';
-ALTER TYPE "BillingFundingSourceType" ADD VALUE 'insurance';
-ALTER TYPE "BillingFundingSourceType" ADD VALUE 'home_care_package';
-ALTER TYPE "BillingFundingSourceType" ADD VALUE 'grant_funded';
-ALTER TYPE "BillingFundingSourceType" ADD VALUE 'mixed';
+ALTER TYPE "BillingFundingSourceType" ADD VALUE IF NOT EXISTS 'ndis_agency_managed';
+ALTER TYPE "BillingFundingSourceType" ADD VALUE IF NOT EXISTS 'private_pay';
+ALTER TYPE "BillingFundingSourceType" ADD VALUE IF NOT EXISTS 'employer_funded';
+ALTER TYPE "BillingFundingSourceType" ADD VALUE IF NOT EXISTS 'insurance';
+ALTER TYPE "BillingFundingSourceType" ADD VALUE IF NOT EXISTS 'home_care_package';
+ALTER TYPE "BillingFundingSourceType" ADD VALUE IF NOT EXISTS 'grant_funded';
+ALTER TYPE "BillingFundingSourceType" ADD VALUE IF NOT EXISTS 'mixed';
 
 -- AlterEnum
 -- This migration adds more than one value to an enum.
@@ -55,9 +55,9 @@ ALTER TYPE "BillingFundingSourceType" ADD VALUE 'mixed';
 -- the enum.
 
 
-ALTER TYPE "BillingServiceType" ADD VALUE 'foods';
-ALTER TYPE "BillingServiceType" ADD VALUE 'moves';
-ALTER TYPE "BillingServiceType" ADD VALUE 'academy';
+ALTER TYPE "BillingServiceType" ADD VALUE IF NOT EXISTS 'foods';
+ALTER TYPE "BillingServiceType" ADD VALUE IF NOT EXISTS 'moves';
+ALTER TYPE "BillingServiceType" ADD VALUE IF NOT EXISTS 'academy';
 
 -- AlterEnum
 -- This migration adds more than one value to an enum.
@@ -67,20 +67,20 @@ ALTER TYPE "BillingServiceType" ADD VALUE 'academy';
 -- the enum.
 
 
-ALTER TYPE "BillingInvoiceStatus" ADD VALUE 'evidence_required';
-ALTER TYPE "BillingInvoiceStatus" ADD VALUE 'policy_review_required';
-ALTER TYPE "BillingInvoiceStatus" ADD VALUE 'participant_review';
-ALTER TYPE "BillingInvoiceStatus" ADD VALUE 'provider_review';
-ALTER TYPE "BillingInvoiceStatus" ADD VALUE 'approved';
-ALTER TYPE "BillingInvoiceStatus" ADD VALUE 'ready_to_issue';
-ALTER TYPE "BillingInvoiceStatus" ADD VALUE 'sent';
-ALTER TYPE "BillingInvoiceStatus" ADD VALUE 'partially_paid';
-ALTER TYPE "BillingInvoiceStatus" ADD VALUE 'overdue';
-ALTER TYPE "BillingInvoiceStatus" ADD VALUE 'disputed';
-ALTER TYPE "BillingInvoiceStatus" ADD VALUE 'on_hold';
-ALTER TYPE "BillingInvoiceStatus" ADD VALUE 'credited';
-ALTER TYPE "BillingInvoiceStatus" ADD VALUE 'void';
-ALTER TYPE "BillingInvoiceStatus" ADD VALUE 'written_off';
+ALTER TYPE "BillingInvoiceStatus" ADD VALUE IF NOT EXISTS 'evidence_required';
+ALTER TYPE "BillingInvoiceStatus" ADD VALUE IF NOT EXISTS 'policy_review_required';
+ALTER TYPE "BillingInvoiceStatus" ADD VALUE IF NOT EXISTS 'participant_review';
+ALTER TYPE "BillingInvoiceStatus" ADD VALUE IF NOT EXISTS 'provider_review';
+ALTER TYPE "BillingInvoiceStatus" ADD VALUE IF NOT EXISTS 'approved';
+ALTER TYPE "BillingInvoiceStatus" ADD VALUE IF NOT EXISTS 'ready_to_issue';
+ALTER TYPE "BillingInvoiceStatus" ADD VALUE IF NOT EXISTS 'sent';
+ALTER TYPE "BillingInvoiceStatus" ADD VALUE IF NOT EXISTS 'partially_paid';
+ALTER TYPE "BillingInvoiceStatus" ADD VALUE IF NOT EXISTS 'overdue';
+ALTER TYPE "BillingInvoiceStatus" ADD VALUE IF NOT EXISTS 'disputed';
+ALTER TYPE "BillingInvoiceStatus" ADD VALUE IF NOT EXISTS 'on_hold';
+ALTER TYPE "BillingInvoiceStatus" ADD VALUE IF NOT EXISTS 'credited';
+ALTER TYPE "BillingInvoiceStatus" ADD VALUE IF NOT EXISTS 'void';
+ALTER TYPE "BillingInvoiceStatus" ADD VALUE IF NOT EXISTS 'written_off';
 
 -- AlterTable
 ALTER TABLE "BillingInvoice" ADD COLUMN     "amountPaidCents" INTEGER NOT NULL DEFAULT 0,

@@ -7,7 +7,7 @@ CREATE TYPE "IncidentIntakePath" AS ENUM ('concern', 'incident', 'safeguarding')
 CREATE TYPE "BackupShiftRecoveryStatus" AS ENUM ('detected', 'proposing', 'awaiting_participant', 'assigned', 'failed', 'escalated');
 
 -- AlterEnum
-ALTER TYPE "ConsentScope" ADD VALUE 'support_profile_read';
+ALTER TYPE "ConsentScope" ADD VALUE IF NOT EXISTS 'support_profile_read';
 
 -- CreateTable
 CREATE TABLE "support_profiles" (
