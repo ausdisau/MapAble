@@ -86,18 +86,17 @@ Timestamps must be unique. PR 1 renames the NDIS claiming migration folder to re
 - `scripts/ci/check-migration-order.ts` — monotonic unique timestamps
 - `scripts/ci/check-migration-integrity.ts` — no duplicates; rejects production runbook `db push`; detects edited historical migrations via git history when `BASE_SHA` set
 
-## Stub migrations blocking migrate-from-zero
+## Stub migrations and migrate-from-zero
 
-Several MapAble Core phase folders are **documentation stubs** (comments only, or minimal DDL) that historically assumed `prisma db push`. Status: `verified`.
+Several MapAble Core phase folders were historically **documentation stubs** (comments only) that assumed `prisma db push`. On `cursor/migration-trust-repair-0a20`, empty-DB `migrate deploy` is **green** (57/57) after allowlisted repairs to `mapable_core_phase_3`, `mapable_care_mvp`, `mapable_access_phase_1`, and related enum `ADD VALUE` migrations — see `MIGRATE_FROM_ZERO_REPAIR.md`.
 
-Examples: `mapable_core_phase_3`–`5`, `mapable_care_mvp`, `mapable_core_phase_6`–`10`, `mapable_core_phase_12`, `case_management`.
+Remaining comment-only stubs (e.g. `mapable_core_phase_4`–`5`, `6`–`10`, `12`, `case_management`) no longer block empty-DB deploy because later migrations / bootstrap DDL cover required objects.
 
 **CI policy (updated 2026-07-20):**
 
 - Required **Migrations** job: order + integrity + ephemeral schema coherence via CI-only `db push`
 - **Migrate from zero** job: hard-fails on `prisma migrate deploy` from empty DB (no `continue-on-error`, no masked `exit 0`)
-- First failing migration: `20260525000000_mapable_access_phase_1` (missing `);` before `CREATE INDEX`) — see `MIGRATE_FROM_ZERO_BLOCKER.md`
-- SQL rewrite deferred until account-owner provides `_prisma_migrations` evidence
+- Neon production evidence fetched 2026-07-20; owner checksum update runbook required (do not re-run repaired SQL on prod)
 - Production remains `prisma migrate deploy` only — never `db push`
 
 ## Approved historical repairs
