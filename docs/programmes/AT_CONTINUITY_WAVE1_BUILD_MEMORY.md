@@ -27,11 +27,13 @@ This is **not** caused by public AT Continuity routes (Wave 1 adds none) and is
 
 ## Mitigation applied
 
-Set `experimental.staticGenerationMaxConcurrency: 1` in `next.config.ts` (with
-existing `cpus: 1`) to bound SSG worker fan-out.
+1. `experimental.staticGenerationMaxConcurrency: 1` and
+   `staticGenerationMinPagesPerWorker: 50` in `next.config.ts` (with `cpus: 1`)
+2. Bounded heap **7168** MB for `pnpm build` / Accessibility workflow (single
+   documented ceiling short of a larger runner)
 
-Heap remains **6144** MB — do not ratchet upward without a larger runner
-(`OWNER_ACTION_REQUIRED` if still insufficient).
+Do **not** raise heap further on standard GitHub-hosted runners without moving to
+a larger runner (`OWNER_ACTION_REQUIRED`).
 
 ## Follow-up performance issue (human)
 

@@ -30,7 +30,9 @@ jobs:
           --health-timeout 5s
           --health-retries 5
     env:
-      NODE_OPTIONS: --max-old-space-size=6144
+      # Bounded heap for post-compile SSG on ~7GB runners (see AT_CONTINUITY_WAVE1_BUILD_MEMORY.md).
+      # Do not raise further without a larger runner (OWNER_ACTION_REQUIRED).
+      NODE_OPTIONS: --max-old-space-size=7168
       NEXTAUTH_SECRET: ci-nextauth-secret-not-for-production-use-32chars
       NEXTAUTH_URL: http://127.0.0.1:3000
       NEXT_PUBLIC_APP_URL: http://127.0.0.1:3000

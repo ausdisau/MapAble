@@ -16,6 +16,7 @@ const nextConfig: NextConfig = {
   experimental: {
     cpus: 1,
     staticGenerationMaxConcurrency: 1,
+    staticGenerationMinPagesPerWorker: 50,
   },
   async redirects() {
     return [

@@ -17,7 +17,8 @@ import type {
 
 /**
  * Flag-gated AT Continuity writers.
- * Reuses ConsentRecord / AuditEvent; does not create clinical suitability SoT.
+ * Callers must honour consent/authority; writers emit AuditEvent only.
+ * Does not create clinical suitability SoT or mutate consent aggregates.
  */
 export async function registerEquipmentAsset(
   input: AtEquipmentAssetInput,
