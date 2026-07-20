@@ -46,6 +46,11 @@ function main(): void {
     "docs/remediation/FEATURE_FREEZE.md",
     "docs/remediation/CAPABILITY_INVENTORY.md",
     "docs/remediation/DOMAIN_OWNERSHIP.md",
+    "docs/programmes/NDIS_EXPANSION_MASTER_PLAN.md",
+    "docs/programmes/NDIS_EXPANSION_DOMAIN_MAP.md",
+    "docs/programmes/NDIS_EXPANSION_PR_RECONCILIATION.md",
+    "docs/programmes/NDIS_REGULATORY_GATE_MATRIX.md",
+    "docs/programmes/NDIS_EXPANSION_DELIVERY_SEQUENCE.md",
   ]) {
     if (!fs.existsSync(path.join(ROOT, rel))) {
       errors.push(`${rel} missing`);
@@ -59,6 +64,21 @@ function main(): void {
   }
   if (/BILLING_CLAIMS_GATEWAY\s*=\s*live/i.test(envExample)) {
     errors.push(".env.example sets BILLING_CLAIMS_GATEWAY=live");
+  }
+
+  // 5) NDIS Expansion hard-off flags must default false (or be absent = off)
+  for (const flag of [
+    "MAPABLE_NDIA_CLAIM_SUBMISSION_ENABLED",
+    "MAPABLE_AUTOMATED_PAYMENT_APPROVAL_ENABLED",
+    "MAPABLE_AT_CONTINUITY_ENABLED",
+    "MAPABLE_PBS_OPERATIONS_ENABLED",
+    "MAPABLE_PBS_AI_DRAFTING_ENABLED",
+    "MAPABLE_RESTRICTIVE_PRACTICE_REGISTER_ENABLED",
+  ]) {
+    const enabled = new RegExp(`${flag}\\s*=\\s*true`, "i").test(envExample);
+    if (enabled) {
+      errors.push(`.env.example enables ${flag}=true (must default false)`);
+    }
   }
 
   if (errors.length > 0) {

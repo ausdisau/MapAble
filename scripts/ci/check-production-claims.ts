@@ -15,6 +15,7 @@ const SCAN_DIRS = [
   "docs/remediation",
   "docs/strategy",
   "docs/productisation",
+  "docs/programmes",
   "README.md",
 ];
 
@@ -121,6 +122,8 @@ function main(): void {
     "docs/strategy/BUILD_PARTNER_DEFER.md",
     "docs/strategy/STRATEGIC_OPPORTUNITIES.md",
     "docs/productisation/CAPABILITY_REGISTRY.md",
+    "docs/programmes/NDIS_EXPANSION_MASTER_PLAN.md",
+    "docs/programmes/NDIS_REGULATORY_GATE_MATRIX.md",
   ];
   for (const rel of strategyRequired) {
     if (!fs.existsSync(path.join(ROOT, rel))) {

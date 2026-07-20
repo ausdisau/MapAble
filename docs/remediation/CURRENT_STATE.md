@@ -1,8 +1,9 @@
 # Remediation — Current State
 
-**Last verified:** 2026-07-20 (service-launch remediation pass on PR #378)
-**Base `origin/main`:** `b18fbf63d62624cb31d933198c5ec8eb9ea4593d`
-**Active draft PR:** #378 @ branch `cursor/wave0-stabilisation-repair-2794`
+**Last verified:** 2026-07-20 (post-#378 tip + NDIS Expansion Wave 0 docs)
+**Base `origin/main` tip:** `8f64dc3845288dc42beefb35cdea95b9ca28dba5` (Merge PR #378)
+**NDIS Expansion Wave 0:** documentation/registry reconciliation on
+`cursor/ndis-expansion-wave0-0a20` — **no product migrations**
 **Finding status values:** `verified` | `likely` | `needs_runtime_verification` | `not_present` | `already_remediated`
 
 This document records live repository and production-edge inspection. CI green is **not** a production-ready claim.
@@ -25,14 +26,15 @@ This document records live repository and production-edge inspection. CI green i
 | Item                                   | Status                                                                                              |
 | -------------------------------------- | --------------------------------------------------------------------------------------------------- |
 | PR #377 Wave 0                         | MERGED (was merged with red Format CI historically)                                                 |
-| PR #378 repair + launch remediation    | OPEN draft — continues on same branch                                                               |
-| Canonical origin code                  | Apex-only validators + safe JSON-LD serializer (this PR)                                            |
+| PR #378 repair + launch remediation    | **MERGED** into `main` @ `8f64dc38`                                                                 |
+| Canonical origin code                  | Apex-only validators + safe JSON-LD serializer (landed via #378)                                    |
 | Deploy-path env gate                   | `next.config.ts` + `instrumentation.ts`                                                             |
 | Prod audit allowlist                   | Exact/descendant path match only                                                                    |
 | Migrate-from-zero                      | Hard-fail CI; P3018 at `20260525000000_mapable_access_phase_1` — see `MIGRATE_FROM_ZERO_BLOCKER.md` |
-| Authenticated a11y                     | Seeded pilot users + Playwright storage-state (this PR); was skipped with `A11Y_SKIP_AUTH_ROUTES=1` |
+| Authenticated a11y                     | Seeded pilot users + Playwright storage-state (landed via #378)                                     |
 | CSP enforce                            | Builder exists; **not wired** — `CSP_ENFORCEMENT.md`                                                |
 | Capabilities marked `production_ready` | **not_present** (must remain unset)                                                                 |
+| NDIS Expansion product waves           | **blocked** until migrate-from-zero green + freeze lift — see `docs/programmes/NDIS_EXPANSION_*`    |
 
 ## Architectural invariants (unchanged)
 
