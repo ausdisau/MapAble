@@ -185,6 +185,28 @@ export function advisoryIds(adv: AuditAdvisory): string[] {
   return [...new Set(ids.map((id) => id.toUpperCase()))];
 }
 
+/**
+ * Normalize a pnpm dependency path for exact/descendant matching.
+ * Collapses whitespace and trims; does not rewrite package identity segments.
+ */
+export function normalizeDependencyPath(path: string): string {
+  return path.trim().replace(/\s+/g, "");
+}
+
+/**
+ * True when `findingPath` is exactly `exceptionPath` or a formal descendant
+ * (`exceptionPath>...`). Substring matches are intentionally rejected.
+ */
+export function dependencyPathMatchesException(
+  findingPath: string,
+  exceptionPath: string,
+): boolean {
+  const p = normalizeDependencyPath(findingPath);
+  const ex = normalizeDependencyPath(exceptionPath);
+  if (!p || !ex) return false;
+  return p === ex || p.startsWith(`${ex}>`);
+}
+
 export function evaluateProductionAudit(input: {
   advisories: AuditAdvisory[];
   allowlist: AllowlistFile;
@@ -228,15 +250,13 @@ export function evaluateProductionAudit(input: {
       adv.findings?.flatMap((f) => f.paths ?? []) ?? ([] as string[]);
     const matched = activeExceptions.some((ex) => {
       const exId = ex.advisoryId.toUpperCase();
-      if (!ids.includes(exId) && !ids.includes(String(adv.id ?? ""))) {
+      if (!ids.includes(exId)) {
         return false;
       }
       if (ex.package !== pkg) return false;
-      if (paths.length === 0) return true;
-      return paths.some(
-        (p) =>
-          p === ex.path || p.startsWith(`${ex.path}>`) || p.includes(ex.path),
-      );
+      // Findings without paths cannot be precisely allowlisted — fail closed.
+      if (paths.length === 0) return false;
+      return paths.some((p) => dependencyPathMatchesException(p, ex.path));
     });
     if (!matched) {
       unresolved.push(

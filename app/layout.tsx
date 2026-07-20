@@ -13,7 +13,10 @@ import {
 import { Providers } from "@/components/providers";
 import { MAPABLE_LOGO_MARK_SRC } from "@/lib/brand/constants";
 import { getCanonicalPublicOrigin } from "@/lib/config/canonical-url";
-import { buildPublicJsonLd } from "@/lib/config/json-ld";
+import {
+  buildPublicJsonLd,
+  serializeJsonLdForScript,
+} from "@/lib/config/json-ld";
 
 const canonicalOrigin = getCanonicalPublicOrigin();
 const publicJsonLd = buildPublicJsonLd();
@@ -88,14 +91,14 @@ export default function RootLayout({
           type="application/ld+json"
           suppressHydrationWarning
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify(publicJsonLd.organization),
+            __html: serializeJsonLdForScript(publicJsonLd.organization),
           }}
         />
         <script
           type="application/ld+json"
           suppressHydrationWarning
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify(publicJsonLd.website),
+            __html: serializeJsonLdForScript(publicJsonLd.website),
           }}
         />
         <Providers>{children}</Providers>

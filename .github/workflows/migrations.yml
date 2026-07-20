@@ -79,11 +79,12 @@ jobs:
             exit 1
           fi
 
-  migrate-from-zero-report:
-    name: Migrate from zero (report)
+  migrate-from-zero:
+    name: Migrate from zero
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    continue-on-error: true
+    # Truthful hard gate: a green check must not hide P3018 / stub failures.
+    # Remains red until Wave 1 baseline repair with verified migration history.
     services:
       postgres:
         image: postgres:16
@@ -111,18 +112,10 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - name: Attempt migrate deploy from zero
+      - name: Migrate deploy from zero (must succeed)
         id: migrate
         run: |
-          set +e
           pnpm exec prisma migrate deploy 2>&1 | tee /tmp/migrate-from-zero.log
-          code=${PIPESTATUS[0]}
-          set -e
-          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
-          if [ "$code" -ne 0 ]; then
-            echo "::warning::migrate deploy from zero failed — see stub inventory in docs/remediation/MIGRATION_INVENTORY.md"
-          fi
-          exit 0
       - uses: actions/upload-artifact@v4
         if: always()
         with:

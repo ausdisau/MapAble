@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  buildContentSecurityPolicyEnforce,
   buildContentSecurityPolicyReportOnly,
   getBaselineSecurityHeaders,
 } from "@/lib/security/headers";
@@ -15,6 +16,7 @@ describe("baseline security headers", () => {
     expect(map["Permissions-Policy"]).toMatch(/camera=\(\)/);
     expect(map["X-Frame-Options"]).toBe("DENY");
     expect(map["Content-Security-Policy-Report-Only"]).toBeTruthy();
+    expect(map["Content-Security-Policy"]).toBeUndefined();
     expect(map["Strict-Transport-Security"]).toBeUndefined();
   });
 
@@ -23,7 +25,15 @@ describe("baseline security headers", () => {
     expect(csp).toContain("default-src 'self'");
     expect(csp).toContain("frame-ancestors 'none'");
     expect(csp).toContain("object-src 'none'");
+    expect(csp).toContain("'unsafe-eval'");
     expect(csp).not.toMatch(/script-src[^;]*\*/);
     expect(csp).not.toContain("script-src *");
+  });
+
+  it("enforce builder removes unsafe-eval when nonce is supplied", () => {
+    const csp = buildContentSecurityPolicyEnforce("test-nonce-value");
+    expect(csp).toContain("'nonce-test-nonce-value'");
+    expect(csp).not.toContain("'unsafe-eval'");
+    expect(() => buildContentSecurityPolicyEnforce("")).toThrow(/nonce/i);
   });
 });

@@ -2,7 +2,12 @@
 
 This document is the required configuration for GitHub branch protection on `main`. Apply these settings in the repository’s GitHub settings (Settings → Branches → Branch protection rules). CI cannot enforce protection settings itself; this file is the operational checklist.
 
-**FindingStatus:** required checks listed below are `verified` as workflow files; whether they are enabled on the GitHub branch rule is `needs_runtime_verification` until an admin confirms.
+**FindingStatus (API read 2026-07-20):**
+
+- `GET /repos/ausdisau/mapableau-new/rulesets` → `[]` (no rulesets visible to the integration token)
+- `GET /repos/.../branches/main/protection` → **403** Resource not accessible by integration
+
+Effective branch protection **cannot be claimed configured** from automation. Account owner must verify in GitHub Settings → Rules / Branches.
 
 **Repository ownership (Wave 0):** the repository is owned by personal GitHub user `ausdisau`, not an organisation. Specialist `@ausdisau/team-*` teams cannot exist until the repository is moved under a GitHub Organisation.
 
@@ -23,7 +28,8 @@ Configure these check names to match the workflow job names exactly:
 | Check             | Workflow                                  | Purpose                                                                               |
 | ----------------- | ----------------------------------------- | ------------------------------------------------------------------------------------- |
 | CI                | `.github/workflows/ci.yml`                | Install, Prisma, type-check, format, lint, test, build, ownership/migration collision |
-| Migrations        | `.github/workflows/migrations.yml`        | Ephemeral Postgres migrate-from-zero + integrity                                      |
+| Migrations        | `.github/workflows/migrations.yml`        | Ephemeral schema coherence + integrity                                                |
+| Migrate from zero | `.github/workflows/migrations.yml`        | Hard-fail `prisma migrate deploy` on empty DB (currently red until Wave 1 baseline)   |
 | Security          | `.github/workflows/security.yml`          | Semgrep + prod audit gate + secret/fallback/route checks                              |
 | Accessibility     | `.github/workflows/accessibility.yml`     | Playwright + axe smoke                                                                |
 | Production claims | `.github/workflows/production-claims.yml` | Public claim / db push / certification language gates                                 |

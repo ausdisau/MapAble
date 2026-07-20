@@ -92,10 +92,12 @@ Several MapAble Core phase folders are **documentation stubs** (comments only, o
 
 Examples: `mapable_core_phase_3`–`5`, `mapable_care_mvp`, `mapable_core_phase_6`–`10`, `mapable_core_phase_12`, `case_management`.
 
-**CI policy (PR 1):**
+**CI policy (updated 2026-07-20):**
 
 - Required **Migrations** job: order + integrity + ephemeral schema coherence via CI-only `db push`
-- **Migrate from zero (report)** job: attempts `migrate deploy`, uploads logs, `continue-on-error` until a baseline/squash PR replaces stubs
+- **Migrate from zero** job: hard-fails on `prisma migrate deploy` from empty DB (no `continue-on-error`, no masked `exit 0`)
+- First failing migration: `20260525000000_mapable_access_phase_1` (missing `);` before `CREATE INDEX`) — see `MIGRATE_FROM_ZERO_BLOCKER.md`
+- SQL rewrite deferred until account-owner provides `_prisma_migrations` evidence
 - Production remains `prisma migrate deploy` only — never `db push`
 
 ## Approved historical repairs

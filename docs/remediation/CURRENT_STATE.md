@@ -1,102 +1,64 @@
-# Remediation Phase 0 — Current State
+# Remediation — Current State
 
-**Inspected at:** 2026-07-17  
-**Base branch:** `main`  
-**Base SHA:** `5c6679831d6c467d6edec4e64a98c60b98e8a761`  
+**Last verified:** 2026-07-20 (service-launch remediation pass on PR #378)
+**Base `origin/main`:** `b18fbf63d62624cb31d933198c5ec8eb9ea4593d`
+**Active draft PR:** #378 @ branch `cursor/wave0-stabilisation-repair-2794`
 **Finding status values:** `verified` | `likely` | `needs_runtime_verification` | `not_present` | `already_remediated`
 
-This document records repository inspection before remediation edits. A file or model existing is **not** proof that a capability works in production.
+This document records live repository and production-edge inspection. CI green is **not** a production-ready claim.
 
-## Repository identity
+## Live production edge (curl, 2026-07-20)
 
-| Finding                                             | Status      | Evidence                                                     |
-| --------------------------------------------------- | ----------- | ------------------------------------------------------------ |
-| Next.js App Router + React + TypeScript application | verified    | `package.json` (`next@15.5.7`, `react@^18`), `app/` tree     |
-| Prisma + PostgreSQL data layer                      | verified    | `prisma/schema.prisma`, `DATABASE_URL` in `.env.example`     |
-| Package manager pnpm with lockfile                  | verified    | `packageManager: pnpm@10.12.1`, `pnpm-lock.yaml`             |
-| Clean working tree on inspection                    | verified    | `git status` empty at base SHA                               |
-| Replacement app / second platform present           | not_present | Single Next.js app + `apps/realtime-server` workspace member |
+| Check                                                  | Result                                                                                                       | Status                                                                  |
+| ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------- |
+| Apex `https://mapable.com.au/`                         | HTTP 200                                                                                                     | verified                                                                |
+| `https://www.mapable.com.au/`                          | HTTP 307 → `https://mapable.com.au/`                                                                         | verified (TLS/redirect working at scan time; still account-owner owned) |
+| `/jobs`                                                | HTTP 308 → `/employment`                                                                                     | verified                                                                |
+| `/robots.txt` / `/sitemap.xml`                         | 200; sitemap locs use apex                                                                                   | verified                                                                |
+| HTML JSON-LD on apex                                   | Still contains `http://localhost:3000` and `sameAs` www — **production has not deployed PR #378 repair yet** | verified                                                                |
+| CSP                                                    | Report-Only; includes `unsafe-eval`                                                                          | verified                                                                |
+| `/api/health`, `/api/health/live`, `/api/health/ready` | 404 on production (probes land with this PR)                                                                 | verified                                                                |
+| Branch protection via API                              | rulesets `[]`; protection endpoint 403                                                                       | needs_runtime_verification (account-owner)                              |
 
-## Tooling and quality gates
+## Wave 0 / repair programme status
 
-| Finding                                                        | Status             | Evidence                                               |
-| -------------------------------------------------------------- | ------------------ | ------------------------------------------------------ |
-| Scripts: `type-check`, `lint`, `test`, `format:check`, `build` | verified           | `package.json` scripts                                 |
-| ESLint ignored during `next build`                             | already_remediated | PR 1 removed `ignoreDuringBuilds`                      |
-| Full-repo `eslint .` can OOM                                   | verified           | Mitigated by scoped `pnpm lint` + heap limit (PR 1)    |
-| Full-repo Prettier red (~1477 files)                           | verified           | CI uses scoped `format:check`; `format:check:all` debt |
-| `tests/` not in default lint gate                              | verified           | `pnpm lint:tests` follow-up                            |
-| TypeScript build errors fail the build                         | verified           | `typescript.ignoreBuildErrors: false`                  |
-| GitHub Actions CI for lint/test/build                          | not_present        | Only `.github/workflows/semgrep.yml` and Replit sync   |
-| CODEOWNERS                                                     | not_present        | No root or `.github/CODEOWNERS` at inspection          |
-| Playwright / axe browser accessibility suite                   | not_present        | No playwright config; no `@axe-core` dependency        |
-| Husky prepush runs type-check, format, lint                    | verified           | `prepush` script                                       |
+| Item                                   | Status                                                                                              |
+| -------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| PR #377 Wave 0                         | MERGED (was merged with red Format CI historically)                                                 |
+| PR #378 repair + launch remediation    | OPEN draft — continues on same branch                                                               |
+| Canonical origin code                  | Apex-only validators + safe JSON-LD serializer (this PR)                                            |
+| Deploy-path env gate                   | `next.config.ts` + `instrumentation.ts`                                                             |
+| Prod audit allowlist                   | Exact/descendant path match only                                                                    |
+| Migrate-from-zero                      | Hard-fail CI; P3018 at `20260525000000_mapable_access_phase_1` — see `MIGRATE_FROM_ZERO_BLOCKER.md` |
+| Authenticated a11y                     | Seeded pilot users + Playwright storage-state (this PR); was skipped with `A11Y_SKIP_AUTH_ROUTES=1` |
+| CSP enforce                            | Builder exists; **not wired** — `CSP_ENFORCEMENT.md`                                                |
+| Capabilities marked `production_ready` | **not_present** (must remain unset)                                                                 |
 
-## Configuration and secrets
+## Architectural invariants (unchanged)
 
-| Finding                                                            | Status      | Evidence                                                        |
-| ------------------------------------------------------------------ | ----------- | --------------------------------------------------------------- |
-| `.env.example` documents core secrets and feature gates            | verified    | Auth, Stripe, Xero, NDIS, mock providers                        |
-| NDIS encryption falls back to `NEXTAUTH_SECRET` then static string | verified    | `lib/crypto/ndis.ts`                                            |
-| Transport routing provider defaults to `mock`                      | verified    | `.env.example`, `lib/config/transport-routing.ts`               |
-| Many phase12 flags default enabled (`!== "false"`)                 | verified    | `lib/config/phase12.ts`                                         |
-| Typed production capability registry API                           | not_present | Transport local matrix only (`lib/transport/feature-status.ts`) |
-| Production fail-closed validation for encryption key               | not_present | `lib/env.ts` does not require `NDIS_ENCRYPTION_KEY`             |
+- AccessPlace — canonical public place identity
+- AccessibilityProfile — canonical preference record
+- ConsentRecord — foundational consent system
+- AuditEvent — canonical consequential-action audit
+- Care, Transport, Calendar, Jobs, billing entities remain canonical
+- AI may interpret/retrieve/explain/summarise/propose only
+- Paid features must not influence confidence, safety, moderation, accreditation, or personal-fit
+- Essential workflows remain available without AI/chat-only interaction
 
-## Data model and migrations
+## Git metadata
 
-| Finding                                                                 | Status   | Evidence                                                            |
-| ----------------------------------------------------------------------- | -------- | ------------------------------------------------------------------- |
-| Single large Prisma schema (~482 models)                                | verified | `prisma/schema.prisma`                                              |
-| 48 migration directories                                                | verified | `prisma/migrations/**`                                              |
-| Duplicate migration timestamp `20260525000000`                          | verified | `mapable_access_phase_1` and `ndis_direct_claiming`                 |
-| Historical migrations contain `db push` developer comments              | verified | Multiple phase migration SQL headers                                |
-| Parallel transport models (`TransportBooking` vs `TransportTrip`)       | verified | Schema + `lib/transport/booking-bridge-service.ts`                  |
-| Parallel invoice models (`Invoice`, `BillingInvoice`, `NdisInvoice`, …) | verified | Schema sections + `lib/invoices`, `lib/billing`, `lib/billing-core` |
-| Multiple consent-related models                                         | verified | `ConsentRecord`, `FhirConsentRecord`, `TelehealthRecordingConsent`  |
+| Finding                                     | Status                       | Evidence                                                                |
+| ------------------------------------------- | ---------------------------- | ----------------------------------------------------------------------- |
+| Broken gitlink `tmp/mapable-unified-replit` | already_remediated (this PR) | Was mode `160000` without `.gitmodules`; removed from index; gitignored |
+| `.gitmodules`                               | not_present                  |                                                                         |
 
-## Domains and routes
+## Historical Phase 0 notes
 
-| Finding                                                            | Status   | Evidence                                                |
-| ------------------------------------------------------------------ | -------- | ------------------------------------------------------- |
-| Care / transport / jobs / billing libs exist with substantial code | verified | `lib/care`, `lib/transport`, `lib/jobs`, `lib/billing`  |
-| Xero integration largely stub/placeholder                          | verified | `lib/xero/**`                                           |
-| Care invoice placeholder path                                      | verified | `app/api/care/bookings/[id]/invoice-placeholder`        |
-| National accountability one-step publish to `published`            | verified | `lib/national-accountability/accountability-service.ts` |
-| Admin ambient permission grant                                     | verified | `lib/auth/permissions.ts` `isAdminRole` short-circuit   |
-| `/admin` and `/employer` absent from middleware auth prefixes      | verified | `lib/mapable-peers/peer-middleware.ts`                  |
-| ~479 API `route.ts` files; many without Zod                        | likely   | Static counts; not every route audited line-by-line     |
-| Public accountability pages unauthenticated                        | verified | `app/(core)/accountability`                             |
-| Mobile contracts are scaffolding, not a shipped native app         | verified | `mobile-contracts/**`                                   |
+Older tables below this line may be stale relative to Wave 0 merges. Prefer the 2026-07-20 sections above and `WAVE0_STABILISATION.md` / `MIGRATE_FROM_ZERO_BLOCKER.md` for launch decisions.
 
-## Documentation honesty
+<details>
+<summary>Archived Phase 0 inspection (2026-07-17)</summary>
 
-| Finding                                                 | Status      | Evidence                                                  |
-| ------------------------------------------------------- | ----------- | --------------------------------------------------------- |
-| Accessibility statement avoids WCAG certification claim | verified    | `app/(marketing)/accessibility-statement/page.tsx`        |
-| Phase docs prescribe `prisma db push` as deploy path    | verified    | `docs/mapable/core-phases.md`, module docs                |
-| Ops docs warn against prod `db push` in places          | verified    | `docs/operations/production-infrastructure.md`            |
-| Transport docs already prefer `TransportTrip` SoT       | verified    | `.cursor/rules/mapable-transport.mdc`, `docs/transport/*` |
-| `docs/remediation/**` before this programme             | not_present | Created by PR 1                                           |
+Base SHA at that inspection: `5c667983`. Many tooling gaps listed then (Playwright, CODEOWNERS, CI) have since been addressed in later PRs. Do not use that snapshot for go/no-go.
 
-## Maturity (inspection only — not promotion)
-
-| Capability                                       | Honest state                                            | Status   |
-| ------------------------------------------------ | ------------------------------------------------------- | -------- |
-| Auth sessions                                    | internal_alpha                                          | verified |
-| Care full request→reconciliation loop            | controlled_pilot (gaps: agreements, evidence invoicing) | likely   |
-| Transport full trip loop with production routing | pilot / sandbox                                         | verified |
-| Billing Centre                                   | internal_alpha                                          | verified |
-| Jobs employment-support loop                     | scaffold / internal_alpha                               | likely   |
-| NDIA live claim submission                       | scaffold / mock                                         | verified |
-| Public accountability governed pipeline          | demo                                                    | verified |
-| Native mobile app                                | concept (contracts only)                                | verified |
-| WCAG / ISO / SOC certification                   | not_present as claims                                   | verified |
-
-## What this document does not prove
-
-- That any capability is `production_ready` or `generally_available`
-- That deploy-time configuration in Vercel matches `.env.example`
-- That every API route enforces consent and tenancy
-
-Those require later remediation PRs and runtime verification.
+</details>

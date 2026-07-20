@@ -63,7 +63,10 @@ export default async function SafetyCentrePage() {
         <p>
           <span className="font-medium text-foreground">Immediate danger?</span>{" "}
           Call <strong>000</strong>. For platform safeguarding principles see{" "}
-          <Link href="/safeguards" className="text-primary hover:underline">
+          <Link
+            href="/safeguards"
+            className="font-medium text-foreground underline underline-offset-2"
+          >
             MapAble safeguards
           </Link>
           . Provider staff triage happens in the provider and admin consoles.

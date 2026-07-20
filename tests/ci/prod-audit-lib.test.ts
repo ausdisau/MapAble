@@ -168,4 +168,129 @@ describe("prod-audit-lib", () => {
     if (parsed.ok) return;
     expect(parsed.error).toMatch(/unrecognised schema/i);
   });
+
+  it("rejects substring path allowlist matches for unrelated dependencies", () => {
+    const audit = parseAuditJson(
+      JSON.stringify({
+        advisories: {
+          "1": {
+            id: 1,
+            github_advisory_id: "GHSA-TEST-PATH",
+            module_name: "left-pad",
+            severity: "critical",
+            findings: [
+              {
+                paths: [
+                  ".>unrelated-wrapper>left-pad-extra>deep",
+                  ".>other>left-pad-helper",
+                ],
+              },
+            ],
+          },
+        },
+      }),
+    );
+    const allowlist = parseAllowlistJson(
+      JSON.stringify({
+        exceptions: [
+          {
+            advisoryId: "GHSA-TEST-PATH",
+            package: "left-pad",
+            // Substring of finding paths, but not exact or formal descendant prefix.
+            path: "left-pad",
+            rationale: "adversarial fixture",
+            owner: "@ausdisau",
+            compensatingControl: "fixture only",
+            expiry: "2099-01-01",
+          },
+        ],
+      }),
+    );
+    expect(audit.ok && allowlist.ok).toBe(true);
+    if (!audit.ok || !allowlist.ok) return;
+    const result = evaluateProductionAudit({
+      advisories: audit.advisories,
+      allowlist: allowlist.allowlist,
+      today: "2026-07-19",
+    });
+    expect(result.ok).toBe(false);
+  });
+
+  it("allows exact path and formal descendant path only", () => {
+    const audit = parseAuditJson(
+      JSON.stringify({
+        advisories: {
+          "1": {
+            id: 1,
+            github_advisory_id: "GHSA-TEST-DESCENDANT",
+            module_name: "left-pad",
+            severity: "high",
+            findings: [{ paths: [".>app>left-pad>nested"] }],
+          },
+        },
+      }),
+    );
+    const allowlist = parseAllowlistJson(
+      JSON.stringify({
+        exceptions: [
+          {
+            advisoryId: "GHSA-TEST-DESCENDANT",
+            package: "left-pad",
+            path: ".>app>left-pad",
+            rationale: "fixture",
+            owner: "@ausdisau",
+            compensatingControl: "fixture",
+            expiry: "2099-01-01",
+          },
+        ],
+      }),
+    );
+    expect(audit.ok && allowlist.ok).toBe(true);
+    if (!audit.ok || !allowlist.ok) return;
+    const result = evaluateProductionAudit({
+      advisories: audit.advisories,
+      allowlist: allowlist.allowlist,
+      today: "2026-07-19",
+    });
+    expect(result.ok).toBe(true);
+  });
+
+  it("fails closed when advisory has no finding paths", () => {
+    const audit = parseAuditJson(
+      JSON.stringify({
+        advisories: {
+          "1": {
+            id: 1,
+            github_advisory_id: "GHSA-TEST-NOPATH",
+            module_name: "left-pad",
+            severity: "high",
+            findings: [{}],
+          },
+        },
+      }),
+    );
+    const allowlist = parseAllowlistJson(
+      JSON.stringify({
+        exceptions: [
+          {
+            advisoryId: "GHSA-TEST-NOPATH",
+            package: "left-pad",
+            path: ".>left-pad",
+            rationale: "fixture",
+            owner: "@ausdisau",
+            compensatingControl: "fixture",
+            expiry: "2099-01-01",
+          },
+        ],
+      }),
+    );
+    expect(audit.ok && allowlist.ok).toBe(true);
+    if (!audit.ok || !allowlist.ok) return;
+    const result = evaluateProductionAudit({
+      advisories: audit.advisories,
+      allowlist: allowlist.allowlist,
+      today: "2026-07-19",
+    });
+    expect(result.ok).toBe(false);
+  });
 });

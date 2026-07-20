@@ -1,6 +1,9 @@
 /**
  * Fail-closed production environment gate for real Vercel production deploys.
  * Local/CI/preview builds remain usable unless MAPABLE_ENFORCE_PRODUCTION_ENV=true.
+ *
+ * Non-Vercel production hosts MUST set MAPABLE_ENFORCE_PRODUCTION_ENV=true so
+ * the same validators run at next.config load and Node instrumentation startup.
  */
 // Relative import so next.config.ts can load this without path aliases.
 import {

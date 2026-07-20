@@ -70,13 +70,29 @@ Run this checklist before promoting MapAble to a public production deployment.
 - [ ] `/jobs` permanently redirects to `/employment`.
 - [ ] Public claims avoid unsupported NDIS registration, WCAG conformance and data sovereignty statements.
 
+## Uptime monitoring probes
+
+Use these non-sensitive endpoints (no auth, `Cache-Control: no-store`):
+
+| Probe     | Path                    | Ready when                                                                                  |
+| --------- | ----------------------- | ------------------------------------------------------------------------------------------- |
+| Liveness  | `GET /api/health/live`  | `200` `{ "status": "ok" }` — process only                                                   |
+| Readiness | `GET /api/health/ready` | `200` `{ "status": "ready" }` — DB reachable; `503` `{ "status": "unavailable" }` otherwise |
+
+Do not alert on readiness alone during planned maintenance. Never expect hostnames, credentials, or stack traces in responses.
+
 ## Post-deploy smoke checks
 
 ```bash
 curl -I https://mapable.com.au/
+curl -I https://www.mapable.com.au/
+curl -sS https://mapable.com.au/api/health/live
+curl -sS https://mapable.com.au/api/health/ready
 curl https://mapable.com.au/api/auth/session
 curl https://mapable.com.au/api/auth/providers
 curl -I https://mapable.com.au/robots.txt
 curl -I https://mapable.com.au/sitemap.xml
+curl -I https://mapable.com.au/jobs
+# Confirm JSON-LD uses https://mapable.com.au (not localhost/www)
 curl -I https://mapable.com.au/jobs
 ```
