@@ -37,6 +37,7 @@
     "fetch:ndis-list-providers": "tsx scripts/fetch-ndis-list-providers.ts",
     "seed:ndis-provider-outlets": "tsx prisma/seed-ndis-provider-outlets.ts",
     "seed:billing-centre": "tsx prisma/seed-billing-centre.ts",
+    "seed:a11y-pilot": "tsx prisma/seed-a11y-pilot.ts",
     "db:generate": "prisma generate",
     "db:migrate:deploy": "prisma migrate deploy",
     "db:migrate:status": "prisma migrate status",

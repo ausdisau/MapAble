@@ -14,15 +14,32 @@ jobs:
   accessibility:
     name: Accessibility
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 50
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: mapable_a11y
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     env:
       NODE_OPTIONS: --max-old-space-size=6144
       NEXTAUTH_SECRET: ci-nextauth-secret-not-for-production-use-32chars
-      NEXTAUTH_URL: http://localhost:3000
+      NEXTAUTH_URL: http://127.0.0.1:3000
+      NEXT_PUBLIC_APP_URL: http://127.0.0.1:3000
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mapable_a11y?schema=public
       DIRECT_URL: postgresql://postgres:postgres@localhost:5432/mapable_a11y?schema=public
-      # Public shells only when DB unavailable; auth routes skip honestly
-      A11Y_SKIP_AUTH_ROUTES: "1"
+      # Password credentials must work for Playwright seeds
+      TWILIO_2FA_ENABLED: "false"
+      # Auth routes execute with seeded storage-state fixtures
+      A11Y_SKIP_AUTH_ROUTES: "0"
     steps:
       - uses: actions/checkout@v4
 
@@ -41,14 +58,21 @@ jobs:
       - name: Prisma generate
         run: pnpm exec prisma generate
 
+      - name: Ephemeral schema for a11y (CI-only db push)
+        run: pnpm exec prisma db push --accept-data-loss --skip-generate
+
+      - name: Seed authenticated a11y pilot users
+        run: pnpm exec tsx prisma/seed-a11y-pilot.ts
+
       - name: Install Playwright browsers
         run: pnpm exec playwright install --with-deps chromium
 
       - name: Build
         run: pnpm build
 
-      - name: Axe smoke (public + documented auth skips)
+      - name: Axe + authenticated acceptance
         env:
           PLAYWRIGHT_WEB_SERVER: pnpm start
-          A11Y_SKIP_AUTH_ROUTES: "1"
+          PLAYWRIGHT_BASE_URL: http://127.0.0.1:3000
+          A11Y_SKIP_AUTH_ROUTES: "0"
         run: pnpm test:a11y

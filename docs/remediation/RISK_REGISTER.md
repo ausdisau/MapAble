@@ -34,6 +34,15 @@ Severity: critical | high | medium | low
 | R21 | Deployed Vercel env missing `NDIS_ENCRYPTION_KEY`           | needs_runtime_verification |
 | R22 | Live marketing pages over-claim availability                | needs_runtime_verification |
 | R23 | Production DB already recorded one duplicate migration name | needs_runtime_verification |
+| R24 | Migrate-from-zero P3018 at `mapable_access_phase_1` + stubs | verified (hard CI fail)    |
+| R25 | CSP Report-Only with `unsafe-eval` (enforce not proven)     | verified                   |
+| R26 | Branch protection / independent approval not API-verified   | needs_runtime_verification |
+| R27 | Production JSON-LD still localhost until #378 deployed      | verified (edge scan)       |
+| R28 | Authenticated a11y / zoom / reduced-motion coverage gaps    | likely (improved in #378)  |
+
+## Risk acceptance
+
+No critical risk is accepted as closed merely because documentation exists. Closure requires tests, CI gates, and (for crypto/auth/billing) specialist review per `docs/operations/branch-protection.md`.
 
 ## Risk acceptance
 

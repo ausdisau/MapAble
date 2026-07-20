@@ -1,6 +1,6 @@
 /**
  * Single canonical public origin for metadata, robots, sitemap, and auth links.
- * Provisional Wave 0 decision: apex https://mapable.com.au (www TLS expired; see PR #344).
+ * Controlled-pilot decision: apex https://mapable.com.au only.
  */
 
 export const CANONICAL_PRODUCTION_ORIGIN = "https://mapable.com.au";
@@ -21,13 +21,35 @@ export function isLocalHostname(hostname: string): boolean {
 }
 
 /**
+ * Normalize an origin-only URL: accept a single trailing slash, return without it.
+ * Returns null when the value is not a parseable absolute URL.
+ */
+export function normalizeOriginOnlyUrl(value: string): string | null {
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+  try {
+    const parsed = new URL(trimmed);
+    return stripTrailingSlash(
+      parsed.origin + (parsed.pathname === "/" ? "" : parsed.pathname),
+    );
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Validate a public app/auth URL for production use.
- * Rejects localhost, 127.0.0.1, insecure HTTP, and malformed URLs.
+ *
+ * Production accepts exactly the canonical apex origin (optional trailing `/`).
+ * Rejects alternate hosts (including www), non-default ports, paths, query,
+ * fragments, credentials, HTTP, and localhost/loopback.
  */
 export function validatePublicOriginUrl(
   value: string | undefined,
   variable: string,
+  options: { requireCanonicalHost?: boolean } = {},
 ): CanonicalUrlIssue | null {
+  const requireCanonicalHost = options.requireCanonicalHost ?? true;
   const trimmed = value?.trim();
   if (!trimmed) {
     return { variable, message: "Required in production" };
@@ -61,6 +83,46 @@ export function validatePublicOriginUrl(
     };
   }
 
+  if (parsed.search || parsed.hash) {
+    return {
+      variable,
+      message: "Must be origin-only (no query string or fragment)",
+    };
+  }
+
+  if (parsed.pathname && parsed.pathname !== "/") {
+    return {
+      variable,
+      message: "Must be origin-only (path other than / rejected)",
+    };
+  }
+
+  // Non-default ports are rejected (URL.port is "" for default 443).
+  if (parsed.port) {
+    return {
+      variable,
+      message: "Must not include a non-default port",
+    };
+  }
+
+  if (parsed.hostname.toLowerCase() === "www.mapable.com.au") {
+    return {
+      variable,
+      message:
+        "Must use apex https://mapable.com.au (www is not the canonical origin)",
+    };
+  }
+
+  if (
+    requireCanonicalHost &&
+    parsed.origin.replace(/\/$/, "") !== CANONICAL_PRODUCTION_ORIGIN
+  ) {
+    return {
+      variable,
+      message: `Must be exactly ${CANONICAL_PRODUCTION_ORIGIN}`,
+    };
+  }
+
   return null;
 }
 
@@ -84,8 +146,18 @@ export function getCanonicalPublicOrigin(
         if (parsed.protocol !== "https:" || isLocalHostname(parsed.hostname)) {
           continue;
         }
+        // Prefer exact apex when building production metadata.
+        if (
+          parsed.hostname.toLowerCase() === "www.mapable.com.au" ||
+          parsed.port ||
+          (parsed.pathname && parsed.pathname !== "/") ||
+          parsed.search ||
+          parsed.hash
+        ) {
+          continue;
+        }
       }
-      return stripTrailingSlash(candidate);
+      return stripTrailingSlash(parsed.origin);
     } catch {
       continue;
     }
@@ -132,15 +204,19 @@ export function validateProductionPublicUrls(
     if (issue) issues.push(issue);
   }
 
-  if (
-    nextAuthUrl &&
-    publicAppUrl &&
-    stripTrailingSlash(nextAuthUrl) !== stripTrailingSlash(publicAppUrl)
-  ) {
-    issues.push({
-      variable: "NEXTAUTH_URL",
-      message: "Must match NEXT_PUBLIC_APP_URL origin in production",
-    });
+  if (nextAuthUrl && publicAppUrl) {
+    try {
+      const a = stripTrailingSlash(new URL(nextAuthUrl).origin);
+      const b = stripTrailingSlash(new URL(publicAppUrl).origin);
+      if (a !== b) {
+        issues.push({
+          variable: "NEXTAUTH_URL",
+          message: "Must match NEXT_PUBLIC_APP_URL origin in production",
+        });
+      }
+    } catch {
+      // Invalid URL issues already recorded above.
+    }
   }
 
   return issues;
@@ -155,7 +231,10 @@ export function validateProductionDatabaseUrls(
 
   const databaseUrl = env.DATABASE_URL?.trim();
   if (!databaseUrl) {
-    issues.push({ variable: "DATABASE_URL", message: "Required in production" });
+    issues.push({
+      variable: "DATABASE_URL",
+      message: "Required in production",
+    });
   } else {
     try {
       const parsed = new URL(databaseUrl);
@@ -211,6 +290,14 @@ export function validateProductionDatabaseUrls(
   return issues;
 }
 
+/**
+ * Canonical auth-signing secret contract for production gates:
+ * - Production (Vercel production or MAPABLE_ENFORCE_PRODUCTION_ENV): require
+ *   `NEXTAUTH_SECRET` (≥16 chars). Aliases are not accepted at the deploy gate.
+ * - Vercel preview: `NEXTAUTH_SECRET` or `MAPABLE_PREVIEW_AUTH_SECRET` (≥16).
+ * - Runtime NextAuth resolution may still accept AUTH_SECRET / SESSION_SECRET
+ *   as legacy signing aliases only — never for data encryption.
+ */
 export function validateProductionNextAuthSecret(
   env: NodeJS.ProcessEnv = process.env,
 ): CanonicalUrlIssue[] {
@@ -225,7 +312,8 @@ export function validateProductionNextAuthSecret(
     return [
       {
         variable: "NEXTAUTH_SECRET",
-        message: "Required in production (min 16 characters)",
+        message:
+          "Required in production (min 16 characters). Deploy gate does not accept AUTH_SECRET/SESSION_SECRET aliases.",
       },
     ];
   }

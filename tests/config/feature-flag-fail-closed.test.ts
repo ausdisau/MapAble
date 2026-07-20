@@ -16,9 +16,8 @@ describe("Wave 0 capability flags fail closed", () => {
     const { phase4Config } = await import("@/lib/config/phase4");
     const { phase5Config } = await import("@/lib/config/phase5");
     const { isBillingCopilotEnabled } = await import("@/lib/billing/config");
-    const { caseManagementConfig } = await import(
-      "@/lib/config/case-management"
-    );
+    const { caseManagementConfig } =
+      await import("@/lib/config/case-management");
 
     expect(phase4Config.matchingEngineEnabled).toBe(false);
     expect(phase5Config.ndiaReadinessEnabled).toBe(false);
@@ -31,9 +30,8 @@ describe("Wave 0 capability flags fail closed", () => {
     vi.stubEnv("MATCH_PARTICIPANT_CONFIRM_REQUIRED", undefined);
     vi.stubEnv("AI_MATCHING_REQUIRE_HUMAN_REVIEW", undefined);
 
-    const { platformPatternsConfig } = await import(
-      "@/lib/config/platform-patterns"
-    );
+    const { platformPatternsConfig } =
+      await import("@/lib/config/platform-patterns");
     const { phase5Config } = await import("@/lib/config/phase5");
 
     expect(platformPatternsConfig.matchParticipantConfirmRequired).toBe(true);
@@ -42,9 +40,8 @@ describe("Wave 0 capability flags fail closed", () => {
 
   it("keeps starting-work synthetic-only fail-open as a safety default", async () => {
     vi.stubEnv("MAPABLE_STARTING_WORK_SYNTHETIC_ONLY", undefined);
-    const { startingWorkPilotConfig } = await import(
-      "@/lib/config/starting-work-pilot"
-    );
+    const { startingWorkPilotConfig } =
+      await import("@/lib/config/starting-work-pilot");
     expect(startingWorkPilotConfig.syntheticOnly).toBe(true);
   });
 });

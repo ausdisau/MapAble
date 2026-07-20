@@ -4,8 +4,9 @@ import { expect, test, type Page, type Response } from "@playwright/test";
 /**
  * Accessibility smoke for public route shells.
  *
- * Authenticated shells are skipped when A11Y_SKIP_AUTH_ROUTES=1 (default in CI
- * without seeded users). Skips are documented — not silent passes.
+ * Authenticated shells are covered by authenticated-journeys.spec.ts with
+ * seeded storage-state fixtures. When A11Y_SKIP_AUTH_ROUTES=1, auth axe tests
+ * in this file remain documented skips (local without DB).
  *
  * Unexpected 404/5xx responses fail. This suite does not claim WCAG conformance.
  */
@@ -32,7 +33,7 @@ const AUTH_ROUTES = [
   "/dashboard/billing",
 ] as const;
 
-/** Routes intentionally unavailable (feature-disabled). None fabricated for Wave 0. */
+/** Routes intentionally unavailable (feature-disabled). None fabricated. */
 const FEATURE_DISABLED_ROUTES: ReadonlyArray<{
   route: string;
   expectedStatuses: number[];
@@ -41,7 +42,6 @@ const FEATURE_DISABLED_ROUTES: ReadonlyArray<{
 async function settleNavigation(page: Page): Promise<void> {
   await page.waitForLoadState("domcontentloaded");
   await expect(page.locator("body")).toBeVisible();
-  // Prefer a main landmark when present; fall back to body settle.
   const main = page.locator("main, [role='main']");
   if ((await main.count()) > 0) {
     await expect(main.first()).toBeVisible({ timeout: 10_000 });
@@ -124,7 +124,6 @@ test.describe("Authenticated route shells (axe)", () => {
       expect(status, `${route} returned unexpected 404`).not.toBe(404);
 
       await settleNavigation(page);
-      // Unauthenticated may redirect to login — axe the resulting shell only when intentional.
       const url = page.url();
       const landedOnLogin = /\/login(?:\?|$)/.test(new URL(url).pathname);
       expect(
@@ -138,8 +137,6 @@ test.describe("Authenticated route shells (axe)", () => {
 
 test.describe("Feature-disabled route expectations", () => {
   test("inventory is explicit (no silent skips)", async () => {
-    // Documented placeholder — add routes with expectedStatuses when a feature
-    // is intentionally disabled in CI rather than converting failures to skips.
     expect(Array.isArray(FEATURE_DISABLED_ROUTES)).toBe(true);
   });
 

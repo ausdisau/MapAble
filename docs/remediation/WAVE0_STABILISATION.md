@@ -1,10 +1,12 @@
 # Wave 0 Stabilisation — Findings and Decisions
 
-**Status:** implemented on branch `cursor/production-readiness-wave0-stabilisation-2794`  
-**Base:** `origin/main` at inspection  
+**Status:** Wave 0 merged via PR #377; repair on `cursor/wave0-stabilisation-repair-2794`
+
+**Base:** `origin/main` @ `b18fbf63` (merge of #377)
+
 **FindingStatus vocabulary:** `verified` | `likely` | `needs_runtime_verification` | `not_present` | `already_remediated`
 
-Wave 0 is emergency production-readiness stabilisation only. It does **not** mark any capability `production_ready`. Feature flags are not assurance.
+Wave 0 is controlled-pilot stabilisation only. It does **not** mark any capability `production_ready`. Feature flags are not assurance.
 
 ## Protected controlled-pilot slice
 
@@ -34,7 +36,14 @@ Explicitly remain disabled / unclaimed: live NDIA claim submission; automatic pa
 
 ## Production environment validation contract
 
-In `NODE_ENV=production`, core validation (`lib/env.ts` + `lib/config/canonical-url.ts`) requires:
+Validators live in `lib/config/canonical-url.ts`. Deployment enforcement is **not** limited to the manual integration-env script:
+
+- `assertDeployedProductionEnv()` in `lib/env/assert-deployed-production-env.ts`
+- Invoked from `next.config.ts` (build) and `instrumentation.ts` (Node runtime)
+- Enforced when `VERCEL=1` and `VERCEL_ENV=production`, or when `MAPABLE_ENFORCE_PRODUCTION_ENV=true`
+- Local / CI / Vercel preview remain usable unless the enforce flag is set
+
+When enforced, validation requires:
 
 | Variable                               | Rule                                                                                                       |
 | -------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
@@ -43,7 +52,7 @@ In `NODE_ENV=production`, core validation (`lib/env.ts` + `lib/config/canonical-
 | `DIRECT_URL`                           | Required; same URL shape rules as `DATABASE_URL`                                                           |
 | `NEXTAUTH_SECRET`                      | Required (≥16 chars); preview may use `MAPABLE_PREVIEW_AUTH_SECRET`                                        |
 
-Canonical public origin resolver: `lib/config/canonical-url.ts` → used by metadataBase, robots, sitemap, Open Graph URL, and `getAppBaseUrl()`.
+Secret values are never printed. Canonical public origin: `lib/config/canonical-url.ts` → metadataBase, robots, sitemap, Open Graph, JSON-LD (`lib/config/json-ld.ts`), and `getAppBaseUrl()`.
 
 ## Route compatibility
 
@@ -60,10 +69,10 @@ Each exception must include: advisory ID, package, path, rationale, owner, compe
 
 ## Rollback procedure
 
-1. Revert the Wave 0 merge commit(s) on `main` (git-safe; no Prisma migrations).
+1. Revert the Wave 0 merge commit (`b18fbf63`) and any subsequent repair merge on `main` (git-safe; no Prisma migrations in Wave 0).
 2. `/jobs` returns to 404 until redirect is restored.
 3. Capability flags revert to prior fail-open defaults if the revert includes those files.
-4. Security headers and audit gate disappear with the revert.
+4. Security headers, deploy-path env gate, and audit gate disappear with the revert.
 5. Account-owner Vercel env/domain changes (if applied) must be rolled back separately in the Vercel dashboard.
 
 ## Open PR recommendations
@@ -121,30 +130,50 @@ These are human operations — not performed by Wave 0 code:
 
 ## Accessibility follow-up (prepare only — Wave 4)
 
-- Authenticated Playwright seeds  
-- NVDA / VoiceOver / TalkBack  
-- Keyboard-only journeys  
-- 200% and 400% zoom/reflow  
-- Windows High Contrast  
-- Reduced motion  
+- Authenticated Playwright seeds
+- NVDA / VoiceOver / TalkBack
+- Keyboard-only journeys
+- 200% and 400% zoom/reflow
+- Windows High Contrast
+- Reduced motion
 
 No WCAG conformance claim is made by Wave 0.
 
-## Verification notes (agent environment)
+## Verification notes (repair branch — agent environment)
 
-| Check | Result | Notes |
-| --- | --- | --- |
-| `pnpm install --frozen-lockfile` | pass | |
-| `prisma validate` / `generate` | pass | |
-| `type-check` | pass | |
-| `format:check` | pass | scoped paths |
-| `lint` | pass | app/components/lib/schemas/scripts/ci |
-| `lint:tests` | **pre-existing fail on main** | 46 eslint import-order/unused-var errors; reproduced on `origin/main@0ac4f65` |
-| `pnpm test` | **1 pre-existing env fail** | `tests/booking-rag-scope.test.ts` requires Postgres; same failure on main without DB. Other Wave 0–touched suites pass (976+ tests) |
-| `pnpm test:a11y` | pass | 13 passed, 5 auth routes documented skip (`A11Y_SKIP_AUTH_ROUTES=1`) |
-| `pnpm build` | pass | May need `NODE_OPTIONS=--max-old-space-size=8192` on smaller VMs; CI uses 6144 |
-| `pnpm audit --prod --audit-level=high` | pass | 0 high/critical |
-| `pnpm ci:prod-audit` | pass | empty allowlist |
-| migration / ownership / claims / feature-deps / merge-train | pass | |
+Ephemeral Postgres: `postgresql://postgres:postgres@localhost:5432/mapable_ci` (same shape as GitHub CI). Commands re-run after repair edits; skipped steps are **not** recorded as pass.
+
+| Check                            | Result                        | Notes                                                                                        |
+| -------------------------------- | ----------------------------- | -------------------------------------------------------------------------------------------- |
+| `pnpm install --frozen-lockfile` | pass                          |                                                                                              |
+| `prisma validate` / `generate`   | pass                          |                                                                                              |
+| `type-check`                     | pass                          |                                                                                              |
+| `format:check`                   | pass                          | Prettier on scoped Wave 0 paths                                                              |
+| `git diff --check`               | pass                          |                                                                                              |
+| `lint`                           | pass                          | app/components/lib/schemas/scripts/ci                                                        |
+| `lint:tests`                     | **pre-existing fail on main** | 46-error backlog; not expanded. New/changed tests linted directly with ESLint (pass)         |
+| `pnpm ci:prod-audit`             | pass                          | empty allowlist; fail-closed parser                                                          |
+| `pnpm build`                     | pass                          | `NODE_OPTIONS=--max-old-space-size=8192`                                                     |
+| `pnpm test:a11y`                 | pass                          | 13 passed, 5 auth routes skipped (`A11Y_SKIP_AUTH_ROUTES=1`)                                 |
+| `prisma db push` + `pnpm test`   | pass                          | 998 passed, 2 skipped                                                                        |
+| Focused Wave 0 unit suites       | pass                          | deploy env, JSON-LD, prod-audit-lib, canonical URL, security headers, `/jobs`, feature flags |
 
 Migrate-from-zero workflow job remains `continue-on-error: true` (Wave 1 debt; not changed).
+
+## Repair follow-up (post-merge of #377)
+
+PR #377 was merged to `main` by the repository owner while CI Format check was red on `docs/remediation/WAVE0_STABILISATION.md` (subsequent CI steps skipped). Repair branch `cursor/wave0-stabilisation-repair-2794` completes:
+
+1. Prettier formatting for `format:check`
+2. Deploy-path production env enforcement (`next.config.ts` + `instrumentation.ts` via `assertDeployedProductionEnv`)
+3. JSON-LD canonical apex consistency via `buildPublicJsonLd()` / `getCanonicalPublicOrigin()`
+4. Fail-closed prod-audit parsing/evaluation (`scripts/ci/prod-audit-lib.ts`) with fixture tests
+5. Upload-validation advisory signal integrity (WARN vs FAILED; documented false-positive exclusions)
+6. Figma evidence: **blocked** — see `WAVE0_FIGMA_ROUTE_EVIDENCE.md` (placeholder URL only)
+
+### Deferred blockers (unchanged)
+
+- Migrate-from-zero still fails with Prisma P3018 in `20260525000000_mapable_access_phase_1` (Wave 1).
+- Five authenticated accessibility routes remain skipped.
+- Branch protection, independent approval, production Vercel variables and www TLS renewal are account-owner tasks.
+- Overall production readiness requires later waves. Do not mark capabilities `production_ready`.
