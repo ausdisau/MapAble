@@ -4,6 +4,7 @@ import "leaflet/dist/leaflet.css";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata } from "next";
 import { Outfit, Plus_Jakarta_Sans } from "next/font/google";
+import { headers } from "next/headers";
 
 import { AccessiBeWidget } from "@/components/accessibility/AccessiBeWidget";
 import {
@@ -17,6 +18,7 @@ import {
   buildPublicJsonLd,
   serializeJsonLdForScript,
 } from "@/lib/config/json-ld";
+import { CSP_NONCE_HEADER } from "@/lib/security/csp-preview-enforce";
 
 const canonicalOrigin = getCanonicalPublicOrigin();
 const publicJsonLd = buildPublicJsonLd();
@@ -72,11 +74,14 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const headerStore = await headers();
+  const scriptNonce = headerStore.get(CSP_NONCE_HEADER) ?? undefined;
+
   return (
     <html lang="en" className={`${plusJakarta.variable} ${outfit.variable}`}>
       <head>
@@ -89,6 +94,7 @@ export default function RootLayout({
       <body className={plusJakarta.className}>
         <script
           type="application/ld+json"
+          nonce={scriptNonce}
           suppressHydrationWarning
           dangerouslySetInnerHTML={{
             __html: serializeJsonLdForScript(publicJsonLd.organization),
@@ -96,6 +102,7 @@ export default function RootLayout({
         />
         <script
           type="application/ld+json"
+          nonce={scriptNonce}
           suppressHydrationWarning
           dangerouslySetInnerHTML={{
             __html: serializeJsonLdForScript(publicJsonLd.website),

@@ -1,29 +1,44 @@
 # CSP enforcement status
 
-**Status:** release blocker for broad service; report-only acceptable for public informational / early controlled pilot with monitoring.
+**Status:** report-only in production; preview enforce available behind fail-closed flag  
+**Last refreshed:** 2026-07-20
 
-## Current production behaviour (verified 2026-07-20)
+## Current production behaviour
 
-- Header: `Content-Security-Policy-Report-Only` only (no enforcing `Content-Security-Policy`).
-- `script-src` includes `'unsafe-inline'` and `'unsafe-eval'`.
-- Applied via `lib/security/headers.ts` → `next.config.ts` `headers()`.
+- Header: `Content-Security-Policy-Report-Only` only via `next.config.ts` / `getBaselineSecurityHeaders()`.
+- `script-src` includes `'unsafe-inline'` and `'unsafe-eval'` on the report-only policy.
+- **Enforcing `Content-Security-Policy` must not be enabled in production.**
 
-## Enforcement path (implemented but not wired)
+## Preview-only enforcement (this programme)
 
-`buildContentSecurityPolicyEnforce(nonce)` builds a policy that:
+| Control             | Value                                                                             |
+| ------------------- | --------------------------------------------------------------------------------- |
+| Flag                | `MAPABLE_CSP_ENFORCE_PREVIEW=true`                                                |
+| Enable environments | Vercel `preview` **or** local `development`/`test`                                |
+| Hard-off            | `VERCEL_ENV=production` (even if flag set)                                        |
+| Policy builder      | `buildContentSecurityPolicyEnforce(nonce)` — nonce required, **no** `unsafe-eval` |
+| Nonce propagation   | Middleware sets `x-nonce`; root layout applies nonce to JSON-LD scripts           |
+| Report sink         | `POST /api/security/csp-report` (redacted; no script samples / secrets)           |
 
-- uses `'nonce-…'` for scripts;
-- omits `'unsafe-eval'`;
-- keeps inventoried Stripe / maps / analytics hosts.
+## Smoke routes (preview evidence required)
 
-It is **not** applied in `getBaselineSecurityHeaders()` because Next.js inline bootstrap, auth widgets, Stripe.js, map tiles/scripts, and AdSense have not been proven to survive enforce mode in CI smoke tests.
+When the flag is on in preview, capture pass/fail (and redacted blocked-uri origins) for:
 
-## Safe enablement checklist (account-owner + engineering)
+- `/`
+- `/login`
+- `/provider-finder`
+- `/accessibility-map`
+- Care request entry
+- Transport request entry
+- Payment UI **only if** already enabled in that preview
 
-1. Inject a per-request nonce into the root layout and every required inline script.
-2. Run Playwright smoke on `/`, `/login`, `/provider-finder`, `/accessibility-map`, care/transport request, and Stripe-related pages with enforce headers in a preview.
-3. Confirm no CSP violations that break auth, payments UI, or maps.
-4. Flip `getBaselineSecurityHeaders()` to emit `Content-Security-Policy` (enforce) and keep Report-Only as a secondary signal if desired.
-5. Remove `'unsafe-eval'` from the report-only policy only after enforce is green.
+Human/preview evidence status starts as `NOT_RUN` until recorded.
 
-Until then, treat enforced CSP without `unsafe-eval` as a **release blocker**, not a Wave 0 merge gate.
+## Safe production enablement (future — not authorised here)
+
+1. Preview enforce green across smoke routes
+2. Confirm auth, Stripe, maps, AdSense survive without `unsafe-eval`
+3. Account-owner approval
+4. Only then consider production enforce (separate change)
+
+Until then, enforced CSP without `unsafe-eval` remains a **release blocker** for broad service, not a merge gate for this remediation PR.

@@ -8,6 +8,18 @@ import {
   redirectLegacySquarePath,
   shouldRunAuthMiddleware,
 } from "@/lib/mapable-peers/peer-middleware";
+import {
+  CSP_ENFORCE_HEADER,
+  CSP_NONCE_HEADER,
+  createScriptNonce,
+  isCspPreviewEnforceEnabled,
+} from "@/lib/security/csp-preview-enforce";
+import { buildContentSecurityPolicyEnforce } from "@/lib/security/headers";
+import {
+  CORRELATION_ID_HEADER,
+  REQUEST_ID_HEADER,
+  resolveCorrelationId,
+} from "@/lib/security/request-correlation";
 
 /** Match NextAuth secure cookie naming on HTTPS (Vercel, production). */
 function usesSecureSessionCookies(request: NextRequest): boolean {
@@ -72,29 +84,61 @@ function authMisconfiguredResponse(request: NextRequest): NextResponse {
 
 function redirectToLogin(request: NextRequest): NextResponse {
   const login = new URL("/login", request.url);
-  const callbackPath =
-    request.nextUrl.pathname + request.nextUrl.search;
+  const callbackPath = request.nextUrl.pathname + request.nextUrl.search;
   login.searchParams.set("callbackUrl", callbackPath);
   return NextResponse.redirect(login);
 }
 
+function withCorrelationAndCsp(
+  request: NextRequest,
+  response: NextResponse,
+  nonce: string,
+): NextResponse {
+  const correlationId = resolveCorrelationId(
+    request.headers.get(CORRELATION_ID_HEADER) ??
+      request.headers.get(REQUEST_ID_HEADER),
+  );
+  response.headers.set(CORRELATION_ID_HEADER, correlationId);
+  response.headers.set(REQUEST_ID_HEADER, correlationId);
+
+  if (isCspPreviewEnforceEnabled()) {
+    response.headers.set(
+      CSP_ENFORCE_HEADER,
+      buildContentSecurityPolicyEnforce(nonce),
+    );
+  }
+
+  return response;
+}
+
 export default async function middleware(request: NextRequest) {
+  const nonce = createScriptNonce();
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set(CSP_NONCE_HEADER, nonce);
+
   const legacySquare = redirectLegacySquarePath(request);
-  if (legacySquare) return legacySquare;
+  if (legacySquare) return withCorrelationAndCsp(request, legacySquare, nonce);
 
   const peerResponse = handlePeerPeersHost(request);
-  if (peerResponse) return peerResponse;
+  if (peerResponse) return withCorrelationAndCsp(request, peerResponse, nonce);
 
   if (shouldRunAuthMiddleware(request.nextUrl.pathname)) {
     if (!(await hasAuthenticatedSession(request))) {
       if (!resolveNextAuthSecret()) {
-        return authMisconfiguredResponse(request);
+        return withCorrelationAndCsp(
+          request,
+          authMisconfiguredResponse(request),
+          nonce,
+        );
       }
-      return redirectToLogin(request);
+      return withCorrelationAndCsp(request, redirectToLogin(request), nonce);
     }
   }
 
-  return NextResponse.next();
+  const response = NextResponse.next({
+    request: { headers: requestHeaders },
+  });
+  return withCorrelationAndCsp(request, response, nonce);
 }
 
 export const config = {
