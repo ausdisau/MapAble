@@ -2,11 +2,15 @@ import { createAuditEvent } from "@/lib/audit/audit-event-service";
 import { prisma } from "@/lib/prisma";
 
 import { assertAtContinuityEnabled } from "./flags";
-import { assertSafeParticipantFacingCopy } from "./invariants";
+import {
+  assertHumanApprovedNotification,
+  assertSafeParticipantFacingCopy,
+} from "./invariants";
 import type {
   AtBackupPlanInput,
   AtDependencyLinkInput,
   AtEquipmentAssetInput,
+  AtNotificationRequestInput,
   AtOutageInput,
   AtRepairPartnerRefInput,
 } from "./types";
@@ -208,4 +212,56 @@ export async function linkOperationalDependency(
   });
 
   return link;
+}
+
+/**
+ * Records a human-approved notification intent.
+ * Does not send clinical free text; metadata stays identifier-safe.
+ */
+export async function requestHumanApprovedNotification(
+  input: AtNotificationRequestInput,
+  actorUserId: string,
+) {
+  assertAtContinuityEnabled();
+  assertHumanApprovedNotification({ humanApproved: input.humanApproved });
+  assertSafeParticipantFacingCopy(input.templateKey);
+
+  if (input.approvedByUserId !== actorUserId) {
+    throw new Error(
+      "AT Continuity notification approver must match the acting user",
+    );
+  }
+
+  const asset = await prisma.atEquipmentAsset.findFirst({
+    where: {
+      id: input.assetId,
+      participantUserId: input.participantUserId,
+    },
+  });
+  if (!asset) {
+    throw new Error("AT equipment asset not found for participant");
+  }
+
+  const notificationId = `at_notify_${asset.id}_${input.templateKey}`;
+
+  await createAuditEvent({
+    actorUserId,
+    action: "at_continuity.notification_approved",
+    entityType: "AtEquipmentAsset",
+    entityId: asset.id,
+    metadata: {
+      notificationId,
+      channel: input.channel,
+      templateKey: input.templateKey,
+      approvedByUserId: input.approvedByUserId,
+      participantUserId: input.participantUserId,
+    },
+  });
+
+  return {
+    id: notificationId,
+    status: "approved_pending_delivery" as const,
+    channel: input.channel,
+    templateKey: input.templateKey,
+  };
 }

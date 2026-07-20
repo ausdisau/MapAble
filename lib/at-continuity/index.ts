@@ -2,10 +2,7 @@ export {
   atContinuityConfig,
   isAtContinuityEnabled,
 } from "@/lib/config/at-continuity";
-export {
-  AtContinuityDisabledError,
-  assertAtContinuityEnabled,
-} from "./flags";
+export { AtContinuityDisabledError, assertAtContinuityEnabled } from "./flags";
 export {
   AtContinuityInvariantError,
   assertHumanApprovedNotification,
@@ -18,6 +15,7 @@ export {
   linkRepairPartner,
   recordEquipmentOutage,
   registerEquipmentAsset,
+  requestHumanApprovedNotification,
   upsertBackupPlan,
 } from "./service";
 export type {
@@ -26,6 +24,7 @@ export type {
   AtDependencyTargetType,
   AtEquipmentAssetInput,
   AtEquipmentCategory,
+  AtNotificationRequestInput,
   AtOutageInput,
   AtOutageStatus,
   AtRepairPartnerRefInput,

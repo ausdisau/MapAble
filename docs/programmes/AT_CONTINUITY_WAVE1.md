@@ -43,6 +43,17 @@ MapAble does **not** determine clinical suitability, prescribe AT, or replace 00
 Narrow domain waiver recorded in `docs/remediation/FEATURE_FREEZE.md` for
 `lib/at-continuity/**` and the additive AT tables only. Flag remains default false.
 
+## Human preview
+
+Use [../../scripts/preview/at-continuity-wave1-human-preview.md](../../scripts/preview/at-continuity-wave1-human-preview.md)
+for pass/fail, accessibility observations, stop conditions, and rollback.
+
+## Build / Accessibility CI memory
+
+See [AT_CONTINUITY_WAVE1_BUILD_MEMORY.md](./AT_CONTINUITY_WAVE1_BUILD_MEMORY.md).
+OOM was post-compile static generation at ~6 GB heap; mitigated via
+`staticGenerationMaxConcurrency: 1` (not unbounded heap growth).
+
 ## Rollback
 
 1. Keep `MAPABLE_AT_CONTINUITY_ENABLED=false`

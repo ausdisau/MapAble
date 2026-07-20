@@ -70,3 +70,14 @@ export type AtDependencyLinkInput = {
   targetEntityId: string;
   notes?: string | null;
 };
+
+/** Participant-facing notification intent — never auto-sent without human approval. */
+export type AtNotificationRequestInput = {
+  participantUserId: string;
+  assetId: string;
+  channel: "in_app" | "email";
+  /** Template key / safe identifier — not free-text clinical narrative. */
+  templateKey: string;
+  humanApproved: boolean;
+  approvedByUserId: string;
+};

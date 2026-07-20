@@ -26,7 +26,9 @@ describe("AT Continuity Wave 1 scaffold", () => {
     previous = process.env[flag];
     delete process.env[flag];
     expect(isAtContinuityEnabled()).toBe(false);
-    expect(() => assertAtContinuityEnabled()).toThrow(AtContinuityDisabledError);
+    expect(() => assertAtContinuityEnabled()).toThrow(
+      AtContinuityDisabledError,
+    );
   });
 
   it("refuses writers when the flag is off", async () => {
@@ -47,17 +49,21 @@ describe("AT Continuity Wave 1 scaffold", () => {
 
   it("refuses clinical suitability and emergency dispatch claims", () => {
     expect(() =>
-      assertSafeParticipantFacingCopy("MapAble certifies this AT as clinically suitable"),
+      assertSafeParticipantFacingCopy(
+        "MapAble certifies this AT as clinically suitable",
+      ),
     ).toThrow(AtContinuityInvariantError);
     expect(() =>
-      assertSafeParticipantFacingCopy("Use MapAble emergency dispatch instead of 000"),
+      assertSafeParticipantFacingCopy(
+        "Use MapAble emergency dispatch instead of 000",
+      ),
     ).toThrow(AtContinuityInvariantError);
   });
 
   it("requires human approval before notifications", () => {
-    expect(() => assertHumanApprovedNotification({ humanApproved: false })).toThrow(
-      AtContinuityInvariantError,
-    );
+    expect(() =>
+      assertHumanApprovedNotification({ humanApproved: false }),
+    ).toThrow(AtContinuityInvariantError);
     expect(() =>
       assertHumanApprovedNotification({ humanApproved: true }),
     ).not.toThrow();
