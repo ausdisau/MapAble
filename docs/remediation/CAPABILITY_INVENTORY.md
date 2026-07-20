@@ -9,7 +9,7 @@ see `lib/convergence-os/seed/capabilities.ts` and
 [docs/productisation/CAPABILITY_REGISTRY.md](../productisation/CAPABILITY_REGISTRY.md).
 
 **Rule:** Feature flags and documentation are **not** evidence of production readiness.
-**Updated:** 2026-07-17 — reconciled with main after productisation #327.
+**Updated:** 2026-07-20 — post #378 + NDIS Expansion Wave 0 docs (no product schema).
 
 | Key                        | Title                             | Domain         | State              | publicClaimAllowed | Classification status | Evidence / gaps                                                                        |
 | -------------------------- | --------------------------------- | -------------- | ------------------ | ------------------ | --------------------- | -------------------------------------------------------------------------------------- |
@@ -46,9 +46,13 @@ see `lib/convergence-os/seed/capabilities.ts` and
 | outcomes.ledger            | Outcomes and Impact Ledger        | outcomes       | concept            | false              | verified              | No immutable receipts yet                                                              |
 | pilot.starting_work        | Starting Work controlled pilot    | pilot          | synthetic_demo     | false              | verified              | Synthetic journey on main (#327); DB-backed journey is programme PR 4                  |
 | managed.support_delivery   | MapAble Managed Support           | provider       | concept            | false              | verified              | **blocked_by_registration** — do not fabricate                                         |
+| ndis.expansion_foundation  | NDIS Expansion Wave 0 docs        | programmes     | concept            | false              | verified              | Docs/registry only; product waves blocked by migrate-from-zero                         |
+| ndis.at_continuity         | Assistive Technology Continuity   | programmes     | concept            | false              | verified              | Planned Wave 1; flag default false; not implemented                                    |
+| ndis.plan_manager_infrastructure | Plan Management Infrastructure | billing     | concept            | false              | verified              | Planned Wave 10; NDIA submit + auto payment approval must stay false                   |
 
 See also ConvergenceOS `CAPABILITY_SEEDS` and [PUBLIC_CLAIM_REGISTRY](../convergence-os/PUBLIC_CLAIM_REGISTRY.md).
 Strategy lanes: [OPERATING_LANES](../strategy/OPERATING_LANES.md).
+NDIS Expansion: [NDIS_EXPANSION_MASTER_PLAN](../programmes/NDIS_EXPANSION_MASTER_PLAN.md).
 
 ## Marketing language vs inventory
 

@@ -63,3 +63,4 @@ Maximum **three** unmerged PRs in a stack. Prefer merge PR *n* before opening PR
 - [COMPETITIVE_POSITION.md](./COMPETITIVE_POSITION.md)
 - [BUILD_PARTNER_DEFER.md](./BUILD_PARTNER_DEFER.md)
 - [../productisation/CAPABILITY_REGISTRY.md](../productisation/CAPABILITY_REGISTRY.md)
+- NDIS Expansion sequence (distinct multi-wave programme): [../programmes/NDIS_EXPANSION_DELIVERY_SEQUENCE.md](../programmes/NDIS_EXPANSION_DELIVERY_SEQUENCE.md)

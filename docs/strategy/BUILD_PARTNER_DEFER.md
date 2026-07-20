@@ -53,4 +53,5 @@ Integration boundary: agreement, evidence, mission coordination — not clinical
 
 - [OPERATING_LANES.md](./OPERATING_LANES.md)
 - [STRATEGIC_OPPORTUNITIES.md](./STRATEGIC_OPPORTUNITIES.md)
+- NDIS Expansion regulatory gates: [../programmes/NDIS_REGULATORY_GATE_MATRIX.md](../programmes/NDIS_REGULATORY_GATE_MATRIX.md)
 - Capability honesty: `lib/convergence-os/seed/capabilities.ts`
