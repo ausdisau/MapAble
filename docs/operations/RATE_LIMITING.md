@@ -1,7 +1,8 @@
 # Rate limiting — honesty and decision matrix
 
+**Canonical pilot policy:** [CONTROLLED_PILOT_CHARTER.md](./CONTROLLED_PILOT_CHARTER.md)  
 **Status:** process-local limiter only in repository  
-**Production-sensitive enables:** `BLOCKED` until a distributed store is owner-approved and evidenced  
+**Sensitive pilot mutations:** `BLOCKED` until a distributed store is owner-approved and evidenced  
 **Rule:** Do not invent or auto-select an external vendor during feature freeze.
 
 ## Current implementation
@@ -12,30 +13,30 @@
 | Multi-instance / multi-region safety | None                        | `FAILED` for production-sensitive claims            |
 | Abuse protection for CSP report sink | Uses process-local helper   | Acceptable for Preview/CI; **not** production-grade |
 
-## Decision matrix (no vendor selected)
+## Approved shared store scan (2026-07-21)
 
-Agents must **not** add Redis, Upstash, Vercel KV, or another store unless the account owner records an approved provider with privacy review.
+| Store                                                   | Present in repo with production config evidence? |
+| ------------------------------------------------------- | ------------------------------------------------ |
+| Redis / Upstash / Vercel KV / other distributed limiter | **No**                                           |
 
-| Criterion     | Question                                               | Owner answer required |
-| ------------- | ------------------------------------------------------ | --------------------- |
-| Data location | AU / region residency for IP hashes or keys?           |                       |
-| Privacy       | What identifiers are stored? Retention?                |                       |
-| Retention     | TTL aligned to window only?                            |                       |
-| Availability  | Failure mode if store down (fail-closed vs fail-open)? |                       |
-| Cost          | Preview + production estimate                          |                       |
-| Approval      | Named owner + date                                     |                       |
+Therefore: **no adapter added**. If an approved store later appears with privacy review, design a focused adapter behind a default-false flag.
 
-Until completed, keep:
+## Owner decision matrix (complete before selecting a vendor)
 
-- NDIA submission hard-off
-- Automated payment/invoice approval hard-off
-- Sensitive high-volume public write paths behind existing fail-closed flags
-- CSP production enforce hard-off
+| Criterion                       | Question                                     | Owner answer              | Status                  |
+| ------------------------------- | -------------------------------------------- | ------------------------- | ----------------------- |
+| AU availability / data location | AU / region residency for IP hashes or keys? |                           | `OWNER_ACTION_REQUIRED` |
+| Personal information exposure   | What identifiers stored?                     |                           | `OWNER_ACTION_REQUIRED` |
+| Logging and retention           | TTL aligned to window only? Logs?            |                           | `OWNER_ACTION_REQUIRED` |
+| Latency                         | p99 impact on auth/mutations                 |                           | `OWNER_ACTION_REQUIRED` |
+| Availability                    | Multi-AZ / SLA                               |                           | `OWNER_ACTION_REQUIRED` |
+| Multi-region behaviour          | Failover semantics                           |                           | `OWNER_ACTION_REQUIRED` |
+| Outage handling                 | Fail-closed for sensitive mutations?         | Required: **fail closed** | Policy in charter       |
+| Deletion                        | Key purge / GDPR-aligned deletion            |                           | `OWNER_ACTION_REQUIRED` |
+| Cost                            | Preview + production estimate                |                           | `OWNER_ACTION_REQUIRED` |
+| Contractual / privacy review    | Named reviewer + date                        |                           | `OWNER_ACTION_REQUIRED` |
 
-## Adapter policy
-
-- **If** an already-approved distributed store appears in this repository with production configuration evidence, design a focused adapter behind a **default-false** flag.
-- **As of 2026-07-21 rescan:** no approved distributed store dependency is present → **no adapter added**.
+Until completed, keep NDIA submit, automated payment/invoice approval, and other sensitive high-volume writes fail-closed. Process-local limiting must **not** be described as production-grade.
 
 ## Rollback
 

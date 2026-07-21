@@ -1,5 +1,7 @@
 # Accessibility manual evidence matrix
 
+**Canonical pilot boundary:** [../operations/CONTROLLED_PILOT_CHARTER.md](../operations/CONTROLLED_PILOT_CHARTER.md)  
+**Ordered session:** [../operations/CONTROLLED_PILOT_RELEASE_SESSION.md](../operations/CONTROLLED_PILOT_RELEASE_SESSION.md)  
 **Do not claim WCAG conformance.**  
 Automated Playwright/axe coverage is necessary but not sufficient.  
 **Status:** all manual rows `NOT_RUN` until a human tester records evidence.

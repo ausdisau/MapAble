@@ -1,5 +1,6 @@
 # Controlled-pilot golden journeys
 
+**Canonical boundary:** [CONTROLLED_PILOT_CHARTER.md](./CONTROLLED_PILOT_CHARTER.md)  
 **Slice:** invitation-only controlled pilot  
 **Data rule:** synthetic test data only — never real participant information  
 **Status:** all journeys `NOT_RUN` until humans execute and record pass/fail  
