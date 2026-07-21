@@ -11,7 +11,7 @@ GitHub Actions job `Accessibility` failed during `pnpm build` with:
 
 - Failure occurred **after** `✓ Compiled successfully`, during static generation
 - Mitigated by `experimental.staticGenerationMaxConcurrency: 1` +
-  `staticGenerationMinPagesPerWorker: 50` and a 7168 MB heap on GitHub Actions
+  `staticGenerationMinPagesPerWorker: 100` and a 7168 MB heap on GitHub Actions
 
 **Verification:** Accessibility workflow on tip `2933873d` — **pass** (~10m28s).
 
