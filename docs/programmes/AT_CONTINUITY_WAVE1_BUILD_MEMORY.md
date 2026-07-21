@@ -51,4 +51,4 @@ Open a performance tracking issue to:
 | ------- | ------ |
 | Accessibility workflow | `VERIFIED` pass on `2933873d` |
 | CI workflow | `VERIFIED` pass on `2933873d` |
-| Vercel preview after heap retune | `NOT_RUN` until redeploy |
+| Vercel preview after 6144 retune | `VERIFIED` READY `dpl_5v31ZBriAf2xCzdsDVu8mCJvGTVQ` (tip `8c0f0db3`) |

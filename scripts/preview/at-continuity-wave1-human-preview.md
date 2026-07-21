@@ -8,10 +8,10 @@
 
 | Field | Value |
 | ----- | ----- |
-| Preview URL | `OWNER_ACTION_REQUIRED` — prior deploy `dpl_H9xrsrEVyhLdm2aTWRJQ8a4aEFDr` SIGKILL OOM; retry after build-heap retune |
+| Preview URL | `https://mapableau-2x62z7uv9-mapableau.vercel.app` (READY `dpl_5v31ZBri…` tip `8c0f0db3`, heap 6144) — tip `e430d559` docs-only follow-up deploying |
 | Tester | Agent automated gates only; **human tester still required** |
 | Date | 2026-07-20 (automated evidence); human date TBD |
-| Environment | CI verified; preview URL pending redeploy |
+| Environment | CI verified; Vercel preview READY after 6144 retune |
 | Flag state observed | Code/default `false` (`VERIFIED` via acceptance tests); live preview observation `NOT_RUN` |
 | Overall result | **CONDITIONAL** — CI/Accessibility green; human preview `NOT_RUN` |
 
