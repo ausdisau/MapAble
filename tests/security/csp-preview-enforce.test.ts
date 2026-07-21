@@ -61,6 +61,29 @@ describe("CSP preview enforce gate", () => {
     ).toBe(true);
   });
 
+  it("enables for non-Vercel next start (CI) when flag is true", () => {
+    expect(
+      isCspPreviewEnforceEnabled(
+        env({
+          MAPABLE_CSP_ENFORCE_PREVIEW: "true",
+          NODE_ENV: "production",
+        }),
+      ),
+    ).toBe(true);
+  });
+
+  it("stays hard-off when VERCEL_ENV=production without VERCEL=1", () => {
+    expect(
+      isCspPreviewEnforceEnabled(
+        env({
+          MAPABLE_CSP_ENFORCE_PREVIEW: "true",
+          VERCEL_ENV: "production",
+          NODE_ENV: "production",
+        }),
+      ),
+    ).toBe(false);
+  });
+
   it("rejects empty nonce for enforce builder", () => {
     expect(() => buildContentSecurityPolicyEnforce("")).toThrow(/nonce/i);
     expect(() => buildContentSecurityPolicyEnforce("   ")).toThrow(/nonce/i);

@@ -14,7 +14,7 @@ export function isCspPreviewEnforceEnabled(
 ): boolean {
   if (env[CSP_PREVIEW_ENFORCE_FLAG] !== "true") return false;
 
-  // Hard-off on Vercel production and any explicit production env label.
+  // Hard-off on Vercel production (and any host labeled VERCEL_ENV=production).
   if (env.VERCEL_ENV === "production") return false;
 
   if (env.VERCEL === "1") {
@@ -22,12 +22,9 @@ export function isCspPreviewEnforceEnabled(
     return env.VERCEL_ENV === "preview";
   }
 
-  // Local / CI unit tests — never treat bare NODE_ENV=production as eligible.
-  return (
-    env.NODE_ENV === "development" ||
-    env.NODE_ENV === "test" ||
-    env.VITEST === "true"
-  );
+  // Non-Vercel: allow local/CI including `next start` (NODE_ENV=production).
+  // Production apex remains hard-off via VERCEL_ENV=production above.
+  return true;
 }
 
 export function createScriptNonce(): string {
