@@ -1,9 +1,9 @@
 # NDIS Expansion Master Plan
 
-**Status:** programme foundation (Wave 0) — not production approval  
-**Inspection base:** `origin/main` @ `8f64dc38` (PR #378 merged)  
+**Status:** Wave 0 on `main`; Wave 1 open as draft #382 — not production approval  
+**Inspection base:** `origin/main` @ `6279ab91` (#380 docs + #381 migrate-from-zero)  
 **Public claim:** unsupported — MapAble is not claimed as an NDIS-registered provider  
-**Product migrations in this wave:** none
+**Empty-DB migrate-from-zero:** `VERIFIED` green — production history reconciliation remains `OWNER_ACTION_REQUIRED`
 
 This programme extends the existing MapAble platform with eleven **connected** systems.
 They are not eleven independent applications. Every system reuses canonical identity,

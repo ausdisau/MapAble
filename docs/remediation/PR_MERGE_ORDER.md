@@ -2,25 +2,37 @@
 
 Do **not** combine these into one mega-PR. Do **not** start PR N+1 until PR N builds, passes required checks, and has an independent review summary.
 
-## Sequence
+**Main tip at refresh:** `6279ab91`  
+**Stack rule:** max three unmerged stacked PRs; prefer independent branches from `main`.
 
-| PR  | Title                                   | Depends on | Scope                                                                                                    |
-| --- | --------------------------------------- | ---------- | -------------------------------------------------------------------------------------------------------- |
-| 1   | Repository controls                     | —          | Remediation docs, CODEOWNERS, CI, migration checks, lint enforcement, branch-protection docs, a11y smoke |
-| 2   | Production configuration                | 1          | Typed env validation, encryption fail-closed, capability registry, claim checks, storage gating          |
-| 3   | Auth, permission and tenancy hardening  | 2          | Server guards, tenant context, break-glass, negative access tests                                        |
-| 4   | Consent canonicalisation                | 3          | ConsentDecision service, adapter, disclosure ledger, revocation tests                                    |
-| 5   | Billing canonicalisation                | 3          | BillingInvoice SoT, evidence linkage, pricing version, recon foundation                                  |
-| 6   | Care transaction completion             | 4, 5       | Agreements, recurrence, recovery, evidence invoicing, e2e                                                |
-| 7   | Transport canonicalisation              | 4, 5       | Trip migration plan, access profiles, quotes, address protection                                         |
-| 8   | Transport transaction completion        | 7          | Offline events, evidence, disputes, holds, e2e                                                           |
-| 9   | Jobs transaction completion             | 6, 8       | Disclosure, interview a11y, retention, orchestration, e2e                                                |
-| 10  | Quality and Safeguards Ops              | 3, 4       | Taxonomy, deadlines, investigation, corrective actions                                                   |
-| 11  | Public Accountability Portal            | 5, 10      | Publication pipeline, methodology, suppression, corrections                                              |
-| 12  | Observability and operational readiness | 6, 8, 11   | Telemetry, SLOs, runbooks, recovery                                                                      |
-| 13  | Mobile and offline foundations          | 6, 8, 12   | Stable mobile API, encrypted offline queue, worker/driver flows                                          |
+## Active remediation sequence (2026-07-20)
 
-## Dependency graph
+| Order | Title                                      | Depends on                                | Scope                                                                                         |
+| ----- | ------------------------------------------ | ----------------------------------------- | --------------------------------------------------------------------------------------------- |
+| A     | Repository truth and change controls       | current `main`                            | Evidence ledger, stale-doc repair, readiness CI consistency, PR stack map                     |
+| B     | Repair existing #382 AT Continuity         | A reviewable; #381/#380 already on `main` | Format, a11y OOM diagnosis, acceptance tests; flag remains false                              |
+| C     | Preview-gated runtime hardening            | A independently reviewable                | CSP nonce/preview enforce (not production), config tests, health/SLO docs, rate-limit honesty |
+| D     | Human ops / a11y / golden-journey evidence | A–C as applicable                         | Owner actions + `NOT_RUN` until humans execute                                                |
+
+## Historical canonicalisation sequence (unchanged intent)
+
+| PR  | Title                                   | Depends on | Scope                                                             |
+| --- | --------------------------------------- | ---------- | ----------------------------------------------------------------- |
+| 1   | Repository controls                     | —          | Remediation docs, CODEOWNERS, CI, migration checks                |
+| 2   | Production configuration                | 1          | Typed env validation, encryption fail-closed, capability registry |
+| 3   | Auth, permission and tenancy hardening  | 2          | Server guards, tenant context, break-glass                        |
+| 4   | Consent canonicalisation                | 3          | ConsentDecision service, revocation tests                         |
+| 5   | Billing canonicalisation                | 3          | BillingInvoice SoT                                                |
+| 6   | Care transaction completion             | 4, 5       | Agreements, recurrence, evidence invoicing                        |
+| 7   | Transport canonicalisation              | 4, 5       | Trip migration plan, quotes                                       |
+| 8   | Transport transaction completion        | 7          | Offline events, disputes                                          |
+| 9   | Jobs transaction completion             | 6, 8       | Disclosure, retention                                             |
+| 10  | Quality and Safeguards Ops              | 3, 4       | Investigation loop                                                |
+| 11  | Public Accountability Portal            | 5, 10      | Publication pipeline                                              |
+| 12  | Observability and operational readiness | 6, 8, 11   | Telemetry, SLOs, runbooks                                         |
+| 13  | Mobile and offline foundations          | 6, 8, 12   | Stable mobile API                                                 |
+
+## Dependency graph (historical)
 
 ```text
 PR1 → PR2 → PR3 → PR4 → PR6 → PR9
@@ -31,12 +43,11 @@ PR1 → PR2 → PR3 → PR4 → PR6 → PR9
                          PR6/PR8 ─────┘
 ```
 
-## PR 1 exit criteria (gate for PR 2)
+## Exit criteria for sequence A (this PR)
 
 - [ ] CI workflow green (install, prisma, type-check, format, lint, test, build, ownership/migration collision checks)
-- [ ] Migrations workflow green (order + integrity + ephemeral schema coherence; migrate-from-zero report may warn until stub baseline PR)
-- [ ] Security workflow green (Semgrep retained + additional gates)
-- [ ] Accessibility workflow green (Playwright + axe smoke)
-- [ ] Production-claims workflow green
+- [ ] Migrations + migrate-from-zero green (empty DB)
+- [ ] `pnpm ci:readiness-evidence` green
+- [ ] Security / production-claims / accessibility workflows green or explicitly `NOT_RUN` with reason
 - [ ] Concise review summary; no unrelated product features
-- [ ] Duplicate migration timestamp repaired and inventoried
+- [ ] No claim of production readiness without ledger evidence

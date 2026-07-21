@@ -25,15 +25,15 @@ Effective branch protection **cannot be claimed configured** from automation. Ac
 
 Configure these check names to match the workflow job names exactly:
 
-| Check             | Workflow                                  | Purpose                                                                               |
-| ----------------- | ----------------------------------------- | ------------------------------------------------------------------------------------- |
-| CI                | `.github/workflows/ci.yml`                | Install, Prisma, type-check, format, lint, test, build, ownership/migration collision |
-| Migrations        | `.github/workflows/migrations.yml`        | Ephemeral schema coherence + integrity                                                |
-| Migrate from zero | `.github/workflows/migrations.yml`        | Hard-fail `prisma migrate deploy` on empty DB (currently red until Wave 1 baseline)   |
-| Security          | `.github/workflows/security.yml`          | Semgrep + prod audit gate + secret/fallback/route checks                              |
-| Accessibility     | `.github/workflows/accessibility.yml`     | Playwright + axe smoke                                                                |
-| Production claims | `.github/workflows/production-claims.yml` | Public claim / db push / certification language gates                                 |
-| Vercel Preview    | Vercel GitHub integration                 | Preview deployment                                                                    |
+| Check             | Workflow                                  | Purpose                                                                                        |
+| ----------------- | ----------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| CI                | `.github/workflows/ci.yml`                | Install, Prisma, type-check, format, lint, test, build, ownership/migration collision          |
+| Migrations        | `.github/workflows/migrations.yml`        | Ephemeral schema coherence + integrity                                                         |
+| Migrate from zero | `.github/workflows/migrations.yml`        | Hard-fail `prisma migrate deploy` on empty DB — **green on `main` after #381**; still required |
+| Security          | `.github/workflows/security.yml`          | Semgrep + prod audit gate + secret/fallback/route checks                                       |
+| Accessibility     | `.github/workflows/accessibility.yml`     | Playwright + axe smoke                                                                         |
+| Production claims | `.github/workflows/production-claims.yml` | Public claim / db push / certification language gates                                          |
+| Vercel Preview    | Vercel GitHub integration                 | Preview deployment                                                                             |
 
 Until Vercel is connected, mark Vercel Preview as required only when the integration is active (`needs_runtime_verification`).
 

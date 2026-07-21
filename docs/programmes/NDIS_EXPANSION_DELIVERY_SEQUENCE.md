@@ -1,22 +1,24 @@
 # NDIS Expansion — Delivery Sequence
 
-**Status:** Wave 0 sequencing — not a merge or deploy authorisation  
-**Inspected main tip:** `8f64dc38` (PR #378 merged)  
-**Product entry gate:** **closed** until migrate-from-zero is green
+**Status:** Wave 0 landed; Wave 1 repair in flight — not a merge or deploy authorisation  
+**Inspected main tip:** `6279ab91` (PR #380 merged; #381 migrate-from-zero on main)  
+**Product entry gate:** Wave 1 open as #382 with flag off; freeze waiver narrow
 
-## Hard stop
+## Hard stop (refreshed 2026-07-20)
 
-| Prerequisite                                           | Status at Wave 0 inspection                                   |
-| ------------------------------------------------------ | ------------------------------------------------------------- |
-| PR #378 merged or equivalent release blockers resolved | **Pass** — merged                                             |
-| Required CI checks effective                           | **Partial** — migrate-from-zero hard-fails                    |
-| Migration-from-zero on disposable PostgreSQL           | **Fail** — P3018 @ `20260525000000_mapable_access_phase_1`    |
-| Migration order + integrity                            | **Pass** on tip                                               |
-| Auth + tenant-isolation suites                         | Existing; not sufficient alone while migrate-from-zero is red |
-| Feature freeze                                         | **Active** — new product Prisma domains frozen                |
+| Prerequisite                                   | Status                                                                             |
+| ---------------------------------------------- | ---------------------------------------------------------------------------------- |
+| PR #378 / #380 / #381 on `main`                | **Pass** — merged                                                                  |
+| Required CI checks effective                   | **Partial** — branch protection `OWNER_ACTION_REQUIRED`                            |
+| Migration-from-zero on disposable PostgreSQL   | **Pass** — `VERIFIED` green on `main` CI                                           |
+| Production `_prisma_migrations` reconciliation | **`OWNER_ACTION_REQUIRED`** — separate from empty-DB green                         |
+| Migration order + integrity                    | **Pass** on tip                                                                    |
+| Feature freeze                                 | **Active** — AT Continuity narrow waiver for #382 only                             |
+| Wave 1 (#382) CI + Accessibility               | **Pass** on repaired tip; leave draft until human preview acceptance               |
+| Wave 1 Vercel preview                          | **Pass** — READY after build-heap retune (6144); human synthetic journey `NOT_RUN` |
 
-Until migrate-from-zero is green **and** freeze is lifted or waived for the target
-domain, **do not** start product Waves 1–11. Complete Wave 0 documentation only.
+Empty-DB migrate-from-zero is no longer the active product-entry blocker. Wave 1 remains
+gated by freeze waiver discipline, green CI on #382, human acceptance, and fail-closed flags.
 
 ## Pull request order
 
@@ -73,11 +75,12 @@ Non-deliverables:
 
 Prerequisites:
 
-1. Wave 0 docs PR #380 merged — **done**
-2. Migration-trust repair #381: migrate-from-zero green — **done**
-3. Required CI green on then-current `main`
-4. Feature freeze lifted or AT domain explicitly waived — **AT Continuity waiver** in `FEATURE_FREEZE.md`
-5. Fresh branch from then-current `main`
+1. ~~Wave 0 PR merged~~ — **done** (#380)
+2. ~~Migration-trust repair: migrate-from-zero green~~ — **done** (#381)
+3. ~~Repair #382 CI (format) + Accessibility OOM~~ — **done** on repaired tip; keep draft
+4. Feature freeze AT waiver remains narrow; flag stays false
+5. Human preview acceptance + audit evidence before any enable discussion
+6. Production checksum reconciliation remains `OWNER_ACTION_REQUIRED` (parallel, not a flag enable)
 
 See [AT_CONTINUITY_WAVE1.md](./AT_CONTINUITY_WAVE1.md).
 
