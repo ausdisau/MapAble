@@ -1,7 +1,7 @@
 /**
  * Productisation + leadership train — PR action ledger.
  * Actions: merge | rebase | recreate | split | consolidate | supersede | close | archive | defer | retain_as_reference | retire_after_migration
- * Verified against live GitHub state at ledger refresh (2026-07-17T19:18Z, main fb80bc83); descriptions are not evidence of main source.
+ * Verified against live GitHub state at ledger refresh (2026-07-20, main 6279ab91); descriptions are not evidence of main source.
  */
 
 export type PrLedgerAction =
@@ -51,11 +51,10 @@ export const SUPERSEDED_CLOSE_TARGETS: number[] = [
 export const MAX_UNMERGED_STACK_DEPTH = 3;
 
 /**
- * Immediate leadership train on current main (depth ≤ 3).
- * Strategy #331 → Trust Fabric #328 → Access Evidence #329.
- * #330 Starting Work DB queues when a slot frees; Transport/Care recreate after #330.
+ * Immediate independent-from-main tips under stack policy (depth ≤ 3).
+ * #330/#341/#340 are MERGED. Do not deepen the Geoscape train (#367→#386).
  */
-export const PRODUCTISATION_TRAIN_HEADS: number[] = [330, 341, 340];
+export const PRODUCTISATION_TRAIN_HEADS: number[] = [367, 382, 383];
 
 export const PR_ACTION_LEDGER: PrActionLedgerEntry[] = [
   {
@@ -151,7 +150,8 @@ export const PR_ACTION_LEDGER: PrActionLedgerEntry[] = [
     schemaImpact: "medium",
     canonicalDomains: ["transport.trip"],
     action: "retain_as_reference",
-    reason: "Consolidate writers onto TransportTrip; Booking retire_after_migration.",
+    reason:
+      "Consolidate writers onto TransportTrip; Booking retire_after_migration.",
     dependencies: [],
     operatingModeNote: "scaffold → synthetic",
     productionClaimAllowed: false,
@@ -265,14 +265,16 @@ export const PR_ACTION_LEDGER: PrActionLedgerEntry[] = [
     schemaImpact: "medium",
     canonicalDomains: ["journeys.starting_work"],
     action: "retain_as_reference",
-    reason: "Closed as stack tip; synthetic Starting Work landed via #327; durable projection is #330.",
+    reason:
+      "Closed as stack tip; synthetic Starting Work landed via #327; durable projection is #330.",
     dependencies: [327],
     operatingModeNote: "synthetic on main; DB projection queued as #330",
     productionClaimAllowed: false,
   },
   {
     number: 327,
-    title: "Care/Transport/Billing slices, Companion, Provider Ops, Starting Work",
+    title:
+      "Care/Transport/Billing slices, Companion, Provider Ops, Starting Work",
     state: "MERGED",
     isDraft: false,
     baseBranch: "main",
@@ -303,7 +305,8 @@ export const PR_ACTION_LEDGER: PrActionLedgerEntry[] = [
     schemaImpact: "none",
     canonicalDomains: ["convergence.control_plane"],
     action: "retain_as_reference",
-    reason: "Leadership train slot 1 — docs/strategy + capability honesty; no product migration.",
+    reason:
+      "Leadership train slot 1 — docs/strategy + capability honesty; no product migration.",
     dependencies: [327],
     operatingModeNote: "documentation / claim discipline",
     productionClaimAllowed: false,
@@ -346,15 +349,14 @@ export const PR_ACTION_LEDGER: PrActionLedgerEntry[] = [
   {
     number: 330,
     title: "Database-Backed Starting Work Golden Journey",
-    state: "OPEN",
+    state: "MERGED",
     isDraft: false,
     baseBranch: "main",
     mergeable: "MERGEABLE",
     schemaImpact: "medium",
     canonicalDomains: ["journeys.starting_work"],
-    action: "merge",
-    reason:
-      "Leadership train slot 1 — MIG 20260717140000; temporary projection only — no CareOSMission.",
+    action: "retain_as_reference",
+    reason: "MERGED 2026-07-17 — no longer an open merge target.",
     dependencies: [328, 329, 327],
     operatingModeNote: "controlled_pilot projection — flags default off",
     productionClaimAllowed: false,
@@ -405,7 +407,8 @@ export const PR_ACTION_LEDGER: PrActionLedgerEntry[] = [
     schemaImpact: "medium",
     canonicalDomains: ["journeys.starting_work"],
     action: "close",
-    reason: "Duplicates open Moat #330; do not open starting-work-db-journey-e909.",
+    reason:
+      "Duplicates open Moat #330; do not open starting-work-db-journey-e909.",
     supersededBy: 330,
     dependencies: [333],
     operatingModeNote: "superseded by #330",
@@ -433,15 +436,14 @@ export const PR_ACTION_LEDGER: PrActionLedgerEntry[] = [
   {
     number: 341,
     title: "Persistent TransportQuote recreate (unique migration)",
-    state: "OPEN",
-    isDraft: true,
+    state: "MERGED",
+    isDraft: false,
     baseBranch: "main",
     mergeable: "MERGEABLE",
     schemaImpact: "medium",
     canonicalDomains: ["transport.quotes"],
-    action: "merge",
-    reason:
-      "Recreates closed #332 with MIG 20260717150000 after Trust Fabric; merge after #330.",
+    action: "retain_as_reference",
+    reason: "MERGED 2026-07-17 — supersedes #332; no longer open.",
     supersedes: [332],
     dependencies: [330],
     operatingModeNote: "internal_alpha — flags default off",
@@ -451,20 +453,19 @@ export const PR_ACTION_LEDGER: PrActionLedgerEntry[] = [
   {
     number: 340,
     title: "Recurring Care schedules recreate (unique migration)",
-    state: "OPEN",
-    isDraft: true,
-    baseBranch: "cursor/transport-persistent-quotes-b3d4",
+    state: "MERGED",
+    isDraft: false,
+    baseBranch: "main",
     mergeable: "MERGEABLE",
     schemaImpact: "medium",
     canonicalDomains: ["care.recurring"],
-    action: "merge",
-    reason:
-      "Recreates closed #333 with MIG 20260717160000 after Access Evidence; stack on #341.",
+    action: "retain_as_reference",
+    reason: "MERGED 2026-07-17 — supersedes #333; no longer open.",
     supersedes: [333],
     dependencies: [341],
     operatingModeNote: "internal_alpha — flags default off",
     productionClaimAllowed: false,
-    stackDepth: 2,
+    stackDepth: 1,
   },
   {
     number: 319,
@@ -558,7 +559,8 @@ export const PR_ACTION_LEDGER: PrActionLedgerEntry[] = [
     schemaImpact: "none",
     canonicalDomains: ["access.cast"],
     action: "close",
-    reason: "Base #324 already merged; tip work should land as follow-up on main if still needed.",
+    reason:
+      "Base #324 already merged; tip work should land as follow-up on main if still needed.",
     supersededBy: 324,
     dependencies: [324],
     operatingModeNote: "retired duplicate tip",
@@ -638,7 +640,8 @@ export const PR_ACTION_LEDGER: PrActionLedgerEntry[] = [
     schemaImpact: "high",
     canonicalDomains: ["continuity.os"],
     action: "close",
-    reason: "Superseded by #301 Continuity direction; avoid dual Continuity SoT.",
+    reason:
+      "Superseded by #301 Continuity direction; avoid dual Continuity SoT.",
     supersededBy: 301,
     dependencies: [],
     operatingModeNote: "retired predecessor",
@@ -670,7 +673,8 @@ export const PR_ACTION_LEDGER: PrActionLedgerEntry[] = [
     schemaImpact: "high",
     canonicalDomains: ["auth.sessions"],
     action: "close",
-    reason: "Conflicts with declared NextAuth ownership in DOMAIN_OWNERSHIP.md.",
+    reason:
+      "Conflicts with declared NextAuth ownership in DOMAIN_OWNERSHIP.md.",
     dependencies: [],
     operatingModeNote: "retired — wrong auth SoT",
     productionClaimAllowed: false,
@@ -685,7 +689,8 @@ export const PR_ACTION_LEDGER: PrActionLedgerEntry[] = [
     schemaImpact: "medium",
     canonicalDomains: ["programmes.connected_capability"],
     action: "rebase",
-    reason: "CONFLICTING with main; rebase after #312/#313 — no new participant SoT.",
+    reason:
+      "CONFLICTING with main; rebase after #312/#313 — no new participant SoT.",
     dependencies: [312],
     operatingModeNote: "scaffold",
     productionClaimAllowed: false,
@@ -731,7 +736,8 @@ export const PR_ACTION_LEDGER: PrActionLedgerEntry[] = [
     schemaImpact: "high",
     canonicalDomains: ["access.intelligence", "places.access_place"],
     action: "supersede",
-    reason: "Sibling of #273; rebuild/consolidate onto AI Next — do not merge both.",
+    reason:
+      "Sibling of #273; rebuild/consolidate onto AI Next — do not merge both.",
     supersededBy: 273,
     dependencies: [],
     operatingModeNote: "superseded sibling",
@@ -841,7 +847,8 @@ export const PR_ACTION_LEDGER: PrActionLedgerEntry[] = [
     schemaImpact: "high",
     canonicalDomains: ["consent", "identity.credentials"],
     action: "split",
-    reason: "Split from mega-stack; extend consent on main — no new person SoT.",
+    reason:
+      "Split from mega-stack; extend consent on main — no new person SoT.",
     dependencies: [296],
     operatingModeNote: "concept",
     productionClaimAllowed: false,
@@ -856,7 +863,8 @@ export const PR_ACTION_LEDGER: PrActionLedgerEntry[] = [
     schemaImpact: "high",
     canonicalDomains: ["aura.proposal"],
     action: "defer",
-    reason: "Land only after security + consent; L≤3 propose; no authority writes.",
+    reason:
+      "Land only after security + consent; L≤3 propose; no authority writes.",
     dependencies: [298, 313],
     operatingModeNote: "concept — ceiling L3_PROPOSE",
     productionClaimAllowed: false,
@@ -902,15 +910,173 @@ export const PR_ACTION_LEDGER: PrActionLedgerEntry[] = [
     schemaImpact: "high",
     canonicalDomains: ["care.careos_parallel"],
     action: "defer",
-    reason: "Second CareOSMission writer — blocked without architecture decision.",
+    reason:
+      "Second CareOSMission writer — blocked without architecture decision.",
     dependencies: [231],
     operatingModeNote: "deferred — kill criterion if merged as SoT",
     productionClaimAllowed: false,
     stackDepth: 3,
   },
+  {
+    number: 367,
+    title: "Geoscape G-NAF street address autocomplete",
+    state: "OPEN",
+    isDraft: true,
+    baseBranch: "main",
+    mergeable: "MERGEABLE",
+    schemaImpact: "low",
+    canonicalDomains: ["booking.address", "geoscape.predictive"],
+    action: "defer",
+    reason:
+      "Merge only after licensing/privacy approval (OWNER_ACTION_REQUIRED). Then retarget #384 onto main to reduce stack to ≤3. Do not add a fifth PR.",
+    dependencies: [],
+    operatingModeNote:
+      "controlled_pilot adapters — GEOSCAPE_PREDICTIVE_ENABLED default false",
+    productionClaimAllowed: false,
+    stackDepth: 1,
+  },
+  {
+    number: 379,
+    title: "Positive Behaviour Support foundation",
+    state: "OPEN",
+    isDraft: true,
+    baseBranch: "main",
+    mergeable: "CONFLICTING",
+    schemaImpact: "high",
+    canonicalDomains: ["ndis.pbs_operations"],
+    action: "defer",
+    reason:
+      "Blocked/extractable future Wave 7 — path lib/positive-behaviour-support/** is non-canonical; Wave 0 owner is lib/pbs-operations/**. Do not merge as-is.",
+    dependencies: [],
+    operatingModeNote: "Wave 7 partner-clinical — flags must stay false",
+    productionClaimAllowed: false,
+    stackDepth: 1,
+  },
+  {
+    number: 382,
+    title: "NDIS Expansion Wave 1 — AT Continuity scaffold",
+    state: "OPEN",
+    isDraft: true,
+    baseBranch: "main",
+    mergeable: "MERGEABLE",
+    schemaImpact: "medium",
+    canonicalDomains: ["ndis.at_continuity"],
+    action: "rebase",
+    reason:
+      "Repair format:check + Accessibility OOM on existing tip; MAPABLE_AT_CONTINUITY_ENABLED=false; leave draft until CI + human acceptance.",
+    dependencies: [380, 381],
+    operatingModeNote:
+      "scaffold — no clinical/emergency claims; human-approved notifications",
+    productionClaimAllowed: false,
+    stackDepth: 1,
+  },
+  {
+    number: 383,
+    title: "VisionAccess shared contracts and synthetic Access Lens",
+    state: "OPEN",
+    isDraft: true,
+    baseBranch: "main",
+    mergeable: "MERGEABLE",
+    schemaImpact: "none",
+    canonicalDomains: ["vision.access_lens"],
+    action: "defer",
+    reason:
+      "Freeze review — independent from main; keep flags false; do not stack under Geoscape train.",
+    dependencies: [],
+    operatingModeNote: "synthetic_demo — no camera/inference",
+    productionClaimAllowed: false,
+    stackDepth: 1,
+  },
+  {
+    number: 384,
+    title: "Access Address Intelligence context",
+    state: "OPEN",
+    isDraft: true,
+    baseBranch: "cursor/geoscape-street-address-de67",
+    mergeable: "MERGEABLE",
+    schemaImpact: "low",
+    canonicalDomains: ["spatial.address_intelligence"],
+    action: "defer",
+    reason: "Stacked on #367 — wait for depth reduction / human retarget plan.",
+    dependencies: [367],
+    operatingModeNote: "flags default false — confirmation ≠ accessibility",
+    productionClaimAllowed: false,
+    stackDepth: 2,
+  },
+  {
+    number: 385,
+    title: "Entrance and drop-off candidate resolver",
+    state: "OPEN",
+    isDraft: true,
+    baseBranch: "cursor/access-address-intelligence-1c07",
+    mergeable: "MERGEABLE",
+    schemaImpact: "low",
+    canonicalDomains: ["spatial.approach_candidates"],
+    action: "defer",
+    reason: "Stacked on #384 — at max policy depth; do not add children.",
+    dependencies: [384, 367],
+    operatingModeNote: "synthetic harbour_civic — inferred never public",
+    productionClaimAllowed: false,
+    stackDepth: 3,
+  },
+  {
+    number: 386,
+    title: "Governed provider service-area contracts",
+    state: "OPEN",
+    isDraft: true,
+    baseBranch: "cursor/access-approach-resolver-1c07",
+    mergeable: "MERGEABLE",
+    schemaImpact: "low",
+    canonicalDomains: ["providers.service_areas"],
+    action: "consolidate",
+    reason:
+      "Stack depth 4 exceeds MAX_UNMERGED_STACK_DEPTH=3 — human must consolidate/split/retarget before merge consideration.",
+    dependencies: [385, 384, 367],
+    operatingModeNote: "flags default false — no paid ranking",
+    productionClaimAllowed: false,
+    stackDepth: 4,
+  },
+  {
+    number: 387,
+    title: "Reconcile production-readiness truth and change controls",
+    state: "OPEN",
+    isDraft: true,
+    baseBranch: "main",
+    mergeable: "MERGEABLE",
+    schemaImpact: "none",
+    canonicalDomains: ["convergence.control_plane"],
+    action: "merge",
+    reason:
+      "Authorised merge tip — docs/CI/ledger + scoped axios >=1.18.0 override for GHSA-gcfj-64vw-6mp9; no product domain.",
+    dependencies: [],
+    operatingModeNote:
+      "remediation controls — see AXIOS_GHSA_GCFJ_64VW_6MP9.md",
+    productionClaimAllowed: false,
+    stackDepth: 1,
+  },
+  {
+    number: 388,
+    title: "Preview-gated runtime assurance controls",
+    state: "OPEN",
+    isDraft: true,
+    baseBranch: "main",
+    mergeable: "MERGEABLE",
+    schemaImpact: "none",
+    canonicalDomains: ["security.csp", "ops.runtime"],
+    action: "rebase",
+    reason:
+      "Rebase onto post-#387 main; validate CSP preview flag-on evidence; production enforce remains off.",
+    dependencies: [387],
+    operatingModeNote:
+      "MAPABLE_CSP_ENFORCE_PREVIEW fail-closed; hard-off in production",
+    productionClaimAllowed: false,
+    stackDepth: 1,
+  },
 ];
 
-export function ledgerEntriesByAction(action: PrLedgerAction): PrActionLedgerEntry[] {
+export function ledgerEntriesByAction(
+  action: PrLedgerAction,
+): PrActionLedgerEntry[] {
   return PR_ACTION_LEDGER.filter((e) => e.action === action);
 }
 

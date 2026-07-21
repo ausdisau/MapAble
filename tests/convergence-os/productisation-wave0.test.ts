@@ -21,7 +21,9 @@ import { join } from "node:path";
 
 describe("Productisation Wave 0 registries", () => {
   it("keeps foundation train and adds productisation train", () => {
-    expect(FOUNDATION_MERGE_TRAIN.trainKey).toBe("foundation_governance_prep_v1");
+    expect(FOUNDATION_MERGE_TRAIN.trainKey).toBe(
+      "foundation_governance_prep_v1",
+    );
     expect(PRODUCTISATION_MERGE_TRAIN.trainKey).toBe(
       "productisation_connected_service_v1",
     );
@@ -39,12 +41,25 @@ describe("Productisation Wave 0 registries", () => {
     const closeNumbers = ledgerEntriesByAction("close")
       .map((e) => e.number)
       .sort((a, b) => a - b);
-    expect(closeNumbers).toEqual([...SUPERSEDED_CLOSE_TARGETS].sort((a, b) => a - b));
+    expect(closeNumbers).toEqual(
+      [...SUPERSEDED_CLOSE_TARGETS].sort((a, b) => a - b),
+    );
   });
 
   it("enforces stack depth policy and train heads ≤ 3", () => {
     expect(MAX_UNMERGED_STACK_DEPTH).toBe(3);
-    expect(PRODUCTISATION_TRAIN_HEADS).toEqual([330, 341, 340]);
+    // #330/#341/#340 are MERGED; heads are the next independent-from-main tips (depth ≤ 3).
+    expect(PRODUCTISATION_TRAIN_HEADS).toEqual([367, 382, 383]);
+    expect(PR_ACTION_LEDGER.find((e) => e.number === 330)?.state).toBe(
+      "MERGED",
+    );
+    expect(PR_ACTION_LEDGER.find((e) => e.number === 341)?.state).toBe(
+      "MERGED",
+    );
+    expect(PR_ACTION_LEDGER.find((e) => e.number === 340)?.state).toBe(
+      "MERGED",
+    );
+
     expect(() => assertStackDepthPolicy()).not.toThrow();
     expect(() => assertProductisationTrainDepth()).not.toThrow();
     for (const entry of PR_ACTION_LEDGER) {
@@ -58,12 +73,16 @@ describe("Productisation Wave 0 registries", () => {
   });
 
   it("records AccessCast #324 as merged and duplicates as close", () => {
-    expect(existsSync(join(process.cwd(), "lib/accesscast/index.ts"))).toBe(true);
+    expect(existsSync(join(process.cwd(), "lib/accesscast/index.ts"))).toBe(
+      true,
+    );
     const merged = PR_ACTION_LEDGER.find((e) => e.number === 324);
     expect(merged?.state).toBe("MERGED");
     expect(merged?.action).toBe("retain_as_reference");
     for (const n of [320, 321, 322, 325]) {
-      expect(PR_ACTION_LEDGER.find((e) => e.number === n)?.action).toBe("close");
+      expect(PR_ACTION_LEDGER.find((e) => e.number === n)?.action).toBe(
+        "close",
+      );
     }
   });
 
@@ -75,7 +94,9 @@ describe("Productisation Wave 0 registries", () => {
 
   it("forbids public production claims without maturity evidence", () => {
     expect(() => assertNoProductionClaimsWithoutEvidence()).not.toThrow();
-    expect(PUBLIC_CLAIM_REGISTRY.every((c) => !c.publicClaimAllowed)).toBe(true);
+    expect(PUBLIC_CLAIM_REGISTRY.every((c) => !c.publicClaimAllowed)).toBe(
+      true,
+    );
     expect(
       PUBLIC_CLAIM_REGISTRY.some((c) =>
         c.prohibitedWording.some((w) => w.toLowerCase().includes("guaranteed")),
@@ -120,7 +141,9 @@ describe("Productisation Wave 0 registries", () => {
     const closeSteps = PRODUCTISATION_MERGE_TRAIN.steps.filter((s) =>
       s.action.startsWith("close"),
     );
-    const wave0 = PRODUCTISATION_MERGE_TRAIN.steps.find((s) => s.prNumber === 312);
+    const wave0 = PRODUCTISATION_MERGE_TRAIN.steps.find(
+      (s) => s.prNumber === 312,
+    );
     expect(closeSteps.length).toBeGreaterThanOrEqual(4);
     expect(closeSteps[0]!.stepOrder).toBeLessThan(wave0!.stepOrder);
   });

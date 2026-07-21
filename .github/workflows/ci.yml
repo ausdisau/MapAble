@@ -99,6 +99,9 @@ jobs:
       - name: Merge-train / PR ledger integrity
         run: pnpm exec tsx scripts/ci/check-merge-train-integrity.ts
 
+      - name: Readiness evidence consistency
+        run: pnpm exec tsx scripts/ci/check-readiness-evidence-consistency.ts
+
       - name: Production build
         run: pnpm build
 

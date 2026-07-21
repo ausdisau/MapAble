@@ -55,13 +55,13 @@
 
 | System | Planned owner path | Reuses | Must not create |
 |--------|-------------------|--------|-----------------|
-| AT Continuity | `lib/at-continuity/**` (planned; **no writers yet**) | ParticipantProfile, ConsentRecord, AuditEvent, Care/Transport/Jobs links, provider refs | Clinical suitability SoT; second participant identity |
+| AT Continuity | `lib/at-continuity/**` (Wave 1 in #382; writers flag-gated; not on main yet) | ParticipantProfile, ConsentRecord, AuditEvent, Care/Transport/Jobs links, provider refs | Clinical suitability SoT; second participant identity; emergency-response claims |
 | Plan & Evidence Navigator | `lib/plan-evidence/**` (planned) | Personal data vault patterns, ProgrammeSourceRecord, ConsentRecord, AuditEvent, ParticipantAuthorityGrant | Eligibility engine; fabricated budgets |
 | Support Coordination Outcomes | `lib/support-coordinator/**` (extend) | Existing SC relationships/tasks/plan summaries | Second SC relationship model |
 | Home & Living Navigator | `lib/home-living/**` (planned) | AccessPlace, Care, Transport, AT links, service agreements | Duplicate property registry; housemate compatibility scores |
 | Workforce Assurance | `lib/workforce-readiness/**` + provider-quality (extend) | WorkerProfile, credentials, Academy, incidents | Worker quality scores; auto-assign; auto-clearance |
 | Psychosocial Recovery | `lib/psychosocial-recovery/**` (planned) | Consent, Audit, Calendar, Care links | Clinical treatment plan; crisis prediction |
-| PBS Operations | `lib/pbs-operations/**` (planned) | Consent, Audit, Incident, Worker acknowledgement | AI-approved plans; MapAble as clinical SoT |
+| PBS Operations | `lib/pbs-operations/**` (planned canonical) | Consent, Audit, Incident, Worker acknowledgement | AI-approved plans; MapAble as clinical SoT; **reject** #379 `lib/positive-behaviour-support/**` as Wave 7 SoT |
 | Early Childhood | `lib/early-childhood/**` (planned) | ParticipantAuthorityGrant, Consent, Audit | Developmental ranking scores; advertising use |
 | Allied Health / Home Mod | `lib/allied-health-exchange/**` (planned) | Provider directory, AT Continuity, AccessPlace, Billing evidence | Prescribing; building certification by MapAble |
 | Plan Management Infrastructure | `lib/plan-manager/**` + `lib/billing/**` (extend) | Billing Centre, catalogue, agreements | Live NDIA submit; AI payment approval |
