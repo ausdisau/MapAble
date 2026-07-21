@@ -48,7 +48,7 @@ describe("POST /api/security/csp-report", () => {
     expect(res.status).toBe(415);
   });
 
-  it("rejects oversized bodies", async () => {
+  it("rejects oversized bodies with 413", async () => {
     const res = await POST(
       reportRequest({
         "csp-report": {
@@ -57,7 +57,7 @@ describe("POST /api/security/csp-report", () => {
         },
       }),
     );
-    expect(res.status).toBe(400);
+    expect(res.status).toBe(413);
   });
 
   it("accepts Reporting API arrays", async () => {

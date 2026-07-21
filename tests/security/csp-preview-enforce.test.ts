@@ -1,17 +1,21 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  assertEnforcePolicyShape,
   createScriptNonce,
   isCspPreviewEnforceEnabled,
 } from "@/lib/security/csp-preview-enforce";
-import { buildContentSecurityPolicyEnforce } from "@/lib/security/headers";
+import {
+  buildContentSecurityPolicyEnforce,
+  buildContentSecurityPolicyReportOnly,
+} from "@/lib/security/headers";
 
 function env(partial: Record<string, string | undefined>): NodeJS.ProcessEnv {
   return partial as unknown as NodeJS.ProcessEnv;
 }
 
 describe("CSP preview enforce gate", () => {
-  it("defaults fail-closed", () => {
+  it("defaults fail-closed (flag off)", () => {
     expect(isCspPreviewEnforceEnabled(env({}))).toBe(false);
     expect(
       isCspPreviewEnforceEnabled(
@@ -57,24 +61,29 @@ describe("CSP preview enforce gate", () => {
     ).toBe(true);
   });
 
-  it("builds a path-agnostic enforce policy without unsafe-eval for smoke routes", () => {
+  it("rejects empty nonce for enforce builder", () => {
+    expect(() => buildContentSecurityPolicyEnforce("")).toThrow(/nonce/i);
+    expect(() => buildContentSecurityPolicyEnforce("   ")).toThrow(/nonce/i);
+  });
+
+  it("builds enforce policy with matching nonce and without unsafe-eval", () => {
     const nonce = createScriptNonce();
     const csp = buildContentSecurityPolicyEnforce(nonce);
-    expect(csp).toContain(`'nonce-${nonce}'`);
-    expect(csp).not.toContain("'unsafe-eval'");
-    expect(csp).toContain("report-uri /api/security/csp-report");
+    expect(assertEnforcePolicyShape(csp, nonce)).toEqual([]);
+    const scriptSrc = csp.split("; ").find((d) => d.startsWith("script-src "));
+    expect(scriptSrc).toBeTruthy();
+    expect(scriptSrc).not.toContain("'unsafe-eval'");
+    expect(scriptSrc).not.toContain("'unsafe-inline'");
+    // style-src may still use unsafe-inline for Next.js CSS — not a script bypass
+    expect(csp).toContain("style-src 'self' 'unsafe-inline'");
+  });
 
-    // Same policy applies to inventoried smoke entry points (header is global).
-    for (const path of [
-      "/",
-      "/login",
-      "/provider-finder",
-      "/accessibility-map",
-      "/care",
-      "/transport",
-    ]) {
-      expect(path.startsWith("/")).toBe(true);
-      expect(csp).toContain("default-src 'self'");
-    }
+  it("keeps report-only production policy unchanged (unsafe-eval present)", () => {
+    const reportOnly = buildContentSecurityPolicyReportOnly();
+    expect(reportOnly).toContain("'unsafe-eval'");
+    expect(reportOnly).toContain("'unsafe-inline'");
+    expect(reportOnly).toContain("report-uri /api/security/csp-report");
+    expect(reportOnly).toContain("object-src 'none'");
+    expect(reportOnly).toContain("frame-ancestors 'none'");
   });
 });

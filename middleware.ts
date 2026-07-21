@@ -89,10 +89,16 @@ function redirectToLogin(request: NextRequest): NextResponse {
   return NextResponse.redirect(login);
 }
 
+/**
+ * Apply correlation IDs and, when preview enforce is on, the nonce-bearing
+ * Content-Security-Policy to the response. Request-side CSP is applied in
+ * `buildForwardRequestHeaders` so Next.js can nonce framework scripts.
+ */
 function withCorrelationAndCsp(
   request: NextRequest,
   response: NextResponse,
   nonce: string,
+  enforcePolicy: string | null,
 ): NextResponse {
   const correlationId = resolveCorrelationId(
     request.headers.get(CORRELATION_ID_HEADER) ??
@@ -101,26 +107,50 @@ function withCorrelationAndCsp(
   response.headers.set(CORRELATION_ID_HEADER, correlationId);
   response.headers.set(REQUEST_ID_HEADER, correlationId);
 
-  if (isCspPreviewEnforceEnabled()) {
-    response.headers.set(
-      CSP_ENFORCE_HEADER,
-      buildContentSecurityPolicyEnforce(nonce),
-    );
+  if (enforcePolicy) {
+    response.headers.set(CSP_ENFORCE_HEADER, enforcePolicy);
   }
 
   return response;
 }
 
+function buildForwardRequestHeaders(
+  request: NextRequest,
+  nonce: string,
+  enforcePolicy: string | null,
+): Headers {
+  const requestHeaders = new Headers(request.headers);
+  // Internal only — not a public client header contract.
+  requestHeaders.set(CSP_NONCE_HEADER, nonce);
+  if (enforcePolicy) {
+    // Next.js reads CSP from the *request* to nonce framework/inline scripts.
+    requestHeaders.set(CSP_ENFORCE_HEADER, enforcePolicy);
+  }
+  return requestHeaders;
+}
+
 export default async function middleware(request: NextRequest) {
   const nonce = createScriptNonce();
-  const requestHeaders = new Headers(request.headers);
-  requestHeaders.set(CSP_NONCE_HEADER, nonce);
+  const enforceEnabled = isCspPreviewEnforceEnabled();
+  const enforcePolicy = enforceEnabled
+    ? buildContentSecurityPolicyEnforce(nonce)
+    : null;
+
+  const requestHeaders = buildForwardRequestHeaders(
+    request,
+    nonce,
+    enforcePolicy,
+  );
 
   const legacySquare = redirectLegacySquarePath(request);
-  if (legacySquare) return withCorrelationAndCsp(request, legacySquare, nonce);
+  if (legacySquare) {
+    return withCorrelationAndCsp(request, legacySquare, nonce, enforcePolicy);
+  }
 
   const peerResponse = handlePeerPeersHost(request);
-  if (peerResponse) return withCorrelationAndCsp(request, peerResponse, nonce);
+  if (peerResponse) {
+    return withCorrelationAndCsp(request, peerResponse, nonce, enforcePolicy);
+  }
 
   if (shouldRunAuthMiddleware(request.nextUrl.pathname)) {
     if (!(await hasAuthenticatedSession(request))) {
@@ -129,16 +159,22 @@ export default async function middleware(request: NextRequest) {
           request,
           authMisconfiguredResponse(request),
           nonce,
+          enforcePolicy,
         );
       }
-      return withCorrelationAndCsp(request, redirectToLogin(request), nonce);
+      return withCorrelationAndCsp(
+        request,
+        redirectToLogin(request),
+        nonce,
+        enforcePolicy,
+      );
     }
   }
 
   const response = NextResponse.next({
     request: { headers: requestHeaders },
   });
-  return withCorrelationAndCsp(request, response, nonce);
+  return withCorrelationAndCsp(request, response, nonce, enforcePolicy);
 }
 
 export const config = {

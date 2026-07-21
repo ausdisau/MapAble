@@ -61,10 +61,16 @@ export async function POST(request: Request): Promise<NextResponse> {
   }
 
   const raw = await request.arrayBuffer();
-  if (raw.byteLength === 0 || raw.byteLength > MAX_BODY_BYTES) {
+  if (raw.byteLength === 0) {
     return NextResponse.json(
       { error: "invalid_report" },
       { status: 400, headers: noStore },
+    );
+  }
+  if (raw.byteLength > MAX_BODY_BYTES) {
+    return NextResponse.json(
+      { error: "payload_too_large" },
+      { status: 413, headers: noStore },
     );
   }
 

@@ -36,3 +36,27 @@ export function createScriptNonce(): string {
   crypto.getRandomValues(bytes);
   return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
 }
+
+/**
+ * Assert enforce policy shape for tests and CI smoke (does not enable the flag).
+ */
+export function assertEnforcePolicyShape(
+  policy: string,
+  nonce: string,
+): string[] {
+  const failures: string[] = [];
+  if (!nonce.trim()) failures.push("nonce_empty");
+  if (!policy.includes(`'nonce-${nonce}'`)) failures.push("nonce_missing");
+  if (policy.includes("'unsafe-eval'")) failures.push("unsafe_eval_present");
+  if (/(?:^|;\s*)(?:default-src|script-src)[^;]*\s\*(?:\s|;|$)/.test(policy)) {
+    failures.push("unrestricted_wildcard");
+  }
+  if (!policy.includes("object-src 'none'")) failures.push("object_src");
+  if (!policy.includes("frame-ancestors 'none'")) {
+    failures.push("frame_ancestors");
+  }
+  if (!policy.includes("report-uri /api/security/csp-report")) {
+    failures.push("report_uri");
+  }
+  return failures;
+}

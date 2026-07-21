@@ -6,16 +6,16 @@
 
 ### Recorded preview session (2026-07-21, agent)
 
-| Field | Value |
-| ----- | ----- |
-| Preview URL | `https://mapableau-7jfkuree8-mapableau.vercel.app` (tip `6f48b226`; deployment protection via Vercel share cookie) |
-| Flag on preview | **unset / false** (report-only only) |
-| Enforce `Content-Security-Policy` | absent (`VERIFIED` fail-closed default) |
-| Report-Only header | present; includes `unsafe-eval`; `report-uri /api/security/csp-report` |
-| Correlation | `x-correlation-id` / `x-request-id` present on `/` |
-| Report `POST` valid | **204** empty body |
-| Report wrong content-type | **415** |
-| Flag-on nonce / no-`unsafe-eval` enforce | `NOT_RUN` — owner must set `MAPABLE_CSP_ENFORCE_PREVIEW=true` on preview only |
+| Field                                    | Value                                                                                                              |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| Preview URL                              | `https://mapableau-7jfkuree8-mapableau.vercel.app` (tip `6f48b226`; deployment protection via Vercel share cookie) |
+| Flag on preview                          | **unset / false** (report-only only)                                                                               |
+| Enforce `Content-Security-Policy`        | absent (`VERIFIED` fail-closed default)                                                                            |
+| Report-Only header                       | present; includes `unsafe-eval`; `report-uri /api/security/csp-report`                                             |
+| Correlation                              | `x-correlation-id` / `x-request-id` present on `/`                                                                 |
+| Report `POST` valid                      | **204** empty body                                                                                                 |
+| Report wrong content-type                | **415**                                                                                                            |
+| Flag-on nonce / no-`unsafe-eval` enforce | `NOT_RUN` — owner must set `MAPABLE_CSP_ENFORCE_PREVIEW=true` on preview only                                      |
 
 ## Prerequisites
 

@@ -18,7 +18,10 @@ import {
   buildPublicJsonLd,
   serializeJsonLdForScript,
 } from "@/lib/config/json-ld";
-import { CSP_NONCE_HEADER } from "@/lib/security/csp-preview-enforce";
+import {
+  CSP_NONCE_HEADER,
+  isCspPreviewEnforceEnabled,
+} from "@/lib/security/csp-preview-enforce";
 
 const canonicalOrigin = getCanonicalPublicOrigin();
 const publicJsonLd = buildPublicJsonLd();
@@ -74,13 +77,23 @@ export const metadata: Metadata = {
   },
 };
 
+/**
+ * Resolve script nonce only when preview CSP enforce is active.
+ * Calling `headers()` opts the tree into dynamic rendering — avoid that when
+ * the flag is off so public/static caching remains available.
+ */
+async function resolveScriptNonce(): Promise<string | undefined> {
+  if (!isCspPreviewEnforceEnabled()) return undefined;
+  const headerStore = await headers();
+  return headerStore.get(CSP_NONCE_HEADER) ?? undefined;
+}
+
 export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const headerStore = await headers();
-  const scriptNonce = headerStore.get(CSP_NONCE_HEADER) ?? undefined;
+  const scriptNonce = await resolveScriptNonce();
 
   return (
     <html lang="en" className={`${plusJakarta.variable} ${outfit.variable}`}>
