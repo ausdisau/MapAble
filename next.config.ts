@@ -16,7 +16,8 @@ const nextConfig: NextConfig = {
   experimental: {
     cpus: 1,
     staticGenerationMaxConcurrency: 1,
-    staticGenerationMinPagesPerWorker: 50,
+    // Fewer workers / larger page batches reduce peak RSS on Vercel preview.
+    staticGenerationMinPagesPerWorker: 100,
   },
   async redirects() {
     return [
