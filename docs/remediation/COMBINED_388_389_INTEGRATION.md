@@ -11,7 +11,7 @@
 | Merged                                     | #388 `687a4303`                                                                      |
 | `app/layout.tsx`                           | Auto-merged: CSP nonce scoped to flag-on **and** first-party panel / AccessiBe mutex |
 | `ACCESSIBILITY_WIDGET_DECISION.md`         | add/add conflict — resolved by keeping #389 privacy pack (docs-only)                 |
-| Focused vitest (flags + CSP gate + report) | See agent log — record pass/fail below                                               |
+| Focused vitest (flags + CSP gate + report) | `NOT_RUN` in ephemeral worktree (no install); do not treat as passed                 |
 
 ## Automated checks on combined tree
 
