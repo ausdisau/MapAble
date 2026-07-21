@@ -1,7 +1,7 @@
 # Staging migration rehearsal (owner pack)
 
 **Status:** procedure documented; live rehearsal `NOT_RUN` / `OWNER_ACTION_REQUIRED`  
-**Safety:** no production credentials; no `prisma db push` on shared DBs; no writes to production `_prisma_migrations`.
+**Safety:** no production credentials; never apply schema via Prisma push against shared DBs; no writes to production `_prisma_migrations`.
 
 ## Goal
 
