@@ -59,6 +59,6 @@
 
 ## Remaining human actions
 
-1. After Vercel redeploy succeeds, paste Preview URL above
+1. Open Preview URL above (Vercel Authentication may apply)
 2. Walk the synthetic journey with flag on only in an isolated preview session
 3. Sign Overall result PASS/FAIL/STOP
