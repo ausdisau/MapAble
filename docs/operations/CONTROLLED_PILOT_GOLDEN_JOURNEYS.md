@@ -9,18 +9,18 @@ For each journey record: prerequisites, synthetic data, roles, tenant isolation,
 
 ## Journey register
 
-| ID | Journey | Prerequisites | Roles | Status |
-| -- | ------- | ------------- | ----- | ------ |
-| G1 | Registration and authentication | Pilot cohort allowlist; NextAuth configured in preview/staging | participant | `NOT_RUN` |
-| G2 | Participant accessibility preferences | G1 | participant | `NOT_RUN` |
-| G3 | Consent grant, narrowing, expiry, revocation | G1; ConsentRecord paths | participant, delegate | `NOT_RUN` |
-| G4 | Provider discovery without paid-ranking influence | Provider finder; ranking flags false | participant | `NOT_RUN` |
-| G5 | Care request with manual provider review | Care domain; human review required | participant, provider admin | `NOT_RUN` |
-| G6 | Transport request with no mock-routing availability claim | Transport; mock provider must not claim live routing | participant | `NOT_RUN` |
-| G7 | Participant confirmation and cancellation | G5 or G6 | participant | `NOT_RUN` |
-| G8 | Incident escalation without autonomous safeguarding | Incidents; human pathway only | participant, worker, admin | `NOT_RUN` |
-| G9 | Audit-history inspection | AuditEvent readable to authorised role | admin / participant as permitted | `NOT_RUN` |
-| G10 | AT Continuity (equipment → outage → backup → repair ref → dependency links → human-approved notification → audit) | PR #382 eligible (CI green + flag still false unless explicit pilot enable) | participant, worker, admin | `NOT_RUN` / `BLOCKED` until #382 green |
+| ID  | Journey                                                                                                           | Prerequisites                                                                                                                                                 | Roles                            | Status                                     |
+| --- | ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------- | ------------------------------------------ |
+| G1  | Registration and authentication                                                                                   | Pilot cohort allowlist; NextAuth configured in preview/staging                                                                                                | participant                      | `NOT_RUN`                                  |
+| G2  | Participant accessibility preferences                                                                             | G1                                                                                                                                                            | participant                      | `NOT_RUN`                                  |
+| G3  | Consent grant, narrowing, expiry, revocation                                                                      | G1; ConsentRecord paths                                                                                                                                       | participant, delegate            | `NOT_RUN`                                  |
+| G4  | Provider discovery without paid-ranking influence                                                                 | Provider finder; ranking flags false                                                                                                                          | participant                      | `NOT_RUN`                                  |
+| G5  | Care request with manual provider review                                                                          | Care domain; human review required                                                                                                                            | participant, provider admin      | `NOT_RUN`                                  |
+| G6  | Transport request with no mock-routing availability claim                                                         | Transport; mock provider must not claim live routing                                                                                                          | participant                      | `NOT_RUN`                                  |
+| G7  | Participant confirmation and cancellation                                                                         | G5 or G6                                                                                                                                                      | participant                      | `NOT_RUN`                                  |
+| G8  | Incident escalation without autonomous safeguarding                                                               | Incidents; human pathway only                                                                                                                                 | participant, worker, admin       | `NOT_RUN`                                  |
+| G9  | Audit-history inspection                                                                                          | AuditEvent readable to authorised role                                                                                                                        | admin / participant as permitted | `NOT_RUN`                                  |
+| G10 | AT Continuity (equipment → outage → backup → repair ref → dependency links → human-approved notification → audit) | PR #382 scaffold eligible when tip green; flag still false unless explicit isolated enable; human form `scripts/preview/at-continuity-wave1-human-preview.md` | participant, worker, admin       | `NOT_RUN` (automation is not a substitute) |
 
 ## Shared stop conditions
 

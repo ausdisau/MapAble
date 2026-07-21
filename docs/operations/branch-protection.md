@@ -2,12 +2,18 @@
 
 This document is the required configuration for GitHub branch protection on `main`. Apply these settings in the repository’s GitHub settings (Settings → Branches → Branch protection rules). CI cannot enforce protection settings itself; this file is the operational checklist.
 
-**FindingStatus (API read 2026-07-20):**
+**FindingStatus (API read 2026-07-20; re-audit helper 2026-07-21):**
 
 - `GET /repos/ausdisau/mapableau-new/rulesets` → `[]` (no rulesets visible to the integration token)
 - `GET /repos/.../branches/main/protection` → **403** Resource not accessible by integration
 
 Effective branch protection **cannot be claimed configured** from automation. Account owner must verify in GitHub Settings → Rules / Branches.
+
+**Read-only audit (does not change settings):**
+
+```bash
+node scripts/ci/audit-branch-protection-readonly.mjs
+```
 
 **Repository ownership (Wave 0):** the repository is owned by personal GitHub user `ausdisau`, not an organisation. Specialist `@ausdisau/team-*` teams cannot exist until the repository is moved under a GitHub Organisation.
 

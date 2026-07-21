@@ -32,6 +32,8 @@
     "ci:merge-train-integrity": "tsx scripts/ci/check-merge-train-integrity.ts",
     "ci:readiness-evidence": "tsx scripts/ci/check-readiness-evidence-consistency.ts",
     "ci:prod-audit": "tsx scripts/ci/check-prod-audit.ts",
+    "audit:https-gate": "node scripts/ci/verify-public-https-gate-readonly.mjs",
+    "audit:branch-protection": "node scripts/ci/audit-branch-protection-readonly.mjs",
     "setup:cloud-agent": "bash scripts/setup-cloud-agent.sh",
     "mcp:av": "tsx mcp/av/server.ts",
     "neon:configure": "python3 scripts/configure-neon-env.py",

@@ -1,30 +1,42 @@
-# Rate limiting honesty
+# Rate limiting — honesty and decision matrix
 
-**Last refreshed:** 2026-07-20  
-**Status:** in-memory limiter present; distributed production limiting `BLOCKED` / `OWNER_ACTION_REQUIRED`
+**Status:** process-local limiter only in repository  
+**Production-sensitive enables:** `BLOCKED` until a distributed store is owner-approved and evidenced  
+**Rule:** Do not invent or auto-select an external vendor during feature freeze.
 
-## Current control
+## Current implementation
 
-`lib/api/ip-rate-limit.ts` uses a process-local `Map`. It is suitable for single-process
-dev/preview soft throttling only.
+| Item                                 | Evidence                    | Status                                              |
+| ------------------------------------ | --------------------------- | --------------------------------------------------- |
+| `lib/api/ip-rate-limit.ts`           | In-memory `Map` per process | `VERIFIED` (code)                                   |
+| Multi-instance / multi-region safety | None                        | `FAILED` for production-sensitive claims            |
+| Abuse protection for CSP report sink | Uses process-local helper   | Acceptable for Preview/CI; **not** production-grade |
 
-It is **not** production-safe across multiple Vercel serverless instances.
+## Decision matrix (no vendor selected)
 
-## Inventory (sensitive endpoints)
+Agents must **not** add Redis, Upstash, Vercel KV, or another store unless the account owner records an approved provider with privacy review.
 
-| Surface                       | Current control                                 | Production-safe?          |
-| ----------------------------- | ----------------------------------------------- | ------------------------- |
-| Auth / login adjacent         | In-memory IP helper where wired                 | No                        |
-| Care / transport write APIs   | Permission + tenant checks; rate limit optional | Distributed limit missing |
-| Billing / payout              | Flags fail-closed; specialist review            | Distributed limit missing |
-| Public autocomplete / geocode | Adapter timeouts + optional IP limit            | Distributed limit missing |
+| Criterion     | Question                                               | Owner answer required |
+| ------------- | ------------------------------------------------------ | --------------------- |
+| Data location | AU / region residency for IP hashes or keys?           |                       |
+| Privacy       | What identifiers are stored? Retention?                |                       |
+| Retention     | TTL aligned to window only?                            |                       |
+| Availability  | Failure mode if store down (fail-closed vs fail-open)? |                       |
+| Cost          | Preview + production estimate                          |                       |
+| Approval      | Named owner + date                                     |                       |
 
-## Gate
+Until completed, keep:
 
-If no distributed store is configured and verified:
+- NDIA submission hard-off
+- Automated payment/invoice approval hard-off
+- Sensitive high-volume public write paths behind existing fail-closed flags
+- CSP production enforce hard-off
 
-- Sensitive production capability enables remain **disabled**
-- Evidence ledger records the blocker (`OWNER_ACTION_REQUIRED` / `BLOCKED`)
+## Adapter policy
 
-Do not introduce a new observability/rate-limit vendor during the feature freeze without
-account-owner approval.
+- **If** an already-approved distributed store appears in this repository with production configuration evidence, design a focused adapter behind a **default-false** flag.
+- **As of 2026-07-21 rescan:** no approved distributed store dependency is present → **no adapter added**.
+
+## Rollback
+
+Unset any future distributed limiter flag; revert adapter PR; process-local behaviour remains the documented default.
