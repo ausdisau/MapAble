@@ -14,7 +14,7 @@
 | Control             | Value                                                                                                                     |
 | ------------------- | ------------------------------------------------------------------------------------------------------------------------- |
 | Flag                | `MAPABLE_CSP_ENFORCE_PREVIEW=true`                                                                                        |
-| Enable environments | Vercel `preview` **or** local/CI `development`/`test`                                                                     |
+| Enable environments | Vercel `preview`, or non-Vercel local/CI (including `next start`) when flag is true                                       |
 | Hard-off            | `VERCEL_ENV=production` (even if flag set)                                                                                |
 | Policy builder      | `buildContentSecurityPolicyEnforce(nonce)` — nonce required, **no** `unsafe-eval`                                         |
 | Request headers     | Middleware sets `Content-Security-Policy` + `x-nonce` on the **forwarded request** so Next.js can nonce framework scripts |
