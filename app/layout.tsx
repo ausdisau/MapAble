@@ -4,6 +4,7 @@ import "leaflet/dist/leaflet.css";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata } from "next";
 import { Outfit, Plus_Jakarta_Sans } from "next/font/google";
+import { headers } from "next/headers";
 
 import { AccessiBeWidget } from "@/components/accessibility/AccessiBeWidget";
 import {
@@ -75,11 +76,28 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+/**
+ * Soft compatibility with PR #388 CSP enforce: when that flag is on and
+ * middleware forwards `x-nonce`, attach it to the panel pre-hydration script.
+ * Does not import #388 modules. Avoids `headers()` when the CSP flag is off
+ * so static caching remains available for the default (panel-only) path.
+ */
+async function resolveOptionalCspNonce(): Promise<string | undefined> {
+  if (process.env.MAPABLE_CSP_ENFORCE_PREVIEW !== "true") return undefined;
+  if (process.env.VERCEL_ENV === "production") return undefined;
+  const headerStore = await headers();
+  return headerStore.get("x-nonce") ?? undefined;
+}
+
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const scriptNonce = firstPartyA11yPanel
+    ? await resolveOptionalCspNonce()
+    : undefined;
+
   return (
     <html lang="en" className={`${plusJakarta.variable} ${outfit.variable}`}>
       <head>
@@ -90,6 +108,7 @@ export default function RootLayout({
         <meta name="google-adsense-account" content={ADSENSE_CLIENT_ID} />
         {firstPartyA11yPanel ? (
           <script
+            nonce={scriptNonce}
             dangerouslySetInnerHTML={{
               __html: getPreHydrationAccessibilityScript(),
             }}

@@ -1,35 +1,48 @@
-# Combined #388 + #389 integration (ephemeral)
+# Combined #388 + #389 integration (ephemeral — not pushed)
 
 **Date:** 2026-07-21  
-**Method:** local `git worktree` merge of #388 into #389 tip — **not pushed**, no extra PR.
+**Method:** disposable local worktree from `origin/main` @ `7009e9de` → merge #388 → merge #389 — **not pushed**, no extra PR.
 
-## Merge simulation
+## Tips combined
 
-| Step                                       | Result                                                                               |
-| ------------------------------------------ | ------------------------------------------------------------------------------------ |
-| Base                                       | #389 `db36e15a`                                                                      |
-| Merged                                     | #388 `687a4303`                                                                      |
-| `app/layout.tsx`                           | Auto-merged: CSP nonce scoped to flag-on **and** first-party panel / AccessiBe mutex |
-| `ACCESSIBILITY_WIDGET_DECISION.md`         | add/add conflict — resolved by keeping #389 privacy pack (docs-only)                 |
-| Focused vitest (flags + CSP gate + report) | `NOT_RUN` in ephemeral worktree (no install); do not treat as passed                 |
+| Input              | SHA                                        |
+| ------------------ | ------------------------------------------ |
+| main               | `7009e9de7c815267577404c324231c504077372e` |
+| #388               | `6b70fbd5ae14e0326e3d637d71ccf571929ed966` |
+| #389 (pre-fix tip) | `b3e9bbdfa45919b8d784cfdbec19f095eb3ef9bb` |
+
+## Conflicts
+
+| File                               | Resolution                                      | Owner             |
+| ---------------------------------- | ----------------------------------------------- | ----------------- |
+| `app/layout.tsx`                   | Auto-merged: CSP nonce + panel/AccessiBe mutex  | both (compatible) |
+| `ACCESSIBILITY_WIDGET_DECISION.md` | Took **#389** (full privacy/cut-over pack)      | #389              |
+| `OWNER_ACTION_REQUIRED_OPS.md`     | Took **#388** (charter-linked A–F release pack) | #388              |
+| `GEOSCAPE_TRAIN_RETARGET.md`       | Took **#388** (fuller sequence)                 | #388              |
+
+## Defect found
+
+| Defect                                                                 | Combo | Ownership                     | Fix                                                                                            |
+| ---------------------------------------------------------------------- | ----- | ----------------------------- | ---------------------------------------------------------------------------------------------- |
+| Panel pre-hydration inline `<script>` lacked `nonce` under CSP enforce | D     | **#389** (panel script owner) | Soft `x-nonce` attach when `MAPABLE_CSP_ENFORCE_PREVIEW=true`; avoid `headers()` when flag off |
 
 ## Automated checks on combined tree
 
-| Check                                        | Status                                       |
-| -------------------------------------------- | -------------------------------------------- |
-| Flag default false                           | `VERIFIED` (unit)                            |
-| CSP production hard-off                      | `VERIFIED` (unit)                            |
-| Mutual exclusion AccessiBe vs panel (layout) | `VERIFIED` (code review of merged layout)    |
-| Full Playwright CSP+panel E2E                | `NOT_RUN` (requires dual-flag build session) |
-| Vercel Preview dual-flag                     | `NOT_RUN` / `OWNER_ACTION_REQUIRED`          |
+| Check                                                                                                 | Status                              |
+| ----------------------------------------------------------------------------------------------------- | ----------------------------------- |
+| Flag matrix A–D (unit)                                                                                | `VERIFIED`                          |
+| Layout mutex + nonce source contract                                                                  | `VERIFIED`                          |
+| CSP gate / report sink / panel / health / pilot baseline unit                                         | `VERIFIED`                          |
+| format:check / lint / production-claims / feature-deps / domain ownership / controlled-pilot baseline | `VERIFIED`                          |
+| type-check (after NODE_ENV-safe matrix test)                                                          | re-run on tip                       |
+| Full Vitest / production build / Playwright CSP+panel / Accessibility E2E                             | see tip CI / local notes            |
+| Vercel Preview four-way matrix                                                                        | `NOT_RUN` / `OWNER_ACTION_REQUIRED` |
+| Human a11y / privacy review                                                                           | `NOT_RUN`                           |
 
 ## Owner dual-flag Preview
 
-1. Preview env: `MAPABLE_CSP_ENFORCE_PREVIEW=true`
-2. Preview env: `NEXT_PUBLIC_MAPABLE_FIRST_PARTY_A11Y_PANEL=true`
-3. Confirm no `acsbapp.com` requests; panel opens; no CSP break on smoke routes
-4. Leave both flags **off** in production
+Still `NOT_RUN` until owner sets Preview env and records evidence. Leave both flags **off** in production.
 
 ## Rollback
 
-Discard combined Preview env; redeploy with both flags unset.
+Discard combined Preview env; redeploy with flags unset; revert #389 tip if needed.
