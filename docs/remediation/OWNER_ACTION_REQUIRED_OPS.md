@@ -49,10 +49,10 @@ gh pr view 386 --json baseRefName
 
 ## Secrets, keys, canonical URLs
 
-| Item                                                             | Status                  |
-| ---------------------------------------------------------------- | ----------------------- |
-| Verify production secrets present and rotated on schedule        | `OWNER_ACTION_REQUIRED` |
-| Verify encryption keys (app + field-level) match runbooks        | `OWNER_ACTION_REQUIRED` |
+| Item                                                             | Status                                                                                                                                                         |
+| ---------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Verify production secrets present and rotated on schedule        | `OWNER_ACTION_REQUIRED`                                                                                                                                        |
+| Verify encryption keys (app + field-level) match runbooks        | `OWNER_ACTION_REQUIRED`                                                                                                                                        |
 | Verify canonical public URLs / `NEXT_PUBLIC_APP_URL` / Auth URLs | `OWNER_ACTION_REQUIRED` — post-#387 production build failed: `NEXTAUTH_URL` / `NEXT_PUBLIC_APP_URL` rejected as non-https (`dpl_GgwzvxTy6LHDjcC2A8oRu6rKZEr4`) |
 
 ## Monitoring, alerts, rate limiting
