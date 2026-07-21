@@ -222,4 +222,35 @@ describe("AT Continuity acceptance journey", () => {
       expect(payload.metadata).not.toHaveProperty("summary");
     }
   });
+
+  it("fails closed on cross-participant asset access and approver mismatch", async () => {
+    const { prisma } = await import("@/lib/prisma");
+    vi.mocked(prisma.atEquipmentAsset.findFirst).mockResolvedValueOnce(null);
+
+    await expect(
+      recordEquipmentOutage(
+        {
+          assetId: "asset_1",
+          participantUserId: "other_participant",
+          summary: "Cross-participant attempt",
+          status: "reported",
+        },
+        "worker_1",
+      ),
+    ).rejects.toThrow(/not found for participant/i);
+
+    await expect(
+      requestHumanApprovedNotification(
+        {
+          participantUserId: "participant_1",
+          assetId: "asset_1",
+          channel: "in_app",
+          templateKey: "at_outage_backup_ready",
+          humanApproved: true,
+          approvedByUserId: "someone_else",
+        },
+        "worker_1",
+      ),
+    ).rejects.toThrow(/approver must match the acting user/i);
+  });
 });

@@ -4,61 +4,67 @@
 **Flag:** `MAPABLE_AT_CONTINUITY_ENABLED` must remain **`false`** in preview unless explicitly testing writers with synthetic data.  
 **Do not use real participant information.**
 
-## Pass / fail fields
+## Session metadata (`NOT_RUN` until human fills)
 
-| Field | Value |
-| ----- | ----- |
-| Preview URL | `https://mapableau-2x62z7uv9-mapableau.vercel.app` (READY `dpl_5v31ZBri…` tip `8c0f0db3`, heap 6144) — tip `e430d559` docs-only follow-up deploying |
-| Tester | Agent automated gates only; **human tester still required** |
-| Date | 2026-07-20 (automated evidence); human date TBD |
-| Environment | CI verified; Vercel preview READY after 6144 retune |
-| Flag state observed | Code/default `false` (`VERIFIED` via acceptance tests); live preview observation `NOT_RUN` |
-| Overall result | **CONDITIONAL** — CI/Accessibility green; human preview `NOT_RUN` |
+| Field               | Value                                                                                                                |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| Preview URL         | `https://mapableau-2x62z7uv9-mapableau.vercel.app` (READY tip `8c0f0db3`; later tips may supersede — paste live URL) |
+| Preview SHA         |                                                                                                                      |
+| Tester              |                                                                                                                      |
+| Date                |                                                                                                                      |
+| Browser / device    |                                                                                                                      |
+| Role                |                                                                                                                      |
+| Flag state observed |                                                                                                                      |
+| Overall result      | PASS / FAIL / STOP / `NOT_RUN`                                                                                       |
 
-## Automated evidence already recorded (not a human substitute)
+## Automated evidence (not a human substitute)
 
-| Gate | Result | Evidence |
-| ---- | ------ | -------- |
-| CI | pass | `actions/runs/29788354827` on tip `2933873d` |
-| Accessibility | pass | `actions/runs/29788354798` (~10m28s) |
-| Domain-ownership false positive | fixed | Comment no longer matches `ConsentRecord` scanner |
-| Vitest acceptance journeys | covered in CI | flag-off refuse + synthetic path when enabled in tests |
+| Gate                                            | Result                      | Evidence                                         |
+| ----------------------------------------------- | --------------------------- | ------------------------------------------------ |
+| Flag default false                              | `VERIFIED`                  | `tests/at-continuity/wave1-scaffold.test.ts`     |
+| Acceptance journey (synthetic, flag on in unit) | `VERIFIED`                  | `tests/at-continuity/acceptance-journey.test.ts` |
+| Unapproved notification refused                 | `VERIFIED`                  | unit                                             |
+| Approver must match actor                       | `VERIFIED`                  | unit                                             |
+| Cross-participant asset miss fails closed       | `VERIFIED`                  | unit                                             |
+| Audit metadata without sensitive free text      | `VERIFIED`                  | unit                                             |
+| Accessibility / migrate-from-zero / Security    | `VERIFIED` on repaired tips | GitHub Actions                                   |
+| Vercel READY                                    | `VERIFIED` @ 6144 heap      | `dpl_5v31ZBri…`                                  |
+| Human synthetic walkthrough                     | `NOT_RUN`                   | this form                                        |
 
-## Expected evidence
+## Expected human steps
 
-| Step | Expected | Pass? | Notes |
-| ---- | -------- | ----- | ----- |
-| No public AT Continuity participant routes exposed | No new `/api/at-*` or marketing claim pages from this PR | `VERIFIED` (code search / CI) | Confirm again on preview URL |
-| Flag default false | Writers refuse when unset / not `"true"` | `VERIFIED` (unit/acceptance) | Human: observe preview env |
-| Synthetic journey (flag on in isolated session only) | asset → outage → backup → repair ref → care/transport/work deps → human-approved notification → audit ids | `VERIFIED` in CI tests | Human preview with synthetic data `NOT_RUN` |
-| Notification without approval | Refused | `VERIFIED` (tests) | |
-| Clinical / emergency copy | Refused | `VERIFIED` (tests) | |
-| Audit metadata | Identifiers + safe enums only; no sensitive free text | `VERIFIED` (tests) | |
+| Step                                       | Expected                                                                                              | Pass? | Screenshot / evidence ref | Notes |
+| ------------------------------------------ | ----------------------------------------------------------------------------------------------------- | ----- | ------------------------- | ----- |
+| No public AT Continuity participant routes | No new public `/api/at-*` writers                                                                     |       |                           |       |
+| Flag default false in Preview env          | Writers refuse                                                                                        |       |                           |       |
+| Synthetic journey (flag on, isolated only) | asset → outage → backup → repair → care/transport/work deps → human-approved notification → audit ids |       |                           |       |
+| Notification without approval              | Refused                                                                                               |       |                           |       |
+| Clinical / emergency copy                  | Refused                                                                                               |       |                           |       |
+| Audit metadata                             | Identifiers + safe enums only                                                                         |       | AuditEvent id:            |       |
 
 ## Accessibility observations
 
-| Observation | Result | Defect |
-| ----------- | ------ | ------ |
-| Keyboard reachability of any exposed admin/pilot UI (if present) | `NOT_RUN` | No public Wave 1 UI; N/A unless pilot UI added |
-| Screen reader label clarity | `NOT_RUN` | |
-| Error language plain and non-clinical | `VERIFIED` (copy tests) | Still confirm in preview |
+| Observation                                   | Result          | Defect severity |
+| --------------------------------------------- | --------------- | --------------- |
+| Keyboard reachability of any exposed pilot UI | `NOT_RUN` / N/A |                 |
+| Screen reader label clarity                   | `NOT_RUN`       |                 |
+| Error language plain and non-clinical         | `NOT_RUN`       |                 |
 
 ## Stop conditions
 
-- Real participant data appears → **STOP**
+- Real participant data → **STOP**
 - Clinical suitability / emergency-response / NDIS registration claim → **STOP**
 - Notification send without human approval → **STOP**
-- Public route accidentally exposes AT Continuity writers → **STOP**
+- Public route exposes AT Continuity writers → **STOP**
 
-## Rollback conditions
+## Rollback
 
 - Keep `MAPABLE_AT_CONTINUITY_ENABLED=false`
 - Revert preview deploy / PR tip
-- On non-prod only: revert migration `20260720120000_at_continuity_wave1` if schema must be removed
-- Preserve audit rows; do not delete evidence
+- Non-prod only: revert migration `20260720120000_at_continuity_wave1` if schema must be removed
+- Preserve audit rows
 
-## Remaining human actions
+## Migration owner gate
 
-1. Open Preview URL above (Vercel Authentication may apply)
-2. Walk the synthetic journey with flag on only in an isolated preview session
-3. Sign Overall result PASS/FAIL/STOP
+Staging clone / PITR rehearsal: `docs/operations/STAGING_MIGRATION_REHEARSAL.md` — `OWNER_ACTION_REQUIRED` / `NOT_RUN`.
+Merge remains blocked on owner evidence + this human form.
