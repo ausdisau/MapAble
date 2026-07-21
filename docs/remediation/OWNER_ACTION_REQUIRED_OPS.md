@@ -27,7 +27,13 @@ Owner sets **without disclosing values in chat or logs**:
 | Ready endpoint (`/api/health/ready`)                    |       | `OWNER_ACTION_REQUIRED`                                                                                                |
 | Rollback result or rollback readiness                   |       | `OWNER_ACTION_REQUIRED`                                                                                                |
 
-Read-only public probe (no secrets): `pnpm audit:https-gate`
+Read-only public probe (no secrets): `pnpm audit:https-gate`  
+Redacted deploy artefact validator: `pnpm audit:deploy-evidence -- --evidence ./artifacts/deploy-evidence.redacted.json`  
+Human session artefact validator: `pnpm audit:human-release-evidence -- --evidence ./artifacts/human-release-session.redacted.json`  
+Branch protection audit: `pnpm audit:branch-protection`  
+Staging migration checksum compare (PR #382 tooling): `pnpm exec tsx scripts/ci/compare-prisma-migrations-readonly.ts` after that tip is available locally — `OWNER_ACTION_REQUIRED` until owner export provided.  
+Independent security review checklist (not approval): [INDEPENDENT_REVIEW_388.md](./INDEPENDENT_REVIEW_388.md) — status `NOT_RUN`.  
+Combined #388+#389 ephemeral results: [COMBINED_388_389_INTEGRATION.md](./COMBINED_388_389_INTEGRATION.md).
 
 ### B — Vercel Preview assurance
 
