@@ -23,12 +23,22 @@ describe("first-party panel layout CSP soft-compat", () => {
       "utf8",
     );
     expect(layout).toMatch(/firstPartyA11yPanel \? null : <AccessiBeWidget/);
-    expect(layout).toMatch(/resolveOptionalCspNonce/);
     expect(layout).toMatch(/nonce=\{scriptNonce\}/);
-    expect(layout).toMatch(/MAPABLE_CSP_ENFORCE_PREVIEW/);
-    // Must not force headers() when CSP flag is off
-    expect(layout).toMatch(
-      /MAPABLE_CSP_ENFORCE_PREVIEW !== "true"\) return undefined/,
-    );
+
+    // Standalone #389 uses resolveOptionalCspNonce; after merge with #388 the
+    // layout adopts resolveScriptNonce from csp-preview-enforce. Both gate
+    // headers() so static caching remains available when CSP enforce is off.
+    const hasSoftCompat = /resolveOptionalCspNonce/.test(layout);
+    const hasMergedCspHelper = /resolveScriptNonce/.test(layout);
+    expect(hasSoftCompat || hasMergedCspHelper).toBe(true);
+
+    if (hasSoftCompat) {
+      expect(layout).toMatch(/MAPABLE_CSP_ENFORCE_PREVIEW/);
+      expect(layout).toMatch(
+        /MAPABLE_CSP_ENFORCE_PREVIEW !== "true"\) return undefined/,
+      );
+    } else {
+      expect(layout).toMatch(/isCspPreviewEnforceEnabled/);
+    }
   });
 });
