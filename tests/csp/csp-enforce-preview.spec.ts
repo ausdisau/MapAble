@@ -35,6 +35,45 @@ async function assertNoSecretsInHtml(page: Page) {
   expect(html).not.toMatch(/NEXTAUTH_SECRET|DATABASE_URL|sk_live_|sk_test_/i);
 }
 
+/**
+ * Catch build/runtime CSP mismatch early.
+ *
+ * When `.next` was built without MAPABLE_CSP_ENFORCE_PREVIEW=true but the
+ * server enforces CSP at runtime, middleware emits a fresh nonce while
+ * prerendered `/_next` scripts lack matching nonce attributes. That failure
+ * previously surfaced only as `body` hidden / empty title.
+ */
+async function assertNextScriptsCarryCspNonce(page: Page, csp: string) {
+  const nonce = csp.match(/'nonce-([a-f0-9]+)'/)?.[1];
+  expect(nonce, "CSP header nonce").toBeTruthy();
+
+  const result = await page.evaluate((expectedNonce) => {
+    const scripts = Array.from(
+      document.querySelectorAll<HTMLScriptElement>('script[src*="/_next/"]'),
+    );
+    if (scripts.length === 0) {
+      return { ok: false as const, reason: "no_next_scripts", count: 0 };
+    }
+    const missing = scripts.filter(
+      (el) => (el.nonce || el.getAttribute("nonce") || "") !== expectedNonce,
+    );
+    return {
+      ok: missing.length === 0,
+      reason: missing.length ? "nonce_mismatch" : "ok",
+      count: scripts.length,
+      missingSrc: missing.slice(0, 5).map((el) => el.src),
+    };
+  }, nonce!);
+
+  expect(
+    result.ok,
+    `Next.js scripts must carry CSP nonce '${nonce}'. ` +
+      `Got ${result.reason} (${result.count} scripts` +
+      `${result.missingSrc?.length ? `; missing on ${result.missingSrc.join(", ")}` : ""}). ` +
+      `Rebuild with MAPABLE_CSP_ENFORCE_PREVIEW=true before pnpm start / test:csp-enforce.`,
+  ).toBe(true);
+}
+
 test.describe("CSP enforce preview (MAPABLE_CSP_ENFORCE_PREVIEW=true)", () => {
   for (const route of PUBLIC_ROUTES) {
     test(`route ${route} renders under enforce CSP`, async ({ page }) => {
@@ -52,6 +91,9 @@ test.describe("CSP enforce preview (MAPABLE_CSP_ENFORCE_PREVIEW=true)", () => {
       expect(csp).toContain("object-src 'none'");
       expect(csp).toContain("frame-ancestors 'none'");
       expect(csp).toContain("report-uri /api/security/csp-report");
+
+      // Fail closed on build/runtime nonce mismatch before body visibility.
+      await assertNextScriptsCarryCspNonce(page, csp!);
 
       // Hydration / interactivity smoke — body should be present
       await expect(page.locator("body")).toBeVisible();

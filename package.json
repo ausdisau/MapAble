@@ -22,6 +22,7 @@
     "test:watch": "vitest",
     "test:a11y": "playwright test",
     "test:csp-enforce": "playwright test -c playwright.csp.config.ts",
+    "build:csp-enforce": "MAPABLE_CSP_ENFORCE_PREVIEW=true pnpm build",
     "test:e2e:starting-work": "playwright test -c playwright.e2e.config.ts",
     "preview:csp-perf-matrix": "node scripts/preview/csp-performance-matrix.mjs",
     "ci:migration-order": "tsx scripts/ci/check-migration-order.ts",

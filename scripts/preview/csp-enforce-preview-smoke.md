@@ -17,12 +17,16 @@
 | Report wrong content-type                | **415**                                                                                                            |
 | Flag-on nonce / no-`unsafe-eval` enforce | `NOT_RUN` — owner must set `MAPABLE_CSP_ENFORCE_PREVIEW=true` on preview only                                      |
 
-## Prerequisites
+## Local / CI synthetic flag-on (not Vercel Preview)
 
-1. Deploy this PR tip to a **Vercel preview** (not production).
-2. Set preview env `MAPABLE_CSP_ENFORCE_PREVIEW=true` (preview scope only).
-3. Confirm production project env does **not** have the flag, or hard-off still applies.
-4. Optional: `BASE_URL=https://<preview-host> node scripts/preview/csp-enforce-preview-smoke.mjs`
+1. `MAPABLE_CSP_ENFORCE_PREVIEW=true pnpm build` (or `pnpm build:csp-enforce`)
+2. Start with the same flag (`pnpm start` or Playwright `PLAYWRIGHT_WEB_SERVER`)
+3. `pnpm test:csp-enforce`
+
+Do **not** reuse a `.next` tree built with the flag off: runtime enforce then
+emits a nonce that prerendered `/_next` scripts do not carry, and Playwright
+reports `body` hidden / empty title. The suite asserts matching script nonces
+so that mismatch fails with an explicit rebuild message.
 
 ## Header / nonce checks
 

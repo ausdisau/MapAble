@@ -62,10 +62,11 @@ jobs:
       - name: Install Playwright browsers
         run: pnpm exec playwright install --with-deps chromium
 
+      # Build MUST use the enforce flag so App Router layout stays dynamic and
+      # framework scripts receive per-request nonces. A plain `pnpm build`
+      # followed by flag-on `pnpm start` yields body-hidden Playwright failures.
       - name: Build with CSP enforce flag
-        run: pnpm build
-        env:
-          MAPABLE_CSP_ENFORCE_PREVIEW: "true"
+        run: pnpm build:csp-enforce
 
       - name: Flag-on CSP Playwright matrix
         env:
