@@ -1,39 +1,40 @@
 # AT Continuity — Accessibility CI build memory diagnosis (#382)
 
-**Status:** diagnosis + mitigation on PR tip  
+**Status:** mitigation on PR tip; Accessibility CI green; Vercel preview memory retuned  
 **Date:** 2026-07-20
 
-## Symptom
+## Symptom A — GitHub Accessibility (resolved)
 
 GitHub Actions job `Accessibility` failed during `pnpm build` with:
 
 `FATAL ERROR: Ineffective mark-compacts near heap limit Allocation failed - JavaScript heap out of memory`
 
-- `NODE_OPTIONS=--max-old-space-size=6144` already set
-- Failure occurred **after** `✓ Compiled successfully` (~113s), during the subsequent
-  static generation / page-data phase (~4+ minutes later)
-- Not during install, Prisma generate, or Playwright execution
+- Failure occurred **after** `✓ Compiled successfully`, during static generation
+- Mitigated by `experimental.staticGenerationMaxConcurrency: 1` +
+  `staticGenerationMinPagesPerWorker: 50` and a 7168 MB heap on GitHub Actions
 
-## Likely cause
+**Verification:** Accessibility workflow on tip `2933873d` — **pass** (~10m28s).
 
-- Application has a large App Router surface that loads the generated Prisma client
-  during “Collecting page data” / “Generating static pages”
-- Wave 1 adds additive `at_*` models to `schema.prisma`, increasing client size
-- `experimental.cpus: 1` was already set, but Next.js 15 still defaults
-  `experimental.staticGenerationMaxConcurrency` to **8**, which multiplies peak heap
+## Symptom B — Vercel preview SIGKILL (this follow-up)
 
-This is **not** caused by public AT Continuity routes (Wave 1 adds none) and is
-**not** fixed by raising heap indefinitely on a ~7 GB GitHub-hosted runner.
+Vercel deployment `dpl_H9xrsrEVyhLdm2aTWRJQ8a4aEFDr` failed with:
+
+`Next.js build worker exited with code: null and signal: SIGKILL`
+
+Cause: `package.json` pinned `--max-old-space-size=7168` for all builders. On
+Vercel’s preview container that requests an OS kill before JS heap OOM.
 
 ## Mitigation applied
 
-1. `experimental.staticGenerationMaxConcurrency: 1` and
-   `staticGenerationMinPagesPerWorker: 50` in `next.config.ts` (with `cpus: 1`)
-2. Bounded heap **7168** MB for `pnpm build` / Accessibility workflow (single
-   documented ceiling short of a larger runner)
+1. Keep SSG concurrency at **1** / min pages per worker **50** (`next.config.ts`)
+2. Replace hardcoded build heap with `scripts/run-next-build.mjs`:
+   - Vercel (`VERCEL=1`): **4608** MB
+   - GitHub Actions: **7168** MB
+   - Local default: **6144** MB
+   - Override: `MAPABLE_BUILD_HEAP_MB`
 
-Do **not** raise heap further on standard GitHub-hosted runners without moving to
-a larger runner (`OWNER_ACTION_REQUIRED`).
+Do **not** raise the Vercel heap back to 7168 without a larger build machine
+(`OWNER_ACTION_REQUIRED`).
 
 ## Follow-up performance issue (human)
 
@@ -41,9 +42,12 @@ Open a performance tracking issue to:
 
 1. Profile route imports that eagerly pull `@/lib/prisma` into static generation
 2. Consider splitting heavy admin routes / lazy DB access
-3. Re-measure peak RSS on Accessibility workflow after concurrency fix
+3. Re-measure peak RSS on Accessibility + Vercel preview after this change
 
-## Verification
+## Verification checklist
 
-Re-run Accessibility workflow on #382 after this change. Record pass/fail in the PR.
-If still `FAILED`, leave draft and escalate runner size as `OWNER_ACTION_REQUIRED`.
+| Surface | Status |
+| ------- | ------ |
+| Accessibility workflow | `VERIFIED` pass on `2933873d` |
+| CI workflow | `VERIFIED` pass on `2933873d` |
+| Vercel preview after heap retune | `NOT_RUN` until redeploy |
