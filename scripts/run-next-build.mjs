@@ -16,7 +16,9 @@ function resolveHeapMb() {
     return Number(override);
   }
   if (process.env.VERCEL === "1") {
-    return 4608;
+    // 7168 SIGKILL'd the preview builder; 4608 hit JS heap OOM during SSG.
+    // 6144 matches main's historic build cap with concurrency=1 headroom.
+    return 6144;
   }
   if (process.env.GITHUB_ACTIONS === "true") {
     return 7168;
