@@ -5,6 +5,19 @@ Run this checklist before promoting MapAble to a public production deployment.
 **Canonical host (Wave 0):** `https://mapable.com.au` (apex).  
 `www.mapable.com.au` should redirect to apex after TLS for www is renewed (account-owner operation).
 
+**Evidence discipline:** mark each item `VERIFIED` | `FAILED` | `NOT_RUN` | `OWNER_ACTION_REQUIRED` | `BLOCKED` | `NOT_APPLICABLE`.  
+Authoritative cross-check: [PRODUCTION_READINESS_EVIDENCE_LEDGER.md](../remediation/PRODUCTION_READINESS_EVIDENCE_LEDGER.md).  
+Empty-DB migrate-from-zero green does **not** satisfy production migration reconciliation.
+
+| Area                          | Named owner           | Status                                                           |
+| ----------------------------- | --------------------- | ---------------------------------------------------------------- |
+| Neon backups / PITR           | Account owner         | `OWNER_ACTION_REQUIRED`                                          |
+| Vercel production env secrets | Account owner         | `OWNER_ACTION_REQUIRED`                                          |
+| GitHub branch protection      | Account owner         | `OWNER_ACTION_REQUIRED`                                          |
+| Uptime / alert routing        | Ops owner             | `OWNER_ACTION_REQUIRED`                                          |
+| Pilot support contact         | Pilot lead            | `OWNER_ACTION_REQUIRED`                                          |
+| Independent code review       | Reviewer (not author) | `OWNER_ACTION_REQUIRED` until protection proves required reviews |
+
 ## Build readiness
 
 - [ ] `pnpm setup:cloud-agent`
@@ -37,10 +50,12 @@ Run this checklist before promoting MapAble to a public production deployment.
 
 - [ ] `DATABASE_URL` is a pooled runtime URL.
 - [ ] `DIRECT_URL` is a direct migration URL.
-- [ ] Production branch/backups are owned.
+- [ ] Production branch/backups are owned (`OWNER_ACTION_REQUIRED` until named).
 - [ ] `prisma migrate deploy` plan reviewed.
+- [ ] Production `_prisma_migrations` reconciled or explicitly blocked — see [MIGRATION_RECONCILIATION.md](./MIGRATION_RECONCILIATION.md).
 - [ ] No destructive migration runs without backup approval.
 - [ ] Never use `prisma db push` against shared or production databases.
+- [ ] Backup/restore tabletop recorded — see [BACKUP_RESTORE.md](./BACKUP_RESTORE.md) (`NOT_RUN` until executed).
 
 ## Storage and documents
 
