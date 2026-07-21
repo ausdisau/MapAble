@@ -37,3 +37,20 @@ Accessibility CI sets the flag to `true` so Playwright covers the panel path. Pr
 2. Preview with flag on; complete manual AT checklist in `docs/qa/public-ui-accessibility-remediation.md`
 3. Decide AccessiBe retire date; update accessibility statement
 4. Set flag on preview → staging → production only after approval
+
+## Privacy boundaries (first-party panel)
+
+| Rule                                                     | Status                                        |
+| -------------------------------------------------------- | --------------------------------------------- |
+| Local storage by default (`mapable:accessibility-ui:v1`) | `VERIFIED` (code)                             |
+| No disability inference / AT detection                   | `VERIFIED` (presentation prefs only)          |
+| No analytics of preference values                        | `VERIFIED` (no analytics hooks in panel path) |
+| Account sync allowlists digital presentation fields only | `VERIFIED` (digital-preferences API schema)   |
+| Must not affect matching, price, eligibility, ranking    | `VERIFIED` (no cross-domain writes)           |
+| Production cut-over                                      | `OWNER_ACTION_REQUIRED`                       |
+
+## Recording
+
+- Owner preview: `docs/qa/first-party-a11y-panel-owner-preview.md` (`NOT_RUN`)
+- Combined CSP enforce + panel: Preview env for both flags (`NOT_RUN`)
+- Manual NVDA / VoiceOver / TalkBack: `NOT_RUN`
