@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 
+import { AccessibilityPanelTrigger } from "@/components/accessibility/AccessibilityPanelTrigger";
 import { LogoMark } from "@/components/marketing/mapable-care-shared";
 import { MAPABLE_DONATION_URL } from "@/lib/brand/constants";
 import { marketingFeatureRoutes } from "@/lib/marketing/mapable-care-routes";
@@ -37,8 +38,7 @@ function useDismissOnOutsideAndEscape(
   }, [containerRef, onClose, open]);
 }
 
-const navLinkClass =
-  `inline-flex min-h-11 items-center rounded-xl px-3 text-sm font-black text-[#0C1833] transition hover:bg-slate-50 ${mapableCareFocusRing}`;
+const navLinkClass = `inline-flex min-h-11 items-center rounded-xl px-3 text-sm font-black text-[#0C1833] transition hover:bg-slate-50 ${mapableCareFocusRing}`;
 
 function DonateHeaderLink({ compact = false }: { compact?: boolean }) {
   const className = compact
@@ -46,7 +46,12 @@ function DonateHeaderLink({ compact = false }: { compact?: boolean }) {
     : `inline-flex min-h-11 items-center rounded-xl bg-[#F8C51C] px-4 py-3 text-sm font-black text-[#0C1833] shadow-sm transition hover:bg-[#e6b019] md:px-5 ${mapableCareFocusRing}`;
 
   return (
-    <a href={MAPABLE_DONATION_URL} target="_blank" rel="noopener noreferrer" className={className}>
+    <a
+      href={MAPABLE_DONATION_URL}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={className}
+    >
       Donate
     </a>
   );
@@ -66,7 +71,10 @@ function MarketingAuthLinks({ compact = false }: { compact?: boolean }) {
       <Link href={marketingFeatureRoutes.login} className={loginClassName}>
         Log in
       </Link>
-      <Link href={marketingFeatureRoutes.register} className={registerClassName}>
+      <Link
+        href={marketingFeatureRoutes.register}
+        className={registerClassName}
+      >
         Get started
       </Link>
     </div>
@@ -80,7 +88,9 @@ export function MarketingPrimaryNav() {
   const navRef = useRef<HTMLDivElement>(null);
   useDismissOnOutsideAndEscape(mobileOpen, () => setMobileOpen(false), navRef);
 
-  const searchHref = isHome ? "#guided-search-panel" : marketingFeatureRoutes.providerFinder;
+  const searchHref = isHome
+    ? "#guided-search-panel"
+    : marketingFeatureRoutes.providerFinder;
 
   const primaryLinks = [
     { label: "Search", href: searchHref },
@@ -90,7 +100,10 @@ export function MarketingPrimaryNav() {
   ];
 
   return (
-    <div ref={navRef} className="relative flex w-full items-center justify-between gap-4">
+    <div
+      ref={navRef}
+      className="relative flex w-full items-center justify-between gap-4"
+    >
       <Link
         href={marketingFeatureRoutes.home}
         className={`shrink-0 overflow-visible rounded-2xl p-1 transition hover:bg-slate-50 ${mapableCareFocusRing}`}
@@ -109,6 +122,9 @@ export function MarketingPrimaryNav() {
       </nav>
 
       <div className="flex items-center gap-2 md:gap-3">
+        <div className="hidden md:block">
+          <AccessibilityPanelTrigger />
+        </div>
         <DonateHeaderLink />
         <div className="hidden md:flex">
           <MarketingAuthLinks />
@@ -140,6 +156,9 @@ export function MarketingPrimaryNav() {
                 {link.label}
               </Link>
             ))}
+            <div className="px-1 py-1">
+              <AccessibilityPanelTrigger className="w-full justify-start" />
+            </div>
           </nav>
           <div className="mt-3 border-t border-slate-100 pt-3">
             <MarketingAuthLinks compact />

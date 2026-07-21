@@ -11,6 +11,8 @@ import {
   GoogleAdSense,
 } from "@/components/ads/GoogleAdSense";
 import { Providers } from "@/components/providers";
+import { isFirstPartyAccessibilityPanelEnabled } from "@/lib/accessibility/feature-flags";
+import { getPreHydrationAccessibilityScript } from "@/lib/accessibility/ui-preferences";
 import { MAPABLE_LOGO_MARK_SRC } from "@/lib/brand/constants";
 import { getCanonicalPublicOrigin } from "@/lib/config/canonical-url";
 import {
@@ -20,6 +22,7 @@ import {
 
 const canonicalOrigin = getCanonicalPublicOrigin();
 const publicJsonLd = buildPublicJsonLd();
+const firstPartyA11yPanel = isFirstPartyAccessibilityPanelEnabled();
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -85,6 +88,13 @@ export default function RootLayout({
           content="832ea0b13123578b63ae2fe9"
         />
         <meta name="google-adsense-account" content={ADSENSE_CLIENT_ID} />
+        {firstPartyA11yPanel ? (
+          <script
+            dangerouslySetInnerHTML={{
+              __html: getPreHydrationAccessibilityScript(),
+            }}
+          />
+        ) : null}
       </head>
       <body className={plusJakarta.className}>
         <script
@@ -102,7 +112,7 @@ export default function RootLayout({
           }}
         />
         <Providers>{children}</Providers>
-        <AccessiBeWidget />
+        {firstPartyA11yPanel ? null : <AccessiBeWidget />}
         <GoogleAdSense />
         <SpeedInsights />
       </body>

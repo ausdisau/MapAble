@@ -40,6 +40,8 @@ jobs:
       TWILIO_2FA_ENABLED: "false"
       # Auth routes execute with seeded storage-state fixtures
       A11Y_SKIP_AUTH_ROUTES: "0"
+      # Exercise first-party panel in a11y CI; production default remains off
+      NEXT_PUBLIC_MAPABLE_FIRST_PARTY_A11Y_PANEL: "true"
     steps:
       - uses: actions/checkout@v4
 

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import React, { type ReactNode } from "react";
 
+import { AccessibilityPanelTrigger } from "@/components/accessibility/AccessibilityPanelTrigger";
 import { LogoMark } from "@/components/marketing/mapable-care-shared";
 
 export function MapAbleAppCompactHeader({
@@ -27,12 +28,20 @@ export function MapAbleAppCompactHeader({
               MapAble
             </span>
             {title ? (
-              <span className="mapable-soft block text-xs font-bold text-slate-500">{title}</span>
+              <span className="mapable-soft block text-xs font-bold text-slate-500">
+                {title}
+              </span>
             ) : null}
           </div>
           <span className="sr-only">MapAble home</span>
         </Link>
-        {actions ? <div className="flex items-center gap-2">{actions}</div> : null}
+        <div className="flex items-center gap-2">
+          <AccessibilityPanelTrigger showLabel={false} className="sm:hidden" />
+          <AccessibilityPanelTrigger className="hidden sm:inline-flex" />
+          {actions ? (
+            <div className="flex items-center gap-2">{actions}</div>
+          ) : null}
+        </div>
       </div>
     </header>
   );
