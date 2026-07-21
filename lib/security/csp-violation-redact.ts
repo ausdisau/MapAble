@@ -1,6 +1,6 @@
 /**
  * Redact CSP violation reports for preview evidence capture.
- * Never log cookies, authorization headers, or participant query payloads.
+ * Never log cookies, authorization headers, script samples, or query payloads.
  */
 
 export type CspViolationReport = {
@@ -14,6 +14,17 @@ export type CspViolationReport = {
     "status-code"?: number;
     "script-sample"?: string;
   };
+  // Reporting API (application/reports+json) single item body shape
+  type?: string;
+  body?: {
+    documentURL?: string;
+    blockedURL?: string;
+    effectiveDirective?: string;
+    violatedDirective?: string;
+    disposition?: string;
+    statusCode?: number;
+    sample?: string;
+  };
 };
 
 export type RedactedCspViolation = {
@@ -23,6 +34,8 @@ export type RedactedCspViolation = {
   disposition: string | null;
   statusCode: number | null;
 };
+
+const MAX_DIRECTIVE_LEN = 128;
 
 function originOnly(uri: string | undefined): string | null {
   if (!uri) return null;
@@ -38,20 +51,58 @@ function originOnly(uri: string | undefined): string | null {
   }
 }
 
+function truncateDirective(value: string | undefined): string | null {
+  if (!value) return null;
+  return value.slice(0, MAX_DIRECTIVE_LEN);
+}
+
 export function redactCspViolationReport(
   body: CspViolationReport,
 ): RedactedCspViolation {
-  const report = body["csp-report"] ?? {};
+  const legacy = body["csp-report"];
+  if (legacy) {
+    return {
+      documentOrigin: originOnly(legacy["document-uri"]),
+      blockedUri:
+        originOnly(legacy["blocked-uri"]) ??
+        legacy["blocked-uri"]?.slice(0, 64) ??
+        null,
+      violatedDirective: truncateDirective(
+        legacy["violated-directive"] ?? legacy["effective-directive"],
+      ),
+      disposition: legacy.disposition?.slice(0, 32) ?? null,
+      statusCode:
+        typeof legacy["status-code"] === "number"
+          ? legacy["status-code"]
+          : null,
+    };
+  }
+
+  const reportBody = body.body ?? {};
   return {
-    documentOrigin: originOnly(report["document-uri"]),
+    documentOrigin: originOnly(reportBody.documentURL),
     blockedUri:
-      originOnly(report["blocked-uri"]) ??
-      report["blocked-uri"]?.slice(0, 64) ??
+      originOnly(reportBody.blockedURL) ??
+      reportBody.blockedURL?.slice(0, 64) ??
       null,
-    violatedDirective:
-      report["violated-directive"] ?? report["effective-directive"] ?? null,
-    disposition: report.disposition ?? null,
+    violatedDirective: truncateDirective(
+      reportBody.violatedDirective ?? reportBody.effectiveDirective,
+    ),
+    disposition: reportBody.disposition?.slice(0, 32) ?? null,
     statusCode:
-      typeof report["status-code"] === "number" ? report["status-code"] : null,
+      typeof reportBody.statusCode === "number" ? reportBody.statusCode : null,
   };
+}
+
+/** Normalize JSON body that may be a single report or Reporting API array. */
+export function extractCspReports(payload: unknown): CspViolationReport[] {
+  if (Array.isArray(payload)) {
+    return payload.filter(
+      (item): item is CspViolationReport => !!item && typeof item === "object",
+    );
+  }
+  if (payload && typeof payload === "object") {
+    return [payload as CspViolationReport];
+  }
+  return [];
 }

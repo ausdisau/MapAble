@@ -11,14 +11,17 @@
 
 ## Preview-only enforcement (this programme)
 
-| Control             | Value                                                                             |
-| ------------------- | --------------------------------------------------------------------------------- |
-| Flag                | `MAPABLE_CSP_ENFORCE_PREVIEW=true`                                                |
-| Enable environments | Vercel `preview` **or** local `development`/`test`                                |
-| Hard-off            | `VERCEL_ENV=production` (even if flag set)                                        |
-| Policy builder      | `buildContentSecurityPolicyEnforce(nonce)` — nonce required, **no** `unsafe-eval` |
-| Nonce propagation   | Middleware sets `x-nonce`; root layout applies nonce to JSON-LD scripts           |
-| Report sink         | `POST /api/security/csp-report` (redacted; no script samples / secrets)           |
+| Control              | Value                                                                                                           |
+| -------------------- | --------------------------------------------------------------------------------------------------------------- |
+| Flag                 | `MAPABLE_CSP_ENFORCE_PREVIEW=true`                                                                              |
+| Enable environments  | Vercel `preview` **or** local `development`/`test`                                                              |
+| Hard-off             | `VERCEL_ENV=production` (even if flag set)                                                                      |
+| Policy builder       | `buildContentSecurityPolicyEnforce(nonce)` — nonce required, **no** `unsafe-eval`                               |
+| Nonce propagation    | Middleware sets `x-nonce`; root layout applies nonce to JSON-LD scripts                                         |
+| Report sink          | `POST /api/security/csp-report` — content-type allowlist, 8KB cap, process-local rate limit, redacted logs only |
+| Smoke runbook        | [csp-enforce-preview-smoke.md](../../scripts/preview/csp-enforce-preview-smoke.md)                              |
+| Performance evidence | [CSP_PREVIEW_PERFORMANCE.md](./CSP_PREVIEW_PERFORMANCE.md) — `NOT_RUN` until measured                           |
+| Widget decision      | [ACCESSIBILITY_WIDGET_DECISION.md](./ACCESSIBILITY_WIDGET_DECISION.md) + extract PR #389                        |
 
 ## Smoke routes (preview evidence required)
 
@@ -32,7 +35,8 @@ When the flag is on in preview, capture pass/fail (and redacted blocked-uri orig
 - Transport request entry
 - Payment UI **only if** already enabled in that preview
 
-Human/preview evidence status starts as `NOT_RUN` until recorded.
+Live flag-on preview evidence status: **`NOT_RUN`** until recorded in the smoke runbook.
+Header/nonce unit tests are not a substitute for a real preview session.
 
 ## Safe production enablement (future — not authorised here)
 
