@@ -11,6 +11,17 @@
 | 4   | Informational allowlist test-only                                               | **Yes** | Canonical inventory drives sitemap + homepage CTAs + a11y/runtime suites                                                    | `lib/public-informational/routes.ts`, `app/sitemap.ts`, `lib/marketing/mapable-care-combined-data.ts` | `tests/public-informational/routes.test.ts`, `tests/a11y/informational-routes.spec.ts` | Confirmed and fixed: inventory is imported by sitemap and Playwright; hero/final CTAs retargeted away from `/care/request` etc.                               |
 | 5   | A11y suite misses allowlisted informational routes                              | **Yes** | Added inventory-driven Playwright project `informational`                                                                   | `tests/a11y/informational-routes.spec.ts`, `playwright.config.ts`                                     | same                                                                                   | Confirmed and fixed: every `INFORMATIONAL_RELEASE_ROUTES` path is exercised for axe serious/critical + shell checks.                                          |
 
+## Follow-up correction (browser CSP + runtime boundary)
+
+Independent review of tip `d405e8d5` found two remaining gaps closed in a single correction commit:
+
+| Gap                                                                                                                                                       | Fix                                                                                                                                                                                                                                                         |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Strict CSP schema rejected genuine browser report fields (`referrer`, `source-file`, `line-number`, Reporting API `age`/`user_agent`/`sample`, nullables) | Accept standard legacy + Reporting API fields; Zod **strip** unknown keys (no `.passthrough()`); redaction retains origin/directive/disposition/status only; real Chromium/Firefox fixtures under `tests/security/fixtures/csp-browser/` (WebKit `NOT_RUN`) |
+| Informational runtime boundary incomplete                                                                                                                 | Inventory-driven `informational-boundary` Playwright project: HTTP/HTML, canonical HTTPS apex path, forms, internal links, sitemap, 404+axe, CTA claims; per-route `alternates.canonical` on allowlisted pages                                              |
+
+Production CSP remains report-only. AT Continuity / first-party a11y panel remain default false.
+
 ## Evidence classes (unchanged discipline)
 
 Repository / local / CI / Preview / production / owner / human remain distinct. Production health 404, www TLS expiry, human a11y, monitoring, rollback, and branch protection stay **OWNER_ACTION_REQUIRED** or **NOT_RUN** until direct evidence exists.

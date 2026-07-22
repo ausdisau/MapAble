@@ -10,6 +10,11 @@ import { INFORMATIONAL_RELEASE_ROUTES } from "@/lib/public-informational/routes"
  * Automated axe is not screen-reader or human evidence (those remain NOT_RUN).
  */
 
+/** AccessiBe remote widget may reject headless/local runtimes with this message. */
+function isIgnorableThirdPartyPageError(message: string): boolean {
+  return /snipped is executed in unsupported environment/i.test(message);
+}
+
 async function settleNavigation(page: Page): Promise<void> {
   await page.waitForLoadState("domcontentloaded");
   await expect(page.locator("body")).toBeVisible();
@@ -27,7 +32,9 @@ test.describe("Informational release routes (axe + shell)", () => {
     test(`informational: ${route.path}`, async ({ page }) => {
       const consoleErrors: string[] = [];
       page.on("pageerror", (err) => {
-        consoleErrors.push(err.message.slice(0, 200));
+        const message = err.message.slice(0, 200);
+        if (isIgnorableThirdPartyPageError(message)) return;
+        consoleErrors.push(message);
       });
 
       const response = await page.goto(route.path, {

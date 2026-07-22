@@ -1,0 +1,32 @@
+{
+  "capturedAt": "2026-07-22T08:17:30.908Z",
+  "method": "Playwright headless page with Content-Security-Policy-Report-Only; blocked external script; report-uri intercept preferred; SecurityPolicyViolationEvent fallback; hosts sanitised to https://fixture.local",
+  "results": [
+    {
+      "engine": "chromium",
+      "status": "captured",
+      "file": "chromium-legacy.json",
+      "contentType": "application/csp-report",
+      "captureMethod": "report-uri-post"
+    },
+    {
+      "engine": "firefox",
+      "status": "captured",
+      "file": "firefox-legacy.json",
+      "contentType": "application/csp-report",
+      "captureMethod": "report-uri-post"
+    },
+    {
+      "engine": "webkit",
+      "status": "NOT_RUN",
+      "reason": "browserType.launch: \n╔══════════════════════════════════════════════════════╗\n║ Host system is missing dependencies to run browsers. ║\n║ Please install them with the following command:      ║\n║                                                      ║\n║     sudo npx playwright install-deps                 ║\n║                                                      ║\n║ Alternatively, use apt:                              ║\n║     sudo apt-get install libxslt1.1\\                 ║\n║         libevent-2.1-7t64\\                           ║\n║         libgstreamer-plugins-base1.0-0\\              ║\n║         libgstreamer-gl1.0-0\\                        ║\n║         libgstreamer-plugins-bad1.0-0\\               ║\n║         libavif16\\                                   ║\n║         libharfbuzz-icu0\\                            ║\n║         libwayland-server0\\                          ║\n║         libmanette-0.2-0\\                            ║\n║         libhyphen0\\                                  ║\n║         libwoff1                                     ║\n║                                                      ║\n║ <3 Playwright Team                                   ║\n╚══════════════════════════════════════════════════════╝"
+    },
+    {
+      "engine": "chromium",
+      "status": "captured",
+      "file": "chromium-reporting-api.json",
+      "contentType": "application/reports+json",
+      "captureMethod": "report-uri-fields-remapped-to-reporting-api"
+    }
+  ]
+}

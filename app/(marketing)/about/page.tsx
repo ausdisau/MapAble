@@ -8,11 +8,13 @@ import {
   roadmapPhases,
   trustPrinciples,
 } from "@/lib/canvas/canvas-data";
+import { canonicalAlternate } from "@/lib/config/canonical-url";
 
 export const metadata = {
   title: "About | MapAble",
   description:
     "About MapAble's accessibility-first disability support operating system.",
+  alternates: canonicalAlternate("/about"),
 };
 
 export default function AboutPage() {
@@ -55,8 +57,8 @@ export default function AboutPage() {
                 <li>Deny access by default and audit sensitive access.</li>
                 <li>Human confirmation for high-risk actions.</li>
                 <li>
-                  Accessibility-first design with formal testing before compliance
-                  claims.
+                  Accessibility-first design with formal testing before
+                  compliance claims.
                 </li>
               </ul>
             ),

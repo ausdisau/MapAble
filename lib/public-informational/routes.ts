@@ -32,7 +32,8 @@ export const PUBLIC_INFORMATIONAL_ROUTES: readonly InformationalRoute[] = [
     inSitemap: true,
     titleIncludes: "MapAble",
     h1Includes: "accessible",
-    formsPermitted: false,
+    // Guided search panel is a GET discovery form (not a contact/PII intake).
+    formsPermitted: true,
     authenticationProhibited: true,
     kind: "informational",
   },

@@ -52,9 +52,9 @@ export const metadata: Metadata = {
   description:
     "MapAble helps people explore disability support, provider discovery, accessible transport, employment pathways and consent-aware service tools.",
   applicationName: "MapAble",
-  alternates: {
-    canonical: canonicalOrigin,
-  },
+  // Do not pin every page to the apex pathname. Route modules set
+  // `alternates.canonical` relative to `metadataBase` so each path resolves
+  // to https://mapable.com.au/<path>.
   icons: {
     icon: [{ url: MAPABLE_LOGO_MARK_SRC, type: "image/svg+xml" }],
     shortcut: [{ url: MAPABLE_LOGO_MARK_SRC, type: "image/svg+xml" }],
@@ -136,7 +136,8 @@ export default async function RootLayout({
         <Providers>{children}</Providers>
         {firstPartyA11yPanel ? null : <AccessiBeWidget />}
         <GoogleAdSense />
-        <SpeedInsights />
+        {/* Speed Insights only on Vercel; local/CI production servers have no SI endpoint. */}
+        {process.env.VERCEL === "1" ? <SpeedInsights /> : null}
       </body>
     </html>
   );

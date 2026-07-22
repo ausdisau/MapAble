@@ -16,6 +16,10 @@ const projects: Project[] = [
     name: "informational",
     testMatch: /informational-routes\.spec\.ts/,
   },
+  {
+    name: "informational-boundary",
+    testMatch: /informational-boundary\.spec\.ts/,
+  },
 ];
 
 if (!skipAuth) {

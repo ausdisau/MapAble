@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { ContactForm } from "@/components/marketing/ContactForm";
 import { MAPABLE_SUPPORT_EMAIL } from "@/lib/brand/constants";
+import { canonicalAlternate } from "@/lib/config/canonical-url";
 import {
   mapablePublicCardClass,
   mapablePublicEyebrowClass,
@@ -16,6 +17,7 @@ export const metadata = {
   title: "Contact | MapAble",
   description:
     "Contact MapAble about participant pilots, provider registration, access reviews or privacy requests.",
+  alternates: canonicalAlternate("/contact"),
 };
 
 const infoSections = [
@@ -41,10 +43,14 @@ export default function ContactPage() {
           aria-hidden="true"
           className="pointer-events-none absolute right-[-6rem] top-[-6rem] h-64 w-64 rounded-full bg-mapable-gold/25 blur-3xl"
         />
-        <div className={`${mapablePublicPageContainerClass} relative py-14 sm:py-20`}>
+        <div
+          className={`${mapablePublicPageContainerClass} relative py-14 sm:py-20`}
+        >
           <div className="max-w-3xl">
             <p className={mapablePublicEyebrowClass}>Contact</p>
-            <h1 className={`${mapablePublicTitleClass} mt-3`}>Contact MapAble</h1>
+            <h1 className={`${mapablePublicTitleClass} mt-3`}>
+              Contact MapAble
+            </h1>
             <p className={mapablePublicLeadClass}>
               Use the form for pilot interest, provider enquiries, accessibility
               feedback and privacy requests. You can also email us directly.
@@ -67,12 +73,15 @@ export default function ContactPage() {
           <ContactForm />
 
           <aside className="space-y-5">
-            <article className={`${mapablePublicMutedCardClass} border-[#005B7F]/15`}>
+            <article
+              className={`${mapablePublicMutedCardClass} border-[#005B7F]/15`}
+            >
               <p className={mapablePublicSectionTitleClass}>Before you send</p>
               <ul className="mt-4 space-y-3 text-sm leading-7 text-slate-700">
                 <li>We usually reply by email within a few business days.</li>
                 <li>
-                  Do not attach NDIS plans or clinical records through this form.
+                  Do not attach NDIS plans or clinical records through this
+                  form.
                 </li>
                 <li>
                   For urgent safety matters in Australia, call{" "}
@@ -93,10 +102,16 @@ export default function ContactPage() {
             ))}
 
             <div className="flex flex-wrap gap-3 pt-2">
-              <Link href="/help" className="text-sm font-bold text-mapable-brand hover:underline">
+              <Link
+                href="/help"
+                className="text-sm font-bold text-mapable-brand hover:underline"
+              >
                 Help centre
               </Link>
-              <Link href="/privacy" className="text-sm font-bold text-mapable-brand hover:underline">
+              <Link
+                href="/privacy"
+                className="text-sm font-bold text-mapable-brand hover:underline"
+              >
                 Privacy policy
               </Link>
               <Link

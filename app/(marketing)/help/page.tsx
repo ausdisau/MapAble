@@ -1,11 +1,13 @@
 import Link from "next/link";
 
 import { PublicInfoPage } from "@/components/marketing/PublicInfoPage";
+import { canonicalAlternate } from "@/lib/config/canonical-url";
 
 export const metadata = {
   title: "Help Centre | MapAble",
   description:
     "Get help with MapAble public pages, pilot interest and privacy requests.",
+  alternates: canonicalAlternate("/help"),
 };
 
 export default function HelpPage() {

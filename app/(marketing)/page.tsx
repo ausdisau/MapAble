@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 
 import { MapAbleCareCombinedHomepageSections } from "@/components/marketing/MapAbleCareCombinedHomepage";
+import { canonicalAlternate } from "@/lib/config/canonical-url";
 
 export const metadata: Metadata = {
   title: "MapAble | Accessible places, supports, and journeys",
   description:
     "Find accessible places, NDIS-aware providers, accessible transport, and support journeys you can actually use. Evidence-based access information for Australia.",
-  alternates: { canonical: "/" },
+  alternates: canonicalAlternate("/"),
   openGraph: {
     url: "/",
     title: "MapAble | Accessible places, supports, and journeys",

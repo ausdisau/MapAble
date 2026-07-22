@@ -3,6 +3,7 @@ import React from "react";
 
 import { PublicInfoPage } from "@/components/marketing/PublicInfoPage";
 import { AccessGuidesSection } from "@/components/resources/AccessGuidesSection";
+import { canonicalAlternate } from "@/lib/config/canonical-url";
 import {
   mapablePublicCardClass,
   mapablePublicEyebrowClass,
@@ -18,6 +19,7 @@ export const metadata = {
   title: "Access Guides | MapAble",
   description:
     "MapAble Access Guides for Australian capital cities and regional locations — practical accessibility planning for visitors and locals.",
+  alternates: canonicalAlternate("/guides"),
 };
 
 const regionalTiers = ["Tier 1", "Tier 2", "Tier 3"] as const;
@@ -40,7 +42,8 @@ export default function GuidesIndexPage() {
             content: (
               <ul className="list-disc space-y-2 pl-5">
                 <li>
-                  Start with a capital city guide for visitor-facing day planning.
+                  Start with a capital city guide for visitor-facing day
+                  planning.
                 </li>
                 <li>
                   Download the full Australia guide pack (PDF or Word) from the
