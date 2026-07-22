@@ -1,93 +1,130 @@
-# Account-owner operations checklist
+# Account-owner release pack (controlled pilot)
 
-**Rule:** Do not mark items `VERIFIED` unless the named owner performed them and recorded evidence (run ID, screenshot, ticket, or signed note). Agents must leave unfinished work as `OWNER_ACTION_REQUIRED` or `NOT_RUN`.
+**Canonical pilot boundary:** [../operations/CONTROLLED_PILOT_CHARTER.md](../operations/CONTROLLED_PILOT_CHARTER.md)  
+**Rule:** Do not mark items `VERIFIED` unless the named owner performed them and recorded evidence. A checklist is not evidence.  
+**Inspected `origin/main`:** `7009e9de7c815267577404c324231c504077372e`  
+**Agents must not** change Vercel, Neon, GitHub, DNS, monitoring, or payment accounts.
 
-**Inspected main tip at extract time:** `6279ab9198df2ebefb15a1ec5fe22ac735d21aa1`
+## Ordered release procedure
 
-## Branch protection and review
+### A — Vercel Production configuration
 
-| Item                                                                                                   | Status                  | Evidence / next step                                                   |
-| ------------------------------------------------------------------------------------------------------ | ----------------------- | ---------------------------------------------------------------------- |
-| Enforce branch protection on `main` (PR required, no direct push)                                      | `OWNER_ACTION_REQUIRED` | GitHub Settings → Branches; agent token cannot assert protection rules |
-| Required independent human approval (not author, not bot-only)                                         | `OWNER_ACTION_REQUIRED` | Require ≥1 approving review from CODEOWNERS / security                 |
-| Status checks required (CI, Security, Migrations, Migrate from zero, Accessibility, Production claims) | `OWNER_ACTION_REQUIRED` | Align required checks with workflow names on `main`                    |
+Owner sets **without disclosing values in chat or logs**:
 
-## Geoscape train (depth reduction — no fifth PR)
+1. `NEXTAUTH_URL=https://mapable.com.au`
+2. `NEXT_PUBLIC_APP_URL=https://mapable.com.au` (must match)
+3. Redeploy Production
+4. Record evidence form:
 
-| Item                                                | Status                  | Notes                                |
-| --------------------------------------------------- | ----------------------- | ------------------------------------ |
-| Licensing/privacy approval for Geoscape (#367)      | `OWNER_ACTION_REQUIRED` | Do **not** merge #367 until recorded |
-| After #367 merges: retarget/rebase #384 onto `main` | `NOT_RUN`               | Then keep #385 → #386 as depth ≤3    |
-| Open a fifth Geoscape PR                            | `NOT_APPLICABLE`        | Forbidden                            |
+| Field                                                   | Value | Status                                                                                                                 |
+| ------------------------------------------------------- | ----- | ---------------------------------------------------------------------------------------------------------------------- |
+| Deployment ID                                           |       | `OWNER_ACTION_REQUIRED`                                                                                                |
+| Commit SHA                                              |       | `OWNER_ACTION_REQUIRED`                                                                                                |
+| Build result                                            |       | `OWNER_ACTION_REQUIRED`                                                                                                |
+| Canonical redirect result                               |       | `OWNER_ACTION_REQUIRED`                                                                                                |
+| Auth smoke (`/api/auth/session`, `/api/auth/providers`) |       | `OWNER_ACTION_REQUIRED`                                                                                                |
+| Live endpoint (`/api/health/live`)                      |       | `OWNER_ACTION_REQUIRED` (apex currently 404 HTML — see [HEALTH_ENDPOINT_DIAGNOSIS.md](./HEALTH_ENDPOINT_DIAGNOSIS.md)) |
+| Ready endpoint (`/api/health/ready`)                    |       | `OWNER_ACTION_REQUIRED`                                                                                                |
+| Rollback result or rollback readiness                   |       | `OWNER_ACTION_REQUIRED`                                                                                                |
 
-Exact human commands (inspect / retarget only):
+Read-only public probe (no secrets): `pnpm audit:https-gate`  
+Redacted deploy artefact validator: `pnpm audit:deploy-evidence -- --evidence ./artifacts/deploy-evidence.redacted.json`  
+Human session artefact validator: `pnpm audit:human-release-evidence -- --evidence ./artifacts/human-release-session.redacted.json`  
+Branch protection audit: `pnpm audit:branch-protection`  
+Staging migration checksum compare (PR #382 tooling): `pnpm exec tsx scripts/ci/compare-prisma-migrations-readonly.ts` after that tip is available locally — `OWNER_ACTION_REQUIRED` until owner export provided.  
+Independent security review checklist (not approval): [INDEPENDENT_REVIEW_388.md](./INDEPENDENT_REVIEW_388.md) — status `NOT_RUN`.  
+Combined #388+#389 ephemeral results: [COMBINED_388_389_INTEGRATION.md](./COMBINED_388_389_INTEGRATION.md).
 
-```bash
-gh pr view 367 --json baseRefName,headRefName,isDraft,statusCheckRollup
-gh pr edit 384 --base main   # only after #367 is on main
-gh pr view 385 --json baseRefName
-gh pr view 386 --json baseRefName
-```
+### B — Vercel Preview assurance
 
-## Stale product PRs
+Run **separate** Preview configurations and record pass/fail per matrix (all human/`NOT_RUN` until done):
 
-| PR                | Stance                                                  | Status                |
-| ----------------- | ------------------------------------------------------- | --------------------- |
-| #379 PBS          | Blocked; recreate later under `lib/pbs-operations/**`   | `BLOCKED`             |
-| #383 VisionAccess | Keep draft until explicit feature-freeze waiver         | `BLOCKED`             |
-| #371/#372 a11y    | Superseded by focused accessibility-remediation extract | `retain_as_reference` |
+| Config | Flags                                                  | Status    |
+| ------ | ------------------------------------------------------ | --------- |
+| B1     | All new flags **off**                                  | `NOT_RUN` |
+| B2     | `MAPABLE_CSP_ENFORCE_PREVIEW=true` only                | `NOT_RUN` |
+| B3     | `NEXT_PUBLIC_MAPABLE_FIRST_PARTY_A11Y_PANEL=true` only | `NOT_RUN` |
+| B4     | CSP enforce + first-party panel both on                | `NOT_RUN` |
 
-## Neon staging migration rehearsal
+For each config verify: authentication, registration, provider finder, accessibility map, Care, Transport, hydration, nonce (B2/B4), CSP violations, AccessiBe absent when panel on (B3/B4), panel persist/reset, performance, console/network errors, rollback by unsetting flags.
 
-| Item                                                   | Status                  |
-| ------------------------------------------------------ | ----------------------- |
-| Create Neon staging clone from production              | `OWNER_ACTION_REQUIRED` |
-| Snapshot / enable PITR before rehearsal                | `OWNER_ACTION_REQUIRED` |
-| Run production migration reconciliation on clone       | `OWNER_ACTION_REQUIRED` |
-| Record `_prisma_migrations` diff vs expected inventory | `OWNER_ACTION_REQUIRED` |
-| Do **not** mutate production Neon from agent role      | `VERIFIED` (policy)     |
+Production CSP enforce remains **hard-off**. Panel and AT Continuity flags remain **false** in Production until separate recorded decisions.
 
-## Secrets, keys, canonical URLs
+### C — GitHub governance
 
-| Item                                                             | Status                                                                                                                                                         |
-| ---------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Verify production secrets present and rotated on schedule        | `OWNER_ACTION_REQUIRED`                                                                                                                                        |
-| Verify encryption keys (app + field-level) match runbooks        | `OWNER_ACTION_REQUIRED`                                                                                                                                        |
-| Verify canonical public URLs / `NEXT_PUBLIC_APP_URL` / Auth URLs | `OWNER_ACTION_REQUIRED` — post-#387 production build failed: `NEXTAUTH_URL` / `NEXT_PUBLIC_APP_URL` rejected as non-https (`dpl_GgwzvxTy6LHDjcC2A8oRu6rKZEr4`) |
+Configure and screenshot-verify:
 
-## Monitoring, alerts, rate limiting
+| Control                                                                                                                                              | Status                  |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------- |
+| PR required; ≥1 independent approval; dismiss stale approvals                                                                                        | `OWNER_ACTION_REQUIRED` |
+| Required checks: CI, Migrations, Migrate from zero, Security, Accessibility, Production claims, domain ownership, readiness evidence, Vercel Preview | `OWNER_ACTION_REQUIRED` |
+| No silent administrator bypass; documented break-glass                                                                                               | `OWNER_ACTION_REQUIRED` |
 
-| Item                                                         | Status                                                                           |
-| ------------------------------------------------------------ | -------------------------------------------------------------------------------- |
-| Configure monitoring + paging alerts                         | `OWNER_ACTION_REQUIRED`                                                          |
-| Assign on-call ownership                                     | `OWNER_ACTION_REQUIRED`                                                          |
-| Configure distributed rate limiting (not process-local only) | `OWNER_ACTION_REQUIRED` — see `docs/operations/RATE_LIMITING.md` when #388 lands |
+Helpers: `pnpm audit:branch-protection`; [../operations/branch-protection.md](../operations/branch-protection.md)
 
-## Backup restore + incident tabletop
+### D — Database and recovery
 
-| Item                                                      | Status                  |
-| --------------------------------------------------------- | ----------------------- |
-| Perform backup restoration drill; record RTO/RPO observed | `OWNER_ACTION_REQUIRED` |
-| Incident-response tabletop with named roles               | `OWNER_ACTION_REQUIRED` |
+Provide Neon **staging clone** (not production credentials to agents). Complete:
 
-## Manual assistive technology matrix
+| Step                                                               | Status                                          |
+| ------------------------------------------------------------------ | ----------------------------------------------- |
+| Migration inventory/checksum comparison (read-only helper on #382) | `OWNER_ACTION_REQUIRED`                         |
+| Empty-database migrate-from-zero (CI already proves disposable DB) | CI `VERIFIED`; staging clone `NOT_RUN`          |
+| Staging migration rehearsal                                        | `NOT_RUN`                                       |
+| Snapshot / PITR                                                    | `NOT_RUN`                                       |
+| Restore + schema verification + app smoke                          | `NOT_RUN`                                       |
+| Measured RTO (target 4h) / RPO (target 1h)                         | `NOT_RUN` — targets not achieved until measured |
+| Rollback decision recorded                                         | `OWNER_ACTION_REQUIRED`                         |
 
-| Item                           | Status    |
-| ------------------------------ | --------- |
-| NVDA                           | `NOT_RUN` |
-| VoiceOver (macOS/iOS)          | `NOT_RUN` |
-| TalkBack                       | `NOT_RUN` |
-| Keyboard-only                  | `NOT_RUN` |
-| Zoom 200% / 400%               | `NOT_RUN` |
-| High contrast / forced colours | `NOT_RUN` |
-| Reduced motion                 | `NOT_RUN` |
+Never use Prisma push against shared/production DBs. Never alter production `_prisma_migrations` history from agent role.
 
-Track detail in `docs/qa/public-ui-accessibility-remediation.md`.
+### E — Distributed rate limiting
 
-## Controlled-pilot golden journeys
+| Finding                             | Status                                                           |
+| ----------------------------------- | ---------------------------------------------------------------- |
+| Approved shared store in repository | **None**                                                         |
+| Agent vendor selection              | Forbidden                                                        |
+| Decision matrix                     | [../operations/RATE_LIMITING.md](../operations/RATE_LIMITING.md) |
+| Sensitive pilot mutations           | `BLOCKED` until distributed implementation `VERIFIED`            |
+| Process-local limiter               | Not production-grade                                             |
 
-| Item                                                    | Status    |
-| ------------------------------------------------------- | --------- |
-| Run every controlled-pilot golden journey with evidence | `NOT_RUN` |
+### F — Monitoring and response
 
-Do not claim controlled-pilot readiness ≥75 until journeys and the above gates are evidenced.
+Configure alerts per [../operations/SERVICE_OPERATIONS.md](../operations/SERVICE_OPERATIONS.md) for: apex availability, readiness failure, auth failures, API 5xx, latency, DB connectivity, background jobs, notification failures, CSP reports, security events, participant isolation failures, consent enforcement failures.
+
+Every alert needs: threshold, window, severity, owner, deputy, channel, ack target, escalation, participant impact, runbook, safe degraded mode.  
+External configuration: `OWNER_ACTION_REQUIRED`.
+
+## Recommended PR order (human merges only)
+
+1. **#388** after Preview CSP evidence + independent security review — production CSP report-only
+2. **#389** rebase after #388 merge — combined tests + manual a11y/privacy — panel flag false until approved
+3. **#382** after staging recon + PITR + human walkthrough — AT Continuity stays disabled at merge
+4. **Geoscape** separate — licensing/privacy → #367 → retarget #384 — depth ≤3 — no fifth PR
+
+Agents do **not** merge, close, retarget, or mark ready.
+
+## Human release session
+
+| Item                  | Status                     | Doc                                                                                                                  |
+| --------------------- | -------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| Ordered session       | `NOT_RUN`                  | [../operations/CONTROLLED_PILOT_RELEASE_SESSION.md](../operations/CONTROLLED_PILOT_RELEASE_SESSION.md)               |
+| Manual AT matrix      | `NOT_RUN`                  | [../accessibility/ACCESSIBILITY_MANUAL_EVIDENCE_MATRIX.md](../accessibility/ACCESSIBILITY_MANUAL_EVIDENCE_MATRIX.md) |
+| Golden journeys G1–G9 | `NOT_RUN`                  | [../operations/CONTROLLED_PILOT_GOLDEN_JOURNEYS.md](../operations/CONTROLLED_PILOT_GOLDEN_JOURNEYS.md)               |
+| G10 AT Continuity     | `BLOCKED` until #382 gates | Charter                                                                                                              |
+
+## Responsibility matrix
+
+Fill names only in the charter: [../operations/CONTROLLED_PILOT_CHARTER.md](../operations/CONTROLLED_PILOT_CHARTER.md) — all roles currently `OWNER_ACTION_REQUIRED`. Implementer ≠ final release approver.
+
+## Preview / production flags (must stay false in production until recorded decision)
+
+| Flag                                         | Production    | Notes                         |
+| -------------------------------------------- | ------------- | ----------------------------- |
+| `MAPABLE_CSP_ENFORCE_PREVIEW`                | hard-off      | Preview-only when owner tests |
+| `NEXT_PUBLIC_MAPABLE_FIRST_PARTY_A11Y_PANEL` | default false |                               |
+| `MAPABLE_AT_CONTINUITY_ENABLED`              | default false |                               |
+
+## Stop conditions
+
+See charter — non-waivable for critical safety/privacy/isolation defects.

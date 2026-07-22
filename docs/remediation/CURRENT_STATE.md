@@ -1,8 +1,9 @@
 # Remediation — Current State
 
-**Last verified:** 2026-07-20 (Phase 0 rescan + truth/controls PR)  
-**Base `origin/main` tip:** `6279ab9198df2ebefb15a1ec5fe22ac735d21aa1`  
-**Reference tip (prior assessment):** `6279ab9198df2ebefb15a1ec5fe22ac735d21aa1` (**unchanged**)  
+**Last verified:** 2026-07-21 (controlled-pilot decision programme)  
+**Base `origin/main` tip:** `7009e9de7c815267577404c324231c504077372e`  
+**Prior reference tip:** `3f406c3715d55e644d3385ccbd2141fa7b5813a2` (ancestor; main advanced via #279)  
+**Canonical pilot charter:** [../operations/CONTROLLED_PILOT_CHARTER.md](../operations/CONTROLLED_PILOT_CHARTER.md)  
 **Finding status values:** `VERIFIED` | `FAILED` | `NOT_RUN` | `OWNER_ACTION_REQUIRED` | `BLOCKED` | `NOT_APPLICABLE`
 
 Full Phase 0 notes: [RESCAN_RECONCILIATION.md](./RESCAN_RECONCILIATION.md)  
@@ -22,16 +23,16 @@ This document records live repository and public-edge inspection. CI green is **
 
 ## Live production edge (curl, 2026-07-20)
 
-| Check                                   | Result                                                                     | Status                                               |
-| --------------------------------------- | -------------------------------------------------------------------------- | ---------------------------------------------------- |
-| Apex `https://mapable.com.au/`          | HTTP 200                                                                   | `VERIFIED`                                           |
-| `https://www.mapable.com.au/`           | HTTP 307 → apex                                                            | `VERIFIED` (TLS/redirect at scan; still owner-owned) |
-| `/jobs`                                 | HTTP 308 → `/employment`                                                   | `VERIFIED`                                           |
-| `/robots.txt` / `/sitemap.xml`          | 200; sitemap locs use apex                                                 | `VERIFIED`                                           |
-| HTML JSON-LD on apex                    | May still lag tip until deploy; treat as edge ≠ repo                       | `OWNER_ACTION_REQUIRED` (deploy confirmation)        |
-| CSP                                     | Report-Only; includes `unsafe-eval`                                        | `VERIFIED`                                           |
-| `/api/health/live`, `/api/health/ready` | Present in **repository**; production edge must be re-checked after deploy | Repository `VERIFIED`; edge `NOT_RUN` this rescan    |
-| Branch protection via API               | rulesets `[]`; protection endpoint 403                                     | `OWNER_ACTION_REQUIRED`                              |
+| Check                                   | Result                                                                         | Status                                                                 |
+| --------------------------------------- | ------------------------------------------------------------------------------ | ---------------------------------------------------------------------- |
+| Apex `https://mapable.com.au/`          | HTTP 200                                                                       | `VERIFIED`                                                             |
+| `https://www.mapable.com.au/`           | HTTP 307 → apex                                                                | `VERIFIED` (TLS/redirect at scan; still owner-owned)                   |
+| `/jobs`                                 | HTTP 308 → `/employment`                                                       | `VERIFIED`                                                             |
+| `/robots.txt` / `/sitemap.xml`          | 200; sitemap locs use apex                                                     | `VERIFIED`                                                             |
+| HTML JSON-LD on apex                    | May still lag tip until deploy; treat as edge ≠ repo                           | `OWNER_ACTION_REQUIRED` (deploy confirmation)                          |
+| CSP                                     | Report-Only; includes `unsafe-eval`                                            | `VERIFIED`                                                             |
+| `/api/health/live`, `/api/health/ready` | Present in **repository** on main/#388; apex returns **404 HTML** (2026-07-21) | Repository `VERIFIED`; edge `FAILED`; redeploy `OWNER_ACTION_REQUIRED` |
+| Branch protection via API               | rulesets `[]`; protection endpoint 403                                         | `OWNER_ACTION_REQUIRED`                                                |
 
 ## Wave / repair programme status
 

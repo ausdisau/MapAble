@@ -11,8 +11,13 @@ const nextConfig: NextConfig = {
   reactStrictMode: true, // Enables additional React checks in dev
   // Vercel default build machines are 8 GB; leave headroom so lint+tsc
   // workers are not SIGKILL'd (OOM) during production deploys of main.
+  // staticGenerationMaxConcurrency defaults to 8 and can OOM GitHub’s ~7 GB
+  // runners during “Generating static pages” even when cpus=1 (seen on #382).
   experimental: {
     cpus: 1,
+    staticGenerationMaxConcurrency: 1,
+    // Fewer workers / larger page batches reduce peak RSS on Vercel preview.
+    staticGenerationMinPagesPerWorker: 100,
   },
   async redirects() {
     return [

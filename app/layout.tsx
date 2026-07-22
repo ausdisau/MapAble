@@ -20,6 +20,10 @@ import {
   buildPublicJsonLd,
   serializeJsonLdForScript,
 } from "@/lib/config/json-ld";
+import {
+  CSP_NONCE_HEADER,
+  isCspPreviewEnforceEnabled,
+} from "@/lib/security/csp-preview-enforce";
 
 const canonicalOrigin = getCanonicalPublicOrigin();
 const publicJsonLd = buildPublicJsonLd();
@@ -77,16 +81,15 @@ export const metadata: Metadata = {
 };
 
 /**
- * Soft compatibility with PR #388 CSP enforce: when that flag is on and
- * middleware forwards `x-nonce`, attach it to the panel pre-hydration script.
- * Does not import #388 modules. Avoids `headers()` when the CSP flag is off
- * so static caching remains available for the default (panel-only) path.
+ * Resolve script nonce only when preview CSP enforce is active (#388 on main).
+ * Calling `headers()` opts the tree into dynamic rendering — avoid that when
+ * the flag is off so public/static caching remains available.
+ * Panel prehydration (#389) also receives this nonce when enforce is on.
  */
-async function resolveOptionalCspNonce(): Promise<string | undefined> {
-  if (process.env.MAPABLE_CSP_ENFORCE_PREVIEW !== "true") return undefined;
-  if (process.env.VERCEL_ENV === "production") return undefined;
+async function resolveScriptNonce(): Promise<string | undefined> {
+  if (!isCspPreviewEnforceEnabled()) return undefined;
   const headerStore = await headers();
-  return headerStore.get("x-nonce") ?? undefined;
+  return headerStore.get(CSP_NONCE_HEADER) ?? undefined;
 }
 
 export default async function RootLayout({
@@ -94,9 +97,7 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const scriptNonce = firstPartyA11yPanel
-    ? await resolveOptionalCspNonce()
-    : undefined;
+  const scriptNonce = await resolveScriptNonce();
 
   return (
     <html lang="en" className={`${plusJakarta.variable} ${outfit.variable}`}>
@@ -118,6 +119,7 @@ export default async function RootLayout({
       <body className={plusJakarta.className}>
         <script
           type="application/ld+json"
+          nonce={scriptNonce}
           suppressHydrationWarning
           dangerouslySetInnerHTML={{
             __html: serializeJsonLdForScript(publicJsonLd.organization),
@@ -125,6 +127,7 @@ export default async function RootLayout({
         />
         <script
           type="application/ld+json"
+          nonce={scriptNonce}
           suppressHydrationWarning
           dangerouslySetInnerHTML={{
             __html: serializeJsonLdForScript(publicJsonLd.website),
