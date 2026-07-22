@@ -16,9 +16,14 @@ function resolveHeapMb() {
     return Number(override);
   }
   if (process.env.VERCEL === "1") {
-    // 7168 SIGKILL'd the preview builder; 4608 hit JS heap OOM during SSG.
-    // 6144 matches main's historic build cap with concurrency=1 headroom.
-    return 6144;
+    // History on 8 GB Vercel builders:
+    // - 7168 → SIGKILL (RSS)
+    // - 6144 → SIGKILL on PR #390 tip 47bc425b (dpl_GPMHcZxiy…)
+    // - 4608 → JS heap OOM during SSG
+    // 5632 leaves more non-heap RSS headroom while staying above the 4608 floor.
+    // If this still SIGKILLs, escalate builder size (OWNER_ACTION_REQUIRED) —
+    // do not raise the heap toward 7168 on the default machine.
+    return 5632;
   }
   if (process.env.GITHUB_ACTIONS === "true") {
     return 7168;
