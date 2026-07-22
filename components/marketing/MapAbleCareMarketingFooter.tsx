@@ -3,6 +3,7 @@
 import Link from "next/link";
 import React, { type ReactNode } from "react";
 
+import { AccessibilityPanelTrigger } from "@/components/accessibility/AccessibilityPanelTrigger";
 import { SponsoredBadge } from "@/components/marketing/mapable-care-shared";
 import { MAPABLE_SUPPORT_EMAIL } from "@/lib/brand/constants";
 import {
@@ -13,7 +14,13 @@ import {
   sponsoredPlacements,
 } from "@/lib/marketing/mapable-care-combined-data";
 
-function FooterTextLink({ href, children }: { href: string; children: ReactNode }) {
+function FooterTextLink({
+  href,
+  children,
+}: {
+  href: string;
+  children: ReactNode;
+}) {
   return (
     <Link
       href={href}
@@ -31,7 +38,15 @@ const socialLinks = [
   { href: "https://linkedin.com", label: "LinkedIn", icon: "in" },
 ] as const;
 
-function SocialLink({ href, label, icon }: { href: string; label: string; icon: string }) {
+function SocialLink({
+  href,
+  label,
+  icon,
+}: {
+  href: string;
+  label: string;
+  icon: string;
+}) {
   return (
     <a
       href={href}
@@ -51,7 +66,9 @@ function FooterBrandMark() {
       <div className="flex h-8 w-8 items-center justify-center rounded-sm bg-[#005B7F] text-white shadow-sm">
         <div className="h-4 w-4 rounded-b-full rounded-tl-full bg-white" />
       </div>
-      <span className="text-xl font-black tracking-tight text-[#005B7F]">MapAble</span>
+      <span className="text-xl font-black tracking-tight text-[#005B7F]">
+        MapAble
+      </span>
     </div>
   );
 }
@@ -65,9 +82,12 @@ function AustralianDisabilityMark() {
           <span className="text-[#2AA6B8]">D</span>
         </div>
         <div>
-          <p className="text-sm font-black text-[#7A5A12]">Australian Disability</p>
+          <p className="text-sm font-black text-[#7A5A12]">
+            Australian Disability
+          </p>
           <p className="mt-1 max-w-xs text-xs leading-5 text-slate-600">
-            We&apos;re for a fair, dignified and equal society for all people with disabilities.
+            We&apos;re for a fair, dignified and equal society for all people
+            with disabilities.
           </p>
         </div>
       </div>
@@ -91,7 +111,9 @@ function RegistrationDetails() {
 }
 
 function FooterPartnerStrip() {
-  const footerPlacements = sponsoredPlacements.filter((placement) => placement.placement === "footer");
+  const footerPlacements = sponsoredPlacements.filter(
+    (placement) => placement.placement === "footer",
+  );
   if (footerPlacements.length === 0) return null;
   return (
     <div className="mb-10 rounded-[1.5rem] border border-slate-200 bg-white p-5">
@@ -99,7 +121,8 @@ function FooterPartnerStrip() {
         <div>
           <SponsoredBadge>Community partners</SponsoredBadge>
           <p className="mt-2 text-sm leading-6 text-slate-600">
-            Partner placements are separated from support results and labelled for transparency.
+            Partner placements are separated from support results and labelled
+            for transparency.
           </p>
         </div>
         <div className="grid gap-3 md:min-w-[24rem]">
@@ -109,7 +132,9 @@ function FooterPartnerStrip() {
               href={placement.href}
               className="rounded-2xl border border-slate-200 bg-slate-50 p-4 transition hover:bg-[#F8C51C]/15 focus:outline-none focus:ring-4 focus:ring-[#F8C51C]/40"
             >
-              <span className="block text-sm font-black text-[#0C1833]">{placement.title}</span>
+              <span className="block text-sm font-black text-[#0C1833]">
+                {placement.title}
+              </span>
               <span className="mt-1 block text-xs leading-5 text-slate-600">
                 {placement.description}
               </span>
@@ -130,19 +155,28 @@ export function MapAbleCareMarketingFooter() {
           <section aria-label="About MapAble">
             <FooterBrandMark />
             <p className="mt-5 max-w-sm text-sm leading-7 text-slate-600">
-              A combined care and support platform helping people with disability connect with care,
-              transport, opportunity and everyday access.
+              A combined care and support platform helping people with
+              disability connect with care, transport, opportunity and everyday
+              access.
             </p>
             <div className="mt-5 flex items-center gap-2">
               {socialLinks.map((link) => (
-                <SocialLink key={link.label} href={link.href} label={link.label} icon={link.icon} />
+                <SocialLink
+                  key={link.label}
+                  href={link.href}
+                  label={link.label}
+                  icon={link.icon}
+                />
               ))}
             </div>
             <AustralianDisabilityMark />
             <RegistrationDetails />
           </section>
           <section aria-labelledby="footer-platform-heading">
-            <h2 id="footer-platform-heading" className="text-sm font-black text-[#0C1833]">
+            <h2
+              id="footer-platform-heading"
+              className="text-sm font-black text-[#0C1833]"
+            >
               Platform
             </h2>
             <nav className="mt-5 grid gap-4" aria-label="Platform links">
@@ -154,7 +188,10 @@ export function MapAbleCareMarketingFooter() {
             </nav>
           </section>
           <section aria-labelledby="footer-resources-heading">
-            <h2 id="footer-resources-heading" className="text-sm font-black text-[#0C1833]">
+            <h2
+              id="footer-resources-heading"
+              className="text-sm font-black text-[#0C1833]"
+            >
               Resources
             </h2>
             <nav className="mt-5 grid gap-4" aria-label="Resource links">
@@ -163,10 +200,20 @@ export function MapAbleCareMarketingFooter() {
                   {item.label}
                 </FooterTextLink>
               ))}
+              <FooterTextLink href="/contact">
+                Accessibility feedback
+              </FooterTextLink>
+              <AccessibilityPanelTrigger
+                variant="link"
+                className="justify-start text-left"
+              />
             </nav>
           </section>
           <section aria-labelledby="footer-contact-heading">
-            <h2 id="footer-contact-heading" className="text-sm font-black text-[#0C1833]">
+            <h2
+              id="footer-contact-heading"
+              className="text-sm font-black text-[#0C1833]"
+            >
               Contact
             </h2>
             <address className="mt-5 grid gap-4 not-italic text-sm text-slate-600">
@@ -206,6 +253,10 @@ export function MapAbleCareSlimFooter() {
         <nav className="flex flex-wrap gap-4" aria-label="Legal links">
           <FooterTextLink href="/privacy">Privacy</FooterTextLink>
           <FooterTextLink href="/terms">Terms</FooterTextLink>
+          <FooterTextLink href="/accessibility-statement">
+            Accessibility
+          </FooterTextLink>
+          <AccessibilityPanelTrigger variant="link" />
           <a
             href={`mailto:${MAPABLE_SUPPORT_EMAIL}`}
             className="rounded-lg font-medium transition hover:text-[#005B7F] focus:outline-none focus:ring-4 focus:ring-[#F8C51C]/40"

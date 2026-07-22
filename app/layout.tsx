@@ -12,6 +12,8 @@ import {
   GoogleAdSense,
 } from "@/components/ads/GoogleAdSense";
 import { Providers } from "@/components/providers";
+import { isFirstPartyAccessibilityPanelEnabled } from "@/lib/accessibility/feature-flags";
+import { getPreHydrationAccessibilityScript } from "@/lib/accessibility/ui-preferences";
 import { MAPABLE_LOGO_MARK_SRC } from "@/lib/brand/constants";
 import { getCanonicalPublicOrigin } from "@/lib/config/canonical-url";
 import {
@@ -25,6 +27,7 @@ import {
 
 const canonicalOrigin = getCanonicalPublicOrigin();
 const publicJsonLd = buildPublicJsonLd();
+const firstPartyA11yPanel = isFirstPartyAccessibilityPanelEnabled();
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -78,9 +81,10 @@ export const metadata: Metadata = {
 };
 
 /**
- * Resolve script nonce only when preview CSP enforce is active.
+ * Resolve script nonce only when preview CSP enforce is active (#388 on main).
  * Calling `headers()` opts the tree into dynamic rendering — avoid that when
  * the flag is off so public/static caching remains available.
+ * Panel prehydration (#389) also receives this nonce when enforce is on.
  */
 async function resolveScriptNonce(): Promise<string | undefined> {
   if (!isCspPreviewEnforceEnabled()) return undefined;
@@ -103,6 +107,14 @@ export default async function RootLayout({
           content="832ea0b13123578b63ae2fe9"
         />
         <meta name="google-adsense-account" content={ADSENSE_CLIENT_ID} />
+        {firstPartyA11yPanel ? (
+          <script
+            nonce={scriptNonce}
+            dangerouslySetInnerHTML={{
+              __html: getPreHydrationAccessibilityScript(),
+            }}
+          />
+        ) : null}
       </head>
       <body className={plusJakarta.className}>
         <script
@@ -122,7 +134,7 @@ export default async function RootLayout({
           }}
         />
         <Providers>{children}</Providers>
-        <AccessiBeWidget />
+        {firstPartyA11yPanel ? null : <AccessiBeWidget />}
         <GoogleAdSense />
         <SpeedInsights />
       </body>

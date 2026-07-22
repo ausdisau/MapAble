@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { accessibilityUiPreferencesSchema } from "@/lib/accessibility/ui-preferences";
+
 const mobilityAid = z.enum([
   "manual_wheelchair",
   "power_wheelchair",
@@ -50,7 +52,20 @@ export const accessibilityProfileSchema = z.object({
       voiceControlPreferred: z.boolean().optional(),
       dyslexiaFriendlyMode: z.boolean().optional(),
       simpleLanguageMode: z.boolean().optional(),
+      ui: accessibilityUiPreferencesSchema.optional(),
     })
     .default({}),
   shareWithProviders: z.record(z.string(), z.boolean()).default({}),
+});
+
+/** Narrow schema for panel account sync — only digital preference fields. */
+export const digitalPreferencesPatchSchema = z.object({
+  ui: accessibilityUiPreferencesSchema.optional(),
+  largeText: z.boolean().optional(),
+  highContrast: z.boolean().optional(),
+  reducedMotion: z.boolean().optional(),
+  screenReaderUser: z.boolean().optional(),
+  voiceControlPreferred: z.boolean().optional(),
+  dyslexiaFriendlyMode: z.boolean().optional(),
+  simpleLanguageMode: z.boolean().optional(),
 });
