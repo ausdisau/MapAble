@@ -3,31 +3,24 @@ import type { MetadataRoute } from "next";
 import { getCanonicalPublicOrigin } from "@/lib/config/canonical-url";
 import { DEMO_ACCESS_PLACES } from "@/lib/demo/accessibility-places";
 import { LOCAL_ACCESS_LOCATIONS } from "@/lib/demo/local-access-pages";
+import { informationalSitemapPaths } from "@/lib/public-informational/routes";
 
 const baseUrl = getCanonicalPublicOrigin();
 
-const publicRoutes = [
-  "",
-  "/care",
-  "/transport",
-  "/employment",
+/**
+ * Additional public marketing URLs beyond the informational GO-gate allowlist.
+ * Informational allowlist paths are always sourced from
+ * `lib/public-informational/routes.ts` so the release boundary cannot drift.
+ */
+const additionalPublicRoutes = [
   "/marketplace",
   "/foods",
   "/access",
   "/accessibility-map",
   "/providers",
   "/provider-finder",
-  "/resources",
-  "/guides",
-  "/help",
-  "/about",
   "/pricing",
-  "/contact",
   "/for-providers",
-  "/privacy",
-  "/terms",
-  "/data-deletion",
-  "/accessibility-statement",
   "/journey-planner",
   "/compare",
   "/mapping-days",
@@ -40,13 +33,21 @@ const publicRoutes = [
   "/telehealth",
 ];
 
+function uniqueSitemapPaths(): string[] {
+  const fromInventory = informationalSitemapPaths();
+  const merged = new Set<string>([...fromInventory, ...additionalPublicRoutes]);
+  return [...merged];
+}
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
 
-  const staticEntries = publicRoutes.map((route) => ({
+  const staticEntries = uniqueSitemapPaths().map((route) => ({
     url: `${baseUrl}${route}`,
     lastModified: now,
-    changeFrequency: (route === "" ? "weekly" : "monthly") as "weekly" | "monthly",
+    changeFrequency: (route === "" ? "weekly" : "monthly") as
+      | "weekly"
+      | "monthly",
     priority: route === "" ? 1 : 0.7,
   }));
 

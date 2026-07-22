@@ -63,13 +63,20 @@ describe("homepage guided landing", () => {
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
   });
 
-  it("renders hero CTAs targeting access journeys", () => {
+  it("renders hero CTAs targeting informational destinations", () => {
     expect(
       screen.getByRole("link", { name: /Find accessible places/i }).getAttribute("href"),
     ).toBe("/accessibility-map");
+    const contactLinks = screen.getAllByRole("link", {
+      name: homepageHeroCopy.secondaryCta,
+    });
+    expect(contactLinks.length).toBeGreaterThan(0);
+    expect(contactLinks.every((link) => link.getAttribute("href") === "/contact")).toBe(
+      true,
+    );
     expect(
-      screen.getByRole("link", { name: homepageHeroCopy.secondaryCta }).getAttribute("href"),
-    ).toBe("/care/request");
+      screen.queryByRole("link", { name: /^Request support$/i }),
+    ).toBeNull();
   });
 
   it("renders guided search panel with labeled input", () => {

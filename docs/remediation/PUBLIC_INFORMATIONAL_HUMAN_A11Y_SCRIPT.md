@@ -26,8 +26,9 @@ For each allowlisted path (`/`, `/about`, `/contact`, `/privacy`, `/terms`, `/ac
 
 ## Evidence form (redacted)
 
-Record: tester, date, commit SHA, URL, overallStatus (`NOT_RUN` | `VERIFIED` | `FAILED`), journeys with `evidenceRef` for any `VERIFIED`/`PASS`.  
-Validate with: `pnpm audit:human-release-evidence -- --evidence ./artifacts/human-release-session.redacted.json`
+Record: tester, date, commit SHA, URL, overallStatus (`NOT_RUN` | `INCOMPLETE` | `VERIFIED` | `PASS` | `FAILED` | `FAIL` | `BLOCKED` | `OWNER_ACTION_REQUIRED`), journeys with `evidenceRef` for any `VERIFIED`/`PASS`.  
+Validate with: `pnpm audit:human-release-evidence -- --evidence ./artifacts/human-release-session.redacted.json`  
+The validator is fail-closed: only explicit PASS/VERIFIED evidence exits 0; NOT_RUN/incomplete/blocked/failed never become VERIFIED.
 
 ## Status
 

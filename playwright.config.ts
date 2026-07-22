@@ -12,6 +12,10 @@ const projects: Project[] = [
     name: "public",
     testMatch: /route-shells\.spec\.ts/,
   },
+  {
+    name: "informational",
+    testMatch: /informational-routes\.spec\.ts/,
+  },
 ];
 
 if (!skipAuth) {

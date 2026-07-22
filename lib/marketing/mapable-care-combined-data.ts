@@ -106,16 +106,17 @@ export const logoMenuItems: MenuItem[] = [
 export const homepageHeroCopy = {
   headline: "Find accessible places, supports, and journeys you can actually use.",
   subheading:
-    "MapAble connects verified accessibility information, NDIS-aware providers, accessible transport, employment pathways, and support coordination into one practical platform.",
+    "MapAble publishes accessibility information and programme explainers. Care bookings, transport matching, and NDIS service delivery remain separately governed and are not claimed as generally available here.",
   primaryCta: "Find accessible places",
-  secondaryCta: "Request support",
+  secondaryCta: "Contact MapAble",
 };
 
+/** Informational-release CTAs — no unfinished transactional destinations. */
 export const homepageHeroCtas = [
   { label: "Find accessible places", href: "/accessibility-map" },
-  { label: "Request support", href: "/care/request" },
-  { label: "Plan accessible transport", href: "/journey-planner" },
-  { label: "Verify my venue", href: "/verify-my-venue" },
+  { label: "Learn about Care", href: "/care" },
+  { label: "Learn about Transport", href: "/transport" },
+  { label: "Contact MapAble", href: "/contact" },
 ] as const;
 
 export const homepageCategoryChips = [
@@ -153,7 +154,7 @@ export const competitorContrastCards: DifferenceCard[] = [
   },
   {
     title: "More practical than static place reviews",
-    body: "Plan routes, book transport or support, and update access info when things change.",
+    body: "Use access notes to plan visits, then contact MapAble about pilot interest when transactional services open.",
     badge: "Journey-ready",
   },
   {
@@ -192,8 +193,8 @@ export const homepageSupportJourneySteps: JourneyStep[] = [
   },
   {
     number: "04",
-    title: "Book transport/support",
-    body: "Request accessible transport or a support worker when you need one.",
+    title: "Enquire about support",
+    body: "Contact MapAble about pilot interest — bookings and matching are not offered as a general public service on this informational site.",
   },
   {
     number: "05",
@@ -223,12 +224,12 @@ export const homepageProviderPitch = {
 
 export const homepageFinalCta = {
   headline: "Help build Australia’s access layer.",
-  body: "Map places, verify venues, join a mapping day, or share Access-Fit needs on your terms.",
+  body: "Read how MapAble works, explore programme explainers, or contact us about pilot interest. Public informational pages do not open general bookings or claims.",
   ctas: [
-    { label: "Join a mapping day", href: "/mapping-days" },
-    { label: "Add access info", href: "/add-access-info" },
-    { label: "Verify my venue", href: "/verify-my-venue" },
-    { label: "Compare MapAble", href: "/compare" },
+    { label: "About MapAble", href: "/about" },
+    { label: "Accessibility statement", href: "/accessibility-statement" },
+    { label: "Contact MapAble", href: "/contact" },
+    { label: "Help Centre", href: "/help" },
   ],
 };
 
