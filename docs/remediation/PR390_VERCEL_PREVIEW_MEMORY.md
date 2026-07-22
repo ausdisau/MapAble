@@ -5,11 +5,11 @@
 
 ## Evidence
 
-| Deployment | SHA | Heap | Failure |
-| --- | --- | --- | --- |
+| Deployment                         | SHA        | Heap | Failure                          |
+| ---------------------------------- | ---------- | ---- | -------------------------------- |
 | `dpl_GPMHcZxiyLb1T42F3W7Zt5WxRrUb` | `47bc425b` | 6144 | `out_of_memory` / worker SIGKILL |
-| `dpl_5ydRxpvGxhfL8SdnKvoXr2HpCwAs` | `54536e12` | 5632 | JS heap OOM during lint+types |
-| Prior READY on same project | `8e722ec5` | 6144 | READY (earlier tip) |
+| `dpl_5ydRxpvGxhfL8SdnKvoXr2HpCwAs` | `54536e12` | 5632 | JS heap OOM during lint+types    |
+| Prior READY on same project        | `8e722ec5` | 6144 | READY (earlier tip)              |
 
 ## Repository posture
 
