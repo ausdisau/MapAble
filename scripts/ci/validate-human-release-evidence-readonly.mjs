@@ -7,7 +7,7 @@
  *   node scripts/ci/validate-human-release-evidence-readonly.mjs \
  *     --evidence ./artifacts/human-release-session.redacted.json
  */
-import { readFileSync, existsSync } from "node:fs";
+import { readFileSync, existsSync, statSync } from "node:fs";
 
 const VALID = new Set([
   "VERIFIED",
@@ -21,31 +21,64 @@ const VALID = new Set([
   "STOP",
 ]);
 
+/** Conservative cap — human evidence artefacts are small structured JSON. */
+const MAX_EVIDENCE_BYTES = 256 * 1024;
+
+function failClosed(overall, reason, extra = {}) {
+  console.log(
+    JSON.stringify({
+      mode: "read_only",
+      secretsPrinted: false,
+      mutatesExternalState: false,
+      overall,
+      reason,
+      ...extra,
+      note: "Validator only; does not execute human tests.",
+    }),
+  );
+  process.exit(overall === "FAILED" ? 1 : overall === "OWNER_ACTION_REQUIRED" ? 2 : 0);
+}
+
 function main() {
   const idx = process.argv.indexOf("--evidence");
   const path = idx >= 0 ? process.argv[idx + 1] : undefined;
   if (!path) {
-    console.log(
-      JSON.stringify({
-        overall: "OWNER_ACTION_REQUIRED",
-        reason: "missing --evidence",
-        secretsPrinted: false,
-      }),
-    );
-    process.exit(2);
+    failClosed("OWNER_ACTION_REQUIRED", "missing --evidence");
   }
   if (!existsSync(path)) {
-    console.log(
-      JSON.stringify({
-        overall: "FAILED",
-        reason: "file_missing",
-        secretsPrinted: false,
-      }),
-    );
-    process.exit(1);
+    failClosed("FAILED", "file_missing");
   }
 
-  const data = JSON.parse(readFileSync(path, "utf8"));
+  let size;
+  try {
+    size = statSync(path).size;
+  } catch {
+    failClosed("FAILED", "stat_failed");
+  }
+  if (size > MAX_EVIDENCE_BYTES) {
+    failClosed("FAILED", "evidence_too_large", {
+      maxBytes: MAX_EVIDENCE_BYTES,
+    });
+  }
+
+  let raw;
+  try {
+    raw = readFileSync(path, "utf8");
+  } catch {
+    failClosed("FAILED", "read_failed");
+  }
+
+  let data;
+  try {
+    data = JSON.parse(raw);
+  } catch {
+    failClosed("FAILED", "json_parse_error");
+  }
+
+  if (!data || typeof data !== "object" || Array.isArray(data)) {
+    failClosed("FAILED", "wrong_schema_root");
+  }
+
   const missing = [];
   for (const field of ["tester", "date", "commitSha", "url", "overallStatus"]) {
     if (!data?.[field] || !String(data[field]).trim()) missing.push(field);

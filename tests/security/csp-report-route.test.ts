@@ -9,15 +9,26 @@ import { isCspPreviewEnforceEnabled } from "@/lib/security/csp-preview-enforce";
 
 function reportRequest(
   body: unknown,
-  init?: { contentType?: string; ip?: string },
+  init?: {
+    contentType?: string;
+    ip?: string;
+    contentLength?: string;
+    rawBody?: BodyInit;
+  },
 ): Request {
+  const serialized =
+    init?.rawBody !== undefined ? undefined : JSON.stringify(body);
+  const headers: Record<string, string> = {
+    "content-type": init?.contentType ?? "application/csp-report",
+    "x-forwarded-for": init?.ip ?? "203.0.113.10",
+  };
+  if (init?.contentLength !== undefined) {
+    headers["content-length"] = init.contentLength;
+  }
   return new Request("http://localhost/api/security/csp-report", {
     method: "POST",
-    headers: {
-      "content-type": init?.contentType ?? "application/csp-report",
-      "x-forwarded-for": init?.ip ?? "203.0.113.10",
-    },
-    body: JSON.stringify(body),
+    headers,
+    body: init?.rawBody ?? serialized,
   });
 }
 
@@ -48,7 +59,7 @@ describe("POST /api/security/csp-report", () => {
     expect(res.status).toBe(415);
   });
 
-  it("rejects oversized bodies with 413", async () => {
+  it("rejects oversized bodies with 413 after read", async () => {
     const res = await POST(
       reportRequest({
         "csp-report": {
@@ -58,6 +69,78 @@ describe("POST /api/security/csp-report", () => {
       }),
     );
     expect(res.status).toBe(413);
+  });
+
+  it("rejects oversized Content-Length before buffering", async () => {
+    const res = await POST(
+      reportRequest(
+        { "csp-report": { "document-uri": "https://example.com/" } },
+        { contentLength: "9000" },
+      ),
+    );
+    expect(res.status).toBe(413);
+    const body = await res.json();
+    expect(body).toEqual({ error: "payload_too_large" });
+  });
+
+  it("rejects malformed Content-Length", async () => {
+    const res = await POST(
+      reportRequest(
+        { "csp-report": { "document-uri": "https://example.com/" } },
+        { contentLength: "12abc" },
+      ),
+    );
+    expect(res.status).toBe(400);
+    const body = await res.json();
+    expect(body).toEqual({ error: "invalid_content_length" });
+  });
+
+  it("rejects zero Content-Length", async () => {
+    const res = await POST(
+      reportRequest({}, { contentLength: "0", rawBody: "" }),
+    );
+    expect(res.status).toBe(400);
+  });
+
+  it("accepts valid body when Content-Length is absent", async () => {
+    const payload = {
+      "csp-report": {
+        "document-uri": "https://example.com/",
+        "violated-directive": "script-src",
+      },
+    };
+    const res = await POST(
+      new Request("http://localhost/api/security/csp-report", {
+        method: "POST",
+        headers: {
+          "content-type": "application/csp-report",
+          "x-forwarded-for": "203.0.113.11",
+        },
+        body: JSON.stringify(payload),
+      }),
+    );
+    expect(res.status).toBe(204);
+  });
+
+  it("rejects wrong-schema payloads via Zod without echoing body", async () => {
+    const res = await POST(reportRequest("not-an-object"));
+    expect(res.status).toBe(400);
+    const text = await res.text();
+    expect(text).toContain("invalid_report");
+    expect(text).not.toContain("not-an-object");
+  });
+
+  it("rejects oversized string fields in schema", async () => {
+    const res = await POST(
+      reportRequest({
+        "csp-report": {
+          "document-uri": "https://example.com/",
+          "violated-directive": "d".repeat(3_000),
+        },
+      }),
+    );
+    expect(res.status).toBe(400);
+    expect(await res.json()).toEqual({ error: "invalid_report" });
   });
 
   it("accepts Reporting API arrays", async () => {
