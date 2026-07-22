@@ -50,11 +50,16 @@ describe("NDIS Expansion Wave 0 registry honesty", () => {
     expect(sequence).toMatch(/Wave 1/);
   });
 
-  it("registers expansion capabilities as documented and not production-supported", () => {
+  it("registers expansion capabilities as documented/scaffolded and not production-supported", () => {
     for (const key of EXPANSION_CAPABILITY_KEYS) {
       const seed = CAPABILITY_SEEDS.find((c) => c.capabilityKey === key);
       expect(seed, `missing capability seed ${key}`).toBeTruthy();
-      expect(seed!.maturity).toBe("documented");
+      if (key === "ndis.at_continuity") {
+        expect(seed!.maturity).toBe("scaffolded");
+        expect(seed!.honesty.durable).toBe(true);
+      } else {
+        expect(seed!.maturity).toBe("documented");
+      }
       expect(seed!.productionClaimStatus).toBe("unsupported");
       expect(seed!.honesty.featureEnabled).toBe(false);
       expect(seed!.honesty.productionSupported).toBe(false);

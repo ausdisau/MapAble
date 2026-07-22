@@ -69,3 +69,10 @@
 /docs/access-intelligence-next/ @ausdisau
 /components/access-intelligence-next/ @ausdisau
 /tests/access-intelligence-next/ @ausdisau
+
+# NDIS Expansion — Assistive Technology Continuity (Wave 1)
+/lib/at-continuity/ @ausdisau
+/lib/config/at-continuity.ts @ausdisau
+/docs/programmes/AT_CONTINUITY_WAVE1.md @ausdisau
+/tests/at-continuity/ @ausdisau
+/prisma/migrations/20260720120000_at_continuity_wave1/ @ausdisau

@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "dev:debug": "NODE_OPTIONS='--inspect' next dev",
-    "build": "NODE_OPTIONS='--max-old-space-size=6144' next build",
+    "build": "node scripts/run-next-build.mjs",
     "start": "next start",
     "lint": "NODE_OPTIONS='--max-old-space-size=6144' eslint app components lib schemas scripts/ci --max-warnings 0",
     "lint:tests": "NODE_OPTIONS='--max-old-space-size=6144' eslint tests --max-warnings 0",

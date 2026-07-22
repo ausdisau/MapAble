@@ -58,3 +58,19 @@ Waivers do **not** lift the global freeze. Flags stay default-false. No producti
 ## Honesty labels
 
 Demo, mock, scaffold, and pilot behaviour must be labelled honestly in UI, API, and docs. Feature flags are not assurance.
+
+## Explicit domain waiver — AT Continuity (Wave 1)
+
+**Authorised:** NDIS Expansion Wave 1 after migrate-from-zero green (#381) and Wave 0 docs (#380) on `main`.
+
+| Field        | Value                                                                                                                                            |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Domain       | Assistive Technology Continuity only                                                                                                             |
+| Paths        | `lib/at-continuity/**`, `lib/config/at-continuity.ts`                                                                                            |
+| Schema       | Additive `at_*` tables / enums in `20260720120000_at_continuity_wave1`                                                                           |
+| Flag         | `MAPABLE_AT_CONTINUITY_ENABLED` remains default **false**                                                                                        |
+| Still frozen | New OS layers, payments, second consent/audit, NDIA submit, auto payment approval, other NDIS Expansion product domains without their own waiver |
+| Non-goals    | Clinical suitability SoT; emergency dispatch; marketplace taxonomy as asset register                                                             |
+| Rollback     | Flag off; revert Wave 1 migration on non-prod if required                                                                                        |
+
+This waiver does **not** lift the freeze globally.

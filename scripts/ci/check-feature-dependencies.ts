@@ -51,6 +51,7 @@ function main(): void {
     "docs/programmes/NDIS_EXPANSION_PR_RECONCILIATION.md",
     "docs/programmes/NDIS_REGULATORY_GATE_MATRIX.md",
     "docs/programmes/NDIS_EXPANSION_DELIVERY_SEQUENCE.md",
+    "docs/programmes/AT_CONTINUITY_WAVE1.md",
   ]) {
     if (!fs.existsSync(path.join(ROOT, rel))) {
       errors.push(`${rel} missing`);
