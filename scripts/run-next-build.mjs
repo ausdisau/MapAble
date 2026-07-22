@@ -16,14 +16,14 @@ function resolveHeapMb() {
     return Number(override);
   }
   if (process.env.VERCEL === "1") {
-    // History on 8 GB Vercel builders:
+    // History on default ~8 GB Vercel builders (PR #390):
     // - 7168 → SIGKILL (RSS)
-    // - 6144 → SIGKILL on PR #390 tip 47bc425b (dpl_GPMHcZxiy…)
-    // - 4608 → JS heap OOM during SSG
-    // 5632 leaves more non-heap RSS headroom while staying above the 4608 floor.
-    // If this still SIGKILLs, escalate builder size (OWNER_ACTION_REQUIRED) —
-    // do not raise the heap toward 7168 on the default machine.
-    return 5632;
+    // - 5632 → JS heap OOM during "Linting and checking validity of types"
+    //   (dpl_5ydRxpvGx…)
+    // - 6144 → required for lint/tsc; may still SIGKILL under peak RSS
+    //   (dpl_GPMHcZxiy…). If SIGKILL persists: OWNER_ACTION_REQUIRED larger
+    //   build machine — do not enable ignoreDuringBuilds / ignoreBuildErrors.
+    return 6144;
   }
   if (process.env.GITHUB_ACTIONS === "true") {
     return 7168;

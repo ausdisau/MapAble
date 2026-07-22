@@ -28,15 +28,17 @@ Vercel’s preview container that requests an OS kill before JS heap OOM.
 
 1. Keep SSG concurrency at **1** / min pages per worker **100** (`next.config.ts`)
 2. Replace hardcoded build heap with `scripts/run-next-build.mjs`:
-   - Vercel (`VERCEL=1`): **5632** MB (4608 → JS OOM; 6144/7168 → SIGKILL on 8 GB builders)
+   - Vercel (`VERCEL=1`): **6144** MB (5632 → lint/tsc JS OOM; 7168 → SIGKILL)
    - GitHub Actions: **7168** MB
    - Local default: **6144** MB
    - Override: `MAPABLE_BUILD_HEAP_MB`
 3. `staticGenerationMinPagesPerWorker: 200` (was 100) to cut worker RSS further
 
 Do **not** raise the Vercel heap to 7168 without a larger build machine
-(`OWNER_ACTION_REQUIRED`). If 5632 still SIGKILLs on Vercel preview, escalate
-builder size / route-import profiling — do not keep bumping heap blindly.
+(`OWNER_ACTION_REQUIRED`). Do **not** set `eslint.ignoreDuringBuilds` /
+`typescript.ignoreBuildErrors` to paper over memory pressure — CI already
+enforces lint/types. If 6144 still SIGKILLs on Vercel preview, escalate
+builder size / route-import profiling.
 
 ## Follow-up performance issue (human)
 
