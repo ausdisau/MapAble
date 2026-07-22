@@ -1,9 +1,10 @@
 # Remediation — Current State
 
-**Last verified:** 2026-07-21 (controlled-pilot decision programme)  
-**Base `origin/main` tip:** `7009e9de7c815267577404c324231c504077372e`  
-**Prior reference tip:** `3f406c3715d55e644d3385ccbd2141fa7b5813a2` (ancestor; main advanced via #279)  
+**Last verified:** 2026-07-22 (public informational GO-gate remediation)  
+**Base `origin/main` tip:** `2042a210edba065a500c2936c95f22e47497dec3`  
+**Prior tip (stale):** `7009e9de7c815267577404c324231c504077372e`  
 **Canonical pilot charter:** [../operations/CONTROLLED_PILOT_CHARTER.md](../operations/CONTROLLED_PILOT_CHARTER.md)  
+**Informational closure rescan:** [CLOSURE_RESCAN_2026-07-22.md](./CLOSURE_RESCAN_2026-07-22.md)  
 **Finding status values:** `VERIFIED` | `FAILED` | `NOT_RUN` | `OWNER_ACTION_REQUIRED` | `BLOCKED` | `NOT_APPLICABLE`
 
 Full Phase 0 notes: [RESCAN_RECONCILIATION.md](./RESCAN_RECONCILIATION.md)  
@@ -21,18 +22,18 @@ This document records live repository and public-edge inspection. CI green is **
 | Production account | Neon / Vercel / GitHub settings (owner)     |
 | Human acceptance   | Manual AT, tabletop, pilot golden journeys  |
 
-## Live production edge (curl, 2026-07-20)
+## Live production edge (curl, 2026-07-22)
 
-| Check                                   | Result                                                                         | Status                                                                 |
-| --------------------------------------- | ------------------------------------------------------------------------------ | ---------------------------------------------------------------------- |
-| Apex `https://mapable.com.au/`          | HTTP 200                                                                       | `VERIFIED`                                                             |
-| `https://www.mapable.com.au/`           | HTTP 307 → apex                                                                | `VERIFIED` (TLS/redirect at scan; still owner-owned)                   |
-| `/jobs`                                 | HTTP 308 → `/employment`                                                       | `VERIFIED`                                                             |
-| `/robots.txt` / `/sitemap.xml`          | 200; sitemap locs use apex                                                     | `VERIFIED`                                                             |
-| HTML JSON-LD on apex                    | May still lag tip until deploy; treat as edge ≠ repo                           | `OWNER_ACTION_REQUIRED` (deploy confirmation)                          |
-| CSP                                     | Report-Only; includes `unsafe-eval`                                            | `VERIFIED`                                                             |
-| `/api/health/live`, `/api/health/ready` | Present in **repository** on main/#388; apex returns **404 HTML** (2026-07-21) | Repository `VERIFIED`; edge `FAILED`; redeploy `OWNER_ACTION_REQUIRED` |
-| Branch protection via API               | rulesets `[]`; protection endpoint 403                                         | `OWNER_ACTION_REQUIRED`                                                |
+| Check                                   | Result                                                                                                         | Status                                                                  |
+| --------------------------------------- | -------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| Apex `https://mapable.com.au/`          | HTTP 200; allowlisted informational routes 200                                                                 | `VERIFIED`                                                              |
+| `https://www.mapable.com.au/`           | TLS certificate **expired** (curl exit 60)                                                                     | `FAILED` / `OWNER_ACTION_REQUIRED`                                      |
+| `http://mapable.com.au/`                | 308 → `https://mapable.com.au/`                                                                                | `VERIFIED`                                                              |
+| `/robots.txt` / `/sitemap.xml`          | 200; sitemap locs use apex                                                                                     | `VERIFIED`                                                              |
+| CSP                                     | Report-Only only (no enforce header); includes `unsafe-eval`                                                   | `VERIFIED` (report-only)                                                |
+| `/api/health/live`, `/api/health/ready` | Present in **repository** on main; apex returns **404 HTML**; latest Production build for `2042a210` **ERROR** | Repository `VERIFIED`; edge `FAILED`; HTTPS env `OWNER_ACTION_REQUIRED` |
+| Deployment drift                        | Live edge ≠ failed Production attempt `dpl_D6eih3Nn…` (HTTP `NEXTAUTH_URL` / `NEXT_PUBLIC_APP_URL`)            | `VERIFIED` (drift)                                                      |
+| Branch protection via API               | rulesets `[]`; protection endpoint 403                                                                         | `OWNER_ACTION_REQUIRED`                                                 |
 
 ## Wave / repair programme status
 

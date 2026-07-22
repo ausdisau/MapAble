@@ -16,8 +16,13 @@ function resolveHeapMb() {
     return Number(override);
   }
   if (process.env.VERCEL === "1") {
-    // 7168 SIGKILL'd the preview builder; 4608 hit JS heap OOM during SSG.
-    // 6144 matches main's historic build cap with concurrency=1 headroom.
+    // History on default ~8 GB Vercel builders (PR #390):
+    // - 7168 → SIGKILL (RSS)
+    // - 5632 → JS heap OOM during "Linting and checking validity of types"
+    //   (dpl_5ydRxpvGx…)
+    // - 6144 → required for lint/tsc; may still SIGKILL under peak RSS
+    //   (dpl_GPMHcZxiy…). If SIGKILL persists: OWNER_ACTION_REQUIRED larger
+    //   build machine — do not enable ignoreDuringBuilds / ignoreBuildErrors.
     return 6144;
   }
   if (process.env.GITHUB_ACTIONS === "true") {

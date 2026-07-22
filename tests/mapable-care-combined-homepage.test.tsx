@@ -189,9 +189,10 @@ describe("MapAbleCareCombinedHomepage", () => {
     expect(screen.getByText("To be confirmed")).toBeTruthy();
   });
 
-  it("renders competitor final CTA instead of sponsored home band", () => {
+  it("renders informational final CTA instead of sponsored home band", () => {
     expect(screen.getByRole("heading", { name: /Help build Australia/i })).toBeTruthy();
-    expect(screen.getAllByRole("link", { name: "Verify my venue" }).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole("link", { name: "Contact MapAble" }).length).toBeGreaterThan(0);
+    expect(screen.queryByRole("link", { name: "Verify my venue" })).toBeNull();
   });
 
   it("opens guided chat on panel search submit", () => {

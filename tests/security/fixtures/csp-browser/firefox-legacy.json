@@ -1,0 +1,15 @@
+{
+  "csp-report": {
+    "blocked-uri": "inline",
+    "column-number": 11,
+    "disposition": "report",
+    "document-uri": "https://fixture.local/",
+    "effective-directive": "script-src-elem",
+    "line-number": 10,
+    "original-policy": "default-src 'self'; script-src 'self'; report-uri https://fixture.local/csp-report",
+    "referrer": "",
+    "source-file": "https://fixture.local/",
+    "status-code": 200,
+    "violated-directive": "script-src-elem"
+  }
+}

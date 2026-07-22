@@ -1,9 +1,11 @@
 import { PublicInfoPage } from "@/components/marketing/PublicInfoPage";
+import { canonicalAlternate } from "@/lib/config/canonical-url";
 
 export const metadata = {
   title: "Accessibility statement | MapAble",
   description:
     "MapAble accessibility statement and current WCAG testing status.",
+  alternates: canonicalAlternate("/accessibility-statement"),
 };
 
 export default function AccessibilityStatementPage() {

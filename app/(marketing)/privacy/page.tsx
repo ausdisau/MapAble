@@ -1,9 +1,11 @@
 import { PublicInfoPage } from "@/components/marketing/PublicInfoPage";
+import { canonicalAlternate } from "@/lib/config/canonical-url";
 
 export const metadata = {
   title: "Privacy | MapAble",
   description:
     "MapAble privacy notice for public visitors and pilot participants.",
+  alternates: canonicalAlternate("/privacy"),
 };
 
 export default function PrivacyPage() {

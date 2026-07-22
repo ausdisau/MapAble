@@ -2,7 +2,10 @@
 
 **Canonical pilot boundary:** [../operations/CONTROLLED_PILOT_CHARTER.md](../operations/CONTROLLED_PILOT_CHARTER.md)  
 **Rule:** Do not mark items `VERIFIED` unless the named owner performed them and recorded evidence. A checklist is not evidence.  
-**Inspected `origin/main`:** `7009e9de7c815267577404c324231c504077372e`  
+**Inspected `origin/main`:** `2042a210edba065a500c2936c95f22e47497dec3`  
+**Latest Production deploy attempt:** `dpl_D6eih3NnqM4QJvYL3wRTkuiG2ycc` — **ERROR** (`BUILD_UTILS_SPAWN_1`)  
+**Root cause (authenticated build logs):** Production env rejects insecure HTTP for `NEXTAUTH_URL` and `NEXT_PUBLIC_APP_URL` via `assertDeployedProductionEnv` — repository gate working as designed.  
+**Live apex still serving older deployment** `dpl_MBD4G6ZZhRQ84iTqx2oc1sqZ3dVK` (deployment drift; health routes 404 HTML).  
 **Agents must not** change Vercel, Neon, GitHub, DNS, monitoring, or payment accounts.
 
 ## Ordered release procedure
@@ -13,15 +16,15 @@ Owner sets **without disclosing values in chat or logs**:
 
 1. `NEXTAUTH_URL=https://mapable.com.au`
 2. `NEXT_PUBLIC_APP_URL=https://mapable.com.au` (must match)
-3. Redeploy Production
+3. Confirm Production branch is `main` and deploy the **approved remediation SHA** (not an older alias)
 4. Record evidence form:
 
 | Field                                                   | Value | Status                                                                                                                 |
 | ------------------------------------------------------- | ----- | ---------------------------------------------------------------------------------------------------------------------- |
 | Deployment ID                                           |       | `OWNER_ACTION_REQUIRED`                                                                                                |
-| Commit SHA                                              |       | `OWNER_ACTION_REQUIRED`                                                                                                |
-| Build result                                            |       | `OWNER_ACTION_REQUIRED`                                                                                                |
-| Canonical redirect result                               |       | `OWNER_ACTION_REQUIRED`                                                                                                |
+| Commit SHA                                              |       | `OWNER_ACTION_REQUIRED` (must match reviewed remediation SHA)                                                          |
+| Build result                                            |       | `OWNER_ACTION_REQUIRED` (prior `dpl_D6eih3Nn…` FAILED on HTTP env URLs)                                                |
+| Canonical redirect result                               |       | `OWNER_ACTION_REQUIRED` (also fix expired `www` TLS cert)                                                              |
 | Auth smoke (`/api/auth/session`, `/api/auth/providers`) |       | `OWNER_ACTION_REQUIRED`                                                                                                |
 | Live endpoint (`/api/health/live`)                      |       | `OWNER_ACTION_REQUIRED` (apex currently 404 HTML — see [HEALTH_ENDPOINT_DIAGNOSIS.md](./HEALTH_ENDPOINT_DIAGNOSIS.md)) |
 | Ready endpoint (`/api/health/ready`)                    |       | `OWNER_ACTION_REQUIRED`                                                                                                |

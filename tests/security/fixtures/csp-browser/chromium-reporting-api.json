@@ -1,0 +1,22 @@
+[
+  {
+    "age": 0,
+    "type": "csp-violation",
+    "url": "https://fixture.local/",
+    "user_agent": "synthetic-browser",
+    "body": {
+      "documentURL": "https://fixture.local/",
+      "referrer": "",
+      "blockedURL": "inline",
+      "effectiveDirective": "script-src-elem",
+      "violatedDirective": "script-src-elem",
+      "originalPolicy": "default-src 'self'; script-src 'self'; report-uri /csp-report",
+      "disposition": "report",
+      "sourceFile": "https://fixture.local/",
+      "statusCode": 200,
+      "lineNumber": 10,
+      "columnNumber": 0,
+      "sample": ""
+    }
+  }
+]

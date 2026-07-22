@@ -1,6 +1,6 @@
-import { getToken } from "next-auth/jwt";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { getToken } from "next-auth/jwt";
 
 import { resolveNextAuthSecret } from "@/lib/auth/nextauth-env";
 import {
@@ -10,10 +10,10 @@ import {
 } from "@/lib/mapable-peers/peer-middleware";
 import {
   CSP_ENFORCE_HEADER,
-  CSP_NONCE_HEADER,
   createScriptNonce,
   isCspPreviewEnforceEnabled,
 } from "@/lib/security/csp-preview-enforce";
+import { buildForwardRequestHeaders } from "@/lib/security/forward-request-headers";
 import { buildContentSecurityPolicyEnforce } from "@/lib/security/headers";
 import {
   CORRELATION_ID_HEADER,
@@ -90,20 +90,15 @@ function redirectToLogin(request: NextRequest): NextResponse {
 }
 
 /**
- * Apply correlation IDs and, when preview enforce is on, the nonce-bearing
- * Content-Security-Policy to the response. Request-side CSP is applied in
- * `buildForwardRequestHeaders` so Next.js can nonce framework scripts.
+ * Apply the resolved correlation ID and, when preview enforce is on, the
+ * nonce-bearing Content-Security-Policy to the response. Request-side CSP and
+ * correlation headers are applied in `buildForwardRequestHeaders`.
  */
 function withCorrelationAndCsp(
-  request: NextRequest,
   response: NextResponse,
-  nonce: string,
+  correlationId: string,
   enforcePolicy: string | null,
 ): NextResponse {
-  const correlationId = resolveCorrelationId(
-    request.headers.get(CORRELATION_ID_HEADER) ??
-      request.headers.get(REQUEST_ID_HEADER),
-  );
   response.headers.set(CORRELATION_ID_HEADER, correlationId);
   response.headers.set(REQUEST_ID_HEADER, correlationId);
 
@@ -114,21 +109,6 @@ function withCorrelationAndCsp(
   return response;
 }
 
-function buildForwardRequestHeaders(
-  request: NextRequest,
-  nonce: string,
-  enforcePolicy: string | null,
-): Headers {
-  const requestHeaders = new Headers(request.headers);
-  // Internal only — not a public client header contract.
-  requestHeaders.set(CSP_NONCE_HEADER, nonce);
-  if (enforcePolicy) {
-    // Next.js reads CSP from the *request* to nonce framework/inline scripts.
-    requestHeaders.set(CSP_ENFORCE_HEADER, enforcePolicy);
-  }
-  return requestHeaders;
-}
-
 export default async function middleware(request: NextRequest) {
   const nonce = createScriptNonce();
   const enforceEnabled = isCspPreviewEnforceEnabled();
@@ -136,36 +116,40 @@ export default async function middleware(request: NextRequest) {
     ? buildContentSecurityPolicyEnforce(nonce)
     : null;
 
+  const correlationId = resolveCorrelationId(
+    request.headers.get(CORRELATION_ID_HEADER) ??
+      request.headers.get(REQUEST_ID_HEADER),
+  );
+
   const requestHeaders = buildForwardRequestHeaders(
     request,
     nonce,
     enforcePolicy,
+    correlationId,
   );
 
   const legacySquare = redirectLegacySquarePath(request);
   if (legacySquare) {
-    return withCorrelationAndCsp(request, legacySquare, nonce, enforcePolicy);
+    return withCorrelationAndCsp(legacySquare, correlationId, enforcePolicy);
   }
 
   const peerResponse = handlePeerPeersHost(request);
   if (peerResponse) {
-    return withCorrelationAndCsp(request, peerResponse, nonce, enforcePolicy);
+    return withCorrelationAndCsp(peerResponse, correlationId, enforcePolicy);
   }
 
   if (shouldRunAuthMiddleware(request.nextUrl.pathname)) {
     if (!(await hasAuthenticatedSession(request))) {
       if (!resolveNextAuthSecret()) {
         return withCorrelationAndCsp(
-          request,
           authMisconfiguredResponse(request),
-          nonce,
+          correlationId,
           enforcePolicy,
         );
       }
       return withCorrelationAndCsp(
-        request,
         redirectToLogin(request),
-        nonce,
+        correlationId,
         enforcePolicy,
       );
     }
@@ -174,7 +158,7 @@ export default async function middleware(request: NextRequest) {
   const response = NextResponse.next({
     request: { headers: requestHeaders },
   });
-  return withCorrelationAndCsp(request, response, nonce, enforcePolicy);
+  return withCorrelationAndCsp(response, correlationId, enforcePolicy);
 }
 
 export const config = {

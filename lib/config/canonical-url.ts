@@ -7,6 +7,15 @@ export const CANONICAL_PRODUCTION_ORIGIN = "https://mapable.com.au";
 
 const LOCAL_HOST_RE = /^(localhost|127\.0\.0\.1|\[::1\])$/i;
 
+/**
+ * Relative canonical for App Router metadata (`metadataBase` + pathname).
+ * Pass inventory paths such as `/`, `/about`, `/care`.
+ */
+export function canonicalAlternate(pathname: string): { canonical: string } {
+  if (!pathname || pathname === "/") return { canonical: "/" };
+  return { canonical: pathname.startsWith("/") ? pathname : `/${pathname}` };
+}
+
 export type CanonicalUrlIssue = {
   variable: string;
   message: string;

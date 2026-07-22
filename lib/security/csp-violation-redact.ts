@@ -1,32 +1,45 @@
 /**
  * Redact CSP violation reports for preview evidence capture.
- * Never log cookies, authorization headers, script samples, or query payloads.
+ * Never log cookies, authorization headers, script samples, query payloads,
+ * full document URLs, referrers, source files, original policies, or user-agents.
  */
 
 export type CspViolationReport = {
   "csp-report"?: {
-    "document-uri"?: string;
-    "blocked-uri"?: string;
-    "violated-directive"?: string;
-    "effective-directive"?: string;
-    "original-policy"?: string;
-    disposition?: string;
-    "status-code"?: number;
-    "script-sample"?: string;
+    "document-uri"?: string | null;
+    referrer?: string | null;
+    "blocked-uri"?: string | null;
+    "violated-directive"?: string | null;
+    "effective-directive"?: string | null;
+    "original-policy"?: string | null;
+    disposition?: string | null;
+    "source-file"?: string | null;
+    "status-code"?: number | null;
+    "line-number"?: number | null;
+    "column-number"?: number | null;
+    "script-sample"?: string | null;
   };
-  // Reporting API (application/reports+json) single item body shape
   type?: string;
+  url?: string | null;
+  age?: number | null;
+  user_agent?: string | null;
   body?: {
-    documentURL?: string;
-    blockedURL?: string;
-    effectiveDirective?: string;
-    violatedDirective?: string;
-    disposition?: string;
-    statusCode?: number;
-    sample?: string;
+    documentURL?: string | null;
+    referrer?: string | null;
+    blockedURL?: string | null;
+    effectiveDirective?: string | null;
+    violatedDirective?: string | null;
+    originalPolicy?: string | null;
+    disposition?: string | null;
+    sourceFile?: string | null;
+    statusCode?: number | null;
+    lineNumber?: number | null;
+    columnNumber?: number | null;
+    sample?: string | null;
   };
 };
 
+/** Minimum telemetry retained after redaction — no samples, policies, or full URLs. */
 export type RedactedCspViolation = {
   documentOrigin: string | null;
   blockedUri: string | null;
@@ -37,13 +50,12 @@ export type RedactedCspViolation = {
 
 const MAX_DIRECTIVE_LEN = 128;
 
-function originOnly(uri: string | undefined): string | null {
+function originOnly(uri: string | null | undefined): string | null {
   if (!uri) return null;
   try {
     const u = new URL(uri);
     return u.origin;
   } catch {
-    // data:/inline/eval — keep scheme-ish token only
     if (uri === "inline" || uri === "eval" || uri.startsWith("data:")) {
       return uri.slice(0, 32);
     }
@@ -51,7 +63,7 @@ function originOnly(uri: string | undefined): string | null {
   }
 }
 
-function truncateDirective(value: string | undefined): string | null {
+function truncateDirective(value: string | null | undefined): string | null {
   if (!value) return null;
   return value.slice(0, MAX_DIRECTIVE_LEN);
 }
@@ -65,8 +77,7 @@ export function redactCspViolationReport(
       documentOrigin: originOnly(legacy["document-uri"]),
       blockedUri:
         originOnly(legacy["blocked-uri"]) ??
-        legacy["blocked-uri"]?.slice(0, 64) ??
-        null,
+        (legacy["blocked-uri"] ? legacy["blocked-uri"].slice(0, 64) : null),
       violatedDirective: truncateDirective(
         legacy["violated-directive"] ?? legacy["effective-directive"],
       ),
@@ -83,8 +94,7 @@ export function redactCspViolationReport(
     documentOrigin: originOnly(reportBody.documentURL),
     blockedUri:
       originOnly(reportBody.blockedURL) ??
-      reportBody.blockedURL?.slice(0, 64) ??
-      null,
+      (reportBody.blockedURL ? reportBody.blockedURL.slice(0, 64) : null),
     violatedDirective: truncateDirective(
       reportBody.violatedDirective ?? reportBody.effectiveDirective,
     ),

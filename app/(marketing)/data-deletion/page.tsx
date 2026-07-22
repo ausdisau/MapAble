@@ -1,9 +1,11 @@
 import { PublicInfoPage } from "@/components/marketing/PublicInfoPage";
+import { canonicalAlternate } from "@/lib/config/canonical-url";
 
 export const metadata = {
   title: "Data deletion | MapAble",
   description:
     "How to request deletion or review of personal information held by MapAble.",
+  alternates: canonicalAlternate("/data-deletion"),
 };
 
 export default function DataDeletionPage() {

@@ -1,12 +1,14 @@
 import { ModuleCanvasSection } from "@/components/canvas/ModuleCanvasSection";
 import { PublicModulePage } from "@/components/marketing/PublicModulePage";
 import { TransportFeatureStatus } from "@/components/transport/TransportFeatureStatus";
+import { canonicalAlternate } from "@/lib/config/canonical-url";
 import { transportFeatureSummaries } from "@/lib/transport/feature-status";
 
 export const metadata = {
   title: "MapAble Transport | Accessible travel",
   description:
     "Learn how MapAble Transport supports accessible trip requests, eligibility-aware dispatch, and consent-aware travel records in Australia.",
+  alternates: canonicalAlternate("/transport"),
 };
 
 export default function TransportHubPage() {
@@ -25,16 +27,17 @@ export default function TransportHubPage() {
         comingSoon={[
           ...transportFeatureSummaries("coming_next"),
           ...transportFeatureSummaries("requires_partner").map(
-            (item) => `${item} (partner required)`
+            (item) => `${item} (partner required)`,
           ),
         ]}
         safetyNote={
           <>
             Exact pickup and drop-off details are restricted to authorised
-            people. Route estimates are advisory. Driver and vehicle eligibility,
-            live trip status, evidence, and partner dispatch are not public
-            production claims until their release gates pass. If you are in
-            immediate danger, call 000 — MapAble is not an emergency service.
+            people. Route estimates are advisory. Driver and vehicle
+            eligibility, live trip status, evidence, and partner dispatch are
+            not public production claims until their release gates pass. If you
+            are in immediate danger, call 000 — MapAble is not an emergency
+            service.
           </>
         }
         primaryCta={{

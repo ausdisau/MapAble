@@ -18,6 +18,7 @@ import {
   policyResourceLinks,
   resourceModuleLinks,
 } from "@/lib/canvas/resource-hub-data";
+import { canonicalAlternate } from "@/lib/config/canonical-url";
 import {
   accessGuideDownloads,
   accessGuides,
@@ -28,6 +29,7 @@ export const metadata = {
   title: "Resources | MapAble",
   description:
     "MapAble resource hub for Access Guides, modules, ecosystem canvas, policy links, and support pathways.",
+  alternates: canonicalAlternate("/resources"),
 };
 
 export default function ResourcesPage() {

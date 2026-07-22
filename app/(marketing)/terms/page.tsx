@@ -1,8 +1,10 @@
 import { PublicInfoPage } from "@/components/marketing/PublicInfoPage";
+import { canonicalAlternate } from "@/lib/config/canonical-url";
 
 export const metadata = {
   title: "Terms | MapAble",
   description: "MapAble public website and pilot terms summary.",
+  alternates: canonicalAlternate("/terms"),
 };
 
 export default function TermsPage() {
