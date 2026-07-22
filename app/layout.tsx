@@ -4,6 +4,7 @@ import "leaflet/dist/leaflet.css";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata } from "next";
 import { Outfit, Plus_Jakarta_Sans } from "next/font/google";
+import { headers } from "next/headers";
 
 import { AccessiBeWidget } from "@/components/accessibility/AccessiBeWidget";
 import {
@@ -17,6 +18,10 @@ import {
   buildPublicJsonLd,
   serializeJsonLdForScript,
 } from "@/lib/config/json-ld";
+import {
+  CSP_NONCE_HEADER,
+  isCspPreviewEnforceEnabled,
+} from "@/lib/security/csp-preview-enforce";
 
 const canonicalOrigin = getCanonicalPublicOrigin();
 const publicJsonLd = buildPublicJsonLd();
@@ -72,11 +77,24 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+/**
+ * Resolve script nonce only when preview CSP enforce is active.
+ * Calling `headers()` opts the tree into dynamic rendering — avoid that when
+ * the flag is off so public/static caching remains available.
+ */
+async function resolveScriptNonce(): Promise<string | undefined> {
+  if (!isCspPreviewEnforceEnabled()) return undefined;
+  const headerStore = await headers();
+  return headerStore.get(CSP_NONCE_HEADER) ?? undefined;
+}
+
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const scriptNonce = await resolveScriptNonce();
+
   return (
     <html lang="en" className={`${plusJakarta.variable} ${outfit.variable}`}>
       <head>
@@ -89,6 +107,7 @@ export default function RootLayout({
       <body className={plusJakarta.className}>
         <script
           type="application/ld+json"
+          nonce={scriptNonce}
           suppressHydrationWarning
           dangerouslySetInnerHTML={{
             __html: serializeJsonLdForScript(publicJsonLd.organization),
@@ -96,6 +115,7 @@ export default function RootLayout({
         />
         <script
           type="application/ld+json"
+          nonce={scriptNonce}
           suppressHydrationWarning
           dangerouslySetInnerHTML={{
             __html: serializeJsonLdForScript(publicJsonLd.website),

@@ -1,29 +1,46 @@
 # CSP enforcement status
 
-**Status:** release blocker for broad service; report-only acceptable for public informational / early controlled pilot with monitoring.
+**Status:** report-only in production; preview/CI enforce available behind fail-closed flag  
+**Last refreshed:** 2026-07-21 (closure programme)
 
-## Current production behaviour (verified 2026-07-20)
+## Current production behaviour
 
-- Header: `Content-Security-Policy-Report-Only` only (no enforcing `Content-Security-Policy`).
-- `script-src` includes `'unsafe-inline'` and `'unsafe-eval'`.
-- Applied via `lib/security/headers.ts` → `next.config.ts` `headers()`.
+- Header: `Content-Security-Policy-Report-Only` only via `next.config.ts` / `getBaselineSecurityHeaders()`.
+- `script-src` includes `'unsafe-inline'` and `'unsafe-eval'` on the report-only policy.
+- **Enforcing `Content-Security-Policy` must not be enabled in production.**
 
-## Enforcement path (implemented but not wired)
+## Preview / CI enforcement (this programme)
 
-`buildContentSecurityPolicyEnforce(nonce)` builds a policy that:
+| Control             | Value                                                                                                                     |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| Flag                | `MAPABLE_CSP_ENFORCE_PREVIEW=true`                                                                                        |
+| Enable environments | Vercel `preview`, or non-Vercel local/CI (including `next start`) when flag is true                                       |
+| Hard-off            | `VERCEL_ENV=production` (even if flag set)                                                                                |
+| Policy builder      | `buildContentSecurityPolicyEnforce(nonce)` — nonce required, **no** `unsafe-eval`                                         |
+| Request headers     | Middleware sets `Content-Security-Policy` + `x-nonce` on the **forwarded request** so Next.js can nonce framework scripts |
+| Response headers    | Same enforce policy on the response when flag on                                                                          |
+| Layout nonce        | `headers()` + JSON-LD `nonce=` **only when flag on** (avoids forcing dynamic rendering when off)                          |
+| Report sink         | `POST /api/security/csp-report` — content-type allowlist, 8KB→413, rate limit, redaction, `Cache-Control: no-store`       |
+| CI matrix           | `.github/workflows/csp-enforce-preview.yml` + `pnpm test:csp-enforce`                                                     |
+| Perf matrix         | `scripts/preview/csp-performance-matrix.mjs` (synthetic; not RUM)                                                         |
 
-- uses `'nonce-…'` for scripts;
-- omits `'unsafe-eval'`;
-- keeps inventoried Stripe / maps / analytics hosts.
+## AccessiBe
 
-It is **not** applied in `getBaselineSecurityHeaders()` because Next.js inline bootstrap, auth widgets, Stripe.js, map tiles/scripts, and AdSense have not been proven to survive enforce mode in CI smoke tests.
+`acsbapp.com` is **not** on the enforce allowlist. Flag-on enforce is expected to block AccessiBe.
+Production CSP enforce remains **BLOCKED** until PR **#389** first-party panel is approved and AccessiBe is removed.
 
-## Safe enablement checklist (account-owner + engineering)
+## Evidence statuses
 
-1. Inject a per-request nonce into the root layout and every required inline script.
-2. Run Playwright smoke on `/`, `/login`, `/provider-finder`, `/accessibility-map`, care/transport request, and Stripe-related pages with enforce headers in a preview.
-3. Confirm no CSP violations that break auth, payments UI, or maps.
-4. Flip `getBaselineSecurityHeaders()` to emit `Content-Security-Policy` (enforce) and keep Report-Only as a secondary signal if desired.
-5. Remove `'unsafe-eval'` from the report-only policy only after enforce is green.
+| Item                           | Status                                                   |
+| ------------------------------ | -------------------------------------------------------- |
+| Unit gate + policy shape tests | `VERIFIED` (CI)                                          |
+| CI Playwright flag-on matrix   | run via CSP enforce workflow — record pass/fail per tip  |
+| Vercel Preview flag-on         | `NOT_RUN` until owner sets Preview env and records smoke |
+| Production enforce             | hard-off / `NOT_APPLICABLE` for this programme           |
 
-Until then, treat enforced CSP without `unsafe-eval` as a **release blocker**, not a Wave 0 merge gate.
+## Rollback
+
+1. Unset `MAPABLE_CSP_ENFORCE_PREVIEW` (or set `false`) on Preview.
+2. Redeploy Preview.
+3. Confirm only Report-Only header remains.
+4. Production never had enforce enabled — no production rollback required for this flag.

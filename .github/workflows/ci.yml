@@ -102,6 +102,9 @@ jobs:
       - name: Readiness evidence consistency
         run: pnpm exec tsx scripts/ci/check-readiness-evidence-consistency.ts
 
+      - name: Controlled-pilot baseline
+        run: pnpm exec tsx scripts/ci/check-controlled-pilot-baseline.ts
+
       - name: Production build
         run: pnpm build
 

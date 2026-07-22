@@ -78,6 +78,8 @@ export function buildContentSecurityPolicy(
     "base-uri 'self'",
     "form-action 'self'",
     "frame-ancestors 'none'",
+    // Report sink redacts URI query/secrets — see app/api/security/csp-report
+    "report-uri /api/security/csp-report",
   ];
   return directives.join("; ");
 }

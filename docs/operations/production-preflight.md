@@ -40,6 +40,7 @@ Empty-DB migrate-from-zero green does **not** satisfy production migration recon
 - [ ] `NEXTAUTH_SECRET` is stable, private, and at least 16 characters.
 - [ ] `NEXTAUTH_URL=https://mapable.com.au`.
 - [ ] `NEXT_PUBLIC_APP_URL=https://mapable.com.au`.
+- [ ] After Production redeploy, run read-only `pnpm audit:https-gate` (public edge only; does not print secrets) and record deployment ID + SHA.
 - [ ] Production validation rejects localhost / HTTP for these URLs (`lib/config/canonical-url.ts`).
 - [ ] `/api/auth/session` returns 200.
 - [ ] `/api/auth/providers` returns 200.

@@ -26,6 +26,7 @@ describe("baseline security headers", () => {
     expect(csp).toContain("frame-ancestors 'none'");
     expect(csp).toContain("object-src 'none'");
     expect(csp).toContain("'unsafe-eval'");
+    expect(csp).toContain("report-uri /api/security/csp-report");
     expect(csp).not.toMatch(/script-src[^;]*\*/);
     expect(csp).not.toContain("script-src *");
   });
@@ -34,6 +35,7 @@ describe("baseline security headers", () => {
     const csp = buildContentSecurityPolicyEnforce("test-nonce-value");
     expect(csp).toContain("'nonce-test-nonce-value'");
     expect(csp).not.toContain("'unsafe-eval'");
+    expect(csp).toContain("report-uri /api/security/csp-report");
     expect(() => buildContentSecurityPolicyEnforce("")).toThrow(/nonce/i);
   });
 });
