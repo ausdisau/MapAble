@@ -5,8 +5,8 @@ import dynamic from "next/dynamic";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
-import type { MapLibreProvider } from "@/components/map/MapLibreMap";
 import { MapErrorBoundary } from "@/components/error/MapErrorBoundary";
+import type { MapLibreProvider } from "@/components/map/MapLibreMap";
 import { MapAbleCareCombinedSections } from "@/components/marketing/MapAbleCareCombinedSections";
 import { ProviderFinderAccessLayer } from "@/components/provider-finder/ProviderFinderAccessLayer";
 import { ProviderFinderAskPanel } from "@/components/provider-finder/ProviderFinderAskPanel";

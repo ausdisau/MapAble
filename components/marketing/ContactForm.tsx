@@ -3,14 +3,14 @@
 import { useRef, useState } from "react";
 
 import {
+  CONTACT_CONSENT_SCOPES,
+  ConsentScopeCheckbox,
+} from "@/components/consent/ConsentScopeCheckbox";
+import {
   AccessibleFormField,
   formInputClass,
 } from "@/components/forms/AccessibleFormField";
 import { SensitiveDataBanner } from "@/components/forms/SensitiveDataBanner";
-import {
-  CONTACT_CONSENT_SCOPES,
-  ConsentScopeCheckbox,
-} from "@/components/consent/ConsentScopeCheckbox";
 import {
   CONTACT_TOPICS,
   contactTopicLabels,

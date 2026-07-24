@@ -8,8 +8,8 @@ import {
 } from "@/components/access/AccessDataSourceMarker";
 import { AccessFitBreakdown } from "@/components/access-fit/AccessFitBreakdown";
 import { WhatToConfirmList } from "@/components/access-fit/WhatToConfirmList";
-import { VenueAccessDetails } from "@/components/accessibility-map/VenueAccessDetails";
 import { ViewFloorPlanButton } from "@/components/accessibility-map/floor-plan/ViewFloorPlanButton";
+import { VenueAccessDetails } from "@/components/accessibility-map/VenueAccessDetails";
 import { MapAbleCareMarketingShell } from "@/components/marketing/MapAbleCareMarketingShell";
 import {
   buildPlaceAccessibilityJsonLd,
