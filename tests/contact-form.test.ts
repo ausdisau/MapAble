@@ -37,4 +37,22 @@ describe("contactFormSchema", () => {
 
     expect(parsed.success).toBe(false);
   });
+
+  it("accepts optional consentScopes for audit logging", () => {
+    const parsed = contactFormSchema.safeParse({
+      name: "Alex Taylor",
+      email: "alex@example.com",
+      topic: "privacy",
+      message: "Please help with a privacy request for my account.",
+      consentScopes: ["contact_response", "no_sensitive_upload"],
+    });
+
+    expect(parsed.success).toBe(true);
+    if (parsed.success) {
+      expect(parsed.data.consentScopes).toEqual([
+        "contact_response",
+        "no_sensitive_upload",
+      ]);
+    }
+  });
 });

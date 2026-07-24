@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
+import { MapErrorBoundary } from "@/components/error/MapErrorBoundary";
 import type { MapLibreProvider } from "@/components/map/MapLibreMap";
 import { MapAbleCareCombinedSections } from "@/components/marketing/MapAbleCareCombinedSections";
 import { ProviderFinderAccessLayer } from "@/components/provider-finder/ProviderFinderAccessLayer";
@@ -14,6 +15,10 @@ import { ProviderFinderResultCard } from "@/components/provider-finder/ProviderF
 import { ProviderFinderSidebar } from "@/components/provider-finder/ProviderFinderSidebar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import {
+  SearchResultCardSkeleton,
+  SearchResultGridSkeleton,
+} from "@/components/ui/skeleton";
 import { trackProductEvent } from "@/lib/analytics/product-analytics";
 import { getProviderFinderMapSourceClient } from "@/lib/config/provider-finder-map";
 import {
@@ -47,7 +52,18 @@ const MapLibreMap = dynamic(
     import("@/components/map/MapLibreMap").then((m) => ({
       default: m.MapLibreMap,
     })),
-  { ssr: false }
+  {
+    ssr: false,
+    loading: () => (
+      <div
+        className="flex h-[400px] items-center justify-center rounded-xl border border-border/60 bg-muted/20"
+        role="status"
+        aria-label="Loading map"
+      >
+        <SearchResultCardSkeleton />
+      </div>
+    ),
+  },
 );
 
 type SortMode = "relevance" | "distance" | "rating";
@@ -507,10 +523,11 @@ export default function ProviderFinderClient() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-[50vh] items-center justify-center py-12">
-        <Card variant="outlined" className="p-8 text-center max-w-md">
-          <p className="text-muted-foreground">Loading providers…</p>
-        </Card>
+      <div className="container mx-auto max-w-7xl space-y-6 px-4 py-12">
+        <p className="sr-only" role="status" aria-live="polite">
+          Loading providers
+        </p>
+        <SearchResultGridSkeleton count={6} />
       </div>
     );
   }
@@ -688,21 +705,43 @@ export default function ProviderFinderClient() {
                     </p>
                   </Card>
                 ) : null}
-                <div className="overflow-hidden rounded-xl border border-border/60 shadow-sm">
+                <div className="min-h-[400px] overflow-hidden rounded-xl border border-border/60 shadow-sm">
                   {mapPinsLoading ? (
-                    <p className="p-4 text-sm text-muted-foreground">
+                    <p
+                      className="p-4 text-sm text-muted-foreground"
+                      role="status"
+                      aria-live="polite"
+                    >
                       Loading map pins…
                     </p>
                   ) : null}
-                  <MapLibreMap
-                    providers={mapPinProviders}
-                    userPosition={userLocation}
-                    selectedProviderId={selectedProvider?.id ?? null}
-                    onProviderSelect={(id) => {
-                      const fromList = filteredSorted.find((x) => x.id === id);
-                      if (fromList) setSelectedProvider(fromList);
-                    }}
-                  />
+                  <MapErrorBoundary
+                    fallback={
+                      <ul className="space-y-3 p-4" aria-label="Provider list fallback">
+                        {visible.slice(0, 6).map((p) => (
+                          <li key={p.id}>
+                            <button
+                              type="button"
+                              className="w-full rounded-lg border border-border/60 px-3 py-2 text-left text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                              onClick={() => setSelectedProvider(p)}
+                            >
+                              {p.name} — {p.suburb}, {p.state}
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    }
+                  >
+                    <MapLibreMap
+                      providers={mapPinProviders}
+                      userPosition={userLocation}
+                      selectedProviderId={selectedProvider?.id ?? null}
+                      onProviderSelect={(id) => {
+                        const fromList = filteredSorted.find((x) => x.id === id);
+                        if (fromList) setSelectedProvider(fromList);
+                      }}
+                    />
+                  </MapErrorBoundary>
                 </div>
               </section>
 

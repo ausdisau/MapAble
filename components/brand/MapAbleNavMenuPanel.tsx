@@ -7,6 +7,8 @@ import { useEffect, useRef, type ReactNode } from "react";
 import { cn } from "@/app/lib/utils";
 import { MapAbleLogo } from "@/components/brand/MapAbleLogo";
 import type { MapAbleNavGroup } from "@/components/brand/MapAbleSiteHeader";
+import { useFocusTrap } from "@/hooks/useFocusTrap";
+import { mapableInteractiveFocusRing } from "@/lib/marketing/mapable-care-tokens";
 
 type MapAbleNavMenuPanelProps = {
   open: boolean;
@@ -26,6 +28,9 @@ export function MapAbleNavMenuPanel({
   isActive,
 }: MapAbleNavMenuPanelProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  useFocusTrap(panelRef, open);
 
   useEffect(() => {
     if (!open) return;
@@ -49,10 +54,6 @@ export function MapAbleNavMenuPanel({
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [open, onClose]);
 
-  useEffect(() => {
-    if (open) closeButtonRef.current?.focus();
-  }, [open]);
-
   if (!open) return null;
 
   return (
@@ -65,6 +66,7 @@ export function MapAbleNavMenuPanel({
       />
 
       <div
+        ref={panelRef}
         id="mapable-nav-menu"
         role="dialog"
         aria-modal="true"
@@ -81,7 +83,7 @@ export function MapAbleNavMenuPanel({
           <button
             ref={closeButtonRef}
             type="button"
-            className="inline-flex min-h-10 min-w-10 shrink-0 items-center justify-center rounded-lg border border-input bg-background p-2 text-muted-foreground shadow-sm transition hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            className={`inline-flex min-h-10 min-w-10 shrink-0 items-center justify-center rounded-lg border border-input bg-background p-2 text-muted-foreground shadow-sm transition hover:bg-accent hover:text-accent-foreground ${mapableInteractiveFocusRing}`}
             onClick={onClose}
           >
             <span className="sr-only">Close menu</span>
@@ -102,7 +104,8 @@ export function MapAbleNavMenuPanel({
                       href={item.href}
                       prefetch={false}
                       className={cn(
-                        "block min-h-11 rounded-lg px-3 py-2.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                        "block min-h-11 rounded-lg px-3 py-2.5",
+                        mapableInteractiveFocusRing,
                         isActive(item.href)
                           ? "bg-primary/10 text-primary"
                           : "text-foreground hover:bg-accent",

@@ -2,15 +2,25 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import {
+  AccessDataSourceMarker,
+  resolveAccessDataSourceKind,
+} from "@/components/access/AccessDataSourceMarker";
 import { AccessFitBreakdown } from "@/components/access-fit/AccessFitBreakdown";
 import { WhatToConfirmList } from "@/components/access-fit/WhatToConfirmList";
 import { ViewFloorPlanButton } from "@/components/accessibility-map/floor-plan/ViewFloorPlanButton";
+import { VenueAccessDetails } from "@/components/accessibility-map/VenueAccessDetails";
 import { MapAbleCareMarketingShell } from "@/components/marketing/MapAbleCareMarketingShell";
+import {
+  buildPlaceAccessibilityJsonLd,
+  serializePlaceJsonLd,
+} from "@/lib/access/place-json-ld";
 import { calculateAccessFit } from "@/lib/access-fit/calculate-access-fit";
 import { DEMO_ACCESS_NEEDS } from "@/lib/access-fit/types";
 import { ACCESS_DISCLAIMER } from "@/lib/access-map/copy";
+import { getCanonicalPublicOrigin } from "@/lib/config/canonical-url";
 import { getDemoPlaceBySlug } from "@/lib/demo/accessibility-places";
-import { mapableCareFocusRing } from "@/lib/marketing/mapable-care-tokens";
+import { mapableInteractiveFocusRing } from "@/lib/marketing/mapable-care-tokens";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -35,9 +45,39 @@ export default async function AccessibilityMapPlacePage({ params }: PageProps) {
 
   const fit = calculateAccessFit(DEMO_ACCESS_NEEDS, place.profile);
   const unknownDomains = place.domains.filter((domain) => domain.status !== "known");
+  const sourceKind = resolveAccessDataSourceKind({
+    isDemo: place.isDemo,
+    source: place.source,
+    tier: place.tier,
+  });
+  const placeUrl = `${getCanonicalPublicOrigin()}/accessibility-map/${place.slug}`;
+  const rampMeasurement = place.measurements.find((m) =>
+    /gradient|slope|ramp/i.test(m.label),
+  );
+  const jsonLd = buildPlaceAccessibilityJsonLd({
+    name: place.name,
+    description: `Access score ${place.accessScore}. ${place.topAccessFacts.join(". ")}`,
+    url: placeUrl,
+    suburb: place.suburb,
+    state: place.state,
+    latitude: place.latitude,
+    longitude: place.longitude,
+    category: place.category,
+    doorWidthMm: place.profile.doorWidthMm,
+    stepFreeEntry: place.profile.stepFreeEntry,
+    accessibleToilet: place.profile.accessibleToilet,
+    accessibleParking: place.profile.accessibleParking,
+    hearingLoop: place.profile.hearingLoop,
+    rampSlopeRatio: rampMeasurement?.value ?? null,
+    lastChecked: place.lastChecked,
+  });
 
   return (
     <MapAbleCareMarketingShell>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializePlaceJsonLd(jsonLd) }}
+      />
       <article className="mx-auto max-w-4xl space-y-8 px-5 py-10 lg:px-8">
         <p className="text-xs font-black uppercase tracking-[0.16em] text-amber-800">
           Demo place profile
@@ -49,6 +89,7 @@ export default async function AccessibilityMapPlacePage({ params }: PageProps) {
           <p className="capitalize text-slate-600">
             {place.category.replace(/_/g, " ")} · {place.suburb}, {place.state}
           </p>
+          <AccessDataSourceMarker kind={sourceKind} />
           <ul className="flex flex-wrap gap-2 text-sm">
             <li className="rounded-full bg-[#F6FBFC] px-3 py-1 font-semibold">
               Access score {place.accessScore}
@@ -68,71 +109,7 @@ export default async function AccessibilityMapPlacePage({ params }: PageProps) {
           </ul>
         </header>
 
-        <section aria-labelledby="quick-summary-heading" className="rounded-2xl border border-slate-200 p-5">
-          <h2 id="quick-summary-heading" className="text-xl font-black">
-            Quick access summary
-          </h2>
-          <dl className="mt-4 grid gap-3 sm:grid-cols-2">
-            <SummaryItem
-              term="Best entrance"
-              detail={place.profile.stepFreeEntry ? "Step-free entry reported" : "Confirm entrance"}
-            />
-            <SummaryItem
-              term="Door width"
-              detail={
-                place.profile.doorWidthMm != null
-                  ? `${place.profile.doorWidthMm} mm`
-                  : "Unknown"
-              }
-            />
-            <SummaryItem
-              term="Step-free route"
-              detail={
-                place.profile.internalStepFree ? "Internal step-free noted" : "Needs confirmation"
-              }
-            />
-            <SummaryItem
-              term="Accessible toilet"
-              detail={
-                place.profile.accessibleToilet === true
-                  ? "Yes"
-                  : place.profile.accessibleToilet === false
-                    ? "No"
-                    : "Unknown"
-              }
-            />
-            <SummaryItem
-              term="Parking / drop-off"
-              detail={[
-                place.profile.accessibleParking ? "Accessible parking" : null,
-                place.profile.dropOffPoint ? "Drop-off point" : null,
-              ]
-                .filter(Boolean)
-                .join(" · ") || "Unknown"}
-            />
-            <SummaryItem
-              term="Sensory notes"
-              detail={place.sensoryNotes.join(" · ") || "None listed"}
-            />
-            <SummaryItem
-              term="Staff assistance"
-              detail={
-                place.profile.staffTraining === true
-                  ? "Staff training noted"
-                  : "Confirm with venue"
-              }
-            />
-            <SummaryItem
-              term="Transport options"
-              detail={[
-                place.profile.publicTransportNearby ? "Public transport nearby" : null,
-                place.profile.transportBookable ? "Transport bookable" : null,
-              ]
-                .filter(Boolean)
-                .join(" · ") || "Confirm transport"}
-            />
-          </dl>
-        </section>
+        <VenueAccessDetails place={place} sourceKind={sourceKind} />
 
         <AccessFitBreakdown result={fit} />
         <WhatToConfirmList
@@ -276,7 +253,7 @@ export default async function AccessibilityMapPlacePage({ params }: PageProps) {
         <p>
           <Link
             href="/accessibility-map"
-            className={`font-semibold text-[#005B7F] underline ${mapableCareFocusRing}`}
+            className={`font-semibold text-[#005B7F] underline ${mapableInteractiveFocusRing}`}
           >
             Back to Accessibility Map
           </Link>
@@ -286,20 +263,11 @@ export default async function AccessibilityMapPlacePage({ params }: PageProps) {
   );
 }
 
-function SummaryItem({ term, detail }: { term: string; detail: string }) {
-  return (
-    <div className="rounded-xl bg-slate-50 p-3">
-      <dt className="text-xs font-bold uppercase tracking-wide text-slate-500">{term}</dt>
-      <dd className="mt-1 text-sm font-semibold text-[#0C1833]">{detail}</dd>
-    </div>
-  );
-}
-
 function ActionLink({ href, label }: { href: string; label: string }) {
   return (
     <Link
       href={href}
-      className={`inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-black ${mapableCareFocusRing}`}
+      className={`inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-black ${mapableInteractiveFocusRing}`}
     >
       {label}
     </Link>
