@@ -7,12 +7,13 @@ import {
 import { resolveAccessDataSourceKind } from "@/components/access/AccessDataSourceMarker";
 
 describe("buildPlaceAccessibilityJsonLd", () => {
-  it("exposes Place/LocalBusiness accessibility features", () => {
+  it("exposes Place/CivicStructure accessibility features for libraries", () => {
     const jsonLd = buildPlaceAccessibilityJsonLd({
       name: "Parramatta City Library",
       url: "https://mapable.com.au/accessibility-map/parramatta-city-library",
       suburb: "Parramatta",
       state: "NSW",
+      category: "library",
       latitude: -33.8,
       longitude: 151.0,
       doorWidthMm: 920,
@@ -20,10 +21,13 @@ describe("buildPlaceAccessibilityJsonLd", () => {
       accessibleToilet: true,
       accessibleParking: true,
       hearingLoop: true,
+      rampSlopeRatio: "1:20",
       lastChecked: "2026-05-12",
     });
 
-    expect(jsonLd["@type"]).toEqual(["Place", "LocalBusiness"]);
+    expect(jsonLd["@type"]).toEqual(
+      expect.arrayContaining(["Place", "CivicStructure"]),
+    );
     expect(jsonLd.name).toBe("Parramatta City Library");
     expect(jsonLd.dateModified).toBe("2026-05-12");
     expect(jsonLd.geo).toEqual({
@@ -39,8 +43,20 @@ describe("buildPlaceAccessibilityJsonLd", () => {
         "AccessibleParking",
         "HearingLoop",
         "DoorClearWidthMm:920",
+        "RampSlopeRatio:1:20",
       ]),
     );
+  });
+
+  it("uses LocalBusiness for commercial venues", () => {
+    const jsonLd = buildPlaceAccessibilityJsonLd({
+      name: "King Street Step-Free Cafe",
+      url: "https://mapable.com.au/accessibility-map/king-street-step-free-cafe",
+      category: "cafe_restaurant",
+      suburb: "Newtown",
+      state: "NSW",
+    });
+    expect(jsonLd["@type"]).toEqual(["Place", "LocalBusiness"]);
   });
 
   it("escapes script-breaking characters when serializing", () => {

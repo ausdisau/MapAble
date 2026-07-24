@@ -63,7 +63,7 @@ export function ProviderFinderSidebar({
                 type="button"
                 onClick={() => onSupportTypeChange(type.id)}
                 className={cn(
-                  "w-full rounded-lg px-3 py-2.5 text-left text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                  "w-full rounded-lg px-3 py-2.5 text-left text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary",
                   supportType === type.id
                     ? "bg-primary text-primary-foreground shadow-sm"
                     : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
@@ -96,7 +96,7 @@ export function ProviderFinderSidebar({
                 type="button"
                 onClick={() => toggleAccessNeed(need.id)}
                 className={cn(
-                  "rounded-full border px-3 py-1.5 text-xs font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                  "rounded-full border px-3 py-1.5 text-xs font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary",
                   active
                     ? "border-primary bg-primary/10 text-primary"
                     : "border-border bg-background text-muted-foreground hover:border-primary/30 hover:bg-accent",
@@ -126,7 +126,7 @@ export function ProviderFinderSidebar({
               type="button"
               onClick={() => onFundingChange(option.id)}
               className={cn(
-                "w-full rounded-lg px-3 py-2 text-left text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                "w-full rounded-lg px-3 py-2 text-left text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary",
                 funding === option.id
                   ? "bg-primary/10 font-medium text-primary"
                   : "text-muted-foreground hover:bg-accent",

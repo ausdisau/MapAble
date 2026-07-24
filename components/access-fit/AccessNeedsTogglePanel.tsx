@@ -1,7 +1,7 @@
 import React from "react";
 
 import type { AccessNeed } from "@/lib/access-fit/types";
-import { mapableCareFocusRing } from "@/lib/marketing/mapable-care-tokens";
+import { mapableInteractiveFocusRing } from "@/lib/marketing/mapable-care-tokens";
 
 export const ACCESS_NEED_FIELD_LABELS: { key: keyof AccessNeed; label: string }[] = [
   { key: "wheelchairUser", label: "I use a wheelchair" },
@@ -35,11 +35,11 @@ export function AccessNeedsTogglePanel({
         {ACCESS_NEED_FIELD_LABELS.map(({ key, label }) => (
           <li key={key}>
             <label
-              className={`flex min-h-11 items-center gap-2 rounded-lg px-1 text-sm text-slate-700 ${mapableCareFocusRing}`}
+              className={`flex min-h-11 items-center gap-2 rounded-lg px-1 text-sm text-slate-700 ${mapableInteractiveFocusRing}`}
             >
               <input
                 type="checkbox"
-                className={`h-4 w-4 rounded border-slate-300 ${mapableCareFocusRing}`}
+                className={`h-4 w-4 rounded border-slate-300 ${mapableInteractiveFocusRing}`}
                 checked={needs[key]}
                 onChange={(event) =>
                   onChange({

@@ -1,0 +1,161 @@
+{
+  "venues": [
+    {
+      "id": "demo-parramatta-library",
+      "slug": "parramatta-city-library",
+      "name": "Parramatta City Library",
+      "category": "library",
+      "suburb": "Parramatta",
+      "state": "NSW",
+      "accessScore": 82,
+      "tier": "Silver",
+      "confidence": "high",
+      "lastChecked": "2026-05-12",
+      "source": "MapAble assessor",
+      "topAccessFacts": [
+        "Step-free main entrance",
+        "Accessible toilet on ground floor",
+        "Hearing loop at service desk"
+      ],
+      "keyBarrier": null,
+      "measurements": [
+        {
+          "label": "Entrance door clear width",
+          "value": "920 mm"
+        },
+        {
+          "label": "Path to entrance gradient",
+          "value": "1:20 (estimate)"
+        },
+        {
+          "label": "Accessible toilet door",
+          "value": "910 mm"
+        }
+      ],
+      "doorWidthMm": 920,
+      "stepFreeEntry": true,
+      "accessibleToilet": true
+    },
+    {
+      "id": "demo-newtown-cafe",
+      "slug": "king-street-step-free-cafe",
+      "name": "King Street Step-Free Cafe",
+      "category": "cafe_restaurant",
+      "suburb": "Newtown",
+      "state": "NSW",
+      "accessScore": 64,
+      "tier": "Bronze",
+      "confidence": "medium",
+      "lastChecked": "2026-03-02",
+      "source": "community",
+      "topAccessFacts": [
+        "Step-free entry via side door",
+        "Assistance animal welcome"
+      ],
+      "keyBarrier": "Accessible toilet not confirmed",
+      "measurements": [
+        {
+          "label": "Side entrance door",
+          "value": "860 mm",
+          "note": "Community estimate"
+        },
+        {
+          "label": "Entrance step height (front)",
+          "value": "140 mm",
+          "note": "Use side door instead"
+        }
+      ],
+      "doorWidthMm": 860,
+      "stepFreeEntry": true,
+      "accessibleToilet": null
+    },
+    {
+      "id": "demo-newcastle-toilet",
+      "slug": "newcastle-harbour-accessible-toilet",
+      "name": "Newcastle Harbour Accessible Toilet",
+      "category": "public_toilet",
+      "suburb": "Newcastle",
+      "state": "NSW",
+      "accessScore": 71,
+      "tier": "Silver",
+      "confidence": "high",
+      "lastChecked": "2026-04-18",
+      "source": "partner",
+      "topAccessFacts": [
+        "RADAR key not required",
+        "Step-free path from wharf"
+      ],
+      "keyBarrier": null,
+      "measurements": [
+        {
+          "label": "Door width",
+          "value": "900 mm"
+        },
+        {
+          "label": "Transfer space",
+          "value": "Reported as adequate"
+        }
+      ],
+      "doorWidthMm": 900,
+      "stepFreeEntry": true,
+      "accessibleToilet": true
+    },
+    {
+      "id": "demo-melbourne-gallery",
+      "slug": "southbank-sensory-friendly-gallery",
+      "name": "Southbank Sensory-Friendly Gallery",
+      "category": "other",
+      "suburb": "Southbank",
+      "state": "VIC",
+      "accessScore": 88,
+      "tier": "Gold",
+      "confidence": "high",
+      "lastChecked": "2026-06-01",
+      "source": "provider",
+      "topAccessFacts": [
+        "Quiet hours each Tuesday",
+        "Step-free entry",
+        "Staff trained in sensory support"
+      ],
+      "keyBarrier": null,
+      "measurements": [
+        {
+          "label": "Entrance door",
+          "value": "1000 mm"
+        },
+        {
+          "label": "Gallery aisles",
+          "value": "1200 mm typical"
+        }
+      ],
+      "doorWidthMm": 1000,
+      "stepFreeEntry": true,
+      "accessibleToilet": true
+    },
+    {
+      "id": "demo-brisbane-community-centre",
+      "slug": "south-brisbane-community-centre",
+      "name": "South Brisbane Community Centre",
+      "category": "other",
+      "suburb": "South Brisbane",
+      "state": "QLD",
+      "accessScore": 55,
+      "tier": "Bronze",
+      "confidence": "low",
+      "lastChecked": "2026-01-10",
+      "source": "community",
+      "topAccessFacts": [
+        "Ramp at side entrance reported",
+        "Assistance animal welcome"
+      ],
+      "keyBarrier": "Coordinates not yet mapped",
+      "measurements": [],
+      "doorWidthMm": null,
+      "stepFreeEntry": true,
+      "accessibleToilet": null
+    }
+  ],
+  "count": 5,
+  "source": "demo-public",
+  "generatedAt": "2026-07-24T10:02:32.861Z"
+}

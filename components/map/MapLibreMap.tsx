@@ -81,6 +81,10 @@ export function MapLibreMap({
     <div
       className={`relative flex flex-col gap-3 ${expanded ? "fixed inset-0 z-50 bg-background p-4" : ""}`}
     >
+      <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+        {providers.length} provider pin{providers.length === 1 ? "" : "s"} on the map
+        {selectedProviderId ? `. Selected provider ${selectedProviderId}.` : "."}
+      </p>
       <div
         id={`map-region-${mapId}`}
         ref={containerRef}

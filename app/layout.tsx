@@ -52,6 +52,7 @@ export const metadata: Metadata = {
   description:
     "MapAble helps people explore disability support, provider discovery, accessible transport, employment pathways and consent-aware service tools.",
   applicationName: "MapAble",
+  manifest: "/manifest.webmanifest",
   // Do not pin every page to the apex pathname. Route modules set
   // `alternates.canonical` relative to `metadataBase` so each path resolves
   // to https://mapable.com.au/<path>.
