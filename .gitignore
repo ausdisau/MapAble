@@ -89,3 +89,7 @@ tests/a11y/.auth/
 # Local Replit import working tree (must not be a gitlink/submodule)
 /tmp/mapable-unified-replit/
 /tmp/mapable-unified-replit
+
+# Local open-weight model checkouts (serve via GPT_OSS_BASE_URL)
+/gpt-oss-120b/
+/gpt-oss-20b/
