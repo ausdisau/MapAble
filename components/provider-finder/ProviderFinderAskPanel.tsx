@@ -16,6 +16,7 @@ type Props = {
   onShowResults?: () => void;
   initialProviderName?: string;
   className?: string;
+  modelLabel?: string;
 };
 
 export function ProviderFinderAskPanel({
@@ -25,6 +26,7 @@ export function ProviderFinderAskPanel({
   onShowResults,
   initialProviderName,
   className,
+  modelLabel,
 }: Props) {
   const { status } = useSession();
   const isSignedIn = status === "authenticated";
@@ -71,6 +73,7 @@ export function ProviderFinderAskPanel({
         onInterpretation={handleInterpretation}
         onShowResults={onShowResults}
         className="min-h-0 flex-1"
+        modelLabel={modelLabel}
       />
     </div>
   );

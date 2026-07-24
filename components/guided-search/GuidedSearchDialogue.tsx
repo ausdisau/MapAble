@@ -41,6 +41,8 @@ type Props = {
   className?: string;
   showHeader?: boolean;
   starterPrompts?: string[];
+  /** Safe model display name when gpt-oss powers replies. */
+  modelLabel?: string;
 };
 
 const DEFAULT_STARTERS = [
@@ -60,6 +62,7 @@ export function GuidedSearchDialogue({
   className,
   showHeader = true,
   starterPrompts = DEFAULT_STARTERS,
+  modelLabel,
 }: Props) {
   const router = useRouter();
   const listId = useId();
@@ -351,6 +354,17 @@ export function GuidedSearchDialogue({
               : "e.g. Auslan support worker in Newcastle"
           }
         />
+        {modelLabel === "gpt-oss-120b" ? (
+          <p
+            className={cn(
+              "mt-2 text-muted-foreground",
+              compact ? "text-[10px]" : "text-xs",
+            )}
+            role="note"
+          >
+            Responses powered by gpt-oss-120b
+          </p>
+        ) : null}
       </div>
     </Card>
   );

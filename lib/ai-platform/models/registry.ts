@@ -1,24 +1,34 @@
 export type ModelRegistration = {
   id: string;
-  provider: "ai_gateway" | "google" | "disabled";
+  provider: "ai_gateway" | "google" | "openai_compatible" | "disabled";
   displayName: string;
   allowedTasks: string[];
   maxOutputTokens: number;
   supportsStructuredOutput: boolean;
 };
 
+const SHARED_INTERPRETER_TASKS = [
+  "search.nl_interpreter",
+  "search.access_needs_interpreter",
+  "provider_finder.reply_generator",
+  "agent.disability_services",
+  "agent.booking_services",
+];
+
 const MODELS: ModelRegistration[] = [
   {
     id: "google/gemini-3.5-flash",
     provider: "ai_gateway",
     displayName: "Gemini 3.5 Flash (gateway)",
-    allowedTasks: [
-      "search.nl_interpreter",
-      "search.access_needs_interpreter",
-      "provider_finder.reply_generator",
-      "agent.disability_services",
-      "agent.booking_services",
-    ],
+    allowedTasks: [...SHARED_INTERPRETER_TASKS],
+    maxOutputTokens: 4096,
+    supportsStructuredOutput: true,
+  },
+  {
+    id: "openai/gpt-oss-120b",
+    provider: "openai_compatible",
+    displayName: "gpt-oss-120b",
+    allowedTasks: [...SHARED_INTERPRETER_TASKS],
     maxOutputTokens: 4096,
     supportsStructuredOutput: true,
   },

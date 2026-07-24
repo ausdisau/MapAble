@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 
 import { Badge } from "@/components/ui/badge";
+import { getInterpreterDisplayName } from "@/lib/config/search-interpreter";
 
 import { AskPageClient } from "./AskPageClient";
 
@@ -11,6 +12,8 @@ export const metadata = {
 };
 
 export default function AskPage() {
+  const modelLabel = getInterpreterDisplayName();
+
   return (
     <div className="mx-auto max-w-3xl px-5 py-10 lg:px-8">
       <Badge
@@ -28,7 +31,7 @@ export default function AskPage() {
       </p>
       <div className="mt-8">
         <Suspense fallback={<p className="text-slate-600">Loading Ask MapAble…</p>}>
-          <AskPageClient />
+          <AskPageClient modelLabel={modelLabel} />
         </Suspense>
       </div>
     </div>

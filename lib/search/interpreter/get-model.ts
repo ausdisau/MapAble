@@ -1,12 +1,18 @@
 import { google } from "@ai-sdk/google";
+import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 import { gateway } from "ai";
 
 import {
+  gptOssApiModelId,
+  isGptOssConfigured,
   isSearchInterpreterConfigured,
   searchInterpreterConfig,
 } from "@/lib/config/search-interpreter";
 
 export function getInterpreterEngineId(): string {
+  if (isGptOssConfigured()) {
+    return `ai-sdk/openai-compatible/${gptOssApiModelId(searchInterpreterConfig.modelId)}`;
+  }
   if (searchInterpreterConfig.aiGatewayApiKey) {
     return `ai-sdk/gateway/${searchInterpreterConfig.modelId}`;
   }
@@ -19,6 +25,15 @@ export function getInterpreterModel() {
   }
 
   const modelId = searchInterpreterConfig.modelId;
+
+  if (isGptOssConfigured()) {
+    const provider = createOpenAICompatible({
+      name: "gpt-oss",
+      baseURL: searchInterpreterConfig.gptOssBaseUrl,
+      apiKey: searchInterpreterConfig.gptOssApiKey || undefined,
+    });
+    return provider(gptOssApiModelId(modelId));
+  }
 
   if (searchInterpreterConfig.aiGatewayApiKey) {
     return gateway(modelId);
