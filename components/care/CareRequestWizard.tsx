@@ -10,15 +10,34 @@ import {
   type CareRequestTypeValue,
 } from "@/components/care/SupportTypeChips";
 import {
+  ConsentScopeCheckbox,
+  type ConsentScopeOption,
+} from "@/components/consent/ConsentScopeCheckbox";
+import {
   AccessibleFormField,
   formInputClass,
 } from "@/components/forms/AccessibleFormField";
+import { SensitiveDataBanner } from "@/components/forms/SensitiveDataBanner";
 import { Button } from "@/components/ui/button";
 import {
   composeCareSupportMessage,
   type CareIntakeTaskRow,
 } from "@/lib/care/compose-care-message";
 import type { CareSupportTransformOutput } from "@/server/agents/care/types";
+
+const CARE_CONSENT_SCOPES: ConsentScopeOption[] = [
+  {
+    id: "care_draft_processing",
+    label: "MapAble may process this support description to prepare my draft plan",
+    description: "Used only to generate and show your draft for review.",
+  },
+  {
+    id: "no_sensitive_upload",
+    label:
+      "I confirm I have not pasted NDIS plan documents or clinical records into this form",
+    description: "Use a secure MapAble pathway if those records are required.",
+  },
+];
 
 function newSessionId(): string {
   if (typeof crypto !== "undefined" && crypto.randomUUID) {
@@ -29,6 +48,14 @@ function newSessionId(): string {
 
 function emptyTask(): CareIntakeTaskRow {
   return { name: "", intensity: "standard" };
+}
+
+function focusField(id: string) {
+  const el = document.getElementById(id);
+  if (el instanceof HTMLElement) {
+    el.focus();
+    el.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
 }
 
 export function CareRequestWizard({
@@ -57,6 +84,8 @@ export function CareRequestWizard({
   const [shareAccessibility, setShareAccessibility] = useState(false);
   const [accessSummary, setAccessSummary] = useState("");
   const [linkedTransport, setLinkedTransport] = useState(false);
+  const [consentIds, setConsentIds] = useState<string[]>([]);
+  const [consentError, setConsentError] = useState<string | null>(null);
 
   const [loading, setLoading] = useState(false);
   const [confirming, setConfirming] = useState(false);
@@ -75,15 +104,18 @@ export function CareRequestWizard({
   async function handleContinueToReview(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    setConsentError(null);
 
     const trimmedTitle = title.trim();
     const trimmedDescription = description.trim();
     if (trimmedTitle.length < 3) {
       setError("Please add a short title (at least 3 characters).");
+      queueMicrotask(() => focusField("care-title"));
       return;
     }
     if (trimmedDescription.length < 1) {
       setError("Please describe what support you need.");
+      queueMicrotask(() => focusField("care-description"));
       return;
     }
 
@@ -92,6 +124,28 @@ export function CareRequestWizard({
       .filter((t) => t.name.length > 0);
     if (taskRows.length === 0) {
       setError("Add at least one support task, or describe tasks in your details.");
+      queueMicrotask(() => focusField("task-name-0"));
+      return;
+    }
+
+    if (!consentIds.includes("care_draft_processing")) {
+      setConsentError(
+        "Confirm MapAble may process this description to prepare your draft.",
+      );
+      queueMicrotask(() => focusField("care-consent-legend"));
+      return;
+    }
+    if (!consentIds.includes("no_sensitive_upload")) {
+      setConsentError(
+        "Confirm you have not pasted NDIS plan or clinical records into this form.",
+      );
+      queueMicrotask(() => focusField("care-consent-legend"));
+      return;
+    }
+
+    if (shareAccessibility && accessSummary.trim().length < 3) {
+      setError("Add a brief access needs summary, or untick sharing.");
+      queueMicrotask(() => focusField("care-access"));
       return;
     }
 
@@ -122,6 +176,7 @@ export function CareRequestWizard({
             linkedTransportRequired: linkedTransport,
             accessRequirementsSummary: accessSummary.trim() || undefined,
           },
+          consentScopes: consentIds,
         }),
       });
 
@@ -231,6 +286,8 @@ export function CareRequestWizard({
         matching come after you confirm — no surprises at this step.
       </AuthAlert>
 
+      <SensitiveDataBanner id="care-sensitive-data-banner" />
+
       {error ? <AuthAlert variant="error">{error}</AuthAlert> : null}
 
       <fieldset className="space-y-3" disabled={loading}>
@@ -258,7 +315,7 @@ export function CareRequestWizard({
         id="care-description"
         label="Tell us what you need"
         required
-        hint="Include timing, location, and anything important for the support worker."
+        hint="Include timing, location, and anything important for the support worker. Do not paste NDIS plan PDFs or clinical records."
       >
         <textarea
           id="care-description"
@@ -268,6 +325,7 @@ export function CareRequestWizard({
           rows={4}
           required
           disabled={loading}
+          aria-describedby="care-sensitive-data-banner"
         />
       </AccessibleFormField>
 
@@ -399,6 +457,20 @@ export function CareRequestWizard({
           />
           I may also need transport linked to this support
         </label>
+      </div>
+
+      <div id="care-consent-legend" tabIndex={-1}>
+        <ConsentScopeCheckbox
+          scopes={CARE_CONSENT_SCOPES}
+          checkedIds={consentIds}
+          onChange={(ids) => {
+            setConsentIds(ids);
+            setConsentError(null);
+          }}
+          requiredScopeIds={["care_draft_processing", "no_sensitive_upload"]}
+          error={consentError ?? undefined}
+          legend="Consent before preparing your draft"
+        />
       </div>
 
       <Button

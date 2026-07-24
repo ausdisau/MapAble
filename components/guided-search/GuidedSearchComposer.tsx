@@ -46,7 +46,7 @@ export function GuidedSearchComposer({
         disabled={disabled || isBusy}
         autoComplete="off"
         className={cn(
-          "min-w-0 flex-1 rounded-lg border border-input bg-background shadow-sm outline-none focus:ring-2 focus:ring-ring",
+          "min-w-0 flex-1 rounded-lg border border-input bg-background shadow-sm outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
           compact
             ? "min-h-9 px-3 text-xs"
             : "min-h-10 px-3 text-sm",

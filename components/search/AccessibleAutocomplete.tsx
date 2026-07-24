@@ -238,7 +238,8 @@ export function AccessibleAutocomplete({
           type="search"
           role="combobox"
           aria-expanded={showList}
-          aria-controls={showList ? listboxId : undefined}
+          aria-controls={listboxId}
+          aria-haspopup="listbox"
           aria-activedescendant={
             showList && activeIndex >= 0
               ? `${inputId}-option-${activeIndex}`

@@ -1,12 +1,18 @@
 "use client";
 
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import {
+  AccessDataSourceMarker,
+  resolveAccessDataSourceKind,
+} from "@/components/access/AccessDataSourceMarker";
 import { AccessFitBadge } from "@/components/access-fit/AccessFitBadge";
 import { AccessNeedsTogglePanel } from "@/components/access-fit/AccessNeedsTogglePanel";
 import { ViewFloorPlanButton } from "@/components/accessibility-map/floor-plan/ViewFloorPlanButton";
-import { OpenStreetMapView } from "@/components/accessibility-map/OpenStreetMapView";
+import { MapErrorBoundary } from "@/components/error/MapErrorBoundary";
+import { Skeleton } from "@/components/ui/skeleton";
 import { calculateAccessFit } from "@/lib/access-fit/calculate-access-fit";
 import { DEMO_ACCESS_NEEDS, EMPTY_ACCESS_NEEDS } from "@/lib/access-fit/types";
 import { ACCESS_DISCLAIMER } from "@/lib/access-map/copy";
@@ -19,6 +25,26 @@ import {
 import { mapableCareFocusRing } from "@/lib/marketing/mapable-care-tokens";
 
 const VIEW_STORAGE_KEY = "mapable-accessibility-map-view";
+const RESULTS_PANEL_ID = "access-map-results-panel";
+
+const OpenStreetMapView = dynamic(
+  () =>
+    import("@/components/accessibility-map/OpenStreetMapView").then((m) => ({
+      default: m.OpenStreetMapView,
+    })),
+  {
+    ssr: false,
+    loading: () => (
+      <div
+        className="min-h-[420px] rounded-2xl border border-slate-200 bg-[#F6FBFC] p-4 md:min-h-[60vh]"
+        role="status"
+        aria-label="Loading map"
+      >
+        <Skeleton className="h-full min-h-[388px] w-full" />
+      </div>
+    ),
+  },
+);
 
 export function AccessibilityMapLanding({
   initialPlaces = DEMO_ACCESS_PLACES,
@@ -135,7 +161,7 @@ export function AccessibilityMapLanding({
               </label>
               <input
                 id="access-location"
-                className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 px-3"
+                className={`mt-1 min-h-11 w-full rounded-xl border border-slate-300 px-3 ${mapableCareFocusRing}`}
                 value={location}
                 onChange={(event) => setLocation(event.target.value)}
                 placeholder="Suburb or city"
@@ -147,7 +173,7 @@ export function AccessibilityMapLanding({
               </label>
               <input
                 id="access-query"
-                className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 px-3"
+                className={`mt-1 min-h-11 w-full rounded-xl border border-slate-300 px-3 ${mapableCareFocusRing}`}
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="Cafe, library, toilet…"
@@ -159,7 +185,7 @@ export function AccessibilityMapLanding({
               </label>
               <select
                 id="access-place-type"
-                className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 px-3"
+                className={`mt-1 min-h-11 w-full rounded-xl border border-slate-300 px-3 ${mapableCareFocusRing}`}
                 value={placeType}
                 onChange={(event) => setPlaceType(event.target.value)}
               >
@@ -176,7 +202,7 @@ export function AccessibilityMapLanding({
               </label>
               <select
                 id="access-verification"
-                className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 px-3"
+                className={`mt-1 min-h-11 w-full rounded-xl border border-slate-300 px-3 ${mapableCareFocusRing}`}
                 value={verification}
                 onChange={(event) => setVerification(event.target.value)}
               >
@@ -190,7 +216,7 @@ export function AccessibilityMapLanding({
               </label>
               <select
                 id="access-transport"
-                className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 px-3"
+                className={`mt-1 min-h-11 w-full rounded-xl border border-slate-300 px-3 ${mapableCareFocusRing}`}
                 value={transportOption}
                 onChange={(event) => setTransportOption(event.target.value)}
               >
@@ -203,14 +229,18 @@ export function AccessibilityMapLanding({
 
           <fieldset className="rounded-2xl border border-slate-200 p-4">
             <legend className="px-1 text-sm font-semibold">Access filters</legend>
-            <ul className="mt-2 space-y-2">
+            <ul className="mt-2 space-y-2" aria-live="polite">
               {ACCESS_MAP_FILTERS.map((filter) => (
                 <li key={filter.id}>
-                  <label className="flex min-h-11 items-center gap-2 text-sm">
+                  <label
+                    className={`flex min-h-11 items-center gap-2 rounded-lg px-1 text-sm ${mapableCareFocusRing}`}
+                  >
                     <input
                       type="checkbox"
+                      className={mapableCareFocusRing}
                       checked={selectedFilters.includes(filter.id)}
                       onChange={() => toggleFilter(filter.id)}
+                      aria-controls={RESULTS_PANEL_ID}
                     />
                     <span>{filter.label}</span>
                   </label>
@@ -220,16 +250,22 @@ export function AccessibilityMapLanding({
           </fieldset>
 
           <div className="space-y-3">
-            <label className="flex min-h-11 items-center gap-2 text-sm font-semibold">
+            <label
+              className={`flex min-h-11 items-center gap-2 rounded-lg px-1 text-sm font-semibold ${mapableCareFocusRing}`}
+            >
               <input
                 type="checkbox"
+                className={mapableCareFocusRing}
                 checked={useDemoNeeds}
                 onChange={(event) => setUseDemoNeeds(event.target.checked)}
+                aria-controls="access-needs-panel"
               />
               Use demo wheelchair Access-Fit profile
             </label>
             {!useDemoNeeds ? (
-              <AccessNeedsTogglePanel needs={needs} onChange={setNeeds} />
+              <div id="access-needs-panel">
+                <AccessNeedsTogglePanel needs={needs} onChange={setNeeds} />
+              </div>
             ) : null}
           </div>
         </aside>
@@ -248,6 +284,8 @@ export function AccessibilityMapLanding({
                 type="button"
                 className={`min-h-11 rounded-lg px-4 text-sm font-bold ${view === "list" ? "bg-[#005B7F] text-white" : ""} ${mapableCareFocusRing}`}
                 aria-pressed={view === "list"}
+                aria-controls={RESULTS_PANEL_ID}
+                aria-expanded={view === "list"}
                 onClick={() => handleViewChange("list")}
               >
                 List
@@ -256,6 +294,8 @@ export function AccessibilityMapLanding({
                 type="button"
                 className={`min-h-11 rounded-lg px-4 text-sm font-bold ${view === "map" ? "bg-[#005B7F] text-white" : ""} ${mapableCareFocusRing}`}
                 aria-pressed={view === "map"}
+                aria-controls={RESULTS_PANEL_ID}
+                aria-expanded={view === "map"}
                 onClick={() => handleViewChange("map")}
               >
                 Map
@@ -263,14 +303,33 @@ export function AccessibilityMapLanding({
             </div>
           </div>
 
+          {/* Stable min-height avoids CLS when map scripts load/fail or view toggles */}
+          <div
+            id={RESULTS_PANEL_ID}
+            className="min-h-[420px] md:min-h-[60vh]"
+            aria-live="polite"
+            aria-busy={false}
+          >
           {view === "map" ? (
-            <OpenStreetMapView
-              places={places}
-              selectedId={selectedId}
-              onSelect={handleSelectPlace}
-              activeNeeds={activeNeeds}
-              onSwitchToList={() => handleViewChange("list")}
-            />
+            <MapErrorBoundary
+              fallback={
+                <button
+                  type="button"
+                  className={`min-h-11 rounded-xl border border-slate-300 bg-white px-4 text-sm font-black ${mapableCareFocusRing}`}
+                  onClick={() => handleViewChange("list")}
+                >
+                  Switch to list view
+                </button>
+              }
+            >
+              <OpenStreetMapView
+                places={places}
+                selectedId={selectedId}
+                onSelect={handleSelectPlace}
+                activeNeeds={activeNeeds}
+                onSwitchToList={() => handleViewChange("list")}
+              />
+            </MapErrorBoundary>
           ) : null}
 
           {view === "list" ? (
@@ -278,6 +337,11 @@ export function AccessibilityMapLanding({
             {places.map((place) => {
               const fit = calculateAccessFit(activeNeeds, place.profile);
               const isSelected = selectedId === place.id;
+              const sourceKind = resolveAccessDataSourceKind({
+                isDemo: place.isDemo,
+                source: place.source,
+                tier: place.tier,
+              });
               return (
                 <li key={place.id}>
                   <article
@@ -305,7 +369,7 @@ export function AccessibilityMapLanding({
                         <p className="text-xs text-slate-600">
                           Confidence: {place.confidence} · Last checked {place.lastChecked}
                         </p>
-                        <p className="text-xs text-slate-600">Source: {place.source} · Demo data</p>
+                        <AccessDataSourceMarker kind={sourceKind} className="ml-auto max-w-xs text-left" />
                       </div>
                     </div>
                     <ul className="mt-3 flex flex-wrap gap-2">
@@ -370,6 +434,7 @@ export function AccessibilityMapLanding({
             })}
           </ul>
           ) : null}
+          </div>
 
           <section
             aria-labelledby="help-map-heading"

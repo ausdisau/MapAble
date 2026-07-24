@@ -3,6 +3,8 @@
 import dynamic from "next/dynamic";
 import { useCallback, useMemo, useState } from "react";
 
+import { MapErrorBoundary } from "@/components/error/MapErrorBoundary";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useUserLocation } from "@/hooks/useUserLocation";
 import type { AccessNeed } from "@/lib/access-fit/types";
 import type { DemoAccessPlace } from "@/lib/demo/accessibility-places";
@@ -12,6 +14,7 @@ import {
   getPlaceCoordinates,
   partitionPlacesByCoordinates,
 } from "@/lib/map/accessibilityMapUtils";
+import { mapableCareFocusRing } from "@/lib/marketing/mapable-care-tokens";
 
 const OpenStreetMapViewInner = dynamic(
   () =>
@@ -22,11 +25,11 @@ const OpenStreetMapViewInner = dynamic(
     ssr: false,
     loading: () => (
       <div
-        className="flex min-h-[420px] items-center justify-center rounded-2xl border border-slate-200 bg-[#F6FBFC] md:min-h-[60vh]"
+        className="flex min-h-[420px] items-center justify-center rounded-2xl border border-slate-200 bg-[#F6FBFC] p-4 md:min-h-[60vh]"
         role="status"
         aria-label="Loading map"
       >
-        <p className="text-sm text-slate-600">Loading map…</p>
+        <Skeleton className="h-full min-h-[388px] w-full" />
       </div>
     ),
   },
@@ -140,34 +143,52 @@ export function OpenStreetMapView({
       ) : null}
 
       <div
-        className="access-map-container relative overflow-hidden rounded-2xl border border-slate-200 focus-within:ring-4 focus-within:ring-[#F8C51C]/40"
+        className="access-map-container relative min-h-[420px] overflow-hidden rounded-2xl border border-slate-200 focus-within:ring-4 focus-within:ring-[#F8C51C]/40 md:min-h-[60vh]"
         role="region"
         aria-label="Accessibility places map"
         aria-describedby="access-map-guidance"
       >
-        <OpenStreetMapViewInner
-          mappable={mappable}
-          markerCoordinates={markerCoordinates}
-          selectedId={selectedId}
-          selectedCoords={selectedCoords}
-          onSelect={handleSelect}
-          activeNeeds={activeNeeds}
-          userLocationCoords={userLocationCoords}
-          userLocationHook={userLocationHook}
-          onResetToResults={handleResetToResults}
-          onFitToResults={handleFitToResults}
-          refitTrigger={refitTrigger}
-          onSwitchToList={onSwitchToList}
-          onTileError={() => setTileError(true)}
-          initialCenter={
-            markerCoordinates.length > 0
-              ? markerCoordinates[0]
-              : AUSTRALIA_FALLBACK_CENTER
+        <MapErrorBoundary
+          fallback={
+            onSwitchToList ? (
+              <button
+                type="button"
+                className={`m-4 min-h-11 rounded-xl border border-slate-300 bg-white px-4 text-sm font-black ${mapableCareFocusRing}`}
+                onClick={onSwitchToList}
+              >
+                Open list view
+              </button>
+            ) : (
+              <p className="m-4 text-sm text-slate-700">
+                Map failed to load. Use list view for results.
+              </p>
+            )
           }
-          initialZoom={
-            markerCoordinates.length > 0 ? undefined : AUSTRALIA_FALLBACK_ZOOM
-          }
-        />
+        >
+          <OpenStreetMapViewInner
+            mappable={mappable}
+            markerCoordinates={markerCoordinates}
+            selectedId={selectedId}
+            selectedCoords={selectedCoords}
+            onSelect={handleSelect}
+            activeNeeds={activeNeeds}
+            userLocationCoords={userLocationCoords}
+            userLocationHook={userLocationHook}
+            onResetToResults={handleResetToResults}
+            onFitToResults={handleFitToResults}
+            refitTrigger={refitTrigger}
+            onSwitchToList={onSwitchToList}
+            onTileError={() => setTileError(true)}
+            initialCenter={
+              markerCoordinates.length > 0
+                ? markerCoordinates[0]
+                : AUSTRALIA_FALLBACK_CENTER
+            }
+            initialZoom={
+              markerCoordinates.length > 0 ? undefined : AUSTRALIA_FALLBACK_ZOOM
+            }
+          />
+        </MapErrorBoundary>
       </div>
 
       {/* Live region for result count announcements */}

@@ -48,20 +48,28 @@ export function ProviderFinderSidebar({
       </div>
 
       <div>
-        <h3 className="text-sm font-semibold text-foreground">Support type</h3>
-        <ul className="mt-3 space-y-1">
+        <h3 id="pf-support-type-heading" className="text-sm font-semibold text-foreground">
+          Support type
+        </h3>
+        <ul
+          className="mt-3 space-y-1"
+          role="group"
+          aria-labelledby="pf-support-type-heading"
+          aria-controls="provider-finder-results"
+        >
           {SUPPORT_TYPES.map((type) => (
             <li key={type.id}>
               <button
                 type="button"
                 onClick={() => onSupportTypeChange(type.id)}
                 className={cn(
-                  "w-full rounded-lg px-3 py-2.5 text-left text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                  "w-full rounded-lg px-3 py-2.5 text-left text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                   supportType === type.id
                     ? "bg-primary text-primary-foreground shadow-sm"
                     : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
                 )}
                 aria-pressed={supportType === type.id}
+                aria-controls="provider-finder-results"
               >
                 {type.label}
               </button>
@@ -71,8 +79,15 @@ export function ProviderFinderSidebar({
       </div>
 
       <div>
-        <h3 className="text-sm font-semibold text-foreground">Access needs</h3>
-        <div className="mt-3 flex flex-wrap gap-2">
+        <h3 id="pf-access-needs-heading" className="text-sm font-semibold text-foreground">
+          Access needs
+        </h3>
+        <div
+          className="mt-3 flex flex-wrap gap-2"
+          role="group"
+          aria-labelledby="pf-access-needs-heading"
+          aria-live="polite"
+        >
           {ACCESS_NEEDS.map((need) => {
             const active = accessNeeds.includes(need.id);
             return (
@@ -81,12 +96,13 @@ export function ProviderFinderSidebar({
                 type="button"
                 onClick={() => toggleAccessNeed(need.id)}
                 className={cn(
-                  "rounded-full border px-3 py-1.5 text-xs font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                  "rounded-full border px-3 py-1.5 text-xs font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                   active
                     ? "border-primary bg-primary/10 text-primary"
                     : "border-border bg-background text-muted-foreground hover:border-primary/30 hover:bg-accent",
                 )}
                 aria-pressed={active}
+                aria-controls="provider-finder-results"
               >
                 {need.label}
               </button>
@@ -96,20 +112,27 @@ export function ProviderFinderSidebar({
       </div>
 
       <div>
-        <h3 className="text-sm font-semibold text-foreground">Funding</h3>
-        <div className="mt-3 space-y-1">
+        <h3 id="pf-funding-heading" className="text-sm font-semibold text-foreground">
+          Funding
+        </h3>
+        <div
+          className="mt-3 space-y-1"
+          role="group"
+          aria-labelledby="pf-funding-heading"
+        >
           {FUNDING_OPTIONS.map((option) => (
             <button
               key={option.id}
               type="button"
               onClick={() => onFundingChange(option.id)}
               className={cn(
-                "w-full rounded-lg px-3 py-2 text-left text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                "w-full rounded-lg px-3 py-2 text-left text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                 funding === option.id
                   ? "bg-primary/10 font-medium text-primary"
                   : "text-muted-foreground hover:bg-accent",
               )}
               aria-pressed={funding === option.id}
+              aria-controls="provider-finder-results"
             >
               {option.label}
             </button>

@@ -2,13 +2,23 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { AccessEvidenceCard } from "@/components/access/AccessEvidenceCard";
+import {
+  AccessDataSourceMarker,
+  resolveAccessDataSourceKind,
+} from "@/components/access/AccessDataSourceMarker";
 import { AccessFitBreakdown } from "@/components/access-fit/AccessFitBreakdown";
 import { WhatToConfirmList } from "@/components/access-fit/WhatToConfirmList";
 import { ViewFloorPlanButton } from "@/components/accessibility-map/floor-plan/ViewFloorPlanButton";
 import { MapAbleCareMarketingShell } from "@/components/marketing/MapAbleCareMarketingShell";
+import {
+  buildPlaceAccessibilityJsonLd,
+  serializePlaceJsonLd,
+} from "@/lib/access/place-json-ld";
 import { calculateAccessFit } from "@/lib/access-fit/calculate-access-fit";
 import { DEMO_ACCESS_NEEDS } from "@/lib/access-fit/types";
 import { ACCESS_DISCLAIMER } from "@/lib/access-map/copy";
+import { getCanonicalPublicOrigin } from "@/lib/config/canonical-url";
 import { getDemoPlaceBySlug } from "@/lib/demo/accessibility-places";
 import { mapableCareFocusRing } from "@/lib/marketing/mapable-care-tokens";
 
@@ -35,9 +45,35 @@ export default async function AccessibilityMapPlacePage({ params }: PageProps) {
 
   const fit = calculateAccessFit(DEMO_ACCESS_NEEDS, place.profile);
   const unknownDomains = place.domains.filter((domain) => domain.status !== "known");
+  const sourceKind = resolveAccessDataSourceKind({
+    isDemo: place.isDemo,
+    source: place.source,
+    tier: place.tier,
+  });
+  const placeUrl = `${getCanonicalPublicOrigin()}/accessibility-map/${place.slug}`;
+  const jsonLd = buildPlaceAccessibilityJsonLd({
+    name: place.name,
+    description: `Access score ${place.accessScore}. ${place.topAccessFacts.join(". ")}`,
+    url: placeUrl,
+    suburb: place.suburb,
+    state: place.state,
+    latitude: place.latitude,
+    longitude: place.longitude,
+    category: place.category,
+    doorWidthMm: place.profile.doorWidthMm,
+    stepFreeEntry: place.profile.stepFreeEntry,
+    accessibleToilet: place.profile.accessibleToilet,
+    accessibleParking: place.profile.accessibleParking,
+    hearingLoop: place.profile.hearingLoop,
+    lastChecked: place.lastChecked,
+  });
 
   return (
     <MapAbleCareMarketingShell>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializePlaceJsonLd(jsonLd) }}
+      />
       <article className="mx-auto max-w-4xl space-y-8 px-5 py-10 lg:px-8">
         <p className="text-xs font-black uppercase tracking-[0.16em] text-amber-800">
           Demo place profile
@@ -49,6 +85,7 @@ export default async function AccessibilityMapPlacePage({ params }: PageProps) {
           <p className="capitalize text-slate-600">
             {place.category.replace(/_/g, " ")} · {place.suburb}, {place.state}
           </p>
+          <AccessDataSourceMarker kind={sourceKind} />
           <ul className="flex flex-wrap gap-2 text-sm">
             <li className="rounded-full bg-[#F6FBFC] px-3 py-1 font-semibold">
               Access score {place.accessScore}
@@ -133,6 +170,13 @@ export default async function AccessibilityMapPlacePage({ params }: PageProps) {
             />
           </dl>
         </section>
+
+        <AccessEvidenceCard
+          measurements={place.measurements}
+          confidence={place.confidence}
+          lastChecked={place.lastChecked}
+          sourceKind={sourceKind}
+        />
 
         <AccessFitBreakdown result={fit} />
         <WhatToConfirmList

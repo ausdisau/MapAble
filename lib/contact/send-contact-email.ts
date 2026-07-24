@@ -25,14 +25,24 @@ export async function sendContactFormEmail(
     `Name: ${submission.name}`,
     `Email: ${submission.email}`,
     `Topic: ${topicLabel}`,
+    submission.consentScopes?.length
+      ? `Consent scopes: ${submission.consentScopes.join(", ")}`
+      : null,
     "",
     submission.message,
-  ].join("\n");
+  ]
+    .filter((line) => line != null)
+    .join("\n");
 
   const html = `
     <p><strong>Name:</strong> ${escapeHtml(submission.name)}</p>
     <p><strong>Email:</strong> ${escapeHtml(submission.email)}</p>
     <p><strong>Topic:</strong> ${escapeHtml(topicLabel)}</p>
+    ${
+      submission.consentScopes?.length
+        ? `<p><strong>Consent scopes:</strong> ${escapeHtml(submission.consentScopes.join(", "))}</p>`
+        : ""
+    }
     <hr />
     <p>${escapeHtml(submission.message).replace(/\n/g, "<br />")}</p>
   `.trim();

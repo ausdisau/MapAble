@@ -27,6 +27,8 @@ export const contactFormSchema = z.object({
     .trim()
     .min(20, "Please add a few more details (at least 20 characters)")
     .max(5000, "Message is too long"),
+  /** Explicit consent scopes recorded client-side before submit. */
+  consentScopes: z.array(z.string().max(80)).max(12).optional(),
   /** Honeypot — must stay empty for legitimate submissions. */
   company: z.string().max(0).optional(),
 });
