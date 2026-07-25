@@ -148,6 +148,25 @@ export {
 export { runSafeguardChecks } from "@/lib/billing/safeguards/rules";
 export { generateBillingCopilotSuggestions } from "@/lib/billing/copilot/suggestions";
 
+// Replacement supports (mainstream devices as NDIS Replacement Supports)
+export {
+  calculateSupportSavings,
+  type CalculateSupportSavingsInput,
+  type ReplacementSupportCalculations,
+} from "@/lib/billing/replacement-calculator";
+export {
+  ICAN_V6_DOMAINS,
+  ICAN_V6_DOMAIN_LABELS,
+  DEFAULT_NDIS_HOURLY_WORKER_RATE_AUD,
+  ReplacementSupportRequestSchema,
+  buildReplacementSupportEvidencePack,
+  type IcanV6Domain,
+  type ReplacementSupportRequest,
+  type ReplacementSupportEvidencePack,
+  type ReplacementSupportAuditLogPayload,
+  type BuildReplacementSupportEvidencePackInput,
+} from "@/lib/billing/replacement-support";
+
 // Notifications & overview
 export {
   notifyBillingEvent,
