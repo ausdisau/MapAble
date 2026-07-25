@@ -290,6 +290,7 @@ export function ICanIntakeWizard() {
         <Button
           type="button"
           variant="outline"
+          size="default"
           disabled={shellStepIndex === 0 || pending}
           onClick={() => {
             prevStep();
@@ -301,6 +302,8 @@ export function ICanIntakeWizard() {
         {shellStepIndex < SHELL_DOMAIN_IDS.length - 1 ? (
           <Button
             type="button"
+            variant="default"
+            size="default"
             disabled={!canAdvance || pending}
             onClick={() => {
               nextStep();
@@ -312,6 +315,8 @@ export function ICanIntakeWizard() {
         ) : (
           <Button
             type="button"
+            variant="default"
+            size="default"
             disabled={
               pending ||
               !canAdvance ||

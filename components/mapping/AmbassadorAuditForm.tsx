@@ -137,7 +137,12 @@ export function AmbassadorAuditForm({ onSubmitted }: AmbassadorAuditFormProps) {
         </p>
       ) : null}
 
-      <Button type="submit" disabled={status === "submitting"}>
+      <Button
+        type="submit"
+        variant="default"
+        size="default"
+        disabled={status === "submitting"}
+      >
         {status === "submitting" ? "Submitting…" : "Submit accessibility audit"}
       </Button>
     </form>

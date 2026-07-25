@@ -3,7 +3,7 @@
  * Flag off by default; enabling is not an NDIA submission claim.
  */
 export function isICanIntakeEnabled(
-  env: NodeJS.ProcessEnv = process.env,
+  env: NodeJS.ProcessEnv | Record<string, string | undefined> = process.env,
 ): boolean {
   return env.MAPABLE_ICAN_INTAKE_ENABLED === "true";
 }
