@@ -1,0 +1,380 @@
+[
+  {
+    "migration_name": "20260115224328_init",
+    "checksum": "fbde59df624cfc8590269ba09f5e00bfca6d107cf2b319aefa58c2aeea35627f",
+    "finished": true,
+    "rolled_back": false,
+    "applied_steps_count": 0
+  },
+  {
+    "migration_name": "20260115225133_add_session",
+    "checksum": "dde1e431f72e1c5ba2ea6c4f2335c07e75fdf9e0440d14adb9a420b47cf33499",
+    "finished": true,
+    "rolled_back": false,
+    "applied_steps_count": 0
+  },
+  {
+    "migration_name": "20260115231001_adding_password_hash_field_to_user",
+    "checksum": "3b0dbf7ae4aec58e93d53280e0d6eb0b8b26f7328bff8d935a60d741f7e0c6ce",
+    "finished": true,
+    "rolled_back": false,
+    "applied_steps_count": 0
+  },
+  {
+    "migration_name": "20260311093206_add_provider_models",
+    "checksum": "12385a4fa657f52b4f7d00ce31b1fa7e1dc4ef007bd0147c107a5250fb6134e1",
+    "finished": true,
+    "rolled_back": false,
+    "applied_steps_count": 0
+  },
+  {
+    "migration_name": "20260311094351_add_worker_models",
+    "checksum": "a8ca8b2c48719dee184addd7743516d24e998510fff94f99d66571b9b7e80590",
+    "finished": true,
+    "rolled_back": false,
+    "applied_steps_count": 0
+  },
+  {
+    "migration_name": "20260311095018_add_worker_provider_connection_models",
+    "checksum": "deefb7ae92e43dd13cc00a2c88a87fa727aa2ef1bf70ec162ffee61d101f54d6",
+    "finished": true,
+    "rolled_back": false,
+    "applied_steps_count": 0
+  },
+  {
+    "migration_name": "20260311095603_add_provider_membership_models",
+    "checksum": "5347a078a56ac2ff1ba106087a0bcbd855655b85c8786a5ae8db54ec806743b1",
+    "finished": true,
+    "rolled_back": false,
+    "applied_steps_count": 0
+  },
+  {
+    "migration_name": "20260315053440_add_provider_abn_business_type",
+    "checksum": "6a9903a73cd1a46a2edd027afe8c34b40b90b9779589f104acfdbe929552d9a7",
+    "finished": true,
+    "rolled_back": false,
+    "applied_steps_count": 0
+  },
+  {
+    "migration_name": "20260315060000_add_provider_rating_review_count",
+    "checksum": "6f316d97411a49ab2f5462a2f1d3c26f96ed90a536d35fa1c27906176eded1e7",
+    "finished": true,
+    "rolled_back": false,
+    "applied_steps_count": 0
+  },
+  {
+    "migration_name": "20260315070000_add_service_description_icon",
+    "checksum": "4bd8153ab014e277ef97ebd07f432698da2c677d84ec6e61553a5191c4d45453",
+    "finished": true,
+    "rolled_back": false,
+    "applied_steps_count": 0
+  },
+  {
+    "migration_name": "20260315080000_remove_service_icon",
+    "checksum": "b10e4d080cd648a07456646fe56bde6e24d8c59507986038f83c24950b2086c2",
+    "finished": true,
+    "rolled_back": false,
+    "applied_steps_count": 0
+  },
+  {
+    "migration_name": "20260315090000_add_provider_service_areas",
+    "checksum": "a5b7c52e536751c850766e4f9949877223dc870cfc9275fbe0a8e50c6554dde7",
+    "finished": true,
+    "rolled_back": false,
+    "applied_steps_count": 0
+  },
+  {
+    "migration_name": "20260315100000_add_provider_specialisations",
+    "checksum": "3fe925515f5f5b0fe9349528dca5a6f83fcf6d33ccb407f02753de46f16974ec",
+    "finished": true,
+    "rolled_back": false,
+    "applied_steps_count": 0
+  },
+  {
+    "migration_name": "20260328070108_make_name_required_migration",
+    "checksum": "7b9718f7d88c937343e4f4c48245db6c6e9d645b05fb3e74642d91b3a980f21a",
+    "finished": true,
+    "rolled_back": false,
+    "applied_steps_count": 0
+  },
+  {
+    "migration_name": "20260521000000_mapable_core_phase_1",
+    "checksum": "c75e5be6a07cd912d44b8d82ec953931ec6473081476809e4552bf6d0f72059a",
+    "finished": true,
+    "rolled_back": false,
+    "applied_steps_count": 0
+  },
+  {
+    "migration_name": "20260521120000_mapable_core_phase_2",
+    "checksum": "8bb553d5d43c3dfa0041a88f4e604563b6dfc66c74d9e2e5044ad090401e4edd",
+    "finished": true,
+    "rolled_back": false,
+    "applied_steps_count": 0
+  },
+  {
+    "migration_name": "20260521180000_mapable_core_phase_3",
+    "checksum": "9257daf07149ac283af78a0925d440040d3b4c6f4977bc573c5189e437c2fab5",
+    "finished": true,
+    "rolled_back": false,
+    "applied_steps_count": 0
+  },
+  {
+    "migration_name": "20260521200000_mapable_core_phase_4",
+    "checksum": "79ea28170230ad6d34bd6e9479422ceeee332105b782a48ed0fac520c0742611",
+    "finished": true,
+    "rolled_back": false,
+    "applied_steps_count": 0
+  },
+  {
+    "migration_name": "20260522000000_mapable_core_phase_5",
+    "checksum": "00af3d572bec32d9b7845c9ec4f8e1474ebef7a953184f30ee4b1d976ee55653",
+    "finished": true,
+    "rolled_back": false,
+    "applied_steps_count": 0
+  },
+  {
+    "migration_name": "20260525000000_mapable_access_phase_1",
+    "checksum": "52ecc3b73328a905db0d35028d6e3f7f22ac7d8dbfc2445c171039f96b121f2d",
+    "finished": true,
+    "rolled_back": false,
+    "applied_steps_count": 0
+  },
+  {
+    "migration_name": "20260525000000_ndis_direct_claiming",
+    "checksum": "634372b56ad57acb27cbdd73a2a1bdab357137ad6076a8ac53feef6f8c48ec52",
+    "finished": true,
+    "rolled_back": false,
+    "applied_steps_count": 0
+  },
+  {
+    "migration_name": "20260525120000_mapable_care_mvp",
+    "checksum": "ce29f96b9c8c47ca6ea1becdef8e6945c7203fd3f3da10d85804a591e5a5d103",
+    "finished": true,
+    "rolled_back": false,
+    "applied_steps_count": 0
+  },
+  {
+    "migration_name": "20260527120000_transport_scheduling_routing",
+    "checksum": "a0891aa6abb5bb0f2c4b7e03b20a7836b67d450b6c74b7fb76c1e71998ee1c3a",
+    "finished": true,
+    "rolled_back": false,
+    "applied_steps_count": 0
+  },
+  {
+    "migration_name": "20260601000000_mapable_core_phase_6",
+    "checksum": "cfea83ca09d031fcfe5a6d8b4fc7d8b0e3c2564080e2563ab732cf29fcbba484",
+    "finished": true,
+    "rolled_back": false,
+    "applied_steps_count": 0
+  },
+  {
+    "migration_name": "20260602000000_mapable_core_phase_7",
+    "checksum": "26b2703643cde3e98be965a5374214136407177c53f8432cef8b1e30131b9204",
+    "finished": true,
+    "rolled_back": false,
+    "applied_steps_count": 0
+  },
+  {
+    "migration_name": "20260603000000_mapable_core_phase_8",
+    "checksum": "a0d968d908fc43eb1d62845fb133179f506d3a880e6446818f1b2a04443cbf97",
+    "finished": true,
+    "rolled_back": false,
+    "applied_steps_count": 0
+  },
+  {
+    "migration_name": "20260604000000_mapable_core_phase_9",
+    "checksum": "e5e9e94771ad09930807daf9b6fd0ec945eeac08523107c4eac2af18f8d48ad8",
+    "finished": true,
+    "rolled_back": false,
+    "applied_steps_count": 0
+  },
+  {
+    "migration_name": "20260605000000_mapable_core_phase_10",
+    "checksum": "f16c8ff6814f74a0f41aa6c7e889022fe43d0275958084e16f4b1c9adccc039f",
+    "finished": true,
+    "rolled_back": false,
+    "applied_steps_count": 0
+  },
+  {
+    "migration_name": "20260606000000_mapable_core_phase_12",
+    "checksum": "1630f9783a5d96e4a2c1ad7963addcbd71cbe8d024ed7b6981e15bfbb6340911",
+    "finished": true,
+    "rolled_back": false,
+    "applied_steps_count": 0
+  },
+  {
+    "migration_name": "20260607000000_case_management",
+    "checksum": "1fb539b4468facac84dcfd04f75502075dc4f0691dd45be2c5f074b279e8c8a7",
+    "finished": true,
+    "rolled_back": false,
+    "applied_steps_count": 0
+  },
+  {
+    "migration_name": "20260527210000_accessible_ride_share",
+    "checksum": "f85c53813b10e31371671d6e7ff8c125bda0fcaa61fbc2e901621db4ceb70b37",
+    "finished": false,
+    "rolled_back": true,
+    "applied_steps_count": 0
+  },
+  {
+    "migration_name": "20260527210000_accessible_ride_share",
+    "checksum": "b1b62f3db92e9d7867781b8081914e20e43965676f42718c4221320f6c770581",
+    "finished": true,
+    "rolled_back": false,
+    "applied_steps_count": 1
+  },
+  {
+    "migration_name": "20260530120000_platform_provider_patterns",
+    "checksum": "4d069d5bc30d179b09f337d84c872e7bea06a2ebde17dd570f5f7b2043009b06",
+    "finished": true,
+    "rolled_back": false,
+    "applied_steps_count": 1
+  },
+  {
+    "migration_name": "20260603110000_passkey_credentials",
+    "checksum": "458911d19e5c89ee8a73bf656177e537b3deee5e67644fe9a4774f59abe7be3a",
+    "finished": true,
+    "rolled_back": false,
+    "applied_steps_count": 1
+  },
+  {
+    "migration_name": "20260603120000_y1_wedge",
+    "checksum": "0cf4fea9dae97ec8c95b6f18a64bb1a345cde4690bb00bd40ba7b5a17b298c2b",
+    "finished": true,
+    "rolled_back": false,
+    "applied_steps_count": 1
+  },
+  {
+    "migration_name": "20260603140000_y2_orchestration",
+    "checksum": "eb4f01a6f5a49266f28fa08abeb5a949cbaf554f21f532765b60da9fa050cc3d",
+    "finished": true,
+    "rolled_back": false,
+    "applied_steps_count": 1
+  },
+  {
+    "migration_name": "20260604140000_y3_national_trust",
+    "checksum": "480199dded9dc5b089df39790178813c2b2d4c98ec5c6885808d7521ea37ed59",
+    "finished": true,
+    "rolled_back": false,
+    "applied_steps_count": 1
+  },
+  {
+    "migration_name": "20260605140000_y4_civic_platform",
+    "checksum": "d02857c1cc50f266f25dc586648a4364d9f643231192b5197f4dc3fa6380a71e",
+    "finished": true,
+    "rolled_back": false,
+    "applied_steps_count": 1
+  },
+  {
+    "migration_name": "20260606140000_y5_rights_infrastructure",
+    "checksum": "5fcdecaf4ba338ea28703379a4948b87cd4b7f978e124d2daec892f63da58482",
+    "finished": true,
+    "rolled_back": false,
+    "applied_steps_count": 1
+  },
+  {
+    "migration_name": "20260607120000_ndis_service_delivery_mechanism",
+    "checksum": "b639047f1694e9dc59cf8819415726eb6d639cc58555148605ad2f0fa6c1dcbf",
+    "finished": true,
+    "rolled_back": false,
+    "applied_steps_count": 1
+  },
+  {
+    "migration_name": "20260608130000_ndis_provider_outlet_registry",
+    "checksum": "f388539d957f487d9d4f4deb9e38ec6e4202bf9e775082bd49e7dfaef799298a",
+    "finished": true,
+    "rolled_back": false,
+    "applied_steps_count": 1
+  },
+  {
+    "migration_name": "20260608140000_provider_outlets_outlet_key_nonunique",
+    "checksum": "3dfe45e007ec67a2a66a1d79b1ad9cbb6e4476a130a0aaad2db111da08d24a38",
+    "finished": true,
+    "rolled_back": false,
+    "applied_steps_count": 1
+  },
+  {
+    "migration_name": "20260609120000_ndis_provider_ingestion",
+    "checksum": "533f101ef37469590a91680ced82189db1526d599d3099c0ab26ac925ae1b04b",
+    "finished": true,
+    "rolled_back": false,
+    "applied_steps_count": 1
+  },
+  {
+    "migration_name": "20260604120000_engagement_platform",
+    "checksum": "a42d4f55f93654c5fc9def2d11f757cd2ef786b5a97b892d50f4849f5637a9cc",
+    "finished": true,
+    "rolled_back": false,
+    "applied_steps_count": 1
+  },
+  {
+    "migration_name": "20260610120000_worker_organisation_invites",
+    "checksum": "3340ea89de0636875d3fc3dfeef134ee9bae0c15a1e65b06427330cda885dc56",
+    "finished": true,
+    "rolled_back": false,
+    "applied_steps_count": 1
+  },
+  {
+    "migration_name": "20260603180000_go_live_roadmap",
+    "checksum": "dcbbb21c671f8f2ebba3a814aa6a37c599af72873b48a893a5737af59262c318",
+    "finished": true,
+    "rolled_back": false,
+    "applied_steps_count": 1
+  },
+  {
+    "migration_name": "20260611120000_integration_type_search",
+    "checksum": "ee17e1cfb1c1626c7f787eb4520bbc9096eca866c6f9d700c249e3031773bb6d",
+    "finished": true,
+    "rolled_back": false,
+    "applied_steps_count": 1
+  },
+  {
+    "migration_name": "20260612120000_donations",
+    "checksum": "bcfda216a01ad99efc755c5d69a0851ece4acc95c24d25fef65d23071ec77b5e",
+    "finished": true,
+    "rolled_back": false,
+    "applied_steps_count": 1
+  },
+  {
+    "migration_name": "20260611180000_provider_outlet_classifications",
+    "checksum": "8ee031724c91fcdae50afa15589fa9c74ddadfb0c812f2a98d2f71739391193b",
+    "finished": true,
+    "rolled_back": false,
+    "applied_steps_count": 1
+  },
+  {
+    "migration_name": "20260611140000_abilitypay_mvp",
+    "checksum": "75466a4b9132d90a564d3632b0eb51712f52cef7fe62a0f4c6e9e2d8b87b2d9a",
+    "finished": true,
+    "rolled_back": false,
+    "applied_steps_count": 1
+  },
+  {
+    "migration_name": "20260626120000_payout_ledger",
+    "checksum": "5b045a6e1063b40c24fb56deef1489985a9e3b384f5731df61ab2283455c04e7",
+    "finished": false,
+    "rolled_back": true,
+    "applied_steps_count": 0
+  },
+  {
+    "migration_name": "20260626120000_payout_ledger",
+    "checksum": "5b045a6e1063b40c24fb56deef1489985a9e3b384f5731df61ab2283455c04e7",
+    "finished": true,
+    "rolled_back": false,
+    "applied_steps_count": 0
+  },
+  {
+    "migration_name": "20260714010000_access_marker_feedback",
+    "checksum": "2e497a36a4590bc5b3c0375e5db102a8eeb15589ea5f739e482bd5f79c7555e4",
+    "finished": true,
+    "rolled_back": false,
+    "applied_steps_count": 1
+  },
+  {
+    "migration_name": "20260525010000_ndis_direct_claiming",
+    "checksum": "634372b56ad57acb27cbdd73a2a1bdab357137ad6076a8ac53feef6f8c48ec52",
+    "finished": false,
+    "rolled_back": false,
+    "applied_steps_count": 0
+  }
+]
