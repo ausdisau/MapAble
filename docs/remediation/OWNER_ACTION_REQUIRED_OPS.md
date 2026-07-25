@@ -2,11 +2,10 @@
 
 **Canonical pilot boundary:** [../operations/CONTROLLED_PILOT_CHARTER.md](../operations/CONTROLLED_PILOT_CHARTER.md)  
 **Rule:** Do not mark items `VERIFIED` unless the named owner performed them and recorded evidence. A checklist is not evidence.  
-**Inspected `origin/main`:** `2042a210edba065a500c2936c95f22e47497dec3`  
-**Latest Production deploy attempt:** `dpl_D6eih3NnqM4QJvYL3wRTkuiG2ycc` — **ERROR** (`BUILD_UTILS_SPAWN_1`)  
-**Root cause (authenticated build logs):** Production env rejects insecure HTTP for `NEXTAUTH_URL` and `NEXT_PUBLIC_APP_URL` via `assertDeployedProductionEnv` — repository gate working as designed.  
-**Live apex still serving older deployment** `dpl_MBD4G6ZZhRQ84iTqx2oc1sqZ3dVK` (deployment drift; health routes 404 HTML).  
-**Agents must not** change Vercel, Neon, GitHub, DNS, monitoring, or payment accounts.
+**Inspected tip (2026-07-25):** live apex still `dpl_MBD4G6ZZhRQ84iTqx2oc1sqZ3dVK`; latest Production attempt `dpl_7BRWChKYqTtro417wesyUz1ikmT3` (main `3991d763`) — **ERROR**.  
+**Root cause (authenticated build logs):** `NEXT_PUBLIC_APP_URL` still insecure HTTP → `assertDeployedProductionEnv` fail-closed; `NEXTAUTH_URL` must match apex HTTPS origin.  
+**Canonical owner checklist (same day):** [RELEASE_OWNER_ACTIONS_2026-07-25.md](./RELEASE_OWNER_ACTIONS_2026-07-25.md).  
+**Agents must not** change Vercel Production env, DNS/TLS, GitHub rulesets, or payment accounts. Neon `_prisma_migrations` §3 A-continue was owner-approved separately and is complete.
 
 ## Ordered release procedure
 
@@ -34,7 +33,7 @@ Read-only public probe (no secrets): `pnpm audit:https-gate`
 Redacted deploy artefact validator: `pnpm audit:deploy-evidence -- --evidence ./artifacts/deploy-evidence.redacted.json`  
 Human session artefact validator: `pnpm audit:human-release-evidence -- --evidence ./artifacts/human-release-session.redacted.json`  
 Branch protection audit: `pnpm audit:branch-protection`  
-Staging migration checksum compare: `pnpm exec tsx scripts/ci/compare-prisma-migrations-readonly.ts --exported …` — prod export captured 2026-07-25; follow [WAVE1_A_CONTINUE_RECONCILIATION.md](./WAVE1_A_CONTINUE_RECONCILIATION.md) (`OWNER_ACTION_REQUIRED` until clone rehearsal + prod SQL complete).  
+Migration A-continue §3 on Neon production: **done** (2026-07-25). Jul 16+ forward deploy still **held** — see [RELEASE_OWNER_ACTIONS_2026-07-25.md](./RELEASE_OWNER_ACTIONS_2026-07-25.md) §5.  
 Independent security review checklist (not approval): [INDEPENDENT_REVIEW_388.md](./INDEPENDENT_REVIEW_388.md) — status `NOT_RUN`.  
 Combined #388+#389 ephemeral results: [COMBINED_388_389_INTEGRATION.md](./COMBINED_388_389_INTEGRATION.md).
 
@@ -69,17 +68,17 @@ Helpers: `pnpm audit:branch-protection`; [../operations/branch-protection.md](..
 
 Provide Neon **staging clone** (not production credentials to agents). Complete:
 
-| Step                                                               | Status                                          |
-| ------------------------------------------------------------------ | ----------------------------------------------- |
+| Step                                                               | Status                                                                                                                                |
+| ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------- |
 | Migration inventory/checksum comparison (prod export 2026-07-25)   | Pre-drift `VERIFIED`; post–§3 **checksums aligned** ([WAVE1_A_CONTINUE_RECONCILIATION.md](./WAVE1_A_CONTINUE_RECONCILIATION.md) §5.2) |
-| Empty-database migrate-from-zero (CI already proves disposable DB) | CI `VERIFIED`                                   |
-| Staging migration rehearsal                                        | `VERIFIED` on `wave1-migration-rehearsal`       |
-| Production `_prisma_migrations` §3 rename/checksum SQL             | `VERIFIED` applied 2026-07-25 (owner-approved)  |
-| Jul 16+ forward `migrate deploy` on production                     | `NOT_RUN` — **held** (separate release decision) |
-| Snapshot / PITR                                                    | `NOT_RUN`                                       |
-| Restore + schema verification + app smoke                          | `NOT_RUN`                                       |
-| Measured RTO (target 4h) / RPO (target 1h)                         | `NOT_RUN` — targets not achieved until measured |
-| Rollback decision recorded                                         | `OWNER_ACTION_REQUIRED`                         |
+| Empty-database migrate-from-zero (CI already proves disposable DB) | CI `VERIFIED`                                                                                                                         |
+| Staging migration rehearsal                                        | `VERIFIED` on `wave1-migration-rehearsal`                                                                                             |
+| Production `_prisma_migrations` §3 rename/checksum SQL             | `VERIFIED` applied 2026-07-25 (owner-approved)                                                                                        |
+| Jul 16+ forward `migrate deploy` on production                     | `NOT_RUN` — **held** (separate release decision)                                                                                      |
+| Snapshot / PITR                                                    | `NOT_RUN`                                                                                                                             |
+| Restore + schema verification + app smoke                          | `NOT_RUN`                                                                                                                             |
+| Measured RTO (target 4h) / RPO (target 1h)                         | `NOT_RUN` — targets not achieved until measured                                                                                       |
+| Rollback decision recorded                                         | `OWNER_ACTION_REQUIRED`                                                                                                               |
 
 Never use Prisma push against shared/production DBs. Never alter production `_prisma_migrations` history from agent role.
 
