@@ -95,6 +95,7 @@ export function MarketingPrimaryNav() {
   const primaryLinks = [
     { label: "Search", href: searchHref },
     { label: "Places", href: isHome ? "#map-preview" : "/accessibility-map" },
+    { label: "Transport", href: "/transport" },
     { label: "Providers", href: "/providers" },
     { label: "NDIS Guidance", href: marketingFeatureRoutes.ask },
   ];
