@@ -7,11 +7,11 @@
 
 ## Separation of environments
 
-| Environment                                          | Status                  | Meaning                                                     |
-| ---------------------------------------------------- | ----------------------- | ----------------------------------------------------------- |
-| Disposable empty PostgreSQL / CI `Migrate from zero` | `VERIFIED`              | Repository migrations can deploy from zero                  |
+| Environment                                          | Status                                         | Meaning                                                                                                        |
+| ---------------------------------------------------- | ---------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| Disposable empty PostgreSQL / CI `Migrate from zero` | `VERIFIED`                                     | Repository migrations can deploy from zero                                                                     |
 | Production Neon history                              | **Checksum/rename §3 `VERIFIED`** (2026-07-25) | See [WAVE1_A_CONTINUE_RECONCILIATION.md](./WAVE1_A_CONTINUE_RECONCILIATION.md) §5.2; Jul 16+ deploy still held |
-| Staging clone rehearsal                              | `VERIFIED`              | `wave1-migration-rehearsal` before production apply         |
+| Staging clone rehearsal                              | `VERIFIED`                                     | `wave1-migration-rehearsal` before production apply                                                            |
 
 Repository migrations may deploy from zero. That does **not** prove production history is reconciled. Checksum updates require snapshot/PITR, staging-clone rehearsal, and account-owner approval. Never update production checksums from this agent role.
 

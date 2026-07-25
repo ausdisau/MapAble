@@ -9,13 +9,13 @@
 
 ## 1. Fresh read-only evidence (2026-07-25)
 
-| Source | Detail | Status |
-| ------ | ------ | ------ |
-| Neon project | `mapableau` (`cold-paper-45965334`), region `aws-ap-southeast-2`, PG 17 | `VERIFIED` |
-| Production branch | `production` / `br-rough-bush-a7mlsbdx` (primary) | `VERIFIED` |
-| Dev branch | `vercel-dev` / `br-fancy-night-a7s8qh4g` — only **3** early migrations; **not** a staging clone of prod | `VERIFIED` |
-| Export artefact | [artifacts/production-prisma-migrations-2026-07-25.json](./artifacts/production-prisma-migrations-2026-07-25.json) (name, checksum, finished, rolled_back, applied_steps_count only — no secrets) | `VERIFIED` |
-| Compare helper | `pnpm exec tsx scripts/ci/compare-prisma-migrations-readonly.ts --exported …` → `aligned: false` | `VERIFIED` |
+| Source            | Detail                                                                                                                                                                                            | Status     |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
+| Neon project      | `mapableau` (`cold-paper-45965334`), region `aws-ap-southeast-2`, PG 17                                                                                                                           | `VERIFIED` |
+| Production branch | `production` / `br-rough-bush-a7mlsbdx` (primary)                                                                                                                                                 | `VERIFIED` |
+| Dev branch        | `vercel-dev` / `br-fancy-night-a7s8qh4g` — only **3** early migrations; **not** a staging clone of prod                                                                                           | `VERIFIED` |
+| Export artefact   | [artifacts/production-prisma-migrations-2026-07-25.json](./artifacts/production-prisma-migrations-2026-07-25.json) (name, checksum, finished, rolled_back, applied_steps_count only — no secrets) | `VERIFIED` |
+| Compare helper    | `pnpm exec tsx scripts/ci/compare-prisma-migrations-readonly.ts --exported …` → `aligned: false`                                                                                                  | `VERIFIED` |
 
 **Critical prod anomalies:**
 
@@ -29,18 +29,18 @@
 
 ### 2.1 Checksum mismatches (same migration name)
 
-| Migration | Prod checksum (prefix) | Repo checksum (prefix) | Allowlisted repair? |
-| --------- | ---------------------- | ---------------------- | ------------------- |
-| `20260521120000_mapable_core_phase_2` | `8bb553d5…` | `be2f2253…` | Yes |
-| `20260521180000_mapable_core_phase_3` | `9257daf0…` | `1c286a3b…` | Yes |
-| `20260525000000_mapable_access_phase_1` | `52ecc3b7…` (broken file) | `4e6d7d1f…` | Yes |
-| `20260525120000_mapable_care_mvp` | `ce29f96b…` | `b71b9ad5…` | Yes |
-| `20260527120000_transport_scheduling_routing` | `a0891aa6…` | `10188a38…` | Yes |
-| `20260603120000_y1_wedge` | `0cf4fea9…` | `3b64acfa…` | Yes |
-| `20260604120000_engagement_platform` | `a42d4f55…` | `60313d96…` | Yes |
-| `20260611120000_integration_type_search` | `ee17e1cf…` | `998a7bec…` | Yes |
-| `20260626120000_payout_ledger` | `5b045a6e…` | `8c9daf85…` | Yes |
-| `20260608130000_ndis_provider_outlet_registry` | `f388539d…` | `44fe25d3…` | **No** (historical edit in `0841b48e` — unique index → non-unique; later covered by `…08140000_…`) |
+| Migration                                      | Prod checksum (prefix)    | Repo checksum (prefix) | Allowlisted repair?                                                                                |
+| ---------------------------------------------- | ------------------------- | ---------------------- | -------------------------------------------------------------------------------------------------- |
+| `20260521120000_mapable_core_phase_2`          | `8bb553d5…`               | `be2f2253…`            | Yes                                                                                                |
+| `20260521180000_mapable_core_phase_3`          | `9257daf0…`               | `1c286a3b…`            | Yes                                                                                                |
+| `20260525000000_mapable_access_phase_1`        | `52ecc3b7…` (broken file) | `4e6d7d1f…`            | Yes                                                                                                |
+| `20260525120000_mapable_care_mvp`              | `ce29f96b…`               | `b71b9ad5…`            | Yes                                                                                                |
+| `20260527120000_transport_scheduling_routing`  | `a0891aa6…`               | `10188a38…`            | Yes                                                                                                |
+| `20260603120000_y1_wedge`                      | `0cf4fea9…`               | `3b64acfa…`            | Yes                                                                                                |
+| `20260604120000_engagement_platform`           | `a42d4f55…`               | `60313d96…`            | Yes                                                                                                |
+| `20260611120000_integration_type_search`       | `ee17e1cf…`               | `998a7bec…`            | Yes                                                                                                |
+| `20260626120000_payout_ledger`                 | `5b045a6e…`               | `8c9daf85…`            | Yes                                                                                                |
+| `20260608130000_ndis_provider_outlet_registry` | `f388539d…`               | `44fe25d3…`            | **No** (historical edit in `0841b48e` — unique index → non-unique; later covered by `…08140000_…`) |
 
 Full hashes are in §5 SQL pack and the JSON artefact.
 
@@ -48,21 +48,21 @@ Full hashes are in §5 SQL pack and the JSON artefact.
 
 **Only in production (not in repo folders):**
 
-| Name | Note |
-| ---- | ---- |
-| `20260525000000_ndis_direct_claiming` | Old folder name — rename drift |
-| `20260603180000_go_live_roadmap` | Applied historically; folder removed from repo |
-| `20260611140000_abilitypay_mvp` | Applied historically; folder removed from repo |
+| Name                                             | Note                                           |
+| ------------------------------------------------ | ---------------------------------------------- |
+| `20260525000000_ndis_direct_claiming`            | Old folder name — rename drift                 |
+| `20260603180000_go_live_roadmap`                 | Applied historically; folder removed from repo |
+| `20260611140000_abilitypay_mvp`                  | Applied historically; folder removed from repo |
 | `20260611180000_provider_outlet_classifications` | Applied historically; folder removed from repo |
-| `20260612120000_donations` | Applied historically; folder removed from repo |
-| `20260714010000_access_marker_feedback` | Applied historically; folder removed from repo |
+| `20260612120000_donations`                       | Applied historically; folder removed from repo |
+| `20260714010000_access_marker_feedback`          | Applied historically; folder removed from repo |
 
 **Only in repo (not finished in production):**
 
-| Name | Note |
-| ---- | ---- |
-| `20260525010000_ndis_direct_claiming` | Rename target — unfinished failed/attempt row present |
-| `20260716120000_indoor_accessibility_platform` … `20260720120000_at_continuity_wave1` | **12** forward migrations not yet applied to prod |
+| Name                                                                                  | Note                                                  |
+| ------------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| `20260525010000_ndis_direct_claiming`                                                 | Rename target — unfinished failed/attempt row present |
+| `20260716120000_indoor_accessibility_platform` … `20260720120000_at_continuity_wave1` | **12** forward migrations not yet applied to prod     |
 
 Do **not** run bare `prisma migrate deploy` on production until §3 rename + checksum steps complete — deploy would otherwise hit modified-checksum errors and/or the unfinished rename row.
 
@@ -183,11 +183,11 @@ Optional follow-up (separate PR): add this path to `scripts/ci/allowed-migration
 
 Rows whose folders are gone from the repo (`go_live_roadmap`, `abilitypay_mvp`, `donations`, etc.) will keep showing as “extra” in the compare helper. Options (owner chooses; do **not** drop schema objects):
 
-| Option | Action | Risk |
-| ------ | ------ | ---- |
-| **Keep** (default) | Leave finished rows; document as prod-only history | Compare helper stays non-aligned on `onlyInExport`; `migrate deploy` still OK if checksums for shared names match |
-| **Baseline note** | Record in ops ledger that prod history ⊃ repo history | Low |
-| **Dangerous** | `DELETE` those `_prisma_migrations` rows | Only if you accept Prisma may try to recreate missing folders later — **not recommended** |
+| Option             | Action                                                | Risk                                                                                                              |
+| ------------------ | ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| **Keep** (default) | Leave finished rows; document as prod-only history    | Compare helper stays non-aligned on `onlyInExport`; `migrate deploy` still OK if checksums for shared names match |
+| **Baseline note**  | Record in ops ledger that prod history ⊃ repo history | Low                                                                                                               |
+| **Dangerous**      | `DELETE` those `_prisma_migrations` rows              | Only if you accept Prisma may try to recreate missing folders later — **not recommended**                         |
 
 A-continue recommendation: **keep** orphan finished rows; do not delete them.
 
@@ -236,14 +236,14 @@ Rename rollback: rename `20260525010000_ndis_direct_claiming` back to `202605250
 
 ## 5. Status board
 
-| Item | Status |
-| ---- | ------ |
-| Strategy decision A-continue | `VERIFIED` (human approved) |
-| Fresh prod `_prisma_migrations` export | `VERIFIED` (2026-07-25) |
-| Staging clone rehearsal | **`VERIFIED`** on Neon branch `wave1-migration-rehearsal` (`br-odd-flower-a79knhk5`, parent `production`) — 2026-07-25 |
-| Prod rename + checksum SQL | **`VERIFIED`** applied to Neon `production` (`br-rough-bush-a7mlsbdx`) — 2026-07-25 after explicit owner approval |
-| Forward `migrate deploy` of Jul 16+ migrations on prod | `NOT_RUN` — **held** (separate release decision) |
-| Migration SQL edits in this workstream | **None** (honoured) |
+| Item                                                   | Status                                                                                                                 |
+| ------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
+| Strategy decision A-continue                           | `VERIFIED` (human approved)                                                                                            |
+| Fresh prod `_prisma_migrations` export                 | `VERIFIED` (2026-07-25)                                                                                                |
+| Staging clone rehearsal                                | **`VERIFIED`** on Neon branch `wave1-migration-rehearsal` (`br-odd-flower-a79knhk5`, parent `production`) — 2026-07-25 |
+| Prod rename + checksum SQL                             | **`VERIFIED`** applied to Neon `production` (`br-rough-bush-a7mlsbdx`) — 2026-07-25 after explicit owner approval      |
+| Forward `migrate deploy` of Jul 16+ migrations on prod | `NOT_RUN` — **held** (separate release decision)                                                                       |
+| Migration SQL edits in this workstream                 | **None** (honoured)                                                                                                    |
 
 ### 5.1 Rehearsal evidence (clone only)
 
