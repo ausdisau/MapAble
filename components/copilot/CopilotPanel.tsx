@@ -21,11 +21,14 @@ type Props = {
   demoParticipantId?: string;
   /** Prefill from URL e.g. /ask?provider=slug */
   initialQuery?: string;
+  /** Safe model display name (e.g. gpt-oss-120b) when that engine powers replies. */
+  modelLabel?: string;
 };
 
 export function CopilotPanel({
   demoParticipantId = MOCK_PARTICIPANT_ID,
   initialQuery,
+  modelLabel,
 }: Props) {
   const [query, setQuery] = useState(initialQuery ?? "");
   const [mode, setMode] = useState<string>("All");
@@ -117,6 +120,11 @@ export function CopilotPanel({
           >
             Ask
           </Button>
+          {modelLabel === "gpt-oss-120b" ? (
+            <p className="text-xs text-muted-foreground" role="note">
+              Responses powered by gpt-oss-120b
+            </p>
+          ) : null}
         </CardContent>
       </Card>
 

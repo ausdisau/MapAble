@@ -30,7 +30,10 @@ production deployment URL is verified with the smoke checks below.
 | `NDIS_ENCRYPTION_KEY`                                  | Recommended                   | Separate stable secret for encrypted NDIS identifiers.                                                                                        |
 | `SENDGRID_API_KEY` / `SENDGRID_FROM_EMAIL`             | If email enabled              | Required for production email delivery.                                                                                                       |
 | `DOCUMENT_STORAGE_MODE`                                | Yes                           | Use a production-safe mode once document upload workflows are live.                                                                           |
-| `AI_GATEWAY_API_KEY` or `GOOGLE_GENERATIVE_AI_API_KEY` | If search interpreter enabled | Required for natural-language provider search.                                                                                                |
+| `AI_GATEWAY_API_KEY` or `GOOGLE_GENERATIVE_AI_API_KEY` | If search interpreter enabled | Required for natural-language provider search / Ask MapAble. Prefer AI Gateway on Vercel.                                                     |
+| `SEARCH_INTERPRETER_ENABLED`                           | If NL / Ask AI enabled        | Set `true` on Production for Ask MapAble + Provider Finder interpretation.                                                                   |
+| `SEARCH_INTERPRETER_MODEL`                             | If NL / Ask AI enabled        | Production gpt-oss: `openai/gpt-oss-120b` (Vercel AI Gateway). Gemini fallback: `google/gemini-3.5-flash`.                                  |
+| `GPT_OSS_BASE_URL` / `GPT_OSS_API_KEY`                 | Optional                      | Self-hosted OpenAI-compatible override only. **Not required** for `mapable.com.au` — use AI Gateway + `openai/gpt-oss-120b`.                 |
 | `POSTHOG_API_KEY` / `POSTHOG_HOST`                     | If analytics enabled          | Required for LLM analytics capture.                                                                                                           |
 
 ## Deployment sequence
@@ -77,7 +80,30 @@ production deployment URL is verified with the smoke checks below.
    curl -I https://mapable.com.au/robots.txt
    curl -I https://mapable.com.au/sitemap.xml
    curl -I https://mapable.com.au/jobs
+   curl -sS https://mapable.com.au/api/mapable/ai-status
    ```
+
+   For gpt-oss on Production, `ai-status` should report
+   `"displayName":"gpt-oss-120b","configured":true,"gptOssActive":true`.
+
+## gpt-oss on mapable.com.au (AI Gateway)
+
+Production uses **Vercel AI Gateway** — no GPU host and no `GPT_OSS_BASE_URL`.
+
+Vercel Production env (team that owns `mapable.com.au`):
+
+```bash
+SEARCH_INTERPRETER_ENABLED=true
+SEARCH_INTERPRETER_MODEL=openai/gpt-oss-120b
+AI_GATEWAY_API_KEY=<from Vercel AI Gateway>
+```
+
+Verify after deploy:
+
+```bash
+curl -sS https://mapable.com.au/api/mapable/ai-status
+# Ask MapAble (/ask) and Provider Finder chat show: Responses powered by gpt-oss-120b
+```
 
 ## Database and migrations
 

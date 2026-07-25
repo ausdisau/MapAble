@@ -30,6 +30,7 @@ type ProviderFinderConversationProps = {
   onInterpretation: (data: FinderInterpretationData) => void;
   onSearchFromChat?: () => void;
   className?: string;
+  modelLabel?: string;
 };
 
 const STARTER_PROMPTS = [
@@ -50,6 +51,7 @@ export function ProviderFinderConversation({
   onInterpretation,
   onSearchFromChat,
   className,
+  modelLabel,
 }: ProviderFinderConversationProps) {
   const listId = useId();
   const inputId = useId();
@@ -227,6 +229,11 @@ export function ProviderFinderConversation({
           </Button>
         ) : null}
       </form>
+      {modelLabel === "gpt-oss-120b" ? (
+        <p className="px-3 pb-3 text-xs text-muted-foreground" role="note">
+          Responses powered by gpt-oss-120b
+        </p>
+      ) : null}
     </Card>
   );
 }

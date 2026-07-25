@@ -1,5 +1,6 @@
 import { google } from "@ai-sdk/google";
-import { gateway } from "ai";
+import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
+import { gateway, type LanguageModel } from "ai";
 import type { ZodType } from "zod";
 
 import { requireAiCapability } from "@/lib/ai-platform/capabilities/registry";
@@ -9,6 +10,10 @@ import { redactSensitiveText } from "@/lib/ai-platform/redaction/sensitive";
 import { captureAiPlatformTelemetry } from "@/lib/ai-platform/telemetry/adapter";
 import { aiPlatformConfig } from "@/lib/config/ai-platform";
 import {
+  canonicalizeInterpreterModelId,
+  gptOssApiModelId,
+  isGptOssModelId,
+  isGptOssSelfHostedConfigured,
   isSearchInterpreterConfigured,
   searchInterpreterConfig,
 } from "@/lib/config/search-interpreter";
@@ -19,10 +24,12 @@ export type GatewayResolveInput = {
   taskModelId?: string;
 };
 
+export type GatewayResolvedModel = LanguageModel;
+
 export type GatewayResolveResult =
   | {
       ok: true;
-      model: ReturnType<typeof gateway> | ReturnType<typeof google>;
+      model: GatewayResolvedModel;
       modelId: string;
       engineId: string;
     }
@@ -74,16 +81,33 @@ export function resolveModelForCapability(
     };
   }
 
-  const modelId =
+  const rawModelId =
     input.taskModelId ??
     searchInterpreterConfig.modelId ??
     "google/gemini-3.5-flash";
+  const modelId = canonicalizeInterpreterModelId(rawModelId);
 
   if (!isModelAllowedForTask(modelId, input.capabilityKey)) {
     return {
       ok: false,
       reason: "model_not_allowlisted_for_task",
       useDeterministicFallback: true,
+    };
+  }
+
+  if (isGptOssModelId(rawModelId) && isGptOssSelfHostedConfigured()) {
+    const provider = createOpenAICompatible({
+      name: "gpt-oss",
+      baseURL: searchInterpreterConfig.gptOssBaseUrl,
+      apiKey: searchInterpreterConfig.gptOssApiKey || undefined,
+    });
+    const apiModelId = gptOssApiModelId(rawModelId);
+    return {
+      ok: true,
+      // openai-compatible emits LanguageModelV4; AI SDK 6 LanguageModel is V2/V3.
+      model: provider(apiModelId) as unknown as LanguageModel,
+      modelId,
+      engineId: `ai-sdk/openai-compatible/${apiModelId}`,
     };
   }
 

@@ -110,7 +110,13 @@ function providerHaystack(provider: Provider) {
     .toLowerCase();
 }
 
-export default function ProviderFinderClient() {
+type ProviderFinderClientProps = {
+  modelLabel?: string;
+};
+
+export default function ProviderFinderClient({
+  modelLabel,
+}: ProviderFinderClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { data: outlets, isLoading, isError, error } = useProviderOutlets();
@@ -578,6 +584,7 @@ export default function ProviderFinderClient() {
             <ProviderFinderAskPanel
               className="min-h-[22rem]"
               initialProviderName={providerName || undefined}
+              modelLabel={modelLabel}
               session={{
                 query,
                 location,

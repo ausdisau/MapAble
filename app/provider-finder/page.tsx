@@ -1,8 +1,12 @@
 import { Suspense } from "react";
 
+import { getInterpreterDisplayName } from "@/lib/config/search-interpreter";
+
 import ProviderFinderClient from "./ProviderFinderClient";
 
 export default function Page() {
+  const modelLabel = getInterpreterDisplayName();
+
   return (
     <Suspense
       fallback={
@@ -11,7 +15,7 @@ export default function Page() {
         </p>
       }
     >
-      <ProviderFinderClient />
+      <ProviderFinderClient modelLabel={modelLabel} />
     </Suspense>
   );
 }
