@@ -26,6 +26,7 @@ import {
   getInterpreterDisplayName,
   isGptOssConfigured,
   isGptOssModelId,
+  isGptOssSelfHostedConfigured,
   isSearchInterpreterConfigured,
 } from "@/lib/config/search-interpreter";
 import {
@@ -96,7 +97,18 @@ describe("gpt-oss interpreter config", () => {
     );
   });
 
-  it("requires GPT_OSS_BASE_URL when model is gpt-oss", () => {
+  it("configures gpt-oss via AI Gateway for mapable.com.au production", () => {
+    process.env.SEARCH_INTERPRETER_ENABLED = "true";
+    process.env.SEARCH_INTERPRETER_MODEL = "openai/gpt-oss-120b";
+    process.env.AI_GATEWAY_API_KEY = "gw-key";
+
+    expect(isSearchInterpreterConfigured()).toBe(true);
+    expect(isGptOssConfigured()).toBe(true);
+    expect(isGptOssSelfHostedConfigured()).toBe(false);
+    expect(getInterpreterDisplayName()).toBe("gpt-oss-120b");
+  });
+
+  it("requires Gateway or GPT_OSS_BASE_URL when model is gpt-oss", () => {
     process.env.SEARCH_INTERPRETER_ENABLED = "true";
     process.env.SEARCH_INTERPRETER_MODEL = "openai/gpt-oss-120b";
     process.env.GOOGLE_GENERATIVE_AI_API_KEY = "google-key";
@@ -107,11 +119,11 @@ describe("gpt-oss interpreter config", () => {
 
     process.env.GPT_OSS_BASE_URL = "http://localhost:8000/v1";
     expect(isSearchInterpreterConfigured()).toBe(true);
-    expect(isGptOssConfigured()).toBe(true);
+    expect(isGptOssSelfHostedConfigured()).toBe(true);
     expect(getInterpreterDisplayName()).toBe("gpt-oss-120b");
   });
 
-  it("keeps Gemini path when gateway/google keys exist and model is Gemini", () => {
+  it("keeps Gemini path when gateway keys exist and model is Gemini", () => {
     process.env.SEARCH_INTERPRETER_ENABLED = "true";
     process.env.SEARCH_INTERPRETER_MODEL = "google/gemini-3.5-flash";
     process.env.AI_GATEWAY_API_KEY = "gw-key";
@@ -135,16 +147,33 @@ describe("getInterpreterModel gpt-oss routing", () => {
     restoreEnv();
   });
 
-  it("routes to openai-compatible when gpt-oss is configured", () => {
+  it("routes gpt-oss through AI Gateway when no self-hosted URL (mapable.com.au)", () => {
+    process.env.SEARCH_INTERPRETER_ENABLED = "true";
+    process.env.SEARCH_INTERPRETER_MODEL = "openai/gpt-oss-120b";
+    process.env.AI_GATEWAY_API_KEY = "gw-key";
+
+    gatewayMock.mockReturnValue({ provider: "gateway-gpt-oss" });
+
+    const model = getInterpreterModel();
+
+    expect(gatewayMock).toHaveBeenCalledWith("openai/gpt-oss-120b");
+    expect(model).toEqual({ provider: "gateway-gpt-oss" });
+    expect(createOpenAICompatibleMock).not.toHaveBeenCalled();
+    expect(getInterpreterEngineId()).toBe(
+      "ai-sdk/gateway/openai/gpt-oss-120b",
+    );
+  });
+
+  it("prefers self-hosted openai-compatible when GPT_OSS_BASE_URL is set", () => {
     process.env.SEARCH_INTERPRETER_ENABLED = "true";
     process.env.SEARCH_INTERPRETER_MODEL = "openai/gpt-oss-120b";
     process.env.GPT_OSS_BASE_URL = "http://localhost:8000/v1";
     process.env.GPT_OSS_API_KEY = "secret";
+    process.env.AI_GATEWAY_API_KEY = "gw-key";
 
     const providerFn = vi.fn(() => ({ provider: "gpt-oss-model" }));
     createOpenAICompatibleMock.mockReturnValue(providerFn);
     gatewayMock.mockReturnValue({ provider: "gateway" });
-    googleMock.mockReturnValue({ provider: "google" });
 
     const model = getInterpreterModel();
 
@@ -156,7 +185,6 @@ describe("getInterpreterModel gpt-oss routing", () => {
     expect(providerFn).toHaveBeenCalledWith("gpt-oss-120b");
     expect(model).toEqual({ provider: "gpt-oss-model" });
     expect(gatewayMock).not.toHaveBeenCalled();
-    expect(googleMock).not.toHaveBeenCalled();
     expect(getInterpreterEngineId()).toBe(
       "ai-sdk/openai-compatible/gpt-oss-120b",
     );
@@ -176,7 +204,7 @@ describe("getInterpreterModel gpt-oss routing", () => {
     expect(createOpenAICompatibleMock).not.toHaveBeenCalled();
   });
 
-  it("throws when gpt-oss model is selected without base URL", () => {
+  it("throws when gpt-oss model is selected without Gateway or base URL", () => {
     process.env.SEARCH_INTERPRETER_ENABLED = "true";
     process.env.SEARCH_INTERPRETER_MODEL = "gpt-oss-120b";
 
@@ -187,10 +215,10 @@ describe("getInterpreterModel gpt-oss routing", () => {
 });
 
 describe("gpt-oss model registry", () => {
-  it("allowlists openai/gpt-oss-120b for interpreter tasks", () => {
+  it("allowlists openai/gpt-oss-120b for interpreter tasks via AI Gateway", () => {
     const model = getModel("openai/gpt-oss-120b");
-    expect(model?.provider).toBe("openai_compatible");
-    expect(model?.displayName).toBe("gpt-oss-120b");
+    expect(model?.provider).toBe("ai_gateway");
+    expect(model?.displayName).toContain("gpt-oss-120b");
     expect(
       isModelAllowedForTask("openai/gpt-oss-120b", "search.nl_interpreter"),
     ).toBe(true);
@@ -218,7 +246,26 @@ describe("resolveModelForCapability gpt-oss", () => {
     restoreEnv();
   });
 
-  it("resolves openai-compatible model for search.nl_interpreter", () => {
+  it("resolves AI Gateway model for search.nl_interpreter on production path", () => {
+    process.env.SEARCH_INTERPRETER_ENABLED = "true";
+    process.env.SEARCH_INTERPRETER_MODEL = "openai/gpt-oss-120b";
+    process.env.AI_GATEWAY_API_KEY = "gw-key";
+
+    gatewayMock.mockReturnValue({ provider: "gateway-gpt-oss" });
+
+    const resolved = resolveModelForCapability({
+      capabilityKey: "search.nl_interpreter",
+    });
+
+    expect(resolved.ok).toBe(true);
+    if (resolved.ok) {
+      expect(resolved.modelId).toBe("openai/gpt-oss-120b");
+      expect(resolved.engineId).toBe("ai-sdk/gateway/openai/gpt-oss-120b");
+      expect(resolved.model).toEqual({ provider: "gateway-gpt-oss" });
+    }
+  });
+
+  it("resolves self-hosted openai-compatible when GPT_OSS_BASE_URL is set", () => {
     process.env.SEARCH_INTERPRETER_ENABLED = "true";
     process.env.SEARCH_INTERPRETER_MODEL = "gpt-oss-120b";
     process.env.GPT_OSS_BASE_URL = "http://127.0.0.1:8000/v1";

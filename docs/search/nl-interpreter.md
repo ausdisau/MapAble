@@ -18,14 +18,17 @@ Trivial queries skip the LLM via `looksLikeNaturalLanguage` to save latency and 
 | Variable | Purpose |
 | -------- | ------- |
 | `SEARCH_INTERPRETER_ENABLED` | Set to `false` to force passthrough (default: enabled when keys exist) |
-| `AI_GATEWAY_API_KEY` or `VERCEL_AI_GATEWAY_API_KEY` | Preferred: Vercel AI Gateway |
-| `GOOGLE_GENERATIVE_AI_API_KEY` | Fallback: `@ai-sdk/google` |
-| `SEARCH_INTERPRETER_MODEL` | Gateway-style id, e.g. `google/gemini-3.5-flash` |
+| `AI_GATEWAY_API_KEY` or `VERCEL_AI_GATEWAY_API_KEY` | Preferred: Vercel AI Gateway (required for gpt-oss on mapable.com.au) |
+| `GOOGLE_GENERATIVE_AI_API_KEY` | Fallback: `@ai-sdk/google` (Gemini only) |
+| `SEARCH_INTERPRETER_MODEL` | Gateway-style id, e.g. `openai/gpt-oss-120b` (production) or `google/gemini-3.5-flash` |
+| `GPT_OSS_BASE_URL` / `GPT_OSS_API_KEY` | Optional self-hosted OpenAI-compatible override; not used on mapable.com.au |
 | `ES_URL`, `ES_API_KEY` | Optional Elasticsearch replica (phase 2) |
 | `ES_SERVICE_CATEGORY_ALIAS` | Default `mapable_service_categories_current` |
 | `SEARCH_INTERPRETER_CLASSIFIER_HUB_ID` | Optional HF model repo (phase 3) |
 | `HF_TOKEN` or `HUGGINGFACE_API_KEY` | HF Inference API for classifier hint |
 | `NEXT_PUBLIC_PRODUCT_ANALYTICS_ENABLED` | Emit `search_query_interpreted` in the browser |
+
+**Production (`https://mapable.com.au`):** set `SEARCH_INTERPRETER_MODEL=openai/gpt-oss-120b` with `AI_GATEWAY_API_KEY`. Confirm via `GET /api/mapable/ai-status`.
 
 See [`.env.example`](../../.env.example).
 

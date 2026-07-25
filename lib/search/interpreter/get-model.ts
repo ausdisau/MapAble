@@ -3,15 +3,23 @@ import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 import { gateway } from "ai";
 
 import {
+  canonicalizeInterpreterModelId,
   gptOssApiModelId,
-  isGptOssConfigured,
+  isGptOssModelId,
+  isGptOssSelfHostedConfigured,
   isSearchInterpreterConfigured,
   searchInterpreterConfig,
 } from "@/lib/config/search-interpreter";
 
 export function getInterpreterEngineId(): string {
-  if (isGptOssConfigured()) {
+  if (isGptOssSelfHostedConfigured()) {
     return `ai-sdk/openai-compatible/${gptOssApiModelId(searchInterpreterConfig.modelId)}`;
+  }
+  if (
+    isGptOssModelId(searchInterpreterConfig.modelId) &&
+    searchInterpreterConfig.aiGatewayApiKey
+  ) {
+    return `ai-sdk/gateway/${canonicalizeInterpreterModelId(searchInterpreterConfig.modelId)}`;
   }
   if (searchInterpreterConfig.aiGatewayApiKey) {
     return `ai-sdk/gateway/${searchInterpreterConfig.modelId}`;
@@ -26,7 +34,9 @@ export function getInterpreterModel() {
 
   const modelId = searchInterpreterConfig.modelId;
 
-  if (isGptOssConfigured()) {
+  // Prefer explicit self-hosted endpoint when set; otherwise AI Gateway
+  // (production path for https://mapable.com.au).
+  if (isGptOssSelfHostedConfigured()) {
     const provider = createOpenAICompatible({
       name: "gpt-oss",
       baseURL: searchInterpreterConfig.gptOssBaseUrl,
@@ -36,7 +46,10 @@ export function getInterpreterModel() {
   }
 
   if (searchInterpreterConfig.aiGatewayApiKey) {
-    return gateway(modelId);
+    const gatewayModelId = isGptOssModelId(modelId)
+      ? canonicalizeInterpreterModelId(modelId)
+      : modelId;
+    return gateway(gatewayModelId);
   }
 
   return google(stripGooglePrefix(modelId));

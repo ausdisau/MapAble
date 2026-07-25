@@ -26,8 +26,8 @@ const MODELS: ModelRegistration[] = [
   },
   {
     id: "openai/gpt-oss-120b",
-    provider: "openai_compatible",
-    displayName: "gpt-oss-120b",
+    provider: "ai_gateway",
+    displayName: "gpt-oss-120b (AI Gateway)",
     allowedTasks: [...SHARED_INTERPRETER_TASKS],
     maxOutputTokens: 4096,
     supportsStructuredOutput: true,

@@ -12,8 +12,8 @@ import { aiPlatformConfig } from "@/lib/config/ai-platform";
 import {
   canonicalizeInterpreterModelId,
   gptOssApiModelId,
-  isGptOssConfigured,
   isGptOssModelId,
+  isGptOssSelfHostedConfigured,
   isSearchInterpreterConfigured,
   searchInterpreterConfig,
 } from "@/lib/config/search-interpreter";
@@ -98,7 +98,7 @@ export function resolveModelForCapability(
     };
   }
 
-  if (isGptOssModelId(rawModelId) && isGptOssConfigured()) {
+  if (isGptOssModelId(rawModelId) && isGptOssSelfHostedConfigured()) {
     const provider = createOpenAICompatible({
       name: "gpt-oss",
       baseURL: searchInterpreterConfig.gptOssBaseUrl,

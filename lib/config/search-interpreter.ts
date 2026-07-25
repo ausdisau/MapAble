@@ -7,6 +7,9 @@ export const GPT_OSS_MODEL_IDS = [
 
 export type GptOssModelId = (typeof GPT_OSS_MODEL_IDS)[number];
 
+/** Canonical gateway / allowlist id for production (mapable.com.au). */
+export const GPT_OSS_GATEWAY_MODEL_ID = "openai/gpt-oss-120b";
+
 function env(name: string): string {
   return process.env[name] ?? "";
 }
@@ -22,15 +25,19 @@ export const searchInterpreterConfig = {
   get googleApiKey() {
     return env("GOOGLE_GENERATIVE_AI_API_KEY");
   },
-  /** Gateway-style id (e.g. google/gemini-3.5-flash) or bare id for @ai-sdk/google. */
+  /** Gateway-style id (e.g. google/gemini-3.5-flash or openai/gpt-oss-120b). */
   get modelId() {
     return env("SEARCH_INTERPRETER_MODEL") || "google/gemini-3.5-flash";
   },
-  /** OpenAI-compatible base URL for gpt-oss (e.g. http://localhost:8000/v1). */
+  /**
+   * Optional self-hosted OpenAI-compatible base URL for gpt-oss
+   * (e.g. http://localhost:8000/v1). Production on mapable.com.au should
+   * prefer Vercel AI Gateway instead of this.
+   */
   get gptOssBaseUrl() {
     return env("GPT_OSS_BASE_URL");
   },
-  /** Optional bearer token for the gpt-oss endpoint. */
+  /** Optional bearer token for a self-hosted gpt-oss endpoint. */
   get gptOssApiKey() {
     return env("GPT_OSS_API_KEY");
   },
@@ -62,21 +69,40 @@ export function isGptOssModelId(modelId: string): boolean {
 
 /** Canonical allowlist / registry id for gpt-oss. */
 export function canonicalizeInterpreterModelId(modelId: string): string {
-  if (modelId === "gpt-oss-120b") return "openai/gpt-oss-120b";
+  if (modelId === "gpt-oss-120b") return GPT_OSS_GATEWAY_MODEL_ID;
   return modelId;
 }
 
-/** Model name sent to the OpenAI-compatible chat completions API. */
+/** Model name sent to a self-hosted OpenAI-compatible chat completions API. */
 export function gptOssApiModelId(modelId: string): string {
   return modelId.startsWith("openai/")
     ? modelId.slice("openai/".length)
     : modelId;
 }
 
-export function isGptOssConfigured(): boolean {
+/** Self-hosted gpt-oss via GPT_OSS_BASE_URL (optional; not the mapable.com.au default). */
+export function isGptOssSelfHostedConfigured(): boolean {
   return (
     searchInterpreterConfig.enabled &&
     isGptOssModelId(searchInterpreterConfig.modelId) &&
+    searchInterpreterConfig.gptOssBaseUrl.length > 0
+  );
+}
+
+/**
+ * gpt-oss is configured when the model id is selected and either:
+ * - Vercel AI Gateway key is present (production / mapable.com.au), or
+ * - GPT_OSS_BASE_URL is set (self-hosted OpenAI-compatible server).
+ */
+export function isGptOssConfigured(): boolean {
+  if (
+    !searchInterpreterConfig.enabled ||
+    !isGptOssModelId(searchInterpreterConfig.modelId)
+  ) {
+    return false;
+  }
+  return (
+    searchInterpreterConfig.aiGatewayApiKey.length > 0 ||
     searchInterpreterConfig.gptOssBaseUrl.length > 0
   );
 }
@@ -85,7 +111,7 @@ export function isSearchInterpreterConfigured(): boolean {
   if (!searchInterpreterConfig.enabled) return false;
 
   if (isGptOssModelId(searchInterpreterConfig.modelId)) {
-    return searchInterpreterConfig.gptOssBaseUrl.length > 0;
+    return isGptOssConfigured();
   }
 
   return (
@@ -115,9 +141,7 @@ export function getInterpreterDisplayName(): string {
   if (!searchInterpreterConfig.enabled) return "unavailable";
 
   if (isGptOssModelId(searchInterpreterConfig.modelId)) {
-    return searchInterpreterConfig.gptOssBaseUrl.length > 0
-      ? "gpt-oss-120b"
-      : "unavailable";
+    return isGptOssConfigured() ? "gpt-oss-120b" : "unavailable";
   }
 
   if (
