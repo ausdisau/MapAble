@@ -25,11 +25,12 @@ describe("Core UI navigation", () => {
     expect(titles).toContain("Public accountability");
   });
 
-  it("uses module entry routes for care and transport", () => {
+  it("uses module entry routes for care, transport, and jobs (Year-One)", () => {
     const hrefs = CORE_HUB_SECTIONS.flatMap((s) => s.links.map((l) => l.href));
     expect(hrefs).toContain("/care");
     expect(hrefs).toContain("/transport");
-    expect(hrefs).toContain("/marketplace");
+    expect(hrefs).toContain("/dashboard/jobs");
+    expect(hrefs).not.toContain("/marketplace");
     expect(hrefs).not.toContain("/dashboard/care");
   });
 

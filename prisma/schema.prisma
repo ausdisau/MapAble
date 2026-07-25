@@ -554,6 +554,8 @@ enum MapAbleUserRole {
   driver
   employer
   plan_manager
+  /// MapAble Ambassador — volunteer venue / service accessibility auditors
+  ambassador
   mapable_admin
 }
 
@@ -659,6 +661,8 @@ model ParticipantProfile {
   preferredName            String?
   dateOfBirth              DateTime?
   ndisParticipantNumberEnc String?
+  /// Market jurisdiction for funding / scheme framing: AU (NDIS) or NZ (Whaikaha / Total Mobility).
+  jurisdiction             String                 @default("AU")
   primaryContactMethod     PreferredContactMethod @default(email)
   emergencyContact         Json?
   supportCoordinatorContact Json?
@@ -3865,6 +3869,10 @@ enum ApiScope {
   invoices_read
   support_tickets_write
   webhooks_receive
+  /// DES / IEA partner: job search activity + tenure (consent-gated)
+  employment_activity_read
+  /// DES / IEA partner: 13/26-week outcome milestones (consent-gated)
+  employment_outcomes_write
 }
 
 model DeveloperOrganisation {

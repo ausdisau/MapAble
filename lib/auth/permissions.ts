@@ -106,6 +106,7 @@ export type Permission =
   | "route:manage"
   | "accessibility_map:read"
   | "accessibility_map:manage"
+  | "ambassador:audit"
   | "coordinator:portal"
   | "plan_manager:portal"
   | "employer:ats"
@@ -363,6 +364,13 @@ const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     "billing:view_delegated",
     "billing:export",
   ],
+  ambassador: [
+    "profile:read:self",
+    "profile:write:self",
+    "notification:read:self",
+    "accessibility_map:read",
+    "ambassador:audit",
+  ],
   mapable_admin: [
     "profile:read:any",
     "profile:write:any",
@@ -409,6 +417,7 @@ const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     "stripe:manage",
     "route:manage",
     "accessibility_map:manage",
+    "ambassador:audit",
     "reporting:manage",
     "developer:manage",
     "compliance:manage",

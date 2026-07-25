@@ -1,4 +1,5 @@
 import { PublicModulePage } from "@/components/marketing/PublicModulePage";
+import { enforceYearOneModulePath } from "@/lib/year-one/deferred-module-gate";
 
 export const metadata = {
   title: "MapAble Foods | Meals and grocery support",
@@ -7,6 +8,8 @@ export const metadata = {
 };
 
 export default function FoodsModulePage() {
+  enforceYearOneModulePath("/foods");
+
   return (
     <PublicModulePage
       eyebrow="MapAble Foods"

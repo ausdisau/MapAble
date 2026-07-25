@@ -75,7 +75,9 @@ export const marketingFeatureRoutes = {
   dashboardEngagement: "/dashboard/engagement",
   providerConsole: "/provider",
   supportCoordinator: "/support-coordinator",
+  /** Deferred Year-One — opt-in via MAPABLE_MARKETPLACE_ENABLED only. */
   marketplace: "/marketplace",
+  employment: "/employment",
   privacy: "/privacy",
   terms: "/terms",
 } as const;

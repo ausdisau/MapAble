@@ -13,8 +13,6 @@ const baseUrl = getCanonicalPublicOrigin();
  * `lib/public-informational/routes.ts` so the release boundary cannot drift.
  */
 const additionalPublicRoutes = [
-  "/marketplace",
-  "/foods",
   "/access",
   "/accessibility-map",
   "/providers",

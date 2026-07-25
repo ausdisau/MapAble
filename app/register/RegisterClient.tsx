@@ -27,6 +27,7 @@ export default function RegisterClient({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [jurisdiction, setJurisdiction] = useState<"AU" | "NZ">("AU");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -45,6 +46,7 @@ export default function RegisterClient({
           email: normalizedEmail,
           password: password.trim(),
           name,
+          jurisdiction,
           ...(inviteToken ? { inviteToken } : {}),
         }),
       });
@@ -153,6 +155,27 @@ export default function RegisterClient({
             disabled={isLoading}
             className={formInputClass}
           />
+        </AccessibleFormField>
+
+        <AccessibleFormField
+          id="register-jurisdiction"
+          label="Country / region"
+          required
+          hint="Select where you primarily use disability supports. Australia uses NDIS framing; New Zealand uses Whaikaha / Total Mobility framing."
+        >
+          <select
+            id="register-jurisdiction"
+            className={formInputClass}
+            value={jurisdiction}
+            onChange={(e) =>
+              setJurisdiction(e.target.value === "NZ" ? "NZ" : "AU")
+            }
+            required
+            disabled={isLoading}
+          >
+            <option value="AU">Australia (NDIS)</option>
+            <option value="NZ">New Zealand (Whaikaha / Total Mobility)</option>
+          </select>
         </AccessibleFormField>
 
         {error ? <AuthAlert variant="error">{error}</AuthAlert> : null}

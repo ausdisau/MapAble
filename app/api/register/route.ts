@@ -2,6 +2,12 @@ import { hash } from "bcryptjs";
 import { NextResponse } from "next/server";
 
 import { normalizeAuthEmail } from "@/lib/auth/auth-flow";
+import {
+  JURISDICTION_DEFAULTS,
+  isMapAbleJurisdiction,
+  type MapAbleJurisdiction,
+} from "@/lib/nz-schemes";
+import { refreshParticipantOnboarding } from "@/lib/onboarding/onboarding-service";
 import { prisma } from "@/lib/prisma";
 import {
   acceptWorkerInvite,
@@ -15,12 +21,18 @@ export async function POST(req: Request) {
       password?: string;
       name?: string;
       inviteToken?: string;
+      jurisdiction?: string;
     };
 
     const email = body.email ? normalizeAuthEmail(body.email) : "";
     const password = body.password?.trim() ?? "";
     const name = body.name?.trim() || email.split("@")[0] || "MapAble user";
     const inviteToken = body.inviteToken?.trim();
+    const jurisdiction: MapAbleJurisdiction = isMapAbleJurisdiction(
+      body.jurisdiction?.trim() ?? "",
+    )
+      ? (body.jurisdiction!.trim() as MapAbleJurisdiction)
+      : "AU";
 
     if (!email || !password) {
       return NextResponse.json({ error: "Email and password are required" }, { status: 400 });
@@ -63,6 +75,7 @@ export async function POST(req: Request) {
 
     const passwordHash = await hash(password, 10);
     const primaryRole = inviteToken ? "support_worker" : "participant";
+    const regionDefaults = JURISDICTION_DEFAULTS[jurisdiction];
 
     const user = await prisma.user.create({
       data: {
@@ -91,12 +104,15 @@ export async function POST(req: Request) {
         create: {
           userId: user.id,
           displayName: name,
+          jurisdiction,
+          timezone: regionDefaults.timezone,
         },
-        update: { displayName: name },
+        update: {
+          displayName: name,
+          jurisdiction,
+          timezone: regionDefaults.timezone,
+        },
       });
-      const { refreshParticipantOnboarding } = await import(
-        "@/lib/onboarding/onboarding-service"
-      );
       await refreshParticipantOnboarding(user.id, user.id);
     }
 
@@ -108,7 +124,11 @@ export async function POST(req: Request) {
       });
     }
 
-    return NextResponse.json({ id: user.id, primaryRole });
+    return NextResponse.json({
+      id: user.id,
+      primaryRole,
+      jurisdiction,
+    });
   } catch (error) {
     console.error("[register] failed", error);
     return NextResponse.json(

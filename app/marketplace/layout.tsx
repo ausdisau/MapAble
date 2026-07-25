@@ -2,12 +2,14 @@ import Link from "next/link";
 
 import { MarketplaceCartBadge } from "@/components/marketplace/MarketplaceCartBadge";
 import { requireAuth } from "@/lib/auth/guards";
+import { enforceYearOneModulePath } from "@/lib/year-one/deferred-module-gate";
 
 export default async function MarketplaceLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  enforceYearOneModulePath("/marketplace");
   await requireAuth();
 
   return (
