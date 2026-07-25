@@ -59,6 +59,8 @@ npx prisma migrate status
 
 **Status:** `OWNER_ACTION_REQUIRED` — do not execute from this agent.
 
+**Wave 1 A-continue (canonical):** use [WAVE1_A_CONTINUE_RECONCILIATION.md](./WAVE1_A_CONTINUE_RECONCILIATION.md) — includes 2026-07-25 Neon production export, rename-drift SQL, full checksum pack, and orphan-name guidance. The abbreviated steps below remain for quick reference.
+
 Prefer a staging rehearsal branch first.
 
 After the repair is on the deploy branch that production will pull:

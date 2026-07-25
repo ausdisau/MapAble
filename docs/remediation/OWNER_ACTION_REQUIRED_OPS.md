@@ -34,7 +34,7 @@ Read-only public probe (no secrets): `pnpm audit:https-gate`
 Redacted deploy artefact validator: `pnpm audit:deploy-evidence -- --evidence ./artifacts/deploy-evidence.redacted.json`  
 Human session artefact validator: `pnpm audit:human-release-evidence -- --evidence ./artifacts/human-release-session.redacted.json`  
 Branch protection audit: `pnpm audit:branch-protection`  
-Staging migration checksum compare (PR #382 tooling): `pnpm exec tsx scripts/ci/compare-prisma-migrations-readonly.ts` after that tip is available locally — `OWNER_ACTION_REQUIRED` until owner export provided.  
+Staging migration checksum compare: `pnpm exec tsx scripts/ci/compare-prisma-migrations-readonly.ts --exported …` — prod export captured 2026-07-25; follow [WAVE1_A_CONTINUE_RECONCILIATION.md](./WAVE1_A_CONTINUE_RECONCILIATION.md) (`OWNER_ACTION_REQUIRED` until clone rehearsal + prod SQL complete).  
 Independent security review checklist (not approval): [INDEPENDENT_REVIEW_388.md](./INDEPENDENT_REVIEW_388.md) — status `NOT_RUN`.  
 Combined #388+#389 ephemeral results: [COMBINED_388_389_INTEGRATION.md](./COMBINED_388_389_INTEGRATION.md).
 
@@ -71,9 +71,9 @@ Provide Neon **staging clone** (not production credentials to agents). Complete:
 
 | Step                                                               | Status                                          |
 | ------------------------------------------------------------------ | ----------------------------------------------- |
-| Migration inventory/checksum comparison (read-only helper on #382) | `OWNER_ACTION_REQUIRED`                         |
+| Migration inventory/checksum comparison (prod export 2026-07-25)   | Drift `VERIFIED`; reconcile `OWNER_ACTION_REQUIRED` ([WAVE1_A_CONTINUE_RECONCILIATION.md](./WAVE1_A_CONTINUE_RECONCILIATION.md)) |
 | Empty-database migrate-from-zero (CI already proves disposable DB) | CI `VERIFIED`; staging clone `NOT_RUN`          |
-| Staging migration rehearsal                                        | `NOT_RUN`                                       |
+| Staging migration rehearsal                                        | `NOT_RUN` — create Neon branch from `production` (not `vercel-dev`) |
 | Snapshot / PITR                                                    | `NOT_RUN`                                       |
 | Restore + schema verification + app smoke                          | `NOT_RUN`                                       |
 | Measured RTO (target 4h) / RPO (target 1h)                         | `NOT_RUN` — targets not achieved until measured |

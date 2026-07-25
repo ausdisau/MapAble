@@ -1,7 +1,8 @@
 # Wave 1 — Migration Baseline & Deploy-from-Zero Audit
 
-**Phase:** Wave 1 Phase 1 — local audit & strategy proposal (no further migration edits in this PR)  
+**Phase:** Wave 1 Phase 1 audit + **A-continue** reconciliation pack (no migration SQL edits)  
 **Audit date (UTC):** 2026-07-25  
+**Decision:** **A-continue** approved 2026-07-25 — see [WAVE1_A_CONTINUE_RECONCILIATION.md](./WAVE1_A_CONTINUE_RECONCILIATION.md)  
 **Audited tip:** `cbcff88162974b2941d0f82f15e8891f694a7cdc` (`origin/main` at audit time)  
 **Auditor role:** principal database / release-readiness (read-only for SQL history in this phase)  
 **FindingStatus legend:** `VERIFIED` (reproduced this session) · `DOCUMENTED` (prior remediation evidence in repo) · `OWNER_ACTION_REQUIRED`
@@ -13,11 +14,11 @@
 | Question | Answer | Status |
 | -------- | ------ | ------ |
 | Does empty-DB `prisma migrate deploy` fail on current `main`? | **No** — **58/58** migrations applied successfully | `VERIFIED` |
-| Was the historical P3018 (`access_trust_events` missing `);`) real? | **Yes** — exact defect documented below; pre-repair file sha256 `52ecc3b7…` | `VERIFIED` (defect) + `DOCUMENTED` (prod checksum match) |
+| Was the historical P3018 (`access_trust_events` missing `);`) real? | **Yes** — exact defect documented below; pre-repair file sha256 `52ecc3b7…` | `VERIFIED` (defect) + prod checksum still `52ecc3b7…` |
 | Has Option A (edit historical SQL) already been taken on `main`? | **Yes** — allowlisted repairs landed in **PR #381** (2026-07-20) | `DOCUMENTED` + re-verified green deploy |
 | Do comment-only stub migrations remain? | **Yes** — 9 folders (listed in §3); they no longer block empty-DB deploy | `VERIFIED` |
-| Is production `_prisma_migrations` reconciled with repaired files? | **Unknown / not proven by this session** — prior Neon notes say **drift**; owner runbook still open | `OWNER_ACTION_REQUIRED` |
-| Recommended next step for Wave 1 | **Do not squash yet.** Treat empty-DB baseline as **proven on `main`**. Complete owner checksum / rename-drift reconciliation before any further history rewrite or baseline squash. | Proposal — awaiting approval |
+| Is production `_prisma_migrations` reconciled with repaired files? | **No** — fresh Neon export 2026-07-25 shows **10 checksum mismatches**, rename drift, and orphan prod-only names | `VERIFIED` (drift) · reconcile `OWNER_ACTION_REQUIRED` |
+| Wave 1 strategy | **A-continue** (approved). Defer squash. Owner staging-clone + checksum/rename SQL pack ready | Decision locked |
 
 **Operating rules for this phase (honoured):** no edits to historical `migration.sql`, no deletion of migration folders, no `prisma db push` except against the disposable local database used for proof.
 
@@ -255,16 +256,13 @@ Treat live reconciliation as **`OWNER_ACTION_REQUIRED`** until a fresh read-only
 
 **When B is inappropriate:** production (or long-lived staging) already has applied history and real data — especially with documented checksum / rename drift.
 
-### Recommendation (pending your approval)
+### Recommendation — **A-continue approved**
 
-1. **Accept Option A as the landed empty-DB remediation** (already on `main`). Do **not** re-edit repaired SQL in Wave 1 without new failing evidence.
-2. **Defer Option B (squash)** unless product leadership explicitly chooses a wipe-and-rebaseline of all non-local databases. Empty-DB proof is already satisfied; squash would optimize archaeology, not unblock CI.
-3. **Wave 1 remaining proof work** (no historical SQL edits without new allowlist + approval):
-   - Fresh read-only export of production (and staging) `_prisma_migrations` (name, checksum, finished_at, applied_steps_count).
-   - Staging-clone rehearsal of checksum updates from [MIGRATE_FROM_ZERO_REPAIR.md](./MIGRATE_FROM_ZERO_REPAIR.md).
-   - Owner-executed production checksum + `ndis_direct_claiming` rename-drift reconciliation.
-   - Keep stubs as no-ops for now; optional later “documentation cleanup” PR is separate from baseline proof.
-4. **Do not** run `prisma db push` against shared environments. Disposable local only.
+1. **Keep** Option A repaired history on `main`. Do **not** re-edit repaired SQL without new failing evidence + allowlist.
+2. **Defer** Option B (squash).
+3. **Execute** [WAVE1_A_CONTINUE_RECONCILIATION.md](./WAVE1_A_CONTINUE_RECONCILIATION.md): staging clone → rename + checksum SQL → production under PITR.
+4. Fresh prod export (2026-07-25) is in `docs/remediation/artifacts/`. `vercel-dev` is **not** a prod clone.
+5. **Do not** run `prisma db push` against shared environments.
 
 ---
 
@@ -272,22 +270,21 @@ Treat live reconciliation as **`OWNER_ACTION_REQUIRED`** until a fresh read-only
 
 | Doc / path | Role |
 | ---------- | ---- |
+| [WAVE1_A_CONTINUE_RECONCILIATION.md](./WAVE1_A_CONTINUE_RECONCILIATION.md) | **Active** owner pack + SQL for A-continue |
+| [artifacts/production-prisma-migrations-2026-07-25.json](./artifacts/production-prisma-migrations-2026-07-25.json) | Redacted prod `_prisma_migrations` export |
 | [MIGRATE_FROM_ZERO_BLOCKER.md](./MIGRATE_FROM_ZERO_BLOCKER.md) | Historical P3018 record; empty-DB no longer blocked |
-| [MIGRATE_FROM_ZERO_REPAIR.md](./MIGRATE_FROM_ZERO_REPAIR.md) | Allowlisted repairs + owner checksum runbook |
+| [MIGRATE_FROM_ZERO_REPAIR.md](./MIGRATE_FROM_ZERO_REPAIR.md) | Allowlisted repairs + original checksum narrative |
 | [MIGRATION_INVENTORY.md](./MIGRATION_INVENTORY.md) | Older inventory (refresh counts: **58** on this tip) |
 | `scripts/ci/allowed-migration-repairs.json` | CI integrity allowlist for edited historical SQL |
 | PR [#381](https://github.com/ausdisau/mapableau-new/pull/381) | Landed migrate-from-zero green repairs |
 
 ---
 
-## 7. Approval gate (stop here)
+## 7. Decision log
 
-**This document is the Phase 1 deliverable.** No Prisma schema or `migration.sql` changes are included in this change set.
+| When (UTC) | Decision | Notes |
+| ---------- | -------- | ----- |
+| 2026-07-25 | Phase 1 audit published | No migration.sql edits |
+| 2026-07-25 | **A-continue** approved | Owner reconciliation pack authored; no prod writes from agent |
 
-Please approve one path before Phase 2 execution:
-
-- **A-continue:** Proceed with production/staging `_prisma_migrations` reconciliation only (recommended).
-- **B-squash:** Author a wipe-safe baseline squash plan (explicit environments in scope + cutover steps).
-- **A+hybrid:** Keep repaired history for deployed DBs; introduce a baseline only for brand-new environments (dual-track — higher doc/process cost).
-
-Reply with the chosen option (and any environments that are wipe-eligible) before any further migration-file work.
+**Owner next action:** create Neon branch from `production`, rehearse §3 of the A-continue doc, then apply to production under snapshot/PITR.
