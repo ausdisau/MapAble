@@ -40,6 +40,14 @@ See [ADVANCED_MERGE_TRAIN.md](./ADVANCED_MERGE_TRAIN.md) and [INTAKE.md](./INTAK
 
 AURA Agent OS mega-branches, VisionAccess multimodal, Quality & Safeguards Copilot, Continuity Copilot, live OCR, embeddings, computer-use.
 
+### CareGPT (design only)
+
+| Capability key | Backend | Maturity | Flag default |
+|---|---|---|---|
+| care.gpt (planned) | hybrid | controlled_pilot | `MAPABLE_CARE_GPT_ENABLED` off — **not registered / not implemented** |
+
+Participant-facing Care conversational surface at `/care/gpt` (planned). Orchestrates Care APIs, Co-Pilot drafts, and care agents; never silent book/assign/bill. Spec: [docs/modules/caregpt.md](../modules/caregpt.md).
+
 ## Claim honesty
 
 All ConvergenceOS public claims remain `publicClaimAllowed: false`. `MAPABLE_AI_PUBLIC_CLAIM_ENABLED` defaults false.
