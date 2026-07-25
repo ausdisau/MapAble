@@ -1,7 +1,9 @@
 import Link from "next/link";
 
+import { QuarterlyPacingAlertScaffold } from "@/components/billing/QuarterlyPacingAlertScaffold";
 import { CoreHubCard } from "@/components/core/CoreHubCard";
 import { ProviderSectionNav } from "@/components/provider/ProviderSectionNav";
+import { isPaceQuarterlyPacingEnabled } from "@/lib/config/strategic-2026";
 import { PROVIDER_CLAIMING_LINKS } from "@/lib/core-ui/provider-section-nav";
 
 export const metadata = { title: "Claiming | MapAble Provider" };
@@ -31,6 +33,8 @@ export default function ProviderClaimingHubPage() {
           description="Agency-managed participants via NDIA partner API credentials"
         />
       </div>
+
+      {isPaceQuarterlyPacingEnabled() ? <QuarterlyPacingAlertScaffold /> : null}
 
       <p className="text-sm text-muted-foreground">
         <Link href="/provider/billing" className="text-primary underline">

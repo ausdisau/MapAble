@@ -4,6 +4,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 
+import { FoundationalSupportsLayer } from "@/components/map/FoundationalSupportsLayer";
 import { MapAccessibleResultsList } from "@/components/map/MapAccessibleResultsList";
 import { MapFullscreenToggle } from "@/components/map/MapFullscreenToggle";
 import { useMapConfig } from "@/components/map/MapProvider";
@@ -20,12 +21,14 @@ import type { MapFeatureCollection } from "@/lib/map/types";
 export type CareTransportLayerKey =
   | "careProviders"
   | "infrastructure"
-  | "trips";
+  | "trips"
+  | "foundationalSupports";
 
 type Props = {
   careProviders: MapFeatureCollection;
   infrastructure: MapFeatureCollection;
   trips: MapFeatureCollection | null;
+  foundationalSupports?: MapFeatureCollection | null;
   layers: Record<CareTransportLayerKey, boolean>;
   flyTo?: { lat: number; lng: number; zoom?: number } | null;
   selectedId?: string | null;
@@ -40,6 +43,7 @@ export function CareTransportMapView({
   careProviders,
   infrastructure,
   trips,
+  foundationalSupports = null,
   layers,
   flyTo,
   selectedId,
@@ -59,6 +63,7 @@ export function CareTransportMapView({
   const infraData = layers.infrastructure ? infrastructure : emptyCollection();
   const tripData =
     layers.trips && trips ? trips : emptyCollection();
+  const foundationalData = foundationalSupports ?? emptyCollection();
 
   useGeoJsonSource(map, MAP_SOURCE_IDS.careProviders, careData, {
     layerId: MAP_LAYER_IDS.careProviders,
@@ -114,8 +119,23 @@ export function CareTransportMapView({
         });
       }
     }
+    if (layers.foundationalSupports && foundationalSupports) {
+      for (const f of foundationalSupports.features) {
+        rows.push({
+          id: String(f.properties.id),
+          name: f.properties.name,
+          subtitle: f.properties.subtitle ?? "foundational_support",
+        });
+      }
+    }
     return rows.slice(0, 50);
-  }, [careProviders, infrastructure, trips, layers]);
+  }, [
+    careProviders,
+    infrastructure,
+    trips,
+    foundationalSupports,
+    layers,
+  ]);
 
   const pinCount = listResults.length;
 
@@ -127,6 +147,9 @@ export function CareTransportMapView({
         ...(layers.careProviders ? careProviders.features : []),
         ...(layers.infrastructure ? infrastructure.features : []),
         ...(layers.trips && trips ? trips.features : []),
+        ...(layers.foundationalSupports && foundationalSupports
+          ? foundationalSupports.features
+          : []),
       ];
       const hit = all.find((f) => String(f.properties.id) === id);
       const coords = hit?.geometry?.coordinates;
@@ -134,13 +157,26 @@ export function CareTransportMapView({
         map.flyTo({ center: [coords[0], coords[1]], zoom: 14 });
       }
     },
-    [map, onSelect, careProviders, infrastructure, trips, layers],
+    [
+      map,
+      onSelect,
+      careProviders,
+      infrastructure,
+      trips,
+      foundationalSupports,
+      layers,
+    ],
   );
 
   return (
     <div
       className={`relative flex flex-col gap-3 ${expanded ? "fixed inset-0 z-50 bg-background p-4" : ""}`}
     >
+      <FoundationalSupportsLayer
+        map={map}
+        data={foundationalData}
+        visible={Boolean(layers.foundationalSupports)}
+      />
       <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
         {pinCount} map result{pinCount === 1 ? "" : "s"}
         {selectedId ? `. Selected ${selectedId}.` : "."}

@@ -9,6 +9,7 @@ export const MAP_SOURCE_IDS = {
   dispatchVehicles: "dispatch-vehicles",
   careProviders: "care-providers",
   infrastructure: "infrastructure",
+  foundationalSupports: "foundational-supports",
 } as const;
 
 export const MAP_LAYER_IDS = {
@@ -22,6 +23,7 @@ export const MAP_LAYER_IDS = {
   dispatchVehicles: "dispatch-vehicles-layer",
   careProviders: "care-providers-layer",
   infrastructure: "infrastructure-layer",
+  foundationalSupports: "foundational-supports-layer",
 } as const;
 
 export type MapSourceId = (typeof MAP_SOURCE_IDS)[keyof typeof MAP_SOURCE_IDS];
