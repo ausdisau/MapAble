@@ -51,7 +51,10 @@ export function getModuleIcon(
 /** Year-One registry: Core, Care, Transport, Jobs only. */
 export const YEAR_ONE_MODULE_KEYS = ["care", "transport", "jobs"] as const;
 
-/** Deferred verticals — kept for icon/metadata lookups; excluded from `modules`. */
+/**
+ * Public programme explainers (informational GO) — not Year-One transactional
+ * product surfaces. Kept for icon/metadata lookups; excluded from `modules`.
+ */
 export const deferredModules: MapAbleModule[] = [
   {
     key: "foods",

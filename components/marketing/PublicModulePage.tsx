@@ -36,6 +36,10 @@ const relatedModules = [
   { label: "Care", href: "/care" },
   { label: "Transport", href: "/transport" },
   { label: "Employment", href: "/employment" },
+  { label: "Marketplace", href: "/marketplace" },
+  { label: "Foods", href: "/foods" },
+  { label: "Kids", href: "/kids" },
+  { label: "Moves", href: "/moves" },
   { label: "Accessible places", href: "/access" },
   { label: "Provider finder", href: "/provider-finder" },
 ];

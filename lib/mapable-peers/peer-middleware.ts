@@ -14,7 +14,13 @@ const AUTH_PREFIXES = [
   "/driver",
   "/messages",
   "/practitioner",
-  "/marketplace",
+] as const;
+
+/** Marketplace shop is auth-gated; /marketplace explainer is public. */
+const AUTH_MARKETPLACE_PREFIXES = [
+  "/marketplace/browse",
+  "/marketplace/cart",
+  "/marketplace/products",
 ] as const;
 
 const AUTH_PATHS = ["/care/", "/transport/"] as const;
@@ -23,7 +29,11 @@ export function shouldRunAuthMiddleware(pathname: string): boolean {
   return (
     AUTH_PREFIXES.some(
       (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
-    ) || AUTH_PATHS.some((path) => pathname.startsWith(path))
+    ) ||
+    AUTH_MARKETPLACE_PREFIXES.some(
+      (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
+    ) ||
+    AUTH_PATHS.some((path) => pathname.startsWith(path))
   );
 }
 

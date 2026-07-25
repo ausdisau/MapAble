@@ -2,7 +2,8 @@ import { describe, expect, it } from "vitest";
 
 import { deferredModules, modules } from "@/app/lib/modules";
 import {
-  YEAR_ONE_DEFERRED_MODULE_PATHS,
+  YEAR_ONE_PUBLIC_EXPLAINER_PATHS,
+  isMarketplaceTransactionalPath,
   isYearOneDeferredPathEnabled,
   yearOneScopeConfig,
 } from "@/lib/config/year-one-scope";
@@ -25,14 +26,14 @@ describe("Year-One roadmap alignment", () => {
     );
   });
 
-  it("keeps deferred verticals off by default", () => {
-    expect(yearOneScopeConfig.foodsEnabled).toBe(false);
-    expect(yearOneScopeConfig.kidsEnabled).toBe(false);
-    expect(yearOneScopeConfig.movesEnabled).toBe(false);
-    expect(yearOneScopeConfig.marketplaceEnabled).toBe(false);
-    for (const path of YEAR_ONE_DEFERRED_MODULE_PATHS) {
-      expect(isYearOneDeferredPathEnabled(path)).toBe(false);
+  it("keeps public explainers available and marketplace shop gated", () => {
+    expect(yearOneScopeConfig.marketplaceTransactionalEnabled).toBe(false);
+    for (const path of YEAR_ONE_PUBLIC_EXPLAINER_PATHS) {
+      expect(isYearOneDeferredPathEnabled(path)).toBe(true);
     }
+    expect(isMarketplaceTransactionalPath("/marketplace/browse")).toBe(true);
+    expect(isYearOneDeferredPathEnabled("/marketplace/browse")).toBe(false);
+    expect(isYearOneDeferredPathEnabled("/marketplace/cart")).toBe(false);
   });
 
   it("foundations en-AU and en-NZ with Total Mobility subsidy hint", () => {

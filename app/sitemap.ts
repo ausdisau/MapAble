@@ -29,6 +29,8 @@ const additionalPublicRoutes = [
   "/access-pass",
   "/peer",
   "/telehealth",
+  // Programme explainers also come from INFORMATIONAL_RELEASE_ROUTES;
+  // listed here only if needed beyond that inventory.
 ];
 
 function uniqueSitemapPaths(): string[] {

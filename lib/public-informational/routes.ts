@@ -165,6 +165,46 @@ export const PUBLIC_PROGRAMME_EXPLAINER_ROUTES: readonly InformationalRoute[] =
       authenticationProhibited: true,
       kind: "programme_explainer",
     },
+    {
+      path: "/marketplace",
+      label: "Marketplace (explainer)",
+      inSitemap: true,
+      titleIncludes: "Marketplace",
+      h1Includes: "aids",
+      formsPermitted: false,
+      authenticationProhibited: true,
+      kind: "programme_explainer",
+    },
+    {
+      path: "/foods",
+      label: "Foods (explainer)",
+      inSitemap: true,
+      titleIncludes: "Foods",
+      h1Includes: "Meal",
+      formsPermitted: false,
+      authenticationProhibited: true,
+      kind: "programme_explainer",
+    },
+    {
+      path: "/kids",
+      label: "Kids (explainer)",
+      inSitemap: true,
+      titleIncludes: "Kids",
+      h1Includes: "Family",
+      formsPermitted: false,
+      authenticationProhibited: true,
+      kind: "programme_explainer",
+    },
+    {
+      path: "/moves",
+      label: "Moves (explainer)",
+      inSitemap: true,
+      titleIncludes: "Moves",
+      h1Includes: "Move",
+      formsPermitted: false,
+      authenticationProhibited: true,
+      kind: "programme_explainer",
+    },
   ] as const;
 
 /** Full allowlist for the informational GO gate. */
@@ -184,6 +224,9 @@ export const EXCLUDED_TRANSACTIONAL_PATH_PREFIXES = [
   "/transport/request",
   "/transport/book",
   "/provider/ndis-claims",
+  "/marketplace/browse",
+  "/marketplace/cart",
+  "/marketplace/products",
 ] as const;
 
 /**

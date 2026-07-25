@@ -1,20 +1,19 @@
 import { PublicModulePage } from "@/components/marketing/PublicModulePage";
-import { enforceYearOneModulePath } from "@/lib/year-one/deferred-module-gate";
+import { canonicalAlternate } from "@/lib/config/canonical-url";
 
 export const metadata = {
   title: "MapAble Foods | Meals and grocery support",
   description:
     "Learn how MapAble Foods will handle meal, grocery and delivery workflows with privacy-safe dietary and allergy information.",
+  alternates: canonicalAlternate("/foods"),
 };
 
 export default function FoodsModulePage() {
-  enforceYearOneModulePath("/foods");
-
   return (
     <PublicModulePage
       eyebrow="MapAble Foods"
       title="Meal and grocery support with sensitive dietary information protected."
-      description="MapAble Foods is planned for meal, grocery and delivery workflows that separate food, preparation, delivery and support line items."
+      description="MapAble Foods is planned for meal, grocery and delivery workflows that separate food, preparation, delivery and support line items — without exposing allergy details more widely than needed."
       whoFor={[
         "Participants who need meal, grocery or delivery support options.",
         "Vendors preparing accessible ordering and fulfilment workflows.",

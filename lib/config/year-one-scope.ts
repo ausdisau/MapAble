@@ -1,7 +1,8 @@
 /**
  * Year-One product scope: Core, Care, Transport, Jobs (+ Access discovery).
- * Foods, Kids, Moves, and Marketplace are deferred — hidden from nav and
- * gated behind opt-in flags. Do not treat flag=false as a production claim.
+ *
+ * Foods, Kids, Moves, and Marketplace keep public informational explainers.
+ * Transactional marketplace surfaces (browse/cart/checkout) stay opt-in only.
  */
 
 export const YEAR_ONE_CORE_MODULES = [
@@ -13,46 +14,55 @@ export const YEAR_ONE_CORE_MODULES = [
 
 export type YearOneCoreModule = (typeof YEAR_ONE_CORE_MODULES)[number];
 
-/** Premature verticals excluded from Sydney pilot navigation. */
-export const YEAR_ONE_DEFERRED_MODULE_PATHS = [
+/** Public programme explainers (informational GO — not live commerce). */
+export const YEAR_ONE_PUBLIC_EXPLAINER_PATHS = [
   "/foods",
   "/kids",
   "/moves",
   "/marketplace",
 ] as const;
 
-export type YearOneDeferredPath =
-  (typeof YEAR_ONE_DEFERRED_MODULE_PATHS)[number];
+/** Transactional marketplace paths gated behind MAPABLE_MARKETPLACE_ENABLED. */
+export const YEAR_ONE_MARKETPLACE_TRANSACTIONAL_PREFIXES = [
+  "/marketplace/browse",
+  "/marketplace/cart",
+  "/marketplace/products",
+] as const;
 
 function envEnabled(name: string): boolean {
   return process.env[name] === "true";
 }
 
-/** Opt-in only — default off for Year-One. */
+/** Opt-in only — default off for Year-One transactional commerce. */
 export const yearOneScopeConfig = {
-  foodsEnabled: envEnabled("MAPABLE_FOODS_ENABLED"),
-  kidsEnabled: envEnabled("MAPABLE_KIDS_ENABLED"),
-  movesEnabled: envEnabled("MAPABLE_MOVES_ENABLED"),
+  marketplaceTransactionalEnabled: envEnabled("MAPABLE_MARKETPLACE_ENABLED"),
+  /** @deprecated Alias — prefer marketplaceTransactionalEnabled */
   marketplaceEnabled: envEnabled("MAPABLE_MARKETPLACE_ENABLED"),
+  /** Legacy flags retained for ops docs; public explainers are always on. */
+  foodsEnabled: true,
+  kidsEnabled: true,
+  movesEnabled: true,
 };
 
-export function isYearOneDeferredPathEnabled(pathname: string): boolean {
+export function isMarketplaceTransactionalPath(pathname: string): boolean {
   const path = pathname.split("?")[0] ?? pathname;
-  if (path === "/foods" || path.startsWith("/foods/")) {
-    return yearOneScopeConfig.foodsEnabled;
-  }
-  if (path === "/kids" || path.startsWith("/kids/")) {
-    return yearOneScopeConfig.kidsEnabled;
-  }
-  if (path === "/moves" || path.startsWith("/moves/")) {
-    return yearOneScopeConfig.movesEnabled;
-  }
-  if (path === "/marketplace" || path.startsWith("/marketplace/")) {
-    return yearOneScopeConfig.marketplaceEnabled;
-  }
-  return true;
+  return YEAR_ONE_MARKETPLACE_TRANSACTIONAL_PREFIXES.some(
+    (prefix) => path === prefix || path.startsWith(`${prefix}/`),
+  );
 }
 
 export function isMarketplaceSurfaceEnabled(): boolean {
-  return yearOneScopeConfig.marketplaceEnabled;
+  return yearOneScopeConfig.marketplaceTransactionalEnabled;
+}
+
+/**
+ * Public explainers are always available. Only transactional marketplace
+ * subpaths require MAPABLE_MARKETPLACE_ENABLED.
+ */
+export function isYearOneDeferredPathEnabled(pathname: string): boolean {
+  const path = pathname.split("?")[0] ?? pathname;
+  if (isMarketplaceTransactionalPath(path)) {
+    return yearOneScopeConfig.marketplaceTransactionalEnabled;
+  }
+  return true;
 }
