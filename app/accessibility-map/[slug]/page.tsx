@@ -237,8 +237,8 @@ export default async function AccessibilityMapPlacePage({ params }: PageProps) {
           </h2>
           <div className="mt-4 flex flex-wrap gap-3">
             <ActionLink href="/journey-planner" label="Plan accessible trip" />
-            <ActionLink href="/transport" label="Book transport" />
-            <ActionLink href="/care/request" label="Request support worker" />
+            <ActionLink href="/transport" label="Learn about Transport" />
+            <ActionLink href="/care" label="Learn about Care" />
             <ActionLink href={`/accessibility-map/${place.slug}`} label="Share access info" />
             <ActionLink href="/add-access-info" label="Report outdated info" />
             <ActionLink href="/verify-my-venue" label="Claim/manage this venue" />
