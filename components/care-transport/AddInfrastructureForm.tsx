@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 
+import { InfrastructurePinPreview } from "@/components/care-transport/InfrastructurePinPreview";
 import { Button } from "@/components/ui/button";
 import type { InfrastructureDraft } from "@/lib/care-transport-map/infrastructure-draft";
 
@@ -25,6 +26,8 @@ export function AddInfrastructureForm() {
   const [error, setError] = useState<string | null>(null);
   const [honesty, setHonesty] = useState<string | null>(null);
   const [draft, setDraft] = useState<InfrastructureDraft | null>(null);
+  const [previewLat, setPreviewLat] = useState<number | null>(null);
+  const [previewLng, setPreviewLng] = useState<number | null>(null);
 
   async function onDraft() {
     setDrafting(true);
@@ -40,7 +43,10 @@ export function AddInfrastructureForm() {
         setError(data.error ?? "Could not draft suggestion");
         return;
       }
-      setDraft(data.draft as InfrastructureDraft);
+      const next = data.draft as InfrastructureDraft;
+      setDraft(next);
+      setPreviewLat(next.latitude ?? null);
+      setPreviewLng(next.longitude ?? null);
       setHonesty(data.meta?.honesty ?? null);
     } catch {
       setError("Could not reach MapAble.");
@@ -192,7 +198,11 @@ export function AddInfrastructureForm() {
                 type="number"
                 step="any"
                 required
-                defaultValue={draft.latitude ?? ""}
+                value={previewLat ?? ""}
+                onChange={(e) => {
+                  const n = Number(e.target.value);
+                  setPreviewLat(Number.isFinite(n) ? n : null);
+                }}
                 className="mt-1 min-h-11 w-full rounded-lg border px-3"
               />
             </label>
@@ -203,16 +213,21 @@ export function AddInfrastructureForm() {
                 type="number"
                 step="any"
                 required
-                defaultValue={draft.longitude ?? ""}
+                value={previewLng ?? ""}
+                onChange={(e) => {
+                  const n = Number(e.target.value);
+                  setPreviewLng(Number.isFinite(n) ? n : null);
+                }}
                 className="mt-1 min-h-11 w-full rounded-lg border px-3"
               />
             </label>
           </div>
-          {draft.latitude != null && draft.longitude != null ? (
-            <p className="text-xs text-muted-foreground">
-              Preview pin: {draft.latitude.toFixed(5)}, {draft.longitude.toFixed(5)}{" "}
-              (OSM/Nominatim when geocoding is enabled).
-            </p>
+          {previewLat != null && previewLng != null ? (
+            <InfrastructurePinPreview
+              latitude={previewLat}
+              longitude={previewLng}
+              label={draft.name}
+            />
           ) : (
             <p className="text-xs text-amber-700 dark:text-amber-300">
               No coordinates yet. Enable Nominatim geocoding or enter lat/lng

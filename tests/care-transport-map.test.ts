@@ -4,10 +4,20 @@ import {
   draftInfrastructureFromDescription,
 } from "@/lib/care-transport-map/infrastructure-draft";
 import { planCareTransportMapActions } from "@/lib/care-transport-map/map-actions";
+import { buildMaskedTripLayer } from "@/lib/care-transport-map/map-payload";
 import {
   isAddInfrastructureEnabled,
   isCareTransportMapEnabled,
 } from "@/lib/config/care-transport-map";
+import { prisma } from "@/lib/prisma";
+
+vi.mock("@/lib/prisma", () => ({
+  prisma: {
+    transportTrip: {
+      findMany: vi.fn(),
+    },
+  },
+}));
 
 function restoreEnv(key: string, value: string | undefined) {
   if (value === undefined) {
@@ -92,5 +102,33 @@ describe("draftInfrastructureFromDescription", () => {
       "Fleet depot for accessible vans in Brisbane QLD",
     );
     expect(draft.category).toBe("transport_depot");
+  });
+});
+
+describe("buildMaskedTripLayer", () => {
+  it("includes participant trip points without guest public exposure path", async () => {
+    vi.mocked(prisma.transportTrip.findMany).mockResolvedValue([
+      {
+        id: "trip-1",
+        status: "requested",
+        pickupAddress: "12 Secret St",
+        pickupSuburb: "Parramatta",
+        pickupLat: -33.81,
+        pickupLng: 151.0,
+        dropoffAddress: "99 Hidden Rd",
+        dropoffSuburb: "Sydney",
+        dropoffLat: -33.87,
+        dropoffLng: 151.21,
+      },
+    ] as Awaited<ReturnType<typeof prisma.transportTrip.findMany>>);
+
+    const { collection, count } = await buildMaskedTripLayer("user-1", 10);
+    expect(count).toBe(2);
+    expect(collection.features).toHaveLength(2);
+    // Participant role sees full labels; guest API never calls this helper.
+    expect(collection.features[0]?.properties.name).toContain("Secret");
+    expect(collection.features.every((f) => f.properties.kind === "trip_point")).toBe(
+      true,
+    );
   });
 });
