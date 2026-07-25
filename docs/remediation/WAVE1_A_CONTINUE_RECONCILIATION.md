@@ -240,10 +240,27 @@ Rename rollback: rename `20260525010000_ndis_direct_claiming` back to `202605250
 | ---- | ------ |
 | Strategy decision A-continue | `VERIFIED` (human approved) |
 | Fresh prod `_prisma_migrations` export | `VERIFIED` (2026-07-25) |
-| Staging clone rehearsal | `NOT_RUN` — `OWNER_ACTION_REQUIRED` |
-| Prod rename + checksum SQL | `NOT_RUN` — `OWNER_ACTION_REQUIRED` |
-| Forward `migrate deploy` of Jul 16+ migrations on prod | `NOT_RUN` — separate release decision |
+| Staging clone rehearsal | **`VERIFIED`** on Neon branch `wave1-migration-rehearsal` (`br-odd-flower-a79knhk5`, parent `production`) — 2026-07-25 |
+| Prod rename + checksum SQL | `NOT_RUN` — awaiting explicit owner go-ahead after rehearsal |
+| Forward `migrate deploy` of Jul 16+ migrations on prod | `NOT_RUN` — **held** (separate release decision) |
 | Migration SQL edits in this workstream | **None** (honoured) |
+
+### 5.1 Rehearsal evidence (clone only)
+
+Branch: `wave1-migration-rehearsal` / `br-odd-flower-a79knhk5`  
+Parent: `production` / `br-rough-bush-a7mlsbdx`  
+Precondition: `provider_outlets_outlet_key_idx` is non-unique `CREATE INDEX` (not UNIQUE).
+
+After §3 SQL on the clone:
+
+- Rename: single finished row `20260525010000_ndis_direct_claiming` (old name gone; unfinished attempt deleted).
+- All 9 allowlisted repair checksums + `ndis_provider_outlet_registry` match repo file hashes.
+- `pnpm exec prisma migrate status` against the clone: **no modified-checksum / failed-migration warnings**.
+- Expected remaining differences only:
+  - **12** not-yet-applied repo migrations (`20260716120000_…` … `20260720120000_at_continuity_wave1`) — **do not deploy in this pack**
+  - **5** DB-only orphan names (`go_live_roadmap`, `donations`, `provider_outlet_classifications`, `abilitypay_mvp`, `access_marker_feedback`) — keep per Step 4
+
+Production `production` branch was **not** mutated in the rehearsal.
 
 ---
 
