@@ -1,0 +1,31 @@
+warn The configuration property `package.json#prisma` is deprecated and will be removed in Prisma 7. Please migrate to a Prisma config file (e.g., `prisma.config.ts`).
+For more information, see: https://pris.ly/prisma-config
+
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": PostgreSQL database "neondb", schema "public" at "ep-***.ap-southeast-2.aws.neon.tech"
+
+58 migrations found in prisma/migrations
+Your local migration history and the migrations table from your database are different:
+
+The last common migration is: 20260626120000_payout_ledger
+
+The migrations have not yet been applied:
+20260716120000_indoor_accessibility_platform
+20260717020000_billing_centre_foundations
+20260717100000_convergence_os_registry
+20260717110000_convergence_os_iteration2
+20260717120000_trust_fabric_access_receipts
+20260717130000_access_evidence_envelope_persistence
+20260717140000_starting_work_journey_projection
+20260717150000_transport_quotes_persistent
+20260717160000_care_recurring_schedules
+20260717200000_ai_matching_truth_hardening
+20260719120000_shared_programme_foundation
+20260720120000_at_continuity_wave1
+
+The migrations from the database are not found locally in prisma/migrations:
+20260603180000_go_live_roadmap
+20260612120000_donations
+20260611180000_provider_outlet_classifications
+20260611140000_abilitypay_mvp
+20260714010000_access_marker_feedback

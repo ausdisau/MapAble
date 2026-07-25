@@ -71,9 +71,11 @@ Provide Neon **staging clone** (not production credentials to agents). Complete:
 
 | Step                                                               | Status                                          |
 | ------------------------------------------------------------------ | ----------------------------------------------- |
-| Migration inventory/checksum comparison (prod export 2026-07-25)   | Drift `VERIFIED`; reconcile `OWNER_ACTION_REQUIRED` ([WAVE1_A_CONTINUE_RECONCILIATION.md](./WAVE1_A_CONTINUE_RECONCILIATION.md)) |
-| Empty-database migrate-from-zero (CI already proves disposable DB) | CI `VERIFIED`; staging clone `NOT_RUN`          |
-| Staging migration rehearsal                                        | `NOT_RUN` — create Neon branch from `production` (not `vercel-dev`) |
+| Migration inventory/checksum comparison (prod export 2026-07-25)   | Pre-drift `VERIFIED`; post–§3 **checksums aligned** ([WAVE1_A_CONTINUE_RECONCILIATION.md](./WAVE1_A_CONTINUE_RECONCILIATION.md) §5.2) |
+| Empty-database migrate-from-zero (CI already proves disposable DB) | CI `VERIFIED`                                   |
+| Staging migration rehearsal                                        | `VERIFIED` on `wave1-migration-rehearsal`       |
+| Production `_prisma_migrations` §3 rename/checksum SQL             | `VERIFIED` applied 2026-07-25 (owner-approved)  |
+| Jul 16+ forward `migrate deploy` on production                     | `NOT_RUN` — **held** (separate release decision) |
 | Snapshot / PITR                                                    | `NOT_RUN`                                       |
 | Restore + schema verification + app smoke                          | `NOT_RUN`                                       |
 | Measured RTO (target 4h) / RPO (target 1h)                         | `NOT_RUN` — targets not achieved until measured |
