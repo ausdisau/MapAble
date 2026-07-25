@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
+import { useCallback, useEffect, useState } from "react";
 
 import { CareTransportAskPanel } from "@/components/care-transport/CareTransportAskPanel";
 import {
@@ -23,18 +23,25 @@ const DEFAULT_LAYERS: Record<CareTransportLayerKey, boolean> = {
   careProviders: true,
   infrastructure: true,
   trips: false,
+  foundationalSupports: false,
 };
 
 type Props = {
   addInfrastructureEnabled: boolean;
+  showFoundationalSupports?: boolean;
 };
 
-export function CareTransportMapShell({ addInfrastructureEnabled }: Props) {
+export function CareTransportMapShell({
+  addInfrastructureEnabled,
+  showFoundationalSupports = false,
+}: Props) {
   const { status } = useSession();
   const isSignedIn = status === "authenticated";
   const [layers, setLayers] =
     useState<Record<CareTransportLayerKey, boolean>>(DEFAULT_LAYERS);
   const [payload, setPayload] = useState<CareTransportMapPayload | null>(null);
+  const [foundationalSupports, setFoundationalSupports] =
+    useState<MapFeatureCollection | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [flyTo, setFlyTo] = useState<{
@@ -71,9 +78,57 @@ export function CareTransportMapShell({ addInfrastructureEnabled }: Props) {
     }
   }, [isSignedIn, layers.trips]);
 
+  const loadFoundational = useCallback(async () => {
+    if (!showFoundationalSupports || !layers.foundationalSupports) {
+      setFoundationalSupports(null);
+      return;
+    }
+    try {
+      const params = new URLSearchParams({
+        latitude: "-33.8688",
+        longitude: "151.2093",
+        radiusKm: "80",
+      });
+      const res = await fetch(`/api/navigator/supports?${params.toString()}`);
+      const data = await res.json();
+      if (!res.ok) {
+        setFoundationalSupports(emptyCollection());
+        return;
+      }
+      setFoundationalSupports({
+        type: "FeatureCollection",
+        features: (data.features ?? []).map(
+          (f: {
+            type: "Feature";
+            geometry: { type: "Point"; coordinates: [number, number] };
+            properties: Record<string, unknown>;
+          }) => ({
+            type: "Feature" as const,
+            geometry: f.geometry,
+            properties: {
+              kind: "foundational_support" as const,
+              id: String(f.properties.id ?? ""),
+              name: String(f.properties.name ?? "Foundational support"),
+              subtitle: String(
+                f.properties.subtitle ?? f.properties.category ?? ""
+              ),
+              layerId: "foundational-supports-layer",
+            },
+          })
+        ),
+      });
+    } catch {
+      setFoundationalSupports(emptyCollection());
+    }
+  }, [showFoundationalSupports, layers.foundationalSupports]);
+
   useEffect(() => {
     void loadMap();
   }, [loadMap]);
+
+  useEffect(() => {
+    void loadFoundational();
+  }, [loadFoundational]);
 
   const onMapActions = useCallback((actions: CareTransportMapAction[]) => {
     for (const action of actions) {
@@ -84,9 +139,12 @@ export function CareTransportMapShell({ addInfrastructureEnabled }: Props) {
               careProviders: false,
               infrastructure: false,
               trips: false,
+              foundationalSupports: prev.foundationalSupports,
             };
             for (const key of action.layers) {
-              next[key] = true;
+              if (key in next) {
+                next[key as CareTransportLayerKey] = true;
+              }
             }
             // Keep at least discovery layers if GPT only asked for trips while signed out.
             if (!next.careProviders && !next.infrastructure && !next.trips) {
@@ -120,6 +178,15 @@ export function CareTransportMapShell({ addInfrastructureEnabled }: Props) {
     if (key === "trips" && !isSignedIn) return;
     setLayers((prev) => ({ ...prev, [key]: !prev[key] }));
   };
+
+  const layerButtons: Array<[CareTransportLayerKey, string]> = [
+    ["careProviders", "Care providers"],
+    ["infrastructure", "Infrastructure"],
+    ["trips", "My trips"],
+  ];
+  if (showFoundationalSupports) {
+    layerButtons.push(["foundationalSupports", "Foundational supports"]);
+  }
 
   return (
     <MapProvider>
@@ -164,13 +231,7 @@ export function CareTransportMapShell({ addInfrastructureEnabled }: Props) {
         </div>
 
         <div className="flex flex-wrap gap-2" role="group" aria-label="Map layers">
-          {(
-            [
-              ["careProviders", "Care providers"],
-              ["infrastructure", "Infrastructure"],
-              ["trips", "My trips"],
-            ] as const
-          ).map(([key, label]) => {
+          {layerButtons.map(([key, label]) => {
             const disabled = key === "trips" && !isSignedIn;
             return (
               <button
@@ -225,6 +286,7 @@ export function CareTransportMapShell({ addInfrastructureEnabled }: Props) {
             careProviders={payload?.careProviders ?? emptyCollection()}
             infrastructure={payload?.infrastructure ?? emptyCollection()}
             trips={payload?.trips ?? null}
+            foundationalSupports={foundationalSupports}
             layers={layers}
             flyTo={flyTo}
             selectedId={selectedId}

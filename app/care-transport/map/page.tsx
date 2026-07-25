@@ -6,6 +6,7 @@ import {
   isAddInfrastructureEnabled,
   isCareTransportMapEnabled,
 } from "@/lib/config/care-transport-map";
+import { isFoundationalSupportsEnabled } from "@/lib/config/strategic-2026";
 
 export const metadata = {
   title: "Care + Transport map | MapAble",
@@ -38,6 +39,7 @@ export default function CareTransportMapPage() {
   return (
     <CareTransportMapShell
       addInfrastructureEnabled={isAddInfrastructureEnabled()}
+      showFoundationalSupports={isFoundationalSupportsEnabled()}
     />
   );
 }

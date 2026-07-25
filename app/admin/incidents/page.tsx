@@ -1,6 +1,8 @@
 import Link from "next/link";
 
+import { BehavioralRiskPanelScaffold } from "@/components/safety/BehavioralRiskPanelScaffold";
 import { requireAdmin } from "@/lib/auth/guards";
+import { isBehavioralRiskEnabled } from "@/lib/config/strategic-2026";
 import { prisma } from "@/lib/prisma";
 
 export default async function AdminIncidentsPage() {
@@ -13,6 +15,7 @@ export default async function AdminIncidentsPage() {
   return (
     <div className="space-y-6">
       <h1 className="font-heading text-2xl font-bold">Incident triage</h1>
+      {isBehavioralRiskEnabled() ? <BehavioralRiskPanelScaffold /> : null}
       <ul className="space-y-3">
         {incidents.map((i) => (
           <li key={i.id}>

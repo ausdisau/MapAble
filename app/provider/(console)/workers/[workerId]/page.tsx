@@ -2,9 +2,11 @@ import Link from "next/link";
 
 import { StatusTextBadge } from "@/components/phase3/StatusTextBadge";
 import { ProviderWorkerDetailActions } from "@/components/provider/ProviderWorkerDetailActions";
+import { RegistrationShieldStatus } from "@/components/provider/RegistrationShieldStatus";
 import { getUserOrganisationIds } from "@/lib/api/phase3-scope";
 import { requireAuth } from "@/lib/auth/guards";
 import { hasPermission } from "@/lib/auth/permissions";
+import { isPlatformShieldEnabled } from "@/lib/config/strategic-2026";
 import { prisma } from "@/lib/prisma";
 
 export default async function WorkerDetailPage({
@@ -48,6 +50,13 @@ export default async function WorkerDetailPage({
           displayName={profile.displayName}
           profileSummary={profile.profileSummary}
           active={profile.active}
+        />
+      ) : null}
+
+      {isPlatformShieldEnabled() && canManage ? (
+        <RegistrationShieldStatus
+          workerId={profile.id}
+          providerId={profile.organisationId}
         />
       ) : null}
 

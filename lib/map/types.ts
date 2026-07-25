@@ -5,7 +5,8 @@ export type MapEntityKind =
   | "user"
   | "care_provider"
   | "transport_infra"
-  | "trip_point";
+  | "trip_point"
+  | "foundational_support";
 
 export type MapPointEntity = {
   id: string;
