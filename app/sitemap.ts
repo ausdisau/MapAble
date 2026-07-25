@@ -13,8 +13,6 @@ const baseUrl = getCanonicalPublicOrigin();
  * `lib/public-informational/routes.ts` so the release boundary cannot drift.
  */
 const additionalPublicRoutes = [
-  "/marketplace",
-  "/foods",
   "/access",
   "/accessibility-map",
   "/providers",
@@ -31,6 +29,8 @@ const additionalPublicRoutes = [
   "/access-pass",
   "/peer",
   "/telehealth",
+  // Programme explainers also come from INFORMATIONAL_RELEASE_ROUTES;
+  // listed here only if needed beyond that inventory.
 ];
 
 function uniqueSitemapPaths(): string[] {

@@ -19,11 +19,15 @@ describe("shouldRunAuthMiddleware", () => {
     expect(shouldRunAuthMiddleware("/transport")).toBe(false);
     expect(shouldRunAuthMiddleware("/employment")).toBe(false);
     expect(shouldRunAuthMiddleware("/foods")).toBe(false);
+    expect(shouldRunAuthMiddleware("/kids")).toBe(false);
+    expect(shouldRunAuthMiddleware("/moves")).toBe(false);
+    expect(shouldRunAuthMiddleware("/marketplace")).toBe(false);
   });
 
-  it("guards the marketplace app shell", () => {
-    expect(shouldRunAuthMiddleware("/marketplace")).toBe(true);
+  it("guards transactional marketplace shop routes only", () => {
     expect(shouldRunAuthMiddleware("/marketplace/browse")).toBe(true);
+    expect(shouldRunAuthMiddleware("/marketplace/cart")).toBe(true);
+    expect(shouldRunAuthMiddleware("/marketplace/products/abc")).toBe(true);
   });
 
   it("guards authenticated module subroutes", () => {

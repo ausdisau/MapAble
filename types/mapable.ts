@@ -8,6 +8,7 @@ export type UserRole =
   | "driver"
   | "employer"
   | "plan_manager"
+  | "ambassador"
   | "mapable_admin";
 
 export type CommunicationPreference =

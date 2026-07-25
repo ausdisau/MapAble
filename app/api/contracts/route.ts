@@ -1,12 +1,6 @@
-import { requireApiAdmin } from "@/lib/api/auth-handler";
-import { jsonOk } from "@/lib/api/response";
-import { prisma } from "@/lib/prisma";
+import { postV1NotImplementedResponse } from "@/lib/governance/post-v1-stub";
 
+/** Year-One: smart contracts demoted — audit logs + attestations are primary. */
 export async function GET() {
-  const user = await requireApiAdmin();
-  if (user instanceof Response) return user;
-  const contracts = await prisma.smartContract.findMany({
-    orderBy: { code: "asc" },
-  });
-  return jsonOk({ contracts });
+  return postV1NotImplementedResponse();
 }

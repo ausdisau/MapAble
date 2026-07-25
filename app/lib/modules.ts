@@ -48,55 +48,14 @@ export function getModuleIcon(
   return moduleIcons[moduleKey]?.[style] || moduleIcons.main[style];
 }
 
-export const modules: MapAbleModule[] = [
-  {
-    key: "care",
-    name: "MapAble Care",
-    shortName: "Care",
-    tagline: "Compassionate Support",
-    description:
-      "Find and book qualified support workers for personalized care services",
-    logo: moduleIcons.care.organic,
-    icons: moduleIcons.care,
-    accent: "primary",
-    href: "/care",
-    features: ["Support Workers", "Care Plans", "Case Notes", "NDIS Funding"],
-  },
-  {
-    key: "transport",
-    name: "MapAble Transport",
-    shortName: "Transport",
-    tagline: "Accessible Journeys",
-    description: "Book accessible vehicles and rides for your travel needs",
-    logo: moduleIcons.transport.organic,
-    icons: moduleIcons.transport,
-    accent: "secondary",
-    href: "/transport",
-    features: [
-      "Wheelchair Access",
-      "Door-to-Door",
-      "Group Transport",
-      "Medical Trips",
-    ],
-  },
-  {
-    key: "jobs",
-    name: "MapAble Jobs",
-    shortName: "Jobs",
-    tagline: "Inclusive Employment",
-    description:
-      "Discover employment opportunities with disability-friendly employers",
-    logo: moduleIcons.jobs.organic,
-    icons: moduleIcons.jobs,
-    accent: "brand",
-    href: "/dashboard/jobs",
-    features: [
-      "Job Matching",
-      "Employer Network",
-      "Skills Training",
-      "Workplace Support",
-    ],
-  },
+/** Year-One registry: Core, Care, Transport, Jobs only. */
+export const YEAR_ONE_MODULE_KEYS = ["care", "transport", "jobs"] as const;
+
+/**
+ * Public programme explainers (informational GO) — not Year-One transactional
+ * product surfaces. Kept for icon/metadata lookups; excluded from `modules`.
+ */
+export const deferredModules: MapAbleModule[] = [
   {
     key: "foods",
     name: "MapAble Foods",
@@ -171,6 +130,57 @@ export const modules: MapAbleModule[] = [
   },
 ];
 
+export const modules: MapAbleModule[] = [
+  {
+    key: "care",
+    name: "MapAble Care",
+    shortName: "Care",
+    tagline: "Compassionate Support",
+    description:
+      "Find and book qualified support workers for personalized care services",
+    logo: moduleIcons.care.organic,
+    icons: moduleIcons.care,
+    accent: "primary",
+    href: "/care",
+    features: ["Support Workers", "Care Plans", "Case Notes", "NDIS Funding"],
+  },
+  {
+    key: "transport",
+    name: "MapAble Transport",
+    shortName: "Transport",
+    tagline: "Accessible Journeys",
+    description: "Book accessible vehicles and rides for your travel needs",
+    logo: moduleIcons.transport.organic,
+    icons: moduleIcons.transport,
+    accent: "secondary",
+    href: "/transport",
+    features: [
+      "Wheelchair Access",
+      "Door-to-Door",
+      "Group Transport",
+      "Medical Trips",
+    ],
+  },
+  {
+    key: "jobs",
+    name: "MapAble Jobs",
+    shortName: "Jobs",
+    tagline: "Inclusive Employment",
+    description:
+      "Discover employment opportunities with disability-friendly employers",
+    logo: moduleIcons.jobs.organic,
+    icons: moduleIcons.jobs,
+    accent: "brand",
+    href: "/dashboard/jobs",
+    features: [
+      "Job Matching",
+      "Employer Network",
+      "Skills Training",
+      "Workplace Support",
+    ],
+  },
+];
+
 export const mainModule = {
   key: "main",
   name: "MapAble",
@@ -183,5 +193,8 @@ export const mainModule = {
 };
 
 export function getModuleByKey(key: string): MapAbleModule | undefined {
-  return modules.find((m) => m.key === key);
+  return (
+    modules.find((m) => m.key === key) ??
+    deferredModules.find((m) => m.key === key)
+  );
 }

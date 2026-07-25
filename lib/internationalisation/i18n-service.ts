@@ -1,7 +1,12 @@
 import { phase9Config } from "@/lib/config/phase9";
+import {
+  SUPPORTED_LOCALES,
+  isSupportedLocale,
+  type MapAbleLocale,
+} from "@/lib/nz-schemes";
 import { prisma } from "@/lib/prisma";
 
-const DEFAULT_LOCALE = "en-AU";
+const DEFAULT_LOCALE: MapAbleLocale = "en-AU";
 
 export async function upsertTranslation(params: {
   locale: string;
@@ -26,14 +31,15 @@ export async function upsertTranslation(params: {
 }
 
 export async function getTranslations(locale: string, namespace = "common") {
+  const resolved = isSupportedLocale(locale) ? locale : DEFAULT_LOCALE;
   if (!phase9Config.internationalisationEnabled) {
-    return { locale: DEFAULT_LOCALE, strings: {} as Record<string, string> };
+    return { locale: resolved, strings: {} as Record<string, string> };
   }
   const rows = await prisma.localeTranslation.findMany({
-    where: { locale, namespace },
+    where: { locale: resolved, namespace },
   });
   const strings = Object.fromEntries(rows.map((r) => [r.key, r.value]));
-  return { locale, namespace, strings };
+  return { locale: resolved, namespace, strings };
 }
 
 export async function listSupportedLocales() {
@@ -41,5 +47,11 @@ export async function listSupportedLocales() {
     select: { locale: true },
     distinct: ["locale"],
   });
-  return locales.length ? locales.map((l) => l.locale) : [DEFAULT_LOCALE];
+  const fromDb = locales.map((l) => l.locale);
+  const merged = new Set<string>([...SUPPORTED_LOCALES, ...fromDb]);
+  return [...merged];
+}
+
+export function getFoundationLocales(): readonly MapAbleLocale[] {
+  return SUPPORTED_LOCALES;
 }

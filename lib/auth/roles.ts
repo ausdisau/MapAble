@@ -12,8 +12,11 @@ export const ALL_ROLES: UserRole[] = [
   "driver",
   "employer",
   "plan_manager",
+  "ambassador",
   "mapable_admin",
 ];
+
+export const AMBASSADOR_ROLES: UserRole[] = ["ambassador"];
 
 export const ADMIN_ROLES: UserRole[] = ["mapable_admin"];
 
@@ -43,9 +46,14 @@ export function roleLabel(role: UserRole | MapAbleUserRole): string {
     driver: "Driver",
     employer: "Employer",
     plan_manager: "Plan manager",
+    ambassador: "MapAble Ambassador",
     mapable_admin: "MapAble admin",
   };
   return labels[role] ?? role;
+}
+
+export function isAmbassadorRole(role: UserRole | MapAbleUserRole): boolean {
+  return role === "ambassador";
 }
 
 export function defaultDashboardPath(role: UserRole | MapAbleUserRole): string {
@@ -53,5 +61,6 @@ export function defaultDashboardPath(role: UserRole | MapAbleUserRole): string {
   if (role === "provider_admin" || role === "transport_operator") {
     return "/provider";
   }
+  if (isAmbassadorRole(role)) return "/ambassador";
   return "/dashboard";
 }

@@ -80,6 +80,42 @@ export function MapAbleMarketingFooter() {
               <li>
                 <Link
                   prefetch={false}
+                  href="/marketplace"
+                  className="text-muted-foreground transition hover:text-primary"
+                >
+                  Marketplace
+                </Link>
+              </li>
+              <li>
+                <Link
+                  prefetch={false}
+                  href="/foods"
+                  className="text-muted-foreground transition hover:text-primary"
+                >
+                  Foods
+                </Link>
+              </li>
+              <li>
+                <Link
+                  prefetch={false}
+                  href="/kids"
+                  className="text-muted-foreground transition hover:text-primary"
+                >
+                  Kids
+                </Link>
+              </li>
+              <li>
+                <Link
+                  prefetch={false}
+                  href="/moves"
+                  className="text-muted-foreground transition hover:text-primary"
+                >
+                  Moves
+                </Link>
+              </li>
+              <li>
+                <Link
+                  prefetch={false}
                   href="/providers"
                   className="text-muted-foreground transition hover:text-primary"
                 >
