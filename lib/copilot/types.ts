@@ -15,7 +15,32 @@ export type CopilotIntentType =
   | "health"
   | "unknown";
 
-export type CopilotAskContext = "default" | "provider_finder";
+export type CopilotAskContext =
+  | "default"
+  | "provider_finder"
+  | "care_transport_map";
+
+export type CareTransportMapAction =
+  | {
+      type: "flyTo";
+      lat: number;
+      lng: number;
+      zoom?: number;
+      label?: string;
+    }
+  | {
+      type: "setLayers";
+      layers: Array<"careProviders" | "infrastructure" | "trips">;
+    }
+  | {
+      type: "highlightIds";
+      ids: string[];
+    }
+  | {
+      type: "suggestInfrastructure";
+      href: string;
+      prompt?: string;
+    };
 
 export type CopilotMode =
   | "All"
@@ -185,6 +210,8 @@ export type CopilotAskResponse = {
   blockedActions: CopilotAction[];
   /** Provider Finder NL search payload when applicable */
   finder?: CopilotFinderPayload;
+  /** Care + Transport map actions when context is care_transport_map */
+  mapActions?: CareTransportMapAction[];
   /** NDIS directory matches (serialisable). */
   results?: CopilotProviderResult[];
   suggestedPrompts?: string[];

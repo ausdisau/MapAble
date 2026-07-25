@@ -2,6 +2,7 @@ import { ModuleCanvasSection } from "@/components/canvas/ModuleCanvasSection";
 import { PublicModulePage } from "@/components/marketing/PublicModulePage";
 import { TransportFeatureStatus } from "@/components/transport/TransportFeatureStatus";
 import { canonicalAlternate } from "@/lib/config/canonical-url";
+import { isCareTransportMapEnabled } from "@/lib/config/care-transport-map";
 import { transportFeatureSummaries } from "@/lib/transport/feature-status";
 
 export const metadata = {
@@ -12,6 +13,8 @@ export const metadata = {
 };
 
 export default function TransportHubPage() {
+  const mapEnabled = isCareTransportMapEnabled();
+
   return (
     <>
       <PublicModulePage
@@ -44,10 +47,17 @@ export default function TransportHubPage() {
           label: "Request transport (signed in)",
           href: "/transport/request",
         }}
-        secondaryCta={{
-          label: "Find transport providers",
-          href: "/providers?service=transport",
-        }}
+        secondaryCta={
+          mapEnabled
+            ? {
+                label: "Open Care + Transport map",
+                href: "/care-transport/map",
+              }
+            : {
+                label: "Find transport providers",
+                href: "/providers?service=transport",
+              }
+        }
       />
       <TransportFeatureStatus />
       <ModuleCanvasSection module="transport" />

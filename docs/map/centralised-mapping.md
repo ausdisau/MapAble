@@ -24,11 +24,15 @@ MapAble maps share types, GeoJSON builders, entity mappers, and MapLibre configu
 | `PROVIDER_FINDER_MAP_PIN_LIMIT` | `500` | Max pins per map response |
 | `MAP_GEOCODING_NOMINATIM_ENABLED` | `false` | Server forward geocode fallback |
 | `ACCESS_MAP_OVERLAY_ENABLED` | `false` | Future: access places on Finder map |
+| `CARE_TRANSPORT_MAP_ENABLED` | `false` | Care + Transport GPT/OSM map |
+| `ADD_INFRASTRUCTURE_ENABLED` | `false` | GPT-assisted infrastructure suggest |
 
 ## API
 
 - `GET /api/providers/ndis/search` — NDIS directory search (includes lat/lng when present).
 - `GET /api/providers/map` — GeoJSON pins for Provider Finder when `PROVIDER_FINDER_MAP_SOURCE` is `ndis` or `hybrid`.
+- `GET /api/care-transport/map` — Care providers + infrastructure (+ masked trips when signed in). See `docs/modules/care-transport-map.md`.
+- `POST /api/infrastructure/draft` — draft moderated Care/Transport place fields.
 
 ## Code layout
 
@@ -38,7 +42,12 @@ MapAble maps share types, GeoJSON builders, entity mappers, and MapLibre configu
 - `lib/map/geocoding-service.ts` — suburb/postcode → coordinates
 - `components/map/MapLibreMap.tsx` — Provider Finder map
 - `components/access/AccessMapLayer.tsx` — Access map (shared style via `MapProvider`)
+- `components/care-transport/*` — Care + Transport map + add-infrastructure UI
 
 ## Extension: access overlay on Finder
 
 When `ACCESS_MAP_OVERLAY_ENABLED=true`, add a second GeoJSON source (`MAP_SOURCE_IDS.accessPlaces`) to `MapLibreMap` — not enabled in v1.
+
+## Care + Transport map
+
+See `docs/modules/care-transport-map.md` for layers, Ask context `care_transport_map`, and privacy rules.

@@ -89,8 +89,14 @@ Flag: `MAPABLE_CARE_RECURRING_SCHEDULES_ENABLED` (default **false**).
 `tests/care-mvp.test.ts` — permissions, worker eligibility, participant access helpers.  
 Care↔Billing adapters under `tests/**/care-transport-billing*`.
 
+## Care + Transport map (flagged)
+
+Pilot GPT/OSM map at `/care-transport/map` (flag `CARE_TRANSPORT_MAP_ENABLED`, default false).
+See `docs/modules/care-transport-map.md`. `/care/find` links to the map when enabled.
+
 ## Related
 
+- `docs/modules/care-transport-map.md`
 - `docs/productisation/CARE_TRANSPORT_BILLING_SLICE.md`
 - `docs/productisation/CAPABILITY_REGISTRY.md`
 - `docs/strategy/OPERATING_LANES.md`

@@ -38,3 +38,23 @@ export function getProviderCirclePaint(): CircleLayerSpecification["paint"] {
     "circle-stroke-color": colors.white,
   };
 }
+
+export function getInfrastructureCirclePaint(): CircleLayerSpecification["paint"] {
+  const colors = getMapMarkerColors();
+  return {
+    "circle-radius": 7,
+    "circle-color": colors.secondary,
+    "circle-stroke-width": 2,
+    "circle-stroke-color": colors.white,
+  };
+}
+
+export function getTripPointCirclePaint(): CircleLayerSpecification["paint"] {
+  const colors = getMapMarkerColors();
+  return {
+    "circle-radius": 9,
+    "circle-color": colors.destructive,
+    "circle-stroke-width": 2,
+    "circle-stroke-color": colors.white,
+  };
+}

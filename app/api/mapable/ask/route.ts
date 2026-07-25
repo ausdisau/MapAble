@@ -11,6 +11,7 @@ import { checkIpRateLimit, getClientIp } from "@/lib/api/ip-rate-limit";
 import { getOptionalApiUser } from "@/lib/api/optional-session";
 import { apiForbidden } from "@/lib/auth/guards";
 import { shouldRouteToBookingAgent } from "@/lib/bookings/rag/copilot-route";
+import { planCareTransportMapActions } from "@/lib/care-transport-map/map-actions";
 import { planCopilotActions } from "@/lib/copilot/actionPlanner";
 import { buildCopilotContext } from "@/lib/copilot/contextBuilder";
 import { applyGuardrails } from "@/lib/copilot/guardrails";
@@ -30,6 +31,55 @@ import {
   serialiseFinderPayload,
   type ProviderFinderSessionFields,
 } from "@/lib/provider-finder/ask-bridge";
+
+function parseAskContext(raw: unknown): CopilotAskContext {
+  if (raw === "provider_finder") return "provider_finder";
+  if (raw === "care_transport_map") return "care_transport_map";
+  return "default";
+}
+
+function buildCareTransportMapAskResponse(query: string): CopilotAskResponse {
+  const planned = planCareTransportMapActions(query);
+  return {
+    source: "mapable-copilot",
+    intent: "places",
+    confidence: 0.85,
+    summary: planned.summary,
+    answer: planned.answer,
+    filters: {},
+    actions: planned.mapActions.some((a) => a.type === "suggestInfrastructure")
+      ? [
+          {
+            type: "GUIDANCE_ONLY",
+            label: "Open Add infrastructure",
+            requiresConfirmation: false,
+          },
+        ]
+      : [
+          {
+            type: "GUIDANCE_ONLY",
+            label: "Update map layers",
+            requiresConfirmation: false,
+          },
+        ],
+    draftRecords: [],
+    requiredConfirmations: [],
+    warnings: [
+      {
+        level: "info",
+        message:
+          "Pilot Care + Transport map. Discovery pins only; trip addresses stay role-gated. Nothing is written to OpenStreetMap.org.",
+      },
+    ],
+    blockedActions: [],
+    mapActions: planned.mapActions,
+    suggestedPrompts: [
+      "Care providers near Parramatta",
+      "Show accessible pickup points in Sydney",
+      "Add a care support hub in Newcastle",
+    ],
+  };
+}
 
 const OPERATION = DISABILITY_AGENT_OPERATIONS.mapableAskQuery;
 const MAX_QUERY_LENGTH = 2000;
@@ -201,8 +251,7 @@ export async function POST(request: Request) {
       typeof body.query === "string" ? body.query.trim() : "";
     const mode =
       typeof body.mode === "string" ? body.mode : "All";
-    const context: CopilotAskContext =
-      body.context === "provider_finder" ? "provider_finder" : "default";
+    const context = parseAskContext(body.context);
     const participantId =
       typeof body.participantId === "string"
         ? body.participantId
@@ -238,6 +287,13 @@ export async function POST(request: Request) {
         error: "Your message is too long. Please shorten it and try again.",
         code: "VALIDATION_ERROR",
         retryable: false,
+      });
+    }
+
+    if (context === "care_transport_map") {
+      return disabilityAgentJsonOk(OPERATION, {
+        ...buildCareTransportMapAskResponse(query),
+        operationId: OPERATION,
       });
     }
 
@@ -430,6 +486,12 @@ function buildSuggestedPrompts(
         "OT near Parramatta",
         "Support worker with Auslan",
         "Registered provider in Newcastle",
+      ];
+    case "places":
+      return [
+        "Care providers near Parramatta",
+        "Show accessible pickup points in Sydney",
+        "Add a care support hub in Newcastle",
       ];
     case "combined":
       return [

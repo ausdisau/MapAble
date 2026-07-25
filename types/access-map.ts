@@ -19,6 +19,9 @@ export const accessPlaceCategorySchema = z.enum([
   "accommodation",
   "tourism_attraction",
   "government_service",
+  "care_support_hub",
+  "accessible_pickup_point",
+  "transport_depot",
   "other",
 ]);
 
