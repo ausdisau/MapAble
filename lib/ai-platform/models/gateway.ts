@@ -1,6 +1,6 @@
 import { google } from "@ai-sdk/google";
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
-import { gateway } from "ai";
+import { gateway, type LanguageModel } from "ai";
 import type { ZodType } from "zod";
 
 import { requireAiCapability } from "@/lib/ai-platform/capabilities/registry";
@@ -24,10 +24,7 @@ export type GatewayResolveInput = {
   taskModelId?: string;
 };
 
-export type GatewayResolvedModel =
-  | ReturnType<typeof gateway>
-  | ReturnType<typeof google>
-  | ReturnType<ReturnType<typeof createOpenAICompatible>>;
+export type GatewayResolvedModel = LanguageModel;
 
 export type GatewayResolveResult =
   | {
@@ -107,7 +104,8 @@ export function resolveModelForCapability(
     const apiModelId = gptOssApiModelId(rawModelId);
     return {
       ok: true,
-      model: provider(apiModelId),
+      // openai-compatible emits LanguageModelV4; AI SDK 6 LanguageModel is V2/V3.
+      model: provider(apiModelId) as unknown as LanguageModel,
       modelId,
       engineId: `ai-sdk/openai-compatible/${apiModelId}`,
     };

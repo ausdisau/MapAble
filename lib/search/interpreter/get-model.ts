@@ -1,6 +1,6 @@
 import { google } from "@ai-sdk/google";
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
-import { gateway } from "ai";
+import { gateway, type LanguageModel } from "ai";
 
 import {
   canonicalizeInterpreterModelId,
@@ -27,7 +27,13 @@ export function getInterpreterEngineId(): string {
   return `ai-sdk/google/${stripGooglePrefix(searchInterpreterConfig.modelId)}`;
 }
 
-export function getInterpreterModel() {
+/**
+ * Returns a model usable by AI SDK `streamText` / `generateObject` / `ToolLoopAgent`.
+ *
+ * `@ai-sdk/openai-compatible` currently exposes LanguageModelV4; AI SDK 6's
+ * `LanguageModel` union is still V2/V3, so the self-hosted path is cast.
+ */
+export function getInterpreterModel(): LanguageModel {
   if (!isSearchInterpreterConfigured()) {
     throw new Error("Search interpreter is not configured");
   }
@@ -42,7 +48,9 @@ export function getInterpreterModel() {
       baseURL: searchInterpreterConfig.gptOssBaseUrl,
       apiKey: searchInterpreterConfig.gptOssApiKey || undefined,
     });
-    return provider(gptOssApiModelId(modelId));
+    return provider(
+      gptOssApiModelId(modelId),
+    ) as unknown as LanguageModel;
   }
 
   if (searchInterpreterConfig.aiGatewayApiKey) {
