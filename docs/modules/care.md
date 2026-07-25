@@ -94,3 +94,4 @@ Care↔Billing adapters under `tests/**/care-transport-billing*`.
 - `docs/productisation/CARE_TRANSPORT_BILLING_SLICE.md`
 - `docs/productisation/CAPABILITY_REGISTRY.md`
 - `docs/strategy/OPERATING_LANES.md`
+- [caregpt.md](./caregpt.md) — **CareGPT** (controlled_pilot design; participant conversational front door; not implemented)
