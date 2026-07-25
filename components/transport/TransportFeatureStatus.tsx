@@ -14,22 +14,22 @@ const STATUS_ORDER: TransportFeatureAvailability[] = [
 
 const TONE: Record<
   TransportFeatureAvailability,
-  { panel: string; badge: string }
+  { rule: string; badge: string }
 > = {
   available_now: {
-    panel: "border-[#005B7F]/15 bg-[#005B7F]/5",
+    rule: "border-[#005B7F]",
     badge: "bg-[#005B7F] text-white",
   },
   pilot_sandbox: {
-    panel: "border-amber-300/60 bg-amber-50",
+    rule: "border-amber-600",
     badge: "bg-amber-700 text-white",
   },
   coming_next: {
-    panel: "border-slate-200 bg-slate-50",
+    rule: "border-slate-400",
     badge: "bg-slate-600 text-white",
   },
   requires_partner: {
-    panel: "border-[#00A979]/25 bg-[#00A979]/5",
+    rule: "border-[#00A979]",
     badge: "bg-[#0C1833] text-white",
   },
 };
@@ -59,51 +59,50 @@ export function TransportFeatureStatus({
   return (
     <section
       aria-labelledby="transport-feature-status-heading"
-      className="mx-auto max-w-6xl px-5 py-12 lg:px-8"
+      className="transport-public-section border-b border-slate-200 bg-white"
     >
-      <div className="mb-8 max-w-2xl">
-        <h2
-          id="transport-feature-status-heading"
-          className="mapable-display text-2xl font-black tracking-[-0.04em] text-[#0C1833] sm:text-3xl"
-        >
-          {heading}
-        </h2>
-        <p className="mt-2 text-sm leading-6 text-slate-600">{description}</p>
-      </div>
+      <div className="mx-auto max-w-7xl px-5 py-16 lg:px-8 lg:py-20">
+        <div className="mb-10 max-w-2xl">
+          <h2
+            id="transport-feature-status-heading"
+            className="mapable-display text-3xl font-black tracking-[-0.04em] text-[#0C1833] sm:text-4xl"
+          >
+            {heading}
+          </h2>
+          <p className="mt-3 text-base leading-7 text-slate-600">{description}</p>
+        </div>
 
-      <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-        {STATUS_ORDER.map((status) => {
-          const list = grouped[status];
-          const tone = TONE[status];
-          return (
-            <article
-              key={status}
-              className={`rounded-[1.5rem] border p-5 ${tone.panel}`}
-            >
-              <h3 className="flex flex-wrap items-center gap-2 text-lg font-black text-[#0C1833]">
-                <span
-                  className={`inline-flex rounded-full px-2.5 py-1 text-xs font-bold uppercase tracking-wide ${tone.badge}`}
-                >
-                  {TRANSPORT_FEATURE_STATUS_LABELS[status]}
-                </span>
-              </h3>
-              {list.length === 0 ? (
-                <p className="mt-4 text-sm text-slate-600" role="status">
-                  None listed for this label.
-                </p>
-              ) : (
-                <ul className="mt-4 space-y-4">
-                  {list.map((item) => (
-                    <li key={item.id} className="text-sm leading-6 text-slate-700">
-                      <p className="font-bold text-[#0C1833]">{item.title}</p>
-                      <p className="mt-1">{item.summary}</p>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </article>
-          );
-        })}
+        <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-4">
+          {STATUS_ORDER.map((status) => {
+            const list = grouped[status];
+            const tone = TONE[status];
+            return (
+              <div key={status} className={`border-t-4 pt-5 ${tone.rule}`}>
+                <h3 className="text-base font-black text-[#0C1833]">
+                  <span
+                    className={`inline-flex rounded-md px-2.5 py-1 text-xs font-bold uppercase tracking-wide ${tone.badge}`}
+                  >
+                    {TRANSPORT_FEATURE_STATUS_LABELS[status]}
+                  </span>
+                </h3>
+                {list.length === 0 ? (
+                  <p className="mt-4 text-sm text-slate-600" role="status">
+                    None listed for this label.
+                  </p>
+                ) : (
+                  <ul className="mt-4 space-y-5">
+                    {list.map((item) => (
+                      <li key={item.id} className="text-sm leading-6 text-slate-700">
+                        <p className="font-bold text-[#0C1833]">{item.title}</p>
+                        <p className="mt-1">{item.summary}</p>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
     </section>
   );
