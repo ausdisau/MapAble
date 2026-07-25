@@ -285,6 +285,8 @@ Treat live reconciliation as **`OWNER_ACTION_REQUIRED`** until a fresh read-only
 | When (UTC) | Decision | Notes |
 | ---------- | -------- | ----- |
 | 2026-07-25 | Phase 1 audit published | No migration.sql edits |
-| 2026-07-25 | **A-continue** approved | Owner reconciliation pack authored; no prod writes from agent |
+| 2026-07-25 | **A-continue** approved | Reconciliation pack authored |
+| 2026-07-25 | Staging rehearsal | Neon `wave1-migration-rehearsal` §3 SQL `VERIFIED` |
+| 2026-07-25 | Production §3 SQL applied | Explicit approval; checksums aligned; Jul 16+ deploy still held |
 
-**Owner next action:** create Neon branch from `production`, rehearse §3 of the A-continue doc, then apply to production under snapshot/PITR.
+**Remaining:** separate release decision for Jul 16+ `migrate deploy` on production (out of A-continue scope).

@@ -241,7 +241,7 @@ Rename rollback: rename `20260525010000_ndis_direct_claiming` back to `202605250
 | Strategy decision A-continue | `VERIFIED` (human approved) |
 | Fresh prod `_prisma_migrations` export | `VERIFIED` (2026-07-25) |
 | Staging clone rehearsal | **`VERIFIED`** on Neon branch `wave1-migration-rehearsal` (`br-odd-flower-a79knhk5`, parent `production`) — 2026-07-25 |
-| Prod rename + checksum SQL | `NOT_RUN` — awaiting explicit owner go-ahead after rehearsal |
+| Prod rename + checksum SQL | **`VERIFIED`** applied to Neon `production` (`br-rough-bush-a7mlsbdx`) — 2026-07-25 after explicit owner approval |
 | Forward `migrate deploy` of Jul 16+ migrations on prod | `NOT_RUN` — **held** (separate release decision) |
 | Migration SQL edits in this workstream | **None** (honoured) |
 
@@ -260,7 +260,18 @@ After §3 SQL on the clone:
   - **12** not-yet-applied repo migrations (`20260716120000_…` … `20260720120000_at_continuity_wave1`) — **do not deploy in this pack**
   - **5** DB-only orphan names (`go_live_roadmap`, `donations`, `provider_outlet_classifications`, `abilitypay_mvp`, `access_marker_feedback`) — keep per Step 4
 
-Production `production` branch was **not** mutated in the rehearsal.
+### 5.2 Production apply evidence
+
+**Approved phrase:** `yes, apply §3 SQL to Neon production`  
+**Target:** Neon `mapableau` / `production` / `br-rough-bush-a7mlsbdx`  
+**Scope:** `_prisma_migrations` bookkeeping only (rename + checksum `UPDATE`/`DELETE`). No DDL. No `migrate deploy`.
+
+Post-apply verification:
+
+- Rename resolved: finished `20260525010000_ndis_direct_claiming` only; old `20260525000000_ndis_direct_claiming` gone.
+- `access_phase_1` checksum now `4e6d7d1f…` (was `52ecc3b7…`).
+- Compare helper: **`checksumMismatches: []`** against [artifacts/production-prisma-migrations-finished-post-a-continue-2026-07-25.json](./artifacts/production-prisma-migrations-finished-post-a-continue-2026-07-25.json).
+- `prisma migrate status` (redacted): [artifacts/production-migrate-status-after-a-continue-2026-07-25.txt](./artifacts/production-migrate-status-after-a-continue-2026-07-25.txt) — no modified-checksum language; 12 pending Jul 16+ migrations still held; 5 orphan DB-only names retained.
 
 ---
 
