@@ -72,3 +72,4 @@ maturity and wording allowed by the public claim registry.
 - [OPERATING_LANES.md](./OPERATING_LANES.md)
 - [BUILD_PARTNER_DEFER.md](./BUILD_PARTNER_DEFER.md)
 - [STRATEGIC_OPPORTUNITIES.md](./STRATEGIC_OPPORTUNITIES.md)
+- [BUSINESS_PLAN_ANZ_GAP_ANALYSIS.md](./BUSINESS_PLAN_ANZ_GAP_ANALYSIS.md) — gap vs ANZ business plan pillars (Care / Transport / Marketplace)
