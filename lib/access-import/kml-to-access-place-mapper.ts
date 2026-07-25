@@ -12,6 +12,10 @@ const CATEGORY_HINTS: Record<string, AccessPlaceCategory> = {
   museum: "museum_gallery",
   toilet: "public_toilet",
   transport: "transport_station",
+  depot: "transport_depot",
+  pickup: "accessible_pickup_point",
+  "care hub": "care_support_hub",
+  "support hub": "care_support_hub",
 };
 
 export function inferCategory(

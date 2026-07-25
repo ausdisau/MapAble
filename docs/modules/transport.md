@@ -50,8 +50,16 @@
 2. Recurring Care + journey integration (programme PR 3–4)
 3. Return-journey recovery with Continuity (PR 5)
 
+## Care + Transport map (flagged)
+
+Pilot GPT/OSM map at `/care-transport/map` (flag `CARE_TRANSPORT_MAP_ENABLED`, default false).
+Public discovery pins only; trip points require sign-in and use staged location disclosure.
+Infrastructure suggest: `/add-infrastructure` (`ADD_INFRASTRUCTURE_ENABLED`).
+See `docs/modules/care-transport-map.md`.
+
 ## Related
 
+- `docs/modules/care-transport-map.md`
 - `docs/transport/*` (product requirements, ADRs, implementation checklist)
 - `docs/productisation/CARE_TRANSPORT_BILLING_SLICE.md`
 - `docs/productisation/CAPABILITY_REGISTRY.md`

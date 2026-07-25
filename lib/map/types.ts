@@ -1,5 +1,11 @@
 /** Entity kinds rendered on MapAble maps. */
-export type MapEntityKind = "provider" | "access_place" | "user";
+export type MapEntityKind =
+  | "provider"
+  | "access_place"
+  | "user"
+  | "care_provider"
+  | "transport_infra"
+  | "trip_point";
 
 export type MapPointEntity = {
   id: string;

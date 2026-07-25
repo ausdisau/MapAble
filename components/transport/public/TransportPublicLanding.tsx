@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { ModuleCanvasSection } from "@/components/canvas/ModuleCanvasSection";
 import { TransportFeatureStatus } from "@/components/transport/TransportFeatureStatus";
+import { isCareTransportMapEnabled } from "@/lib/config/care-transport-map";
 import {
   mapableCareFocusRing,
   mapableInteractiveFocusRing,
@@ -228,7 +229,16 @@ function NextStepsSection() {
           </Link>
         </div>
         <ul className="mt-10 flex flex-wrap gap-x-6 gap-y-3">
-          {TRANSPORT_PUBLIC_NEXT_LINKS.map((link) => (
+          {(isCareTransportMapEnabled()
+            ? [
+                {
+                  label: "Care + Transport map",
+                  href: "/care-transport/map",
+                },
+                ...TRANSPORT_PUBLIC_NEXT_LINKS,
+              ]
+            : TRANSPORT_PUBLIC_NEXT_LINKS
+          ).map((link) => (
             <li key={link.href}>
               <Link href={link.href} className={tertiaryLink}>
                 {link.label}
