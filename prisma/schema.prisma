@@ -65,6 +65,7 @@ model User {
 
   careRequests              CareRequest[]      @relation("CareRequestParticipant")
   careRequestsCreated       CareRequest[]      @relation("CareRequestCreatedBy")
+  iCanV6IntakeSubmissions   ICanV6IntakeSubmission[] @relation("ICanV6IntakeParticipant")
   careBookings              CareBooking[]      @relation("CareBookingParticipant")
   careShifts                CareShift[]        @relation("CareShiftParticipant")
   careShiftsApproved        CareShift[]        @relation("CareShiftApprovedBy")
@@ -1591,6 +1592,20 @@ enum OrchestrationEventType {
   interview_transport_draft_created
   invoice_from_care_shift
   care_request_submitted
+}
+
+/// Participant I-CAN v6 intake draft/submission for New Framework Planning prep.
+/// Not an NDIA claim and not a clinical system of record.
+model ICanV6IntakeSubmission {
+  id            String   @id @default(cuid())
+  participantId String
+  participant   User     @relation("ICanV6IntakeParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  status        String   @default("submitted_draft")
+  payload       Json
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([participantId, createdAt])
 }
 
 model CareRequest {
