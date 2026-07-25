@@ -20,18 +20,15 @@ export const infrastructureDraftSchema = z.object({
 
 export type InfrastructureDraft = z.infer<typeof infrastructureDraftSchema>;
 
-const INFRA_CATEGORIES = [
-  "care_support_hub",
-  "accessible_pickup_point",
-  "transport_depot",
-  "transport_station",
-  "health_service",
-  "community_centre",
-] as const;
+type InfraCategory =
+  | "care_support_hub"
+  | "accessible_pickup_point"
+  | "transport_depot"
+  | "transport_station"
+  | "health_service"
+  | "community_centre";
 
-function inferCategory(
-  text: string,
-): (typeof INFRA_CATEGORIES)[number] | "other" {
+function inferCategory(text: string): InfraCategory | "other" {
   const t = text.toLowerCase();
   if (/\b(depot|garage|fleet)\b/.test(t)) return "transport_depot";
   if (/\b(pickup|drop[- ]?off|kerbside)\b/.test(t)) {
