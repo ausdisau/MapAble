@@ -47,10 +47,17 @@ const OpenStreetMapView = dynamic(
   },
 );
 
+const LIST_PAGE_SIZE = 80;
+/** Soft cap so Leaflet stays responsive with the full MapAble ADL import. */
+const MAP_MARKER_SOFT_LIMIT = 1000;
+
+
 export function AccessibilityMapLanding({
   initialPlaces = DEMO_ACCESS_PLACES,
+  dataSourceNote,
 }: {
   initialPlaces?: DemoAccessPlace[];
+  dataSourceNote?: string;
 }) {
   const [location, setLocation] = useState("");
   const [placeType, setPlaceType] = useState("");
@@ -63,6 +70,7 @@ export function AccessibilityMapLanding({
   const [needs, setNeeds] = useState(EMPTY_ACCESS_NEEDS);
   const [useDemoNeeds, setUseDemoNeeds] = useState(false);
   const [mapPinStatus, setMapPinStatus] = useState("");
+  const [listLimit, setListLimit] = useState(LIST_PAGE_SIZE);
   const cardRefs = useRef<Record<string, HTMLElement | null>>({});
   const online = useOnlineStatus();
 
@@ -106,6 +114,51 @@ export function AccessibilityMapLanding({
     transportOption,
     verification,
   ]);
+
+  const listPlaces = useMemo(
+    () => places.slice(0, listLimit),
+    [places, listLimit],
+  );
+  const hasMoreList = places.length > listPlaces.length;
+
+  const mapPlaces = useMemo(() => {
+    if (places.length <= MAP_MARKER_SOFT_LIMIT) return places;
+    const demos = places.filter((p) => p.isDemo);
+    const partner = places.filter((p) => !p.isDemo);
+    const hasActiveSearch = Boolean(
+      query.trim() ||
+        location.trim() ||
+        placeType ||
+        selectedFilters.length ||
+        transportOption ||
+        verification,
+    );
+    if (hasActiveSearch) {
+      return places.slice(0, MAP_MARKER_SOFT_LIMIT);
+    }
+    // Default map: demos + partner pins excluding stairs-heavy noise first.
+    const preferred = partner.filter(
+      (p) => !/stairs/i.test(p.topAccessFacts[0] ?? "") && !/stairs/i.test(p.name),
+    );
+    const filler = partner.filter((p) => !preferred.includes(p));
+    const budget = Math.max(0, MAP_MARKER_SOFT_LIMIT - demos.length);
+    return [...demos, ...preferred.slice(0, budget), ...filler].slice(
+      0,
+      MAP_MARKER_SOFT_LIMIT,
+    );
+  }, [
+    places,
+    query,
+    location,
+    placeType,
+    selectedFilters.length,
+    transportOption,
+    verification,
+  ]);
+
+  useEffect(() => {
+    setListLimit(LIST_PAGE_SIZE);
+  }, [query, location, placeType, selectedFilters, transportOption, verification]);
 
   const activeNeeds = useDemoNeeds ? DEMO_ACCESS_NEEDS : needs;
 
@@ -164,17 +217,28 @@ export function AccessibilityMapLanding({
   }
 
   const listFallback = (
-    <ul className="mt-4 space-y-4" aria-label="Accessible places list fallback">
-      {places.map((place) => (
-        <li key={place.id}>
-          <VenueListCard
-            place={place}
-            activeNeeds={activeNeeds}
-            isSelected={selectedId === place.id}
-          />
-        </li>
-      ))}
-    </ul>
+    <div className="mt-4 space-y-4">
+      <ul className="space-y-4" aria-label="Accessible places list fallback">
+        {listPlaces.map((place) => (
+          <li key={place.id}>
+            <VenueListCard
+              place={place}
+              activeNeeds={activeNeeds}
+              isSelected={selectedId === place.id}
+            />
+          </li>
+        ))}
+      </ul>
+      {hasMoreList ? (
+        <button
+          type="button"
+          className={`min-h-11 rounded-xl border border-slate-300 px-4 text-sm font-semibold ${mapableInteractiveFocusRing}`}
+          onClick={() => setListLimit((n) => n + LIST_PAGE_SIZE)}
+        >
+          Show more ({places.length - listPlaces.length} remaining)
+        </button>
+      ) : null}
+    </div>
   );
 
   return (
@@ -194,6 +258,11 @@ export function AccessibilityMapLanding({
           <p className="mt-3 text-sm font-semibold text-amber-900">
             Places below include clearly labelled demo data while live coverage grows.
           </p>
+          {dataSourceNote ? (
+            <p className="mt-2 text-sm text-slate-600" role="note">
+              {dataSourceNote}
+            </p>
+          ) : null}
         </div>
       </section>
 
@@ -378,8 +447,15 @@ export function AccessibilityMapLanding({
                   </div>
                 }
               >
+                {mapPlaces.length < places.length ? (
+                  <p className="mb-3 text-sm text-slate-600" role="status">
+                    Map shows {mapPlaces.length.toLocaleString("en-AU")} of{" "}
+                    {places.length.toLocaleString("en-AU")} places. Search or filter to
+                    focus the pins.
+                  </p>
+                ) : null}
                 <OpenStreetMapView
-                  places={places}
+                  places={mapPlaces}
                   selectedId={selectedId}
                   onSelect={handleSelectPlace}
                   activeNeeds={activeNeeds}
@@ -389,24 +465,41 @@ export function AccessibilityMapLanding({
             ) : null}
 
             {view === "list" ? (
-              <ul className="space-y-4" aria-label="Accessible places">
-                {places.map((place) => (
-                  <li key={place.id}>
-                    <VenueListCard
-                      ref={(el) => {
-                        cardRefs.current[place.id] = el;
-                      }}
-                      place={place}
-                      activeNeeds={activeNeeds}
-                      isSelected={selectedId === place.id}
-                      onShowOnMap={(id) => {
-                        handleCardSelect(id);
-                        handleViewChange("map");
-                      }}
-                    />
-                  </li>
-                ))}
-              </ul>
+              <div className="space-y-4">
+                <p className="text-sm text-slate-600">
+                  Showing {listPlaces.length.toLocaleString("en-AU")} of{" "}
+                  {places.length.toLocaleString("en-AU")} places
+                  {hasMoreList ? " — refine search or load more below." : "."}
+                </p>
+                <ul className="space-y-4" aria-label="Accessible places">
+                  {listPlaces.map((place) => (
+                    <li key={place.id}>
+                      <VenueListCard
+                        ref={(el) => {
+                          cardRefs.current[place.id] = el;
+                        }}
+                        place={place}
+                        activeNeeds={activeNeeds}
+                        isSelected={selectedId === place.id}
+                        onShowOnMap={(id) => {
+                          handleCardSelect(id);
+                          handleViewChange("map");
+                        }}
+                      />
+                    </li>
+                  ))}
+                </ul>
+                {hasMoreList ? (
+                  <button
+                    type="button"
+                    className={`min-h-11 rounded-xl border border-slate-300 px-4 text-sm font-semibold ${mapableInteractiveFocusRing}`}
+                    onClick={() => setListLimit((n) => n + LIST_PAGE_SIZE)}
+                  >
+                    Show more ({(places.length - listPlaces.length).toLocaleString("en-AU")}{" "}
+                    remaining)
+                  </button>
+                ) : null}
+              </div>
             ) : null}
           </div>
 

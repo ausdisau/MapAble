@@ -1,14 +1,13 @@
 import { NextResponse } from "next/server";
 
+import { getAccessMapPlaces } from "@/lib/access-map/access-map-places";
 import { checkIpRateLimit, getClientIp } from "@/lib/api/ip-rate-limit";
-import {
-  DEMO_ACCESS_PLACES,
-  filterDemoPlaces,
-} from "@/lib/demo/accessibility-places";
+import { filterDemoPlaces } from "@/lib/demo/accessibility-places";
 import { toPublicVenueSpec } from "@/lib/offline/public-venue-dto";
 
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX = 60;
+const MAX_RESULTS = 200;
 
 /**
  * Public venue accessibility search for offline/PWA caching.
@@ -36,18 +35,19 @@ export async function GET(req: Request) {
     .map((f) => f.trim())
     .filter(Boolean);
 
-  const places = filterDemoPlaces(DEMO_ACCESS_PLACES, {
+  const allPlaces = await getAccessMapPlaces();
+  const places = filterDemoPlaces(allPlaces, {
     query,
     suburb,
     filters,
-  });
+  }).slice(0, MAX_RESULTS);
 
   return NextResponse.json(
     {
       venues: places.map(toPublicVenueSpec),
       count: places.length,
       cachedAt: new Date().toISOString(),
-      source: "demo-public",
+      source: "access-map-public",
     },
     {
       headers: {

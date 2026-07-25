@@ -2,10 +2,16 @@ import {
   createImportJob,
   parseImportJobContent,
 } from "@/lib/access-import/access-import-job-service";
-import { MAX_IMPORT_BYTES, MAX_IMPORT_ITEMS } from "@/lib/access-import/import-limits";
+import {
+  MAX_ALLOWLISTED_KML_BYTES,
+  MAX_ALLOWLISTED_KML_ITEMS,
+  MAX_IMPORT_BYTES,
+  MAX_IMPORT_ITEMS,
+} from "@/lib/access-import/import-limits";
 import {
   fetchAllowlistedKml,
   isAllowlistedNetworkLinkUrl,
+  toFetchableAllowlistedKmlUrl,
 } from "@/lib/access-import/kml-networklink-service";
 import { readTextWithByteLimit } from "@/lib/access-import/read-limited-body";
 import { requireApiAdmin } from "@/lib/api/auth-handler";
@@ -13,6 +19,10 @@ import { jsonError, jsonOk } from "@/lib/api/response";
 
 /** Extra bytes for multipart boundaries beyond the file payload. */
 const MULTIPART_OVERHEAD_BYTES = 64 * 1024;
+
+function isMapableAdlUploadName(fileName: string): boolean {
+  return /\bmapable\b/i.test(fileName);
+}
 
 function importPayloadToString(value: unknown): string {
   if (typeof value === "string") return value;
@@ -22,9 +32,9 @@ function importPayloadToString(value: unknown): string {
   return String(value);
 }
 
-function assertPayloadWithinLimit(payload: string) {
+function assertPayloadWithinLimit(payload: string, maxBytes: number) {
   const bytes = new TextEncoder().encode(payload).length;
-  if (bytes > MAX_IMPORT_BYTES) {
+  if (bytes > maxBytes) {
     throw new Error("IMPORT_TOO_LARGE");
   }
 }
@@ -32,13 +42,19 @@ function assertPayloadWithinLimit(payload: string) {
 function importItemLimitResponse(error: unknown) {
   const msg = error instanceof Error ? error.message : "";
   if (msg.startsWith("IMPORT_ITEM_LIMIT:")) {
-    return jsonError(`Too many features (limit ${MAX_IMPORT_ITEMS})`, 413);
+    return jsonError(
+      `Too many features (limit ${MAX_ALLOWLISTED_KML_ITEMS} for MapAble KML, otherwise ${MAX_IMPORT_ITEMS})`,
+      413
+    );
   }
   return null;
 }
 
-function parseJsonImportBody(req: Request): Promise<Record<string, unknown>> {
-  return readTextWithByteLimit(req, MAX_IMPORT_BYTES).then((raw) => {
+function parseJsonImportBody(
+  req: Request,
+  maxBytes: number
+): Promise<Record<string, unknown>> {
+  return readTextWithByteLimit(req, maxBytes).then((raw) => {
     try {
       const parsed = JSON.parse(raw) as unknown;
       if (parsed == null || typeof parsed !== "object" || Array.isArray(parsed)) {
@@ -63,10 +79,11 @@ export async function POST(req: Request) {
       return jsonError("Content-Length required for multipart uploads", 411);
     }
     const uploadBytes = Number(uploadLength);
+    // Content-Length is checked before FormData parsing; allow MapAble ADL size.
     if (
       !Number.isFinite(uploadBytes) ||
       uploadBytes < 0 ||
-      uploadBytes > MAX_IMPORT_BYTES + MULTIPART_OVERHEAD_BYTES
+      uploadBytes > MAX_ALLOWLISTED_KML_BYTES + MULTIPART_OVERHEAD_BYTES
     ) {
       return jsonError("Request body too large", 413);
     }
@@ -78,7 +95,10 @@ export async function POST(req: Request) {
     if (!(file instanceof File)) {
       return jsonError("file required", 400);
     }
-    if (file.size > MAX_IMPORT_BYTES) {
+    const byteLimit = isMapableAdlUploadName(file.name)
+      ? MAX_ALLOWLISTED_KML_BYTES
+      : MAX_IMPORT_BYTES;
+    if (file.size > byteLimit) {
       return jsonError("File too large", 400);
     }
 
@@ -111,7 +131,8 @@ export async function POST(req: Request) {
 
   let body: Record<string, unknown>;
   try {
-    body = await parseJsonImportBody(req);
+    // Allowlisted NetworkLink / MapAble payloads may exceed the default JSON limit.
+    body = await parseJsonImportBody(req, MAX_ALLOWLISTED_KML_BYTES);
   } catch (e) {
     const msg = e instanceof Error ? e.message : "";
     if (msg === "BODY_TOO_LARGE") {
@@ -129,11 +150,13 @@ export async function POST(req: Request) {
       return jsonError("NetworkLink URL is not on the allowlist", 403);
     }
 
-    const xml = await fetchAllowlistedKml(networkLinkUrl);
+    const fetchUrl = toFetchableAllowlistedKmlUrl(networkLinkUrl);
+    const xml = await fetchAllowlistedKml(fetchUrl);
     const job = await createImportJob({
       createdById: user.id,
       sourceType: "kml_network_link",
-      sourceUrl: networkLinkUrl,
+      sourceUrl: fetchUrl,
+      fileName: "MapAble by Australian Disability Ltd.kml",
     });
 
     try {
@@ -149,13 +172,14 @@ export async function POST(req: Request) {
   if (body.kml) {
     const kmlText = importPayloadToString(body.kml);
     try {
-      assertPayloadWithinLimit(kmlText);
+      assertPayloadWithinLimit(kmlText, MAX_ALLOWLISTED_KML_BYTES);
     } catch {
       return jsonError("KML payload too large", 413);
     }
     const job = await createImportJob({
       createdById: user.id,
       sourceType: "uploaded_kml",
+      fileName: "MapAble.kml",
     });
     try {
       await parseImportJobContent(job.id, kmlText, "uploaded_kml");
@@ -170,7 +194,7 @@ export async function POST(req: Request) {
   if (body.geojson) {
     const geojsonText = importPayloadToString(body.geojson);
     try {
-      assertPayloadWithinLimit(geojsonText);
+      assertPayloadWithinLimit(geojsonText, MAX_IMPORT_BYTES);
     } catch {
       return jsonError("GeoJSON payload too large", 413);
     }

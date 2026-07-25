@@ -23,7 +23,8 @@ export type DemoAccessPlace = {
   source: "community" | "provider" | "MapAble assessor" | "partner";
   topAccessFacts: string[];
   keyBarrier: string | null;
-  isDemo: true;
+  /** True for synthetic demo venues; false for imported partner / live data. */
+  isDemo: boolean;
   profile: PlaceAccessProfile;
   measurements: { label: string; value: string; note?: string }[];
   sensoryNotes: string[];

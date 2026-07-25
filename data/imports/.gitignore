@@ -2,3 +2,6 @@
 *.geojson
 *.kmz
 !README.md
+# Small NetworkLink stubs (not full 15MB exports)
+!MapAble.kml
+!MapAble by Australian Disability Ltd.kml

@@ -2,8 +2,14 @@ import type { AccessImportSourceType } from "@prisma/client";
 
 import { parseAccessibleLocationsGeoJson } from "@/lib/access-import/geojson-parser-service";
 import { findDuplicatePlaceCandidates } from "@/lib/access-import/import-deduplication-service";
-import { MAX_IMPORT_ITEMS } from "@/lib/access-import/import-limits";
-import { resolveKmlDocument } from "@/lib/access-import/kml-networklink-service";
+import {
+  MAX_ALLOWLISTED_KML_ITEMS,
+  MAX_IMPORT_ITEMS,
+} from "@/lib/access-import/import-limits";
+import {
+  isAllowlistedNetworkLinkUrl,
+  resolveKmlDocument,
+} from "@/lib/access-import/kml-networklink-service";
 import { sanitizeKmlDescription } from "@/lib/access-import/kml-parser-service";
 import { mapPlacemarkToImportItem } from "@/lib/access-import/kml-to-access-place-mapper";
 import { prisma } from "@/lib/prisma";
@@ -37,6 +43,7 @@ export async function parseImportJobContent(
 
   let placemarks: ReturnType<typeof mapPlacemarkToImportItem>[] = [];
   const errors: string[] = [];
+  let resolvedAllowlistedNetworkLink = false;
 
   if (sourceType === "geojson_upload") {
     const parsed = parseAccessibleLocationsGeoJson(content);
@@ -44,26 +51,48 @@ export async function parseImportJobContent(
     placemarks = parsed.placemarks.map(mapPlacemarkToImportItem);
   } else {
     const doc = await resolveKmlDocument(content);
-    if (doc.networkLinkHref && !doc.placemarks.length) {
-      await prisma.accessImportSource.create({
-        data: { jobId, url: doc.networkLinkHref, rawMeta: { type: "network_link" } },
-      });
+    if (doc.networkLinkHref) {
+      resolvedAllowlistedNetworkLink = isAllowlistedNetworkLinkUrl(
+        doc.networkLinkHref
+      );
+      if (!doc.placemarks.length || resolvedAllowlistedNetworkLink) {
+        await prisma.accessImportSource.create({
+          data: {
+            jobId,
+            url: doc.networkLinkHref,
+            rawMeta: { type: "network_link" },
+          },
+        });
+      }
     }
     placemarks = doc.placemarks.map((p) =>
       mapPlacemarkToImportItem({
         ...p,
-        description: p.description ? sanitizeKmlDescription(p.description) : undefined,
+        description: p.description
+          ? sanitizeKmlDescription(p.description)
+          : undefined,
       })
     );
   }
 
-  if (placemarks.length > MAX_IMPORT_ITEMS) {
+  const job = await prisma.accessImportJob.findUnique({
+    where: { id: jobId },
+    select: { sourceUrl: true, sourceType: true, fileName: true },
+  });
+  const allowlisted =
+    sourceType === "kml_network_link" ||
+    resolvedAllowlistedNetworkLink ||
+    (job?.sourceUrl != null && isAllowlistedNetworkLinkUrl(job.sourceUrl)) ||
+    /\bmapable\b/i.test(job?.fileName ?? "");
+  const itemLimit = allowlisted ? MAX_ALLOWLISTED_KML_ITEMS : MAX_IMPORT_ITEMS;
+
+  if (placemarks.length > itemLimit) {
     await prisma.accessImportJob.update({
       where: { id: jobId },
       data: {
         status: "failed",
         metadata: {
-          error: `Import exceeds maximum of ${MAX_IMPORT_ITEMS} features`,
+          error: `Import exceeds maximum of ${itemLimit} features`,
           parsed: placemarks.length,
         },
       },

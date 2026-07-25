@@ -57,8 +57,11 @@ export default async function AdminAccessDashboardPage() {
         </Link>
       </nav>
       <p className="text-sm text-muted-foreground">
-        Legacy data: copy MapAble.kml and accessible_locations_merged.geojson into{" "}
-        <code>data/imports/</code> then import via KML / GeoJSON admin UI.
+        Legacy data: copy MapAble by Australian Disability Ltd.kml (or MapAble.kml)
+        and accessible_locations_merged.geojson from Operations into{" "}
+        <code>data/imports/</code>, sync Access Map with{" "}
+        <code>python3 scripts/sync-mapable-adl-kml.py</code>, or import via KML /
+        GeoJSON admin UI.
       </p>
     </div>
   );

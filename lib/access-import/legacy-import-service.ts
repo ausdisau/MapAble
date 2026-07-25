@@ -6,6 +6,7 @@ import {
   parseImportJobContent,
 } from "@/lib/access-import/access-import-job-service";
 import {
+  ACCESS_ADL_KML_FILENAME,
   ACCESS_IMPORT_DATA_DIR,
   ACCESS_LEGACY_GEOJSON_FILENAME,
   ACCESS_LEGACY_KML_FILENAME,
@@ -25,18 +26,22 @@ export async function loadLegacyFileFromDataDir(
 export async function bootstrapLegacyImports(actorId: string) {
   const results: { file: string; jobId?: string; error?: string }[] = [];
 
-  const kml = await loadLegacyFileFromDataDir(ACCESS_LEGACY_KML_FILENAME);
+  const kmlFileName =
+    (await loadLegacyFileFromDataDir(ACCESS_ADL_KML_FILENAME)) != null
+      ? ACCESS_ADL_KML_FILENAME
+      : ACCESS_LEGACY_KML_FILENAME;
+  const kml = await loadLegacyFileFromDataDir(kmlFileName);
   if (kml) {
     const job = await createImportJob({
       createdById: actorId,
       sourceType: "uploaded_kml",
-      fileName: ACCESS_LEGACY_KML_FILENAME,
+      fileName: kmlFileName,
     });
     await parseImportJobContent(job.id, kml, "uploaded_kml");
-    results.push({ file: ACCESS_LEGACY_KML_FILENAME, jobId: job.id });
+    results.push({ file: kmlFileName, jobId: job.id });
   } else {
     results.push({
-      file: ACCESS_LEGACY_KML_FILENAME,
+      file: ACCESS_ADL_KML_FILENAME,
       error: "File not found in data/imports",
     });
   }

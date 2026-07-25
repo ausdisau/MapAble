@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>MapAble by Australian Disability Ltd</name>
+    <description>NetworkLink stub for Access Map import. Resolves to the allowlisted Google My Maps KML.</description>
+    <NetworkLink>
+      <name>MapAble by Australian Disability Ltd</name>
+      <Link>
+        <href>https://www.google.com/maps/d/kml?forcekml=1&mid=1sx0iyF2RqJKO8maeZ_Sn_EvWVyybcrOI</href>
+      </Link>
+    </NetworkLink>
+  </Document>
+</kml>

@@ -168,7 +168,16 @@ To pull the standalone Repl [@ausdisau1/MapAble-Transport](https://replit.com/@a
 
 ## Data imports (Access)
 
-Legacy place data for admin import lives under `data/imports/` (often gitignored when large). Copy `MapAble.kml` or `accessible_locations_merged.geojson` from operations storage, or use **Admin → Access → Import**. GeoJSON expects a FeatureCollection with Point features and properties such as `name`, `category`, or `address`.
+Legacy place data for admin import lives under `data/imports/` (often gitignored when large). Copy `MapAble by Australian Disability Ltd.kml` / `MapAble.kml` or `accessible_locations_merged.geojson` from `G:\Operations\MapAble\`, or use **Admin → Access → Import**. GeoJSON expects a FeatureCollection with Point features and properties such as `name`, `category`, or `address`.
+
+To refresh Access Map pins from that KML (or the allowlisted Google My Maps URL):
+
+```bash
+python3 scripts/sync-mapable-adl-kml.py
+# or: python3 scripts/sync-mapable-adl-kml.py "/path/to/MapAble by Australian Disability Ltd.kml"
+```
+
+This writes `public/data/mapable-adl-places.json` consumed by `/accessibility-map`.
 
 ## License
 

@@ -17,9 +17,9 @@ import {
 } from "@/lib/access/place-json-ld";
 import { calculateAccessFit } from "@/lib/access-fit/calculate-access-fit";
 import { DEMO_ACCESS_NEEDS } from "@/lib/access-fit/types";
+import { getAccessMapPlaceBySlug } from "@/lib/access-map/access-map-places";
 import { ACCESS_DISCLAIMER } from "@/lib/access-map/copy";
 import { getCanonicalPublicOrigin } from "@/lib/config/canonical-url";
-import { getDemoPlaceBySlug } from "@/lib/demo/accessibility-places";
 import { mapableInteractiveFocusRing } from "@/lib/marketing/mapable-care-tokens";
 
 type PageProps = {
@@ -28,7 +28,7 @@ type PageProps = {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const place = getDemoPlaceBySlug(slug);
+  const place = await getAccessMapPlaceBySlug(slug);
   if (!place) {
     return { title: "Place not found | MapAble" };
   }
@@ -40,7 +40,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function AccessibilityMapPlacePage({ params }: PageProps) {
   const { slug } = await params;
-  const place = getDemoPlaceBySlug(slug);
+  const place = await getAccessMapPlaceBySlug(slug);
   if (!place) notFound();
 
   const fit = calculateAccessFit(DEMO_ACCESS_NEEDS, place.profile);

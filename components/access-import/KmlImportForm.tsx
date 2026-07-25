@@ -72,8 +72,9 @@ export function KmlImportForm({ networkLinkUrl }: { networkLinkUrl: string }) {
         className="min-h-11 rounded-lg border px-4 text-sm"
         onClick={() => void fetchNetworkLink()}
       >
-        Fetch allowlisted Google My Maps KML
+        Import allowlisted Google My Maps
       </button>
+      <p className="text-xs text-muted-foreground break-all">Source: {networkLinkUrl}</p>
     </div>
   );
 }
