@@ -10,8 +10,8 @@ import { VenueListCard } from "@/components/accessibility-map/VenueListCard";
 import { MapErrorBoundary } from "@/components/error/MapErrorBoundary";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
-import { DEMO_ACCESS_NEEDS, EMPTY_ACCESS_NEEDS } from "@/lib/access-fit/types";
-import { ACCESS_DISCLAIMER } from "@/lib/access-map/copy";
+import { DEMO_ACCESS_NEEDS, EMPTY_ACCESS_NEEDS } from "@/lib/access/fit/types";
+import { ACCESS_DISCLAIMER } from "@/lib/access/map/copy";
 import {
   ACCESS_MAP_FILTERS,
   DEMO_ACCESS_PLACES,

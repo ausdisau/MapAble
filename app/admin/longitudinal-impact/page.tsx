@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/lib/auth/guards";
-import { listPublishedImpactWaves } from "@/lib/longitudinal-impact/impact-wave-service";
+import { listPublishedImpactWaves } from "@/lib/research/longitudinal-impact/impact-wave-service";
 
 export default async function LongitudinalImpactPage() {
   await requireAdmin();

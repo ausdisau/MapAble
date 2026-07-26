@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { requireAdmin } from "@/lib/auth/guards";
 import { prisma } from "@/lib/prisma";
-import { getTrustPassportPilotMetrics, isTrustPassportPilotEnabled } from "@/lib/trust-passport/trust-passport-service";
+import { getTrustPassportPilotMetrics, isTrustPassportPilotEnabled } from "@/lib/trust/passport/trust-passport-service";
 
 export default async function AdminWorkersTrustPassportPage() {
   await requireAdmin();

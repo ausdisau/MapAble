@@ -1,7 +1,7 @@
 "use client";
 
-import { polygonToSvgPoints, routeToSvgPoints } from "@/lib/floor-plan/coordinates";
-import type { FloorPlanRoute, FloorPlanZone } from "@/lib/floor-plan/schemas";
+import { polygonToSvgPoints, routeToSvgPoints } from "@/lib/access/floor-plan/coordinates";
+import type { FloorPlanRoute, FloorPlanZone } from "@/lib/access/floor-plan/schemas";
 
 type FloorPlanRouteLayerProps = {
   zones: FloorPlanZone[];

@@ -4,7 +4,7 @@ import {
   buildClarificationQuestion,
   hasUnresolvedAccessNeeds,
   needsProviderFinderClarification,
-} from "@/lib/provider-finder/clarification";
+} from "@/lib/provider/finder/clarification";
 import type { SearchInterpretation } from "@/types/search";
 
 function baseInterpretation(

@@ -3,7 +3,7 @@ import { jsonOk } from "@/lib/api/response";
 import {
   getSocialImpactDashboard,
   recordSocialImpactOutcome,
-} from "@/lib/social-impact/impact-service";
+} from "@/lib/research/social-impact/impact-service";
 
 export async function GET() {
   const user = await requireApiAdmin();

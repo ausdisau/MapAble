@@ -4,7 +4,7 @@ import {
   draftGovernanceCharter,
   listCharters,
   ratifyCharter,
-} from "@/lib/governance-charter/charter-service";
+} from "@/lib/governance/charter/charter-service";
 
 export async function GET() {
   const user = await requireApiAdmin();

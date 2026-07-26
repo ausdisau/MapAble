@@ -4,7 +4,7 @@ import {
   listPublishedOutcomes,
   publishLongTermOutcome,
   publishOutcomeWave,
-} from "@/lib/long-term-outcomes/outcomes-service";
+} from "@/lib/research/long-term-outcomes/outcomes-service";
 
 export async function GET() {
   const user = await requireApiAdminScope("outcomes:read");

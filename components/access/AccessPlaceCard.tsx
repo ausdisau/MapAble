@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { ACCESS_LABELS } from "@/lib/access-map/copy";
+import { ACCESS_LABELS } from "@/lib/access/map/copy";
 
 export type AccessPlaceCardData = {
   id: string;

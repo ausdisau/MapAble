@@ -7,8 +7,8 @@ import { classifyIntent } from "@/lib/copilot/intentRouter";
 import {
   mergeProviderContextIntoQuery,
   runProviderFinderAskTurn,
-} from "@/lib/provider-finder/ask-bridge";
-import { mergeAppliedFields } from "@/lib/provider-finder/merge-applied";
+} from "@/lib/provider/finder/ask-bridge";
+import { mergeAppliedFields } from "@/lib/provider/finder/merge-applied";
 
 vi.mock("@/lib/api/optional-session", () => ({
   getOptionalApiUser: vi.fn(),
@@ -22,7 +22,7 @@ vi.mock("@/lib/ingestion/ndis-providers-search", () => ({
   searchNdisProviders: vi.fn(async () => ({ providers: [], count: 0 })),
 }));
 
-vi.mock("@/lib/agent-ops/agent-run-service", () => ({
+vi.mock("@/lib/ai/agent-ops/agent-run-service", () => ({
   createAgentRun: vi.fn(async () => ({ id: "run-1", skipped: false })),
 }));
 

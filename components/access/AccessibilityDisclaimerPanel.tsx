@@ -1,4 +1,4 @@
-import { ACCESS_DISCLAIMER } from "@/lib/access-map/copy";
+import { ACCESS_DISCLAIMER } from "@/lib/access/map/copy";
 
 export function AccessibilityDisclaimerPanel() {
   return (

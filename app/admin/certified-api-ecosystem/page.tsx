@@ -3,7 +3,7 @@ import { requireAdmin } from "@/lib/auth/guards";
 import {
   getPartnerConcentrationMetrics,
   listCertifiedApiEcosystem,
-} from "@/lib/certified-api-ecosystem/ecosystem-service";
+} from "@/lib/api/certified-ecosystem/ecosystem-service";
 import {
   API_CERTIFICATION_DISCLAIMER,
   isCertifiedApiEcosystemV2Enabled,

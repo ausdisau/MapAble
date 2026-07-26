@@ -1,5 +1,5 @@
 import { createAttestation } from "@/lib/attestations/attestation-service";
-import { writeBillingAuditLog } from "@/lib/billing-core/audit";
+import { writeBillingAuditLog } from "@/lib/billing/core/audit";
 import { markSplitsReadyForPayment } from "@/lib/payouts/readiness-service";
 import { prisma } from "@/lib/prisma";
 

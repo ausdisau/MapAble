@@ -1,6 +1,6 @@
 import { OversightBoardActions } from "@/app/admin/oversight-board/OversightBoardActions";
 import { requireAdmin } from "@/lib/auth/guards";
-import { getOversightPortalSummary } from "@/lib/oversight-board/oversight-service";
+import { getOversightPortalSummary } from "@/lib/governance/oversight-board/oversight-service";
 
 export default async function OversightBoardAdminPage() {
   await requireAdmin();

@@ -7,7 +7,7 @@ import {
   handlePeerPeersHost,
   redirectLegacySquarePath,
   shouldRunAuthMiddleware,
-} from "@/lib/mapable-peers/peer-middleware";
+} from "@/lib/community/mapable-peers/peer-middleware";
 import {
   CSP_ENFORCE_HEADER,
   createScriptNonce,

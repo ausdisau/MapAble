@@ -32,7 +32,7 @@ describe("Phase 12 permissions", () => {
 describe("constitutional safeguards", () => {
   it("returns articles when enabled", async () => {
     const { listActiveSafeguards } = await import(
-      "@/lib/constitutional-safeguards/safeguards-service"
+      "@/lib/governance/constitutional-safeguards/safeguards-service"
     );
     try {
       const articles = await listActiveSafeguards();

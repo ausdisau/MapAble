@@ -7,7 +7,7 @@ The platform hub lives at **`/core`** (`app/core/`).
 Supporting directories:
 
 - `components/core/` — shared shell (header, footer, hub cards)
-- `lib/core-ui/navigation.ts` — hub links (aligned with routes on this branch)
+- `lib/platform/core-ui/navigation.ts` — hub links (aligned with routes on this branch)
 
 ## Run locally
 

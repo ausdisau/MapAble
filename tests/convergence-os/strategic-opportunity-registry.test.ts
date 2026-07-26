@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { CAPABILITY_SEEDS } from "@/lib/convergence-os/seed/capabilities";
+import { CAPABILITY_SEEDS } from "@/lib/platform/convergence-os/seed/capabilities";
 import {
   PUBLIC_CLAIM_REGISTRY,
   assertNoProductionClaimsWithoutEvidence,
-} from "@/lib/convergence-os/seed/public-claims";
+} from "@/lib/platform/convergence-os/seed/public-claims";
 
 const ROOT = process.cwd();
 
@@ -18,9 +18,9 @@ const REQUIRED_STRATEGY_DOCS = [
 ];
 
 const PRODUCTISATION_PATHS: Record<string, string[]> = {
-  "communication.passport": ["lib/communication-passport/service.ts"],
-  "workforce.readiness": ["lib/workforce-readiness/evaluate.ts"],
-  "provider.ops_attention": ["lib/provider-ops/attention-queue.ts"],
+  "communication.passport": ["lib/support/communication-passport/service.ts"],
+  "workforce.readiness": ["lib/workforce/readiness/evaluate.ts"],
+  "provider.ops_attention": ["lib/provider/ops/attention-queue.ts"],
   "mobile.companion": ["apps/companion/App.tsx", "lib/companion/visit-pack-compile.ts"],
   "pilot.starting_work": ["lib/pilot/starting-work/golden-journey.ts"],
   "transport.quotes": ["lib/transport/quotes/quote-service.ts"],

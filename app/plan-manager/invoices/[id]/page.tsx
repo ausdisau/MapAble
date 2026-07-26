@@ -5,7 +5,7 @@ import { requirePermission } from "@/lib/auth/guards";
 import {
   approveInvoiceForPayment,
   raisePlanManagerQuery,
-} from "@/lib/plan-manager/invoice-review-service";
+} from "@/lib/support/plan-manager/invoice-review-service";
 import { prisma } from "@/lib/prisma";
 
 export default async function PlanManagerInvoiceDetailPage({

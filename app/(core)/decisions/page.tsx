@@ -3,7 +3,7 @@ import Link from "next/link";
 import {
   listDecisionTypes,
   listPublicDecisions,
-} from "@/lib/public-decision-register/decision-service";
+} from "@/lib/governance/public-decision-register/decision-service";
 
 export default async function PublicDecisionsPage({
   searchParams,

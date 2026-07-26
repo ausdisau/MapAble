@@ -3,8 +3,8 @@ import { jsonOk } from "@/lib/api/response";
 import {
   createContinuityPlan,
   getContinuityDashboard,
-} from "@/lib/institutional-continuity/continuity-service";
-import { reviewContinuityCheckpoint } from "@/lib/institutional-permanence/permanence-service";
+} from "@/lib/platform/institutional-continuity/continuity-service";
+import { reviewContinuityCheckpoint } from "@/lib/platform/institutional-permanence/permanence-service";
 
 export async function GET() {
   const user = await requireApiAdminScope("accountability:publish");

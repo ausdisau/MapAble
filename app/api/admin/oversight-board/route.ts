@@ -4,7 +4,7 @@ import {
   getOversightPortalSummary,
   publishOversightDecision,
   scheduleOversightMeeting,
-} from "@/lib/oversight-board/oversight-service";
+} from "@/lib/governance/oversight-board/oversight-service";
 
 export async function GET() {
   const user = await requireApiAdmin();

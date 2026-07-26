@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { requireApiSession } from "@/lib/api/auth-handler";
 import { jsonError, jsonOk, zodErrorResponse } from "@/lib/api/response";
-import { disputeBillingInvoice } from "@/lib/billing-core/transparent-billing";
+import { disputeBillingInvoice } from "@/lib/billing/core/transparent-billing";
 
 const schema = z.object({
   reason: z.string().min(10).max(2000),

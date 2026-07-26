@@ -7,7 +7,7 @@ provider-finder assistant replies.
 
 - `lib/search/interpreter/parse-query.ts`
 - `lib/search/interpreter/resolve-access-needs-llm.ts`
-- `lib/provider-finder/conversation/stream-assistant.ts`
+- `lib/provider/finder/conversation/stream-assistant.ts`
 
 ## Provider
 

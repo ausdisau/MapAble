@@ -1,5 +1,5 @@
 import { ProviderSectionNav } from "@/components/provider/ProviderSectionNav";
-import { PROVIDER_TRANSPORT_SUB_LINKS } from "@/lib/core-ui/provider-section-nav";
+import { PROVIDER_TRANSPORT_SUB_LINKS } from "@/lib/platform/core-ui/provider-section-nav";
 
 export default function ProviderTransportLayout({
   children,

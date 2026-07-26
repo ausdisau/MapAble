@@ -1,6 +1,6 @@
 "use client";
 
-import { getFeatureConfig } from "@/lib/floor-plan/feature-config";
+import { getFeatureConfig } from "@/lib/access/floor-plan/feature-config";
 
 export function FloorPlanLegend() {
   const samples = [

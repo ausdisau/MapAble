@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import {
   answerMissionQuestion,
   missionCopilotGuardrails,
-} from "@/lib/mission-copilot";
+} from "@/lib/ai/mission-copilot";
 import { runGoldenJourney } from "@/lib/pilot/starting-work/golden-journey";
 
 describe("Mission Copilot", () => {

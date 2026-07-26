@@ -3,8 +3,8 @@ import Link from "next/link";
 import { CorePageHeader } from "@/components/core/CorePageHeader";
 import { PeersContrastTable } from "@/components/mapable-peers/PeersContrastTable";
 import { PeersPrincipleList } from "@/components/mapable-peers/PeersPrincipleList";
-import { PEERS_TAGLINE } from "@/lib/mapable-peers/copy";
-import { getPeersLinkHelpers } from "@/lib/mapable-peers/peers-request";
+import { PEERS_TAGLINE } from "@/lib/community/mapable-peers/copy";
+import { getPeersLinkHelpers } from "@/lib/community/mapable-peers/peers-request";
 
 export const metadata = {
   title: "MapAble PEERS — Principles",

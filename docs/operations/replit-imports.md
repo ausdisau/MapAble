@@ -45,7 +45,7 @@ The monorepo already wires the Unified shell and Care module:
 
 | Repl concept | Monorepo location |
 | --- | --- |
-| MapAble-Unified hub | `/core`, `lib/core-ui/navigation.ts`, `components/core/` |
+| MapAble-Unified hub | `/core`, `lib/platform/core-ui/navigation.ts`, `components/core/` |
 | MapAble-for-Care | `/care`, `lib/care/`, `app/api/care/` |
 | MapAble-Transport | `/transport`, `lib/transport/` (see transport import doc) |
 | MapAble-Marketplace | `/marketplace`, `lib/marketplace/`, checkout via billing-core |

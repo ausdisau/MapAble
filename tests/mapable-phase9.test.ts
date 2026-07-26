@@ -35,7 +35,7 @@ describe("Phase 9 permissions", () => {
 describe("public decisions", () => {
   it("returns array when enabled", async () => {
     const { listPublicDecisions } = await import(
-      "@/lib/public-decision-register/decision-service"
+      "@/lib/governance/public-decision-register/decision-service"
     );
     try {
       const list = await listPublicDecisions();

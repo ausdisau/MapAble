@@ -1,5 +1,5 @@
-import { createAccessReview, listPublishedReviewsForPlace } from "@/lib/access-reviews/access-review-service";
-import { publicReviewerDisplayName } from "@/lib/access-reviews/review-access-policy";
+import { createAccessReview, listPublishedReviewsForPlace } from "@/lib/access/reviews/access-review-service";
+import { publicReviewerDisplayName } from "@/lib/access/reviews/review-access-policy";
 import { requireApiSession } from "@/lib/api/auth-handler";
 import {
   jsonBodyErrorResponse,

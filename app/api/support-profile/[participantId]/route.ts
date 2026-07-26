@@ -1,6 +1,6 @@
 import { requireApiSession } from "@/lib/api/auth-handler";
 import { jsonError, jsonOk } from "@/lib/api/response";
-import { getSupportProfileForViewer } from "@/lib/support-profile/support-profile-service";
+import { getSupportProfileForViewer } from "@/lib/support/profile/support-profile-service";
 
 export async function GET(
   _req: Request,

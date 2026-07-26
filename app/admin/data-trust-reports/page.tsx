@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/lib/auth/guards";
-import { listPublishedAnnualReports } from "@/lib/institutional-permanence/permanence-service";
+import { listPublishedAnnualReports } from "@/lib/platform/institutional-permanence/permanence-service";
 import { prisma } from "@/lib/prisma";
 
 export default async function DataTrustReportsPage() {

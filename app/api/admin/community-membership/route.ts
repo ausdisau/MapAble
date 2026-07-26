@@ -6,7 +6,7 @@ import {
   registerCommunityMember,
   renewCommunityMember,
   revokeCommunityMember,
-} from "@/lib/community-governance-membership/membership-service";
+} from "@/lib/governance/community-membership/membership-service";
 
 export async function GET() {
   const user = await requireApiAdminScope("accountability:publish");

@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/lib/auth/guards";
-import { getComplianceRenewalsDashboard } from "@/lib/compliance-renewals/renewal-service";
+import { getComplianceRenewalsDashboard } from "@/lib/compliance/renewals/renewal-service";
 
 export default async function ComplianceRenewalsPage() {
   await requireAdmin();

@@ -3,7 +3,7 @@ import { jsonOk } from "@/lib/api/response";
 import {
   getOperatorDispatchBoard,
   reassignDriver,
-} from "@/lib/operator-dispatch/operator-dispatch-service";
+} from "@/lib/transport/operator-dispatch/operator-dispatch-service";
 
 export async function GET() {
   const user = await requireApiAdmin();

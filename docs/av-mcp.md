@@ -31,7 +31,7 @@ The server uses **stdio** transport only.
 
 ## Library
 
-Shared logic lives in `lib/av-framework/` (also used by `lib/transport/transport-status-service.ts`).
+Shared logic lives in `lib/platform/av-framework/` (also used by `lib/transport/transport-status-service.ts`).
 
 ## Governance
 

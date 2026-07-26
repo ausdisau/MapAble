@@ -3,7 +3,7 @@ import { randomUUID } from "crypto";
 import type { MapAbleUserRole } from "@prisma/client";
 
 import { createAuditEvent } from "@/lib/audit/audit-event-service";
-import { writeBillingAuditLog } from "@/lib/billing-core/audit";
+import { writeBillingAuditLog } from "@/lib/billing/core/audit";
 import type { FinancialAuditEvent } from "@/types/billing";
 
 export type WriteFinancialAuditInput = {

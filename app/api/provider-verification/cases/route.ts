@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 import {
   createVerificationCase,
   submitVerificationCase,
-} from "@/lib/provider-verification/verification-case-service";
+} from "@/lib/provider/verification/verification-case-service";
 
 export async function GET() {
   const user = await requireApiSession();

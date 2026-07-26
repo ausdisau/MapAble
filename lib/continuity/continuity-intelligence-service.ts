@@ -1,7 +1,7 @@
 import { phase5Config } from "@/lib/config/phase5";
 import { y2OrchestrationConfig } from "@/lib/config/y2-orchestration";
 import { y3NationalTrustConfig } from "@/lib/config/y3-national-trust";
-import { whereOrganisationScope } from "@/lib/multi-tenant-admin/tenant-context";
+import { whereOrganisationScope } from "@/lib/platform/multi-tenant-admin/tenant-context";
 import { prisma } from "@/lib/prisma";
 
 export type ContinuityBand = "stable" | "watch" | "at_risk";

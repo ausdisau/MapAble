@@ -1,13 +1,13 @@
 import { describe, expect, it, vi } from "vitest";
 
 import { runProviderFinderAgentTurn } from "@/lib/agent/run-agent-turn";
-import { resetProviderFinderSessionsForTests } from "@/lib/agent-sessions/provider-finder-session";
+import { resetProviderFinderSessionsForTests } from "@/lib/ai/agent-sessions/provider-finder-session";
 import {
   buildClarificationQuestion,
   needsProviderFinderClarification,
-} from "@/lib/provider-finder/clarification";
-import { mergeAppliedFields } from "@/lib/provider-finder/merge-applied";
-import { parseLocationForNdisSearch } from "@/lib/provider-finder/ndis-search-from-applied";
+} from "@/lib/provider/finder/clarification";
+import { mergeAppliedFields } from "@/lib/provider/finder/merge-applied";
+import { parseLocationForNdisSearch } from "@/lib/provider/finder/ndis-search-from-applied";
 
 vi.mock("@/lib/ingestion/ndis-providers-search", () => ({
   searchNdisProviders: vi.fn(async () => ({
@@ -30,7 +30,7 @@ vi.mock("@/lib/ingestion/ndis-providers-search", () => ({
   })),
 }));
 
-vi.mock("@/lib/provider-finder/conversation/run-turn", () => ({
+vi.mock("@/lib/provider/finder/conversation/run-turn", () => ({
   runProviderFinderConversationTurn: vi.fn(async () => ({
     interpretation: {
       sourceQuery: "OT near Parramatta",

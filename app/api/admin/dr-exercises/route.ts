@@ -1,6 +1,6 @@
 import { requireApiAdmin } from "@/lib/api/auth-handler";
 import { jsonOk } from "@/lib/api/response";
-import { runAutomatedDrExercise } from "@/lib/dr-exercises/exercise-automation-service";
+import { runAutomatedDrExercise } from "@/lib/platform/dr-exercises/exercise-automation-service";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {

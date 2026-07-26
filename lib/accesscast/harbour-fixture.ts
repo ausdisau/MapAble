@@ -4,8 +4,8 @@
  * Not a public accessibility claim.
  */
 
-import type { AccessEvidenceClass } from "@/lib/access-intelligence-next";
-import { getHarbourGraph } from "@/lib/access-intelligence-next";
+import type { AccessEvidenceClass } from "@/lib/access/intelligence-next";
+import { getHarbourGraph } from "@/lib/access/intelligence-next";
 
 import type {
   AccessCastCondition,

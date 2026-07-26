@@ -1,5 +1,5 @@
 import { CoreHubCard } from "@/components/core/CoreHubCard";
-import { adaptParticipantDashboard } from "@/lib/adaptive-access";
+import { adaptParticipantDashboard } from "@/lib/access/adaptive";
 import { requireAuth } from "@/lib/auth/guards";
 import { roleLabel } from "@/lib/auth/roles";
 import { caseListWhereForUser } from "@/lib/cases/case-access";

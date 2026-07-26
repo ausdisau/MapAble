@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/lib/auth/guards";
-import { getProviderQualityDashboard } from "@/lib/provider-quality/quality-service";
+import { getProviderQualityDashboard } from "@/lib/provider/quality/quality-service";
 
 export default async function ProviderQualityPage() {
   await requireAdmin();

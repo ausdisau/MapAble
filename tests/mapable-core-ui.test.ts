@@ -4,8 +4,8 @@ import {
   CORE_CIVIC_LINKS,
   CORE_HUB_SECTIONS,
   CORE_PLATFORM_LINKS,
-} from "@/lib/core-ui/navigation";
-import { PROVIDER_NAV_LINKS } from "@/lib/core-ui/provider-nav";
+} from "@/lib/platform/core-ui/navigation";
+import { PROVIDER_NAV_LINKS } from "@/lib/platform/core-ui/provider-nav";
 
 describe("Core UI navigation", () => {
   it("includes civic transparency routes", () => {

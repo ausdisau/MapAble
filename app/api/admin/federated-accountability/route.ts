@@ -5,7 +5,7 @@ import {
   linkPartnerToPublication,
   listAccountabilityPartners,
   publishCoordinatedReportBundle,
-} from "@/lib/federated-accountability/federation-partner-service";
+} from "@/lib/governance/federated-accountability/federation-partner-service";
 
 export async function GET() {
   const user = await requireApiAdminScope("accountability:publish");

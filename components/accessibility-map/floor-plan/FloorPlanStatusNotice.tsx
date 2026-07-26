@@ -1,4 +1,4 @@
-import { FLOOR_PLAN_DISCLAIMER, EMERGENCY_DISCLAIMER } from "@/lib/floor-plan/accessibility-utils";
+import { FLOOR_PLAN_DISCLAIMER, EMERGENCY_DISCLAIMER } from "@/lib/access/floor-plan/accessibility-utils";
 
 export function FloorPlanStatusNotice() {
   return (

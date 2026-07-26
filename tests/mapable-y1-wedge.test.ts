@@ -13,7 +13,7 @@ import {
   defaultSupportProfileSections,
   mergeSupportProfileSections,
   participantSafeSupportProfileSummary,
-} from "@/lib/support-profile/types";
+} from "@/lib/support/profile/types";
 
 describe("Y1 wedge config", () => {
   it("disables all wedge features by default", () => {

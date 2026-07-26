@@ -3,7 +3,7 @@ import { jsonOk } from "@/lib/api/response";
 import {
   listPublicAccountabilityReports,
   publishAccountabilityReport,
-} from "@/lib/national-accountability/accountability-service";
+} from "@/lib/governance/national-accountability/accountability-service";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {

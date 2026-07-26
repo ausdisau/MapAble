@@ -4,8 +4,8 @@
  * Replaceable interface — do not invent a second passport SoT.
  */
 
-import { getCommunicationPassport } from "@/lib/communication-passport/service";
-import type { CommunicationPassport } from "@/lib/communication-passport/types";
+import { getCommunicationPassport } from "@/lib/support/communication-passport/service";
+import type { CommunicationPassport } from "@/lib/support/communication-passport/types";
 
 export type ProgrammeAccessPassportView = {
   participantId: string;

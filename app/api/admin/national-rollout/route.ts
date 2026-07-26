@@ -3,7 +3,7 @@ import { jsonOk } from "@/lib/api/response";
 import {
   getNationalRolloutDashboard,
   upsertRolloutStage,
-} from "@/lib/national-rollout/rollout-stage-service";
+} from "@/lib/platform/national-rollout/rollout-stage-service";
 
 export async function GET() {
   const user = await requireApiAdmin();

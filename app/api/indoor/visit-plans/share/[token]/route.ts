@@ -1,6 +1,6 @@
-import { featureDisabledResponse, indoorApiError } from "@/lib/indoor-accessibility/api-errors";
-import { isIndoorFeatureEnabled } from "@/lib/indoor-accessibility/feature-flags";
-import { resolveVisitPlanShare } from "@/lib/indoor-accessibility/sharing/visit-plan-service";
+import { featureDisabledResponse, indoorApiError } from "@/lib/access/indoor/api-errors";
+import { isIndoorFeatureEnabled } from "@/lib/access/indoor/feature-flags";
+import { resolveVisitPlanShare } from "@/lib/access/indoor/sharing/visit-plan-service";
 
 type RouteParams = { params: Promise<{ token: string }> };
 

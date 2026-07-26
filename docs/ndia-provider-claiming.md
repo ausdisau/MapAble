@@ -6,7 +6,7 @@ MapAble Core module for **registered NDIS providers** to build and submit claims
 
 | Role | Funding | Pathway |
 |------|---------|---------|
-| Registered provider | **Agency-managed** participant | `lib/ndia-provider-claiming` → NDIA API |
+| Registered provider | **Agency-managed** participant | `lib/ndis/provider-claiming` → NDIA API |
 | Plan manager | Plan-managed | Plan manager export — **not** this module |
 | Participant | Self-managed / private | Stripe Checkout or manual reimbursement |
 
@@ -91,10 +91,10 @@ draft → validated → dry_run_passed → submitted → accepted / rejected / p
 
 ## Extending the NDIA adapter
 
-Update `lib/ndia-provider-claiming/ndia-api-client.ts` when NDIA supplies your Payments/Claims OpenAPI path and response schema. MapAble stores the full `claimPayloadJson` for reconciliation.
+Update `lib/ndis/provider-claiming/ndia-api-client.ts` when NDIA supplies your Payments/Claims OpenAPI path and response schema. MapAble stores the full `claimPayloadJson` for reconciliation.
 
 ## Related modules
 
-- `lib/ndis-pricing` — catalogue and price caps
-- `lib/ndia-readiness` — evidence bundles (legacy invoice path)
-- `lib/billing-core` — participant billing (not provider NDIA submit)
+- `lib/ndis/pricing` — catalogue and price caps
+- `lib/ndis/readiness` — evidence bundles (legacy invoice path)
+- `lib/billing/core` — participant billing (not provider NDIA submit)

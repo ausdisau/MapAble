@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { adaptStartingWorkMission } from "@/lib/adaptive-access";
+import { adaptStartingWorkMission } from "@/lib/access/adaptive";
 import {
   isStartingWorkPilotEnabled,
   startingWorkPilotConfig,

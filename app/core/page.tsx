@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { CoreHubCard } from "@/components/core/CoreHubCard";
 import { CorePageHeader } from "@/components/core/CorePageHeader";
-import { CORE_HUB_SECTIONS } from "@/lib/core-ui/navigation";
+import { CORE_HUB_SECTIONS } from "@/lib/platform/core-ui/navigation";
 
 export const metadata = {
   title: "MapAble Core",

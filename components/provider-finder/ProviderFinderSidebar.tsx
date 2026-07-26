@@ -6,7 +6,7 @@ import {
   FUNDING_OPTIONS,
   SUPPORT_TYPES,
   type SupportTypeId,
-} from "@/lib/provider-finder/filters";
+} from "@/lib/provider/finder/filters";
 
 type ProviderFinderSidebarProps = {
   supportType: SupportTypeId;

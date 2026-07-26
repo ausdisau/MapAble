@@ -9,7 +9,7 @@ import { AccessFeatureBadges } from "@/components/access/AccessFeatureBadges";
 import { AccessibilityDisclaimerPanel } from "@/components/access/AccessibilityDisclaimerPanel";
 import { AccreditationSummaryPanel } from "@/components/access-accreditation/AccreditationSummaryPanel";
 import { CommunityReviewPreview } from "@/components/access-reviews/CommunityReviewPreview";
-import { ACCESS_LABELS } from "@/lib/access-map/copy";
+import { ACCESS_LABELS } from "@/lib/access/map/copy";
 
 export function AccessPlaceProfile({
   place,

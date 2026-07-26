@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/lib/auth/guards";
-import { getPartnerBillingDashboard } from "@/lib/partner-billing/billing-service";
+import { getPartnerBillingDashboard } from "@/lib/billing/partner/billing-service";
 
 export default async function PartnerBillingPage() {
   await requireAdmin();

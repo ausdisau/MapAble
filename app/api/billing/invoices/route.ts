@@ -3,8 +3,8 @@ import { jsonOk, zodErrorResponse } from "@/lib/api/response";
 import {
   createDraftInvoice,
   listInvoicesForUser,
-} from "@/lib/billing-core/invoice-service";
-import { createInvoiceSchema } from "@/lib/billing-core/schemas";
+} from "@/lib/billing/core/invoice-service";
+import { createInvoiceSchema } from "@/lib/billing/core/schemas";
 
 export async function GET() {
   const user = await requireApiSession();

@@ -1,7 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page, type Response } from "@playwright/test";
 
-import { INFORMATIONAL_RELEASE_ROUTES } from "@/lib/public-informational/routes";
+import { INFORMATIONAL_RELEASE_ROUTES } from "@/lib/public/informational/routes";
 
 /**
  * Accessibility + shell checks for every allowlisted informational route.

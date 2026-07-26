@@ -1,5 +1,5 @@
 import { ApiCertificationReviewForm } from "@/app/admin/api-certification/ApiCertificationReviewForm";
-import { listCertificationApplications } from "@/lib/api-certification/certification-service";
+import { listCertificationApplications } from "@/lib/api/certification/certification-service";
 import { requireAdmin } from "@/lib/auth/guards";
 import { API_CERTIFICATION_DISCLAIMER, isApiCertificationV2Enabled } from "@/lib/config/y5-rights-infrastructure";
 

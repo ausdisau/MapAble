@@ -9,7 +9,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
-import { assertNoProductionClaimsWithoutEvidence } from "../../lib/convergence-os/seed/public-claims";
+import { assertNoProductionClaimsWithoutEvidence } from "../../lib/platform/convergence-os/seed/public-claims";
 
 const ROOT = process.cwd();
 const errors: string[] = [];

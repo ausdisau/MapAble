@@ -3,7 +3,7 @@ import type { WorkerCredentialStatus } from "@prisma/client";
 import { createAuditEvent } from "@/lib/audit/audit-event-service";
 import { refreshWorkerOnboarding } from "@/lib/onboarding/onboarding-service";
 import { prisma } from "@/lib/prisma";
-import { syncWorkersOnboardingTask } from "@/lib/provider-onboarding-automation/onboarding-service";
+import { syncWorkersOnboardingTask } from "@/lib/provider/onboarding-automation/onboarding-service";
 
 export async function associateWorkerWithOrganisation(
   params:

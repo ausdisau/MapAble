@@ -1,4 +1,4 @@
-import { listPublishedAlgorithms } from "@/lib/algorithm-register/register-service";
+import { listPublishedAlgorithms } from "@/lib/compliance/algorithm-register/register-service";
 import {
   ALGORITHM_TRANSPARENCY_DISCLAIMER,
 } from "@/lib/config/y4-civic-platform";

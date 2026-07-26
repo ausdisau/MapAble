@@ -3,7 +3,7 @@
  *
  * Facts on main:
  * - `lib/aura/` proposal/execution stack is absent
- * - AI-platform authority ceilings live in `lib/ai-platform/types/authority.ts`
+ * - AI-platform authority ceilings live in `lib/ai/platform/types/authority.ts`
  * - Companion exposes device-local Stop AURA (`apps/companion/src/aura/stop-aura.ts`)
  *
  * Programme adapters may read governed proposals only.
@@ -11,7 +11,7 @@
  * Executable actions require participant authority + deterministic service path + not stopped.
  */
 
-import type { AuthorityCeiling } from "@/lib/ai-platform/types/authority";
+import type { AuthorityCeiling } from "@/lib/ai/platform/types/authority";
 import { evaluateParticipantAuthority } from "@/lib/programmes/authority/participant-authority-service";
 import {
   ForbiddenAuraAction,

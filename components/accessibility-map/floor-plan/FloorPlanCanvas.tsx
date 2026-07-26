@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { FloorPlanFeatureLayer } from "@/components/accessibility-map/floor-plan/FloorPlanFeatureLayer";
 import { FloorPlanRouteLayer } from "@/components/accessibility-map/floor-plan/FloorPlanRouteLayer";
 import { useFloorPlanPanZoom } from "@/hooks/useFloorPlanPanZoom";
-import type { FloorPlanDetail, FloorPlanFeature } from "@/lib/floor-plan/schemas";
+import type { FloorPlanDetail, FloorPlanFeature } from "@/lib/access/floor-plan/schemas";
 
 type FloorPlanCanvasProps = {
   plan: FloorPlanDetail;

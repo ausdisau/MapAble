@@ -3,7 +3,7 @@ import { jsonOk } from "@/lib/api/response";
 import {
   listPublishedImpactWaves,
   publishImpactWave,
-} from "@/lib/longitudinal-impact/impact-wave-service";
+} from "@/lib/research/longitudinal-impact/impact-wave-service";
 
 export async function GET() {
   const user = await requireApiAdmin();

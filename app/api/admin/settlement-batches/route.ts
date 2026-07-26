@@ -3,7 +3,7 @@ import { jsonOk } from "@/lib/api/response";
 import {
   createSettlementBatch,
   getSettlementBatchesDashboard,
-} from "@/lib/settlement-batches/settlement-service";
+} from "@/lib/billing/settlement-batches/settlement-service";
 
 export async function GET() {
   const user = await requireApiAdmin();

@@ -34,18 +34,18 @@ import {
   supportAreaLandingRoutes,
   supportAreaToSupportTypeId,
 } from "@/lib/marketing/mapable-care-routes";
-import { fetchProviderMapPins } from "@/lib/provider-finder/fetch-map-pins";
+import { fetchProviderMapPins } from "@/lib/provider/finder/fetch-map-pins";
 import {
   ACCESS_NEEDS,
   SUPPORT_TYPES,
   type SupportTypeId,
-} from "@/lib/provider-finder/filters";
+} from "@/lib/provider/finder/filters";
 import {
   applyInterpretationToFields,
   buildFinderSearchParams,
 } from "@/lib/search/apply-interpretation";
 import { interpretSearchQueryClient } from "@/lib/search/interpreter-client";
-import { useProviderOutlets } from "@/lib/provider-finder/use-provider-outlets";
+import { useProviderOutlets } from "@/lib/provider/finder/use-provider-outlets";
 
 import { mapOutletsToProviders } from "./outletToProvider";
 import { type Provider } from "./providers";

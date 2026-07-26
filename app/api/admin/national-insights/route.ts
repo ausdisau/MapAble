@@ -3,7 +3,7 @@ import { jsonOk } from "@/lib/api/response";
 import {
   captureNationalInsightSnapshot,
   listPublishedNationalInsights,
-} from "@/lib/national-insights/insights-service";
+} from "@/lib/research/national-insights/insights-service";
 
 export async function GET() {
   const user = await requireApiAdmin();

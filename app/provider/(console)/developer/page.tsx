@@ -2,8 +2,8 @@ import { CreateApiKeyDialog } from "@/components/provider/CreateApiKeyDialog";
 import { getUserOrganisationIds } from "@/lib/api/organisation-scope";
 import { requireAuth } from "@/lib/auth/guards";
 import { isAdminRole } from "@/lib/auth/roles";
-import { PARTNER_API_KEY_SCOPES } from "@/lib/developer-api/partner-api-key-scopes";
-import { listPartnerApiKeys } from "@/lib/developer-api/partner-api-key-service";
+import { PARTNER_API_KEY_SCOPES } from "@/lib/api/developer/partner-api-key-scopes";
+import { listPartnerApiKeys } from "@/lib/api/developer/partner-api-key-service";
 import { prisma } from "@/lib/prisma";
 
 function formatDate(value: Date) {

@@ -1,4 +1,4 @@
-import { listPublishedSustainabilityMilestones } from "@/lib/institutional-permanence/permanence-service";
+import { listPublishedSustainabilityMilestones } from "@/lib/platform/institutional-permanence/permanence-service";
 
 export default async function SustainabilityPage() {
   const milestones = await listPublishedSustainabilityMilestones();

@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import {
   approveTransparencyPublication,
   draftTransparencyPublication,
-} from "@/lib/public-transparency/transparency-service";
+} from "@/lib/public/transparency/transparency-service";
 
 export async function GET() {
   const user = await requireApiAdmin();

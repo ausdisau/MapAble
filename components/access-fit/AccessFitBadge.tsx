@@ -1,6 +1,6 @@
 import React from "react";
 
-import type { AccessFitLabel } from "@/lib/access-fit/types";
+import type { AccessFitLabel } from "@/lib/access/fit/types";
 
 const LABEL_STYLES: Record<AccessFitLabel, string> = {
   "strong fit": "bg-emerald-100 text-emerald-900 border-emerald-300",

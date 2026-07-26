@@ -4,7 +4,7 @@ import {
   FEDERATED_RESEARCH_DISCLAIMER,
   isFederatedResearchV2Enabled,
 } from "@/lib/config/y5-rights-infrastructure";
-import { listFederatedAgreements } from "@/lib/federated-research/federation-service";
+import { listFederatedAgreements } from "@/lib/research/federated/federation-service";
 
 export default async function FederatedResearchPage() {
   await requireAdmin();

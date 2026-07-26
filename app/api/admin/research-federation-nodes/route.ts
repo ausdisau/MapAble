@@ -6,7 +6,7 @@ import {
   registerFederationNode,
   revokeFederationNode,
   suspendFederationNode,
-} from "@/lib/research-federation-at-scale/federation-node-service";
+} from "@/lib/research/federation-at-scale/federation-node-service";
 
 export async function GET() {
   const user = await requireApiAdminScope("federated_research:manage");

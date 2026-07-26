@@ -7,7 +7,7 @@ import {
   promoteCertifiedApplicationToEcosystem,
   renewEcosystemEntry,
   revokeEcosystemEntry,
-} from "@/lib/certified-api-ecosystem/ecosystem-service";
+} from "@/lib/api/certified-ecosystem/ecosystem-service";
 
 export async function GET() {
   const user = await requireApiAdminScope("api_certification:manage");

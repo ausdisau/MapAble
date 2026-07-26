@@ -5,7 +5,7 @@ import { jsonOk } from "@/lib/api/response";
 import {
   getApiVersionPolicy,
   updateApiVersionStatus,
-} from "@/lib/api-versioning/version-policy-service";
+} from "@/lib/api/versioning/version-policy-service";
 
 export async function GET() {
   const user = await requireApiAdmin();

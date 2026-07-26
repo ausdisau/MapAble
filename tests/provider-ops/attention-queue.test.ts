@@ -35,7 +35,7 @@ vi.mock("@/lib/prisma", () => ({
   },
 }));
 
-import { buildProviderAttentionQueue } from "@/lib/provider-ops/attention-queue";
+import { buildProviderAttentionQueue } from "@/lib/provider/ops/attention-queue";
 
 const provider: CurrentUser = {
   id: "prov-1",

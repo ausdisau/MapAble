@@ -38,8 +38,8 @@ import {
   useVenueFloorPlanDetail,
   useVenueFloorPlanSummaries,
 } from "@/hooks/useVenueFloorPlans";
-import type { FeatureCategory } from "@/lib/floor-plan/feature-config";
-import { findConnector, isRouteAvailable , sortFloors } from "@/lib/floor-plan/route-utils";
+import type { FeatureCategory } from "@/lib/access/floor-plan/feature-config";
+import { findConnector, isRouteAvailable , sortFloors } from "@/lib/access/floor-plan/route-utils";
 import { mapableCareFocusRing } from "@/lib/marketing/mapable-care-tokens";
 
 type FloorPlanViewerProps = {

@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { AcademyEnrollButton } from "@/app/academy/AcademyEnrollButton";
 import { requirePermission } from "@/lib/auth/guards";
-import { getAcademyCatalog, listUserEnrollments } from "@/lib/provider-academy/academy-service";
+import { getAcademyCatalog, listUserEnrollments } from "@/lib/provider/academy/academy-service";
 
 export default async function AcademyPage() {
   const user = await requirePermission("provider_academy:enroll");

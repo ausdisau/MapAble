@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { RATING_CATEGORIES } from "@/lib/access-reviews/access-rating-service";
+import { RATING_CATEGORIES } from "@/lib/access/reviews/access-rating-service";
 
 const VALUES = [
   "not_applicable",

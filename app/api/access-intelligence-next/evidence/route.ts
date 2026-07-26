@@ -8,7 +8,7 @@ import {
   isDurableEvidenceEnabled,
   listPersistedEnvelopesForSubject,
   persistEvidenceObservation,
-} from "@/lib/access-intelligence-next";
+} from "@/lib/access/intelligence-next";
 import { requireApiSession } from "@/lib/api/auth-handler";
 
 export const dynamic = "force-dynamic";

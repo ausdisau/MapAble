@@ -3,7 +3,7 @@ import { z } from "zod";
 
 import { getProviderFinderMapPinLimit } from "@/lib/config/provider-finder-map";
 import { searchNdisProviders } from "@/lib/ingestion/ndis-providers-search";
-import { parseLocationForNdisSearch } from "@/lib/provider-finder/ndis-search-from-applied";
+import { parseLocationForNdisSearch } from "@/lib/provider/finder/ndis-search-from-applied";
 
 const querySchema = z.object({
   q: z.string().optional(),

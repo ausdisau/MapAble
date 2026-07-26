@@ -2,8 +2,8 @@ import { z } from "zod";
 
 import { requireApiSession } from "@/lib/api/auth-handler";
 import { jsonError, jsonOk, zodErrorResponse } from "@/lib/api/response";
-import { buildBookingGraphForCareRequest } from "@/lib/booking-graph/graph-builder";
-import { validateCareRequestTiming } from "@/lib/booking-graph/timing-validator";
+import { buildBookingGraphForCareRequest } from "@/lib/bookings/graph/graph-builder";
+import { validateCareRequestTiming } from "@/lib/bookings/graph/timing-validator";
 
 const schema = z.object({
   careRequestId: z.string().min(1),

@@ -1,13 +1,13 @@
 import { describe, expect, it } from "vitest";
 
-import { PEERS_PRINCIPLES } from "@/lib/mapable-peers/copy";
+import { PEERS_PRINCIPLES } from "@/lib/community/mapable-peers/copy";
 import {
   isPeerPeersHostname,
   isPeerPeersPublicPath,
   peersPath,
-} from "@/lib/mapable-peers/peer-host";
-import { getPeersRoom, PEERS_ROOMS } from "@/lib/mapable-peers/rooms";
-import { threadsForRoom } from "@/lib/mapable-peers/seed-threads";
+} from "@/lib/community/mapable-peers/peer-host";
+import { getPeersRoom, PEERS_ROOMS } from "@/lib/community/mapable-peers/rooms";
+import { threadsForRoom } from "@/lib/community/mapable-peers/seed-threads";
 
 describe("MapAble PEERS", () => {
   it("defines rooms with unique slugs", () => {

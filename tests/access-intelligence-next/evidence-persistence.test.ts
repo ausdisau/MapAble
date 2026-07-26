@@ -39,7 +39,7 @@ import {
   persistEvidenceObservation,
   decideChangeReview,
   HARBOUR_PILOT,
-} from "@/lib/access-intelligence-next";
+} from "@/lib/access/intelligence-next";
 
 beforeEach(() => {
   vi.clearAllMocks();

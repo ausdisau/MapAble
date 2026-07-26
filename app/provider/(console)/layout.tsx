@@ -1,7 +1,7 @@
 import { PortalNav } from "@/components/core/PortalNav";
 import { AuthenticatedRoleAppShell } from "@/components/layout/AuthenticatedRoleAppShell";
 import { requireAuth, requirePermission } from "@/lib/auth/guards";
-import { PROVIDER_NAV_LINKS } from "@/lib/core-ui/provider-nav";
+import { PROVIDER_NAV_LINKS } from "@/lib/platform/core-ui/provider-nav";
 
 export const dynamic = "force-dynamic";
 

@@ -2,7 +2,7 @@
  * MapAble uses Prisma against PostgreSQL without Supabase RLS in the default stack.
  * All sensitive access MUST be enforced in application services:
  * - lib/auth/guards.ts and lib/auth/permissions.ts (RBAC)
- * - ConsentRecord checks (e.g. lib/support-coordinator/consent-gate.ts)
+ * - ConsentRecord checks (e.g. lib/support/coordinator/consent-gate.ts)
  * - lib/messages/message-access-policy.ts (thread participants)
  * - Document access via lib/storage/document-storage-service.ts
  *

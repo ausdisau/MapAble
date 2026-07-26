@@ -3,7 +3,7 @@ import { jsonOk } from "@/lib/api/response";
 import {
   listMarketplaceListings,
   publishMarketplaceListing,
-} from "@/lib/partner-marketplace/marketplace-service";
+} from "@/lib/partner/marketplace/marketplace-service";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {

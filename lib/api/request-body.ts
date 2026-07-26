@@ -1,4 +1,4 @@
-import { readTextWithByteLimit } from "@/lib/access-import/read-limited-body";
+import { readTextWithByteLimit } from "@/lib/access/import/read-limited-body";
 
 /** Max JSON body for authenticated access API writes (suggest place, reviews). */
 export const ACCESS_API_MAX_JSON_BYTES = 256 * 1024;

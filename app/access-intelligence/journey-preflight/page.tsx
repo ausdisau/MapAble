@@ -7,7 +7,7 @@ import {
   accessIntelligenceNextFlags,
   runDoorToRoomPreflight,
   taylorRoom312Query,
-} from "@/lib/access-intelligence-next";
+} from "@/lib/access/intelligence-next";
 
 export const metadata: Metadata = {
   title: "Journey preflight (synthetic) | Access Intelligence Next",

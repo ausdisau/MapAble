@@ -1,4 +1,4 @@
-import { listPublicCertifiedPartners } from "@/lib/api-certification/certification-service";
+import { listPublicCertifiedPartners } from "@/lib/api/certification/certification-service";
 import { API_CERTIFICATION_DISCLAIMER } from "@/lib/config/y5-rights-infrastructure";
 
 export default async function CertifiedPartnersPage() {

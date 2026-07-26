@@ -5,7 +5,7 @@ import {
   executeAccessQuery,
   type AccessQueryAst,
   type ParticipantRequirementSet,
-} from "@/lib/access-intelligence-next";
+} from "@/lib/access/intelligence-next";
 
 export const dynamic = "force-dynamic";
 

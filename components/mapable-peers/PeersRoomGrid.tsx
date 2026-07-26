@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import type { PeersRoom } from "@/lib/mapable-peers/rooms";
+import type { PeersRoom } from "@/lib/community/mapable-peers/rooms";
 
 export function PeersRoomGrid({
   rooms,

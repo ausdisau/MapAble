@@ -8,7 +8,7 @@ import {
   isSearchInterpreterConfigured,
   searchInterpreterConfig,
 } from "@/lib/config/search-interpreter";
-import { ACCESS_NEEDS } from "@/lib/provider-finder/filters";
+import { ACCESS_NEEDS } from "@/lib/provider/finder/filters";
 import type { NaturalLanguageSearchFilters } from "@/types/search";
 
 import { getInterpreterEngineId, getInterpreterModel } from "./get-model";

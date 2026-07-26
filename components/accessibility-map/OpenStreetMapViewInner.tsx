@@ -16,7 +16,7 @@ import {
 import { MapLegend } from "@/components/accessibility-map/MapLegend";
 import { UserLocationControl } from "@/components/accessibility-map/UserLocationControl";
 import type { UserLocationResult } from "@/hooks/useUserLocation";
-import type { AccessNeed } from "@/lib/access-fit/types";
+import type { AccessNeed } from "@/lib/access/fit/types";
 import type { DemoAccessPlace } from "@/lib/demo/accessibility-places";
 import {
   AUSTRALIA_FALLBACK_ZOOM,

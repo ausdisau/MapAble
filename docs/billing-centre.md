@@ -80,7 +80,7 @@ Exports are permission-checked and audited.
 ## Key modules
 
 - `lib/billing/` — domain services (money, policy, invoicing, claims, reconciliation, payouts, copilot)
-- `lib/billing-core/` — Stripe checkout / Connect / legacy billing helpers
+- `lib/billing/core/` — Stripe checkout / Connect / legacy billing helpers
 - `app/billing/` — workspaces
 - `app/api/billing/` — route handlers
 - `types/billing.ts` — shared types

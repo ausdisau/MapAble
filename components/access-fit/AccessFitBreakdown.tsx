@@ -1,7 +1,7 @@
 import React from "react";
 
 import { AccessFitBadge } from "@/components/access-fit/AccessFitBadge";
-import type { AccessFitResult } from "@/lib/access-fit/types";
+import type { AccessFitResult } from "@/lib/access/fit/types";
 
 
 export function AccessFitBreakdown({ result }: { result: AccessFitResult }) {

@@ -1,6 +1,6 @@
 # Public Claim Registry
 
-Machine seed: `lib/convergence-os/seed/public-claims.ts`.
+Machine seed: `lib/platform/convergence-os/seed/public-claims.ts`.
 
 ## Rule
 

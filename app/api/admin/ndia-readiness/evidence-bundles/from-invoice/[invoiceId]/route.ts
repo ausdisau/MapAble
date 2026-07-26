@@ -1,6 +1,6 @@
 import { requireApiAdmin } from "@/lib/api/auth-handler";
 import { jsonOk } from "@/lib/api/response";
-import { buildEvidenceBundleFromInvoice } from "@/lib/ndia-readiness/evidence-bundle-service";
+import { buildEvidenceBundleFromInvoice } from "@/lib/ndis/readiness/evidence-bundle-service";
 
 export async function POST(
   _req: Request,

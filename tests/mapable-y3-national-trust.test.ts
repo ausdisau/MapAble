@@ -9,7 +9,7 @@ import { y3NationalTrustConfig ,
   WORKER_ASSIST_DISCLAIMER,
 } from "@/lib/config/y3-national-trust";
 import { validateWorkerAssistPrompt } from "@/lib/copilot/worker-assist-service";
-import { mapClaimsToWorkerStatuses } from "@/lib/trust-passport/issuer-adapter";
+import { mapClaimsToWorkerStatuses } from "@/lib/trust/passport/issuer-adapter";
 
 describe("Y3 national trust config", () => {
   it("disables all Y3 features by default", () => {

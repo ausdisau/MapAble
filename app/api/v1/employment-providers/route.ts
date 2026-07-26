@@ -1,5 +1,5 @@
 import { jsonOk } from "@/lib/api/response";
-import { EMPLOYMENT_PROVIDER_PROGRAMMES } from "@/lib/employment-providers/des-iea";
+import { EMPLOYMENT_PROVIDER_PROGRAMMES } from "@/lib/employment/providers/des-iea";
 
 /**
  * DES / IEA partner catalogue — scaffold metadata only.

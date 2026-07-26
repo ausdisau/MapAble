@@ -2,11 +2,11 @@ import { createHash } from "crypto";
 
 import type { ApiScope } from "@prisma/client";
 
-import { listPublishedPlaces } from "@/lib/access-map/access-place-service";
-import { listAccessiblePlaces } from "@/lib/accessibility-map/place-service";
+import { listPublishedPlaces } from "@/lib/access/map/access-place-service";
+import { listAccessiblePlaces } from "@/lib/access/accessibility-map/place-service";
 import { jsonError, jsonOk } from "@/lib/api/response";
-import { getApiVersionPolicy } from "@/lib/api-versioning/version-policy-service";
-import { scopesAllow } from "@/lib/developer-api/api-key-service";
+import { getApiVersionPolicy } from "@/lib/api/versioning/version-policy-service";
+import { scopesAllow } from "@/lib/api/developer/api-key-service";
 import { prisma } from "@/lib/prisma";
 
 

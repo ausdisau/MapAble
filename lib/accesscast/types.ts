@@ -1,4 +1,4 @@
-import type { AccessEvidenceClass } from "@/lib/access-intelligence-next";
+import type { AccessEvidenceClass } from "@/lib/access/intelligence-next";
 
 import type { AccessCastForecastState } from "./states";
 

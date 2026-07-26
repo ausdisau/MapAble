@@ -10,7 +10,7 @@ import { visitPackIntegrityHash } from "@/lib/companion/visit-pack-compile";
 import { companionDeviceEnrolSchema } from "@/mobile-contracts/schemas/companion-device";
 import { visitPackSchema } from "@/mobile-contracts/schemas/visit-pack";
 
-vi.mock("@/lib/communication-passport/service", () => ({
+vi.mock("@/lib/support/communication-passport/service", () => ({
   getCommunicationPassport: vi.fn(async () => ({
     participantId: "p1",
     version: 2,

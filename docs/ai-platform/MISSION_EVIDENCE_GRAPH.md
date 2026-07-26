@@ -21,6 +21,6 @@ Read-only semantic layer over Starting Work canonical relationships. Not a secon
 
 ## Modules
 
-- `lib/ai-platform/graph/`
-- `lib/ai-platform/retrieval/`
-- `lib/ai-platform/embeddings/types.ts` (contracts only)
+- `lib/ai/platform/graph/`
+- `lib/ai/platform/retrieval/`
+- `lib/ai/platform/embeddings/types.ts` (contracts only)

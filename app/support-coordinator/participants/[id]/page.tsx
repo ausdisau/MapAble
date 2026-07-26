@@ -9,7 +9,7 @@ import { listParticipationGoalsForCoordinator } from "@/lib/participation/partic
 import {
   getCoordinatorParticipantTimeline,
   getCoordinatorParticipantSummary,
-} from "@/lib/support-coordinator/relationship-service";
+} from "@/lib/support/coordinator/relationship-service";
 
 export default async function CoordinatorParticipantDetailPage({
   params,

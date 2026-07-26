@@ -52,7 +52,7 @@ Or import both Care and Unified together:
 
 | Area | Location |
 | --- | --- |
-| Platform hub | `/core` — `app/core/`, `components/core/`, `lib/core-ui/` |
+| Platform hub | `/core` — `app/core/`, `components/core/`, `lib/platform/core-ui/` |
 | Module registry | `app/lib/modules.ts` (Care, Transport, Jobs, Foods, …) |
 | Auth & roles | `lib/auth/`, NextAuth routes under `app/api/auth/` |
 | Unified schema | `prisma/schema.prisma` (single source of truth) |
@@ -63,7 +63,7 @@ Or import both Care and Unified together:
 ## Merge checklist
 
 1. **Schema** — Treat `prisma/schema.prisma` in this repo as authoritative; diff Repl models and migrate with `prisma migrate dev`, not ad-hoc SQL.
-2. **Navigation** — Align Repl hub links with `lib/core-ui/navigation.ts` and `CORE_HUB_SECTIONS`; avoid duplicate `/dashboard` vs module routes.
+2. **Navigation** — Align Repl hub links with `lib/platform/core-ui/navigation.ts` and `CORE_HUB_SECTIONS`; avoid duplicate `/dashboard` vs module routes.
 3. **Modules** — Map Repl module entry points to `app/lib/modules.ts` keys and existing routes (`/care`, `/transport`, `/employment`, …).
 4. **Auth** — Consolidate on NextAuth session + `lib/auth/permissions.ts`; do not import parallel auth stacks.
 5. **Env** — Merge Repl secrets into `.env.example` categories (see [integrations/environment.md](../integrations/environment.md)).

@@ -6,9 +6,9 @@ import {
   formatFeatureMeasurements,
   operationalStatusLabel,
   statusTrustLabel,
-} from "@/lib/floor-plan/accessibility-utils";
-import { getFeatureConfig } from "@/lib/floor-plan/feature-config";
-import type { FloorConnector, FloorPlanFeature } from "@/lib/floor-plan/schemas";
+} from "@/lib/access/floor-plan/accessibility-utils";
+import { getFeatureConfig } from "@/lib/access/floor-plan/feature-config";
+import type { FloorConnector, FloorPlanFeature } from "@/lib/access/floor-plan/schemas";
 import { mapableCareFocusRing } from "@/lib/marketing/mapable-care-tokens";
 
 type FloorPlanFeatureDetailsProps = {

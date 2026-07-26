@@ -10,8 +10,8 @@ import {
 } from "@/components/access/AccessDataSourceMarker";
 import { AccessFitBadge } from "@/components/access-fit/AccessFitBadge";
 import { ViewFloorPlanButton } from "@/components/accessibility-map/floor-plan/ViewFloorPlanButton";
-import { calculateAccessFit } from "@/lib/access-fit/calculate-access-fit";
-import type { AccessNeed } from "@/lib/access-fit/types";
+import { calculateAccessFit } from "@/lib/access/fit/calculate-access-fit";
+import type { AccessNeed } from "@/lib/access/fit/types";
 import type { DemoAccessPlace } from "@/lib/demo/accessibility-places";
 import {
   mapableCareFocusRing,

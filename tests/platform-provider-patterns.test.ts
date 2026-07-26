@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { detectInvoiceAnomalies } from "@/lib/billing-core/transparent-billing";
+import { detectInvoiceAnomalies } from "@/lib/billing/core/transparent-billing";
 import { classifySupportCategories } from "@/lib/care/support-category-classifier";
 import { platformPatternsConfig } from "@/lib/config/platform-patterns";
 import {

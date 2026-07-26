@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { CONSTITUTION_RULES } from "@/lib/convergence-os/constitution/rules";
-import { allowedTransitions } from "@/lib/convergence-os/constitution/exceptions";
+import { CONSTITUTION_RULES } from "@/lib/platform/convergence-os/constitution/rules";
+import { allowedTransitions } from "@/lib/platform/convergence-os/constitution/exceptions";
 
 describe("Architecture Constitution", () => {
   it("seeds exactly C-001 through C-025", () => {

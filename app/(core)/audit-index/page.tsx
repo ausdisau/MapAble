@@ -1,5 +1,5 @@
 import { ACCOUNTABILITY_TRANSPARENCY_DISCLAIMER } from "@/lib/config/y5-rights-infrastructure";
-import { listPublishedCivicAudits } from "@/lib/institutional-permanence/permanence-service";
+import { listPublishedCivicAudits } from "@/lib/platform/institutional-permanence/permanence-service";
 
 export default async function AuditIndexPage() {
   const audits = await listPublishedCivicAudits();

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { CAPABILITY_SEEDS } from "@/lib/convergence-os/seed/capabilities";
+import { CAPABILITY_SEEDS } from "@/lib/platform/convergence-os/seed/capabilities";
 
 const ROOT = process.cwd();
 

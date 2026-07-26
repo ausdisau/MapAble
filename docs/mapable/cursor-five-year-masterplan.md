@@ -549,7 +549,7 @@ This masterplan maps to the repository’s phased delivery:
 
 | Wedge | Config flag | Primary modules |
 |-------|-------------|-----------------|
-| Support profile | `SUPPORT_PROFILE_ENABLED` | `lib/support-profile/`, `app/dashboard/support-profile/`, `app/api/support-profile/` |
+| Support profile | `SUPPORT_PROFILE_ENABLED` | `lib/support/profile/`, `app/dashboard/support-profile/`, `app/api/support-profile/` |
 | Explainable matching | `PARTICIPANT_MATCH_REVIEW_ENABLED` | `lib/matching/matching-service.ts`, `app/dashboard/care/matches/` |
 | Incident intake v2 | `INCIDENT_INTAKE_V2_ENABLED` | `lib/incidents/incident-service.ts`, stepped wizard under `app/dashboard/safety/incidents/new/` |
 | Micro-consent | `MICRO_CONSENT_ENABLED` | `lib/consent/micro-consent-service.ts`, `components/consent/ConsentSharingPanel.tsx` |
@@ -564,10 +564,10 @@ Feature flags live in `lib/config/y1-wedge.ts`. Integration tests: `tests/mapabl
 | Backup recovery pilot | `BACKUP_RECOVERY_PILOT_ENABLED` | `lib/care/backup-shift-recovery-service.ts`, `lib/care/backup-recovery-pilot.ts`, `app/admin/backup-recovery/` |
 | Care+transport v2 | `CARE_TRANSPORT_ORCHESTRATION_V2_ENABLED` | `lib/orchestration/care-transport-orchestrator.ts`, `app/api/orchestration/care-transport/` |
 | Micro-consent v2 | `MICRO_CONSENT_V2_ENABLED` | `lib/consent/micro-consent-service.ts`, `app/dashboard/consent/`, `app/api/consent/micro/` |
-| Plan manager integration | `PLAN_MANAGER_INTEGRATION_ENABLED` | `lib/plan-manager/`, `app/plan-manager/`, `app/api/v1/plan-manager/` |
-| Coordinator portal | `SUPPORT_COORDINATOR_PORTAL_ENABLED` | `lib/support-coordinator/`, `app/support-coordinator/`, `app/api/support-coordinator/` |
-| Payment reconciliation v2 | `PAYMENT_RECONCILIATION_V2_ENABLED` | `lib/payment-reconciliation/reconciliation-service.ts` |
-| Multi-tenant workspaces | `MULTI_TENANT_WORKSPACE_V2_ENABLED` | `lib/multi-tenant-admin/tenant-context.ts`, `lib/enterprise-provider/` |
+| Plan manager integration | `PLAN_MANAGER_INTEGRATION_ENABLED` | `lib/support/plan-manager/`, `app/plan-manager/`, `app/api/v1/plan-manager/` |
+| Coordinator portal | `SUPPORT_COORDINATOR_PORTAL_ENABLED` | `lib/support/coordinator/`, `app/support-coordinator/`, `app/api/support-coordinator/` |
+| Payment reconciliation v2 | `PAYMENT_RECONCILIATION_V2_ENABLED` | `lib/billing/payment-reconciliation/reconciliation-service.ts` |
+| Multi-tenant workspaces | `MULTI_TENANT_WORKSPACE_V2_ENABLED` | `lib/platform/multi-tenant-admin/tenant-context.ts`, `lib/provider/enterprise/` |
 
 Y2 flags live in `lib/config/y2-orchestration.ts`. `BACKUP_RECOVERY_PILOT_ENABLED` supersedes `BACKUP_SHIFT_RECOVERY_ENABLED` when enabled. Integration tests: `tests/mapable-y2-orchestration.test.ts`.
 
@@ -575,12 +575,12 @@ Y2 flags live in `lib/config/y2-orchestration.ts`. `BACKUP_RECOVERY_PILOT_ENABLE
 
 | Theme | Config flag | Primary modules |
 |-------|-------------|-----------------|
-| Trust passport pilot | `TRUST_PASSPORT_PILOT_ENABLED` | `lib/trust-passport/`, `app/dashboard/worker/trust-passport/`, `app/admin/workers/trust-passport/` |
+| Trust passport pilot | `TRUST_PASSPORT_PILOT_ENABLED` | `lib/trust/passport/`, `app/dashboard/worker/trust-passport/`, `app/admin/workers/trust-passport/` |
 | Continuity intelligence | `CONTINUITY_INTELLIGENCE_ENABLED` | `lib/continuity/continuity-intelligence-service.ts`, `app/admin/continuity-intelligence/` |
 | Budget guidance (non-advisory) | `BUDGET_GUIDANCE_ENABLED` | `lib/budget/budget-guidance-service.ts`, `app/dashboard/budget/` |
-| Public API v2 partners | `PUBLIC_API_V2_PARTNER_ENABLED` | `lib/api-versioning/version-middleware.ts`, `app/api/v2/` |
-| National insights v2 | `NATIONAL_INSIGHTS_V2_ENABLED` | `lib/national-insights/insights-service.ts`, `/insights/national` |
-| Assessor network pilot | `ASSESSOR_NETWORK_PILOT_ENABLED` | `lib/assessor-network/assessor-network-pilot-service.ts`, `/assessor`, `/admin/assessor-network` |
+| Public API v2 partners | `PUBLIC_API_V2_PARTNER_ENABLED` | `lib/api/versioning/version-middleware.ts`, `app/api/v2/` |
+| National insights v2 | `NATIONAL_INSIGHTS_V2_ENABLED` | `lib/research/national-insights/insights-service.ts`, `/insights/national` |
+| Assessor network pilot | `ASSESSOR_NETWORK_PILOT_ENABLED` | `lib/assessor/network/assessor-network-pilot-service.ts`, `/assessor`, `/admin/assessor-network` |
 | Worker assist copilot | `WORKER_ASSIST_COPILOT_ENABLED` | `lib/copilot/worker-assist-service.ts`, `app/dashboard/worker/shifts/[shiftId]/assist/` |
 | Participation planner | `PARTICIPATION_PLANNER_ENABLED` | `lib/participation/participation-planner-service.ts`, `app/dashboard/participation/` |
 
@@ -591,13 +591,13 @@ Y3 flags live in `lib/config/y3-national-trust.ts`. Integration tests: `tests/ma
 | Theme | Config flag | Primary modules |
 |-------|-------------|-----------------|
 | Data vault v2 | `DATA_VAULT_V2_ENABLED` | `lib/personal-data-vault/`, `app/data-vault/`, `app/admin/personal-data-vault/` |
-| Decision register v2 | `PUBLIC_DECISION_REGISTER_V2_ENABLED` | `lib/public-decision-register/`, `/decisions`, `/admin/public-decisions` |
-| Research safe room pilot | `RESEARCH_SAFE_ROOM_PILOT_ENABLED` | `lib/research-safe-room/safe-room-pilot-service.ts`, `/admin/research-safe-room` |
-| Provider benchmarking v2 | `PROVIDER_BENCHMARKING_V2_ENABLED` | `lib/provider-benchmarking/`, `app/provider/benchmarks/` |
-| Algorithm register v2 | `ALGORITHM_REGISTER_V2_ENABLED` | `lib/algorithm-register/`, `/algorithms`, `/admin/algorithm-register` |
-| Oversight board v2 | `OVERSIGHT_BOARD_V2_ENABLED` | `lib/oversight-board/`, `/oversight`, `/admin/oversight-board` |
-| Governance charter gate | `GOVERNANCE_CHARTER_GATE_ENABLED` | `lib/governance-charter/charter-gate-service.ts`, `/governance` |
-| Privacy analytics pilot | `PRIVACY_PRESERVING_ANALYTICS_PILOT_ENABLED` | `lib/privacy-preserving-analytics/analytics-pilot-service.ts`, `/admin/privacy-analytics` |
+| Decision register v2 | `PUBLIC_DECISION_REGISTER_V2_ENABLED` | `lib/governance/public-decision-register/`, `/decisions`, `/admin/public-decisions` |
+| Research safe room pilot | `RESEARCH_SAFE_ROOM_PILOT_ENABLED` | `lib/research/safe-room/safe-room-pilot-service.ts`, `/admin/research-safe-room` |
+| Provider benchmarking v2 | `PROVIDER_BENCHMARKING_V2_ENABLED` | `lib/provider/benchmarking/`, `app/provider/benchmarks/` |
+| Algorithm register v2 | `ALGORITHM_REGISTER_V2_ENABLED` | `lib/compliance/algorithm-register/`, `/algorithms`, `/admin/algorithm-register` |
+| Oversight board v2 | `OVERSIGHT_BOARD_V2_ENABLED` | `lib/governance/oversight-board/`, `/oversight`, `/admin/oversight-board` |
+| Governance charter gate | `GOVERNANCE_CHARTER_GATE_ENABLED` | `lib/governance/charter/charter-gate-service.ts`, `/governance` |
+| Privacy analytics pilot | `PRIVACY_PRESERVING_ANALYTICS_PILOT_ENABLED` | `lib/privacy/preserving-analytics/analytics-pilot-service.ts`, `/admin/privacy-analytics` |
 
 Y4 flags live in `lib/config/y4-civic-platform.ts`. Integration tests: `tests/mapable-y4-civic-platform.test.ts`.
 
@@ -605,14 +605,14 @@ Y4 flags live in `lib/config/y4-civic-platform.ts`. Integration tests: `tests/ma
 
 | Theme | Config flag | Primary modules |
 |-------|-------------|-----------------|
-| API certification v2 | `API_CERTIFICATION_V2_ENABLED` | `lib/api-certification/`, `/partners/certified`, `/admin/api-certification` |
-| Certified API ecosystem v2 | `CERTIFIED_API_ECOSYSTEM_V2_ENABLED` | `lib/certified-api-ecosystem/`, `/ecosystem`, `/admin/certified-api-ecosystem` |
-| Federated research v2 | `FEDERATED_RESEARCH_V2_ENABLED` | `lib/federated-research/`, `/admin/federated-research` |
-| Research federation at scale v2 | `RESEARCH_FEDERATION_AT_SCALE_V2_ENABLED` | `lib/research-federation-at-scale/`, `/research-federation`, `/admin/research-federation-nodes` |
-| Community governance membership v2 | `COMMUNITY_GOVERNANCE_MEMBERSHIP_V2_ENABLED` | `lib/community-governance-membership/`, `/membership`, `/admin/community-membership` |
-| Long-term outcomes programme v2 | `LONG_TERM_OUTCOMES_V2_ENABLED` | `lib/long-term-outcomes/`, `/outcomes`, `/admin/long-term-outcomes` |
-| Federated accountability v2 | `FEDERATED_ACCOUNTABILITY_V2_ENABLED` | `lib/federated-accountability/`, `/accountability`, `/investment-models`, `/admin/federated-accountability` |
-| Institutional permanence v2 | `INSTITUTIONAL_PERMANENCE_V2_ENABLED` | `lib/institutional-permanence/`, `/audit-index`, `/reports/data-trust`, `/admin/institutional-permanence` |
+| API certification v2 | `API_CERTIFICATION_V2_ENABLED` | `lib/api/certification/`, `/partners/certified`, `/admin/api-certification` |
+| Certified API ecosystem v2 | `CERTIFIED_API_ECOSYSTEM_V2_ENABLED` | `lib/api/certified-ecosystem/`, `/ecosystem`, `/admin/certified-api-ecosystem` |
+| Federated research v2 | `FEDERATED_RESEARCH_V2_ENABLED` | `lib/research/federated/`, `/admin/federated-research` |
+| Research federation at scale v2 | `RESEARCH_FEDERATION_AT_SCALE_V2_ENABLED` | `lib/research/federation-at-scale/`, `/research-federation`, `/admin/research-federation-nodes` |
+| Community governance membership v2 | `COMMUNITY_GOVERNANCE_MEMBERSHIP_V2_ENABLED` | `lib/governance/community-membership/`, `/membership`, `/admin/community-membership` |
+| Long-term outcomes programme v2 | `LONG_TERM_OUTCOMES_V2_ENABLED` | `lib/research/long-term-outcomes/`, `/outcomes`, `/admin/long-term-outcomes` |
+| Federated accountability v2 | `FEDERATED_ACCOUNTABILITY_V2_ENABLED` | `lib/governance/federated-accountability/`, `/accountability`, `/investment-models`, `/admin/federated-accountability` |
+| Institutional permanence v2 | `INSTITUTIONAL_PERMANENCE_V2_ENABLED` | `lib/platform/institutional-permanence/`, `/audit-index`, `/reports/data-trust`, `/admin/institutional-permanence` |
 
 Y5 flags live in `lib/config/y5-rights-infrastructure.ts`. Integration tests: `tests/mapable-y5-rights-infrastructure.test.ts`.
 

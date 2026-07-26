@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import {
   type IndoorAccessibilityFeatureFlag,
   getClientIndoorFeatureFlags,
-} from "@/lib/indoor-accessibility/feature-flags";
+} from "@/lib/access/indoor/feature-flags";
 
 async function fetchIndoorFlags(): Promise<Record<IndoorAccessibilityFeatureFlag, boolean>> {
   try {

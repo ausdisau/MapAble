@@ -1,6 +1,6 @@
 import { ResearchSafeRoomActions } from "@/app/admin/research-safe-room/ResearchSafeRoomActions";
 import { requireAdmin } from "@/lib/auth/guards";
-import { listResearchProjects } from "@/lib/research-safe-room/safe-room-service";
+import { listResearchProjects } from "@/lib/research/safe-room/safe-room-service";
 
 export default async function ResearchSafeRoomPage() {
   await requireAdmin();

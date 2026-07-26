@@ -4,7 +4,7 @@ import { isLongTermOutcomesV2Enabled } from "@/lib/config/y5-rights-infrastructu
 import {
   getOutcomesDisclaimer,
   listPublishedOutcomes,
-} from "@/lib/long-term-outcomes/outcomes-service";
+} from "@/lib/research/long-term-outcomes/outcomes-service";
 
 export default async function LongTermOutcomesAdminPage() {
   await requireAdmin();

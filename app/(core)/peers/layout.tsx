@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { isPeerPeersRequest } from "@/lib/mapable-peers/peers-request";
+import { isPeerPeersRequest } from "@/lib/community/mapable-peers/peers-request";
 
 const PEER_PEERS_ORIGIN = "https://peer.mapable.com.au";
 

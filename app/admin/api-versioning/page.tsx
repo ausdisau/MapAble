@@ -1,4 +1,4 @@
-import { getApiVersionPolicy } from "@/lib/api-versioning/version-policy-service";
+import { getApiVersionPolicy } from "@/lib/api/versioning/version-policy-service";
 import { requireAdmin } from "@/lib/auth/guards";
 import { y3NationalTrustConfig } from "@/lib/config/y3-national-trust";
 

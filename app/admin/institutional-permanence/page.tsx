@@ -1,8 +1,8 @@
 import { PermanenceAdminForms } from "@/app/admin/institutional-permanence/PermanenceAdminForms";
 import { requireAdmin } from "@/lib/auth/guards";
 import { isInstitutionalPermanenceV2Enabled } from "@/lib/config/y5-rights-infrastructure";
-import { getContinuityDashboard } from "@/lib/institutional-continuity/continuity-service";
-import { listPublishedCivicAudits } from "@/lib/institutional-permanence/permanence-service";
+import { getContinuityDashboard } from "@/lib/platform/institutional-continuity/continuity-service";
+import { listPublishedCivicAudits } from "@/lib/platform/institutional-permanence/permanence-service";
 
 export default async function InstitutionalPermanenceAdminPage() {
   await requireAdmin();

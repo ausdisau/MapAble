@@ -55,4 +55,4 @@ Integration boundary: agreement, evidence, mission coordination — not clinical
 - [STRATEGIC_OPPORTUNITIES.md](./STRATEGIC_OPPORTUNITIES.md)
 - [BUSINESS_PLAN_ANZ_GAP_ANALYSIS.md](./BUSINESS_PLAN_ANZ_GAP_ANALYSIS.md) — ANZ business plan pillars vs repo (marketplace deferral)
 - NDIS Expansion regulatory gates: [../programmes/NDIS_REGULATORY_GATE_MATRIX.md](../programmes/NDIS_REGULATORY_GATE_MATRIX.md)
-- Capability honesty: `lib/convergence-os/seed/capabilities.ts`
+- Capability honesty: `lib/platform/convergence-os/seed/capabilities.ts`

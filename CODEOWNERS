@@ -28,7 +28,7 @@
 
 # Billing
 /lib/billing/ @ausdisau
-/lib/billing-core/ @ausdisau
+/lib/billing/core/ @ausdisau
 /lib/invoices/ @ausdisau
 /app/api/billing/ @ausdisau
 /app/api/invoices/ @ausdisau
@@ -42,7 +42,7 @@
 
 # Tenancy / organisations
 /app/api/organisations/ @ausdisau
-/lib/enterprise-provider/ @ausdisau
+/lib/provider/enterprise/ @ausdisau
 
 # Encryption / participant identifiers
 /lib/crypto/ @ausdisau
@@ -62,7 +62,7 @@
 /security/ @ausdisau
 
 # Access Intelligence Next — Living Access Fabric (contracts / synthetic only)
-/lib/access-intelligence-next/ @ausdisau
+/lib/access/intelligence-next/ @ausdisau
 /app/api/access-intelligence-next/ @ausdisau
 /app/access-intelligence/living-graph/ @ausdisau
 /app/access-intelligence/journey-preflight/ @ausdisau
@@ -71,7 +71,7 @@
 /tests/access-intelligence-next/ @ausdisau
 
 # NDIS Expansion — Assistive Technology Continuity (Wave 1)
-/lib/at-continuity/ @ausdisau
+/lib/platform/at-continuity/ @ausdisau
 /lib/config/at-continuity.ts @ausdisau
 /docs/programmes/AT_CONTINUITY_WAVE1.md @ausdisau
 /tests/at-continuity/ @ausdisau

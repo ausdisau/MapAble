@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { CORE_HUB_SECTIONS, CORE_PLATFORM_LINKS } from "@/lib/core-ui/navigation";
+import { CORE_HUB_SECTIONS, CORE_PLATFORM_LINKS } from "@/lib/platform/core-ui/navigation";
 
 describe("MapAble Core hub", () => {
   it("includes /core in platform links", () => {

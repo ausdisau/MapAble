@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/lib/auth/guards";
-import { getNationalRolloutDashboard } from "@/lib/national-rollout/rollout-stage-service";
+import { getNationalRolloutDashboard } from "@/lib/platform/national-rollout/rollout-stage-service";
 
 export default async function NationalRolloutAdminPage() {
   await requireAdmin();

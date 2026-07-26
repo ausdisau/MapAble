@@ -1,6 +1,6 @@
 # Architecture
 
-Canonical layer: `lib/ai-platform/` with adapters over existing modules. Prefer gradual consolidation over mass moves.
+Canonical layer: `lib/ai/platform/` with adapters over existing modules. Prefer gradual consolidation over mass moves.
 
 ```
 Domain services → capability registry → (optional) model gateway → AI SDK providers

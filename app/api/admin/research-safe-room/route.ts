@@ -3,7 +3,7 @@ import { jsonOk } from "@/lib/api/response";
 import {
   createResearchProject,
   listResearchProjects,
-} from "@/lib/research-safe-room/safe-room-service";
+} from "@/lib/research/safe-room/safe-room-service";
 
 export async function GET() {
   const user = await requireApiAdmin();

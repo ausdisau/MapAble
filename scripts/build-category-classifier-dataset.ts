@@ -6,7 +6,7 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 
-import { HERO_SUGGESTED_SEARCHES_FALLBACK } from "../lib/provider-finder/filters";
+import { HERO_SUGGESTED_SEARCHES_FALLBACK } from "../lib/provider/finder/filters";
 
 type SftRow = {
   messages: Array<{ role: "user" | "assistant"; content: string }>;

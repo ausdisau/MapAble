@@ -1,6 +1,6 @@
 import React from "react";
 
-import type { AccessNeed } from "@/lib/access-fit/types";
+import type { AccessNeed } from "@/lib/access/fit/types";
 import { mapableInteractiveFocusRing } from "@/lib/marketing/mapable-care-tokens";
 
 export const ACCESS_NEED_FIELD_LABELS: { key: keyof AccessNeed; label: string }[] = [

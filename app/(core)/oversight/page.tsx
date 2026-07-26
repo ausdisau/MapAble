@@ -1,4 +1,4 @@
-import { getOversightPortalSummary } from "@/lib/oversight-board/oversight-service";
+import { getOversightPortalSummary } from "@/lib/governance/oversight-board/oversight-service";
 
 export default async function OversightPage() {
   const data = await getOversightPortalSummary();

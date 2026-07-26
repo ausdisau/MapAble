@@ -1,6 +1,6 @@
 import type { AccessAccreditationTier } from "@prisma/client";
 
-import { tierLabel } from "@/lib/access-accreditation/accreditation-scoring-service";
+import { tierLabel } from "@/lib/access/accreditation/accreditation-scoring-service";
 
 export function AccreditationTierBadge({
   tier,

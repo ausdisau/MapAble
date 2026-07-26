@@ -4,7 +4,7 @@
  */
 import {
   evaluateAdvisoryCiFindings,
-} from "@/lib/convergence-os/ci/advisory-gate";
+} from "@/lib/platform/convergence-os/ci/advisory-gate";
 
 function main() {
   const result = evaluateAdvisoryCiFindings();

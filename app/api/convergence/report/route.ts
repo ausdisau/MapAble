@@ -1,8 +1,8 @@
 import { requireApiAdmin } from "@/lib/api/auth-handler";
 import { jsonError } from "@/lib/api/response";
-import { requireConvergenceEnabled } from "@/lib/convergence-os/gates";
-import { getLatestSnapshotId } from "@/lib/convergence-os/scans/repository-scan";
-import { buildConvergenceTextReport } from "@/lib/convergence-os/text-report";
+import { requireConvergenceEnabled } from "@/lib/platform/convergence-os/gates";
+import { getLatestSnapshotId } from "@/lib/platform/convergence-os/scans/repository-scan";
+import { buildConvergenceTextReport } from "@/lib/platform/convergence-os/text-report";
 import { prisma } from "@/lib/prisma";
 
 export async function GET(req: Request) {

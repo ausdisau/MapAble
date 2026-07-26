@@ -3,7 +3,7 @@ import { jsonOk } from "@/lib/api/response";
 import {
   listPublishedInvestmentModels,
   runTransportInvestmentModel,
-} from "@/lib/transport-investment-modelling/investment-model-service";
+} from "@/lib/transport/investment-modelling/investment-model-service";
 
 export async function GET() {
   const user = await requireApiAdmin();

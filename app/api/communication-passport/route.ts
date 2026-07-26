@@ -6,7 +6,7 @@ import {
   CommunicationPassportError,
   getCommunicationPassport,
   updateCommunicationPassportModes,
-} from "@/lib/communication-passport/service";
+} from "@/lib/support/communication-passport/service";
 import { isCommunicationPassportEnabled } from "@/lib/config/communication-workforce";
 
 const updateSchema = z

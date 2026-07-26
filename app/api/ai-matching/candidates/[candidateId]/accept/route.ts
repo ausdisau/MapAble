@@ -1,7 +1,7 @@
 import {
   acceptAiCandidate,
-} from "@/lib/ai-matching/ai-match-service";
-import { AiMatchingError } from "@/lib/ai-matching/types";
+} from "@/lib/ai/matching/ai-match-service";
+import { AiMatchingError } from "@/lib/ai/matching/types";
 import { requireApiPermission } from "@/lib/api/auth-handler";
 import { jsonError, jsonOk } from "@/lib/api/response";
 

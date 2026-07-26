@@ -1,6 +1,6 @@
 import { requireApiPermission } from "@/lib/api/auth-handler";
 import { jsonError, jsonOk } from "@/lib/api/response";
-import { submitProviderClaim } from "@/lib/ndia-provider-claiming/claim-service";
+import { submitProviderClaim } from "@/lib/ndis/provider-claiming/claim-service";
 
 export async function POST(
   _req: Request,

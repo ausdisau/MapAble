@@ -4,7 +4,7 @@ import {
   createGrantReport,
   getGrantReportsDashboard,
   submitGrantReport,
-} from "@/lib/grant-reporting/grant-service";
+} from "@/lib/reporting/grant/grant-service";
 
 export async function GET() {
   const user = await requireApiAdmin();

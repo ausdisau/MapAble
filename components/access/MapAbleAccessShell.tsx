@@ -8,7 +8,7 @@ import { AccessMap } from "@/components/access/AccessMap";
 import { AccessPlaceList } from "@/components/access/AccessPlaceList";
 import { AccessSearchBar } from "@/components/access/AccessSearchBar";
 import { MobileAccessMapShell } from "@/components/access/MobileAccessMapShell";
-import { ACCESS_DISCLAIMER } from "@/lib/access-map/copy";
+import { ACCESS_DISCLAIMER } from "@/lib/access/map/copy";
 
 export type AccessPlaceView = {
   id: string;

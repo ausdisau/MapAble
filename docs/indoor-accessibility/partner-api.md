@@ -19,7 +19,7 @@
 
 ## DTO policy
 
-Responses pass through `lib/indoor-accessibility/partner/partner-dto.ts` — no raw DB rows.
+Responses pass through `lib/access/indoor/partner/partner-dto.ts` — no raw DB rows.
 
 ## Embed
 
@@ -27,4 +27,4 @@ Responses pass through `lib/indoor-accessibility/partner/partner-dto.ts` — no 
 
 ## Webhooks
 
-Scaffold: signed payload verification in `lib/indoor-accessibility/partner/api-auth.ts`. Delivery worker not yet implemented.
+Scaffold: signed payload verification in `lib/access/indoor/partner/api-auth.ts`. Delivery worker not yet implemented.

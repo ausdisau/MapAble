@@ -1,4 +1,4 @@
-import { ACCESS_NEEDS } from "@/lib/provider-finder/filters";
+import { ACCESS_NEEDS } from "@/lib/provider/finder/filters";
 import type { AccessNeedResolution } from "@/types/search";
 
 import { resolveAccessNeedIdsWithLlm } from "./resolve-access-needs-llm";

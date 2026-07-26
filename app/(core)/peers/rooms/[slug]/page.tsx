@@ -3,9 +3,9 @@ import { notFound } from "next/navigation";
 
 import { CorePageHeader } from "@/components/core/CorePageHeader";
 import { PeersThreadList } from "@/components/mapable-peers/PeersThreadList";
-import { getPeersLinkHelpers } from "@/lib/mapable-peers/peers-request";
-import { getPeersRoom, PEERS_ROOMS } from "@/lib/mapable-peers/rooms";
-import { threadsForRoom } from "@/lib/mapable-peers/seed-threads";
+import { getPeersLinkHelpers } from "@/lib/community/mapable-peers/peers-request";
+import { getPeersRoom, PEERS_ROOMS } from "@/lib/community/mapable-peers/rooms";
+import { threadsForRoom } from "@/lib/community/mapable-peers/seed-threads";
 
 export function generateStaticParams() {
   return PEERS_ROOMS.map((room) => ({ slug: room.slug }));

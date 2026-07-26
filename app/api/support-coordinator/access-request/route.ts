@@ -6,7 +6,7 @@ import {
   approveCoordinatorAccess,
   listCoordinatorParticipants,
   requestCoordinatorAccess,
-} from "@/lib/support-coordinator/relationship-service";
+} from "@/lib/support/coordinator/relationship-service";
 
 export async function GET() {
   if (!y2OrchestrationConfig.supportCoordinatorPortalEnabled) {

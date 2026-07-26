@@ -4,7 +4,7 @@ import { PROVIDERS } from "@/app/provider-finder/providers";
 import { getCanonicalPublicOrigin } from "@/lib/config/canonical-url";
 import { DEMO_ACCESS_PLACES } from "@/lib/demo/accessibility-places";
 import { LOCAL_ACCESS_LOCATIONS } from "@/lib/demo/local-access-pages";
-import { informationalSitemapPaths } from "@/lib/public-informational/routes";
+import { informationalSitemapPaths } from "@/lib/public/informational/routes";
 import { buildLocalLandingSitemapParams } from "@/lib/seo/local-landing";
 
 const baseUrl = getCanonicalPublicOrigin();
@@ -12,7 +12,7 @@ const baseUrl = getCanonicalPublicOrigin();
 /**
  * Additional public marketing URLs beyond the informational GO-gate allowlist.
  * Informational allowlist paths are always sourced from
- * `lib/public-informational/routes.ts` so the release boundary cannot drift.
+ * `lib/public/informational/routes.ts` so the release boundary cannot drift.
  */
 const additionalPublicRoutes = [
   "/access",

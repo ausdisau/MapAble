@@ -6,13 +6,13 @@ import {
   getDemoFloorPlanSummaries,
   demoVenueHasFloorPlan,
 } from "@/lib/demo/floor-plan-fixture";
-import { isValidNormalizedPoint, normalizedToPercent } from "@/lib/floor-plan/coordinates";
-import { parseFloorPlanSearchParams, buildFloorPlanPath } from "@/lib/floor-plan/floor-plan-url-state";
-import { isRouteAvailable, sortFloors } from "@/lib/floor-plan/route-utils";
+import { isValidNormalizedPoint, normalizedToPercent } from "@/lib/access/floor-plan/coordinates";
+import { parseFloorPlanSearchParams, buildFloorPlanPath } from "@/lib/access/floor-plan/floor-plan-url-state";
+import { isRouteAvailable, sortFloors } from "@/lib/access/floor-plan/route-utils";
 import {
   floorPlanDocumentSchema,
   floorPlanFeatureSchema,
-} from "@/lib/floor-plan/schemas";
+} from "@/lib/access/floor-plan/schemas";
 
 describe("floor plan schemas", () => {
   it("parses valid normalized points", () => {

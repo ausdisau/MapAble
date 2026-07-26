@@ -1,6 +1,6 @@
 import { createHash, randomUUID } from "crypto";
 
-import { getCommunicationPassport } from "@/lib/communication-passport/service";
+import { getCommunicationPassport } from "@/lib/support/communication-passport/service";
 import type { VisitPack } from "@/mobile-contracts/schemas/visit-pack";
 import { visitPackSchema } from "@/mobile-contracts/schemas/visit-pack";
 

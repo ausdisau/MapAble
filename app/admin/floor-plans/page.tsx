@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { isIndoorFeatureEnabled } from "@/lib/indoor-accessibility/feature-flags";
+import { isIndoorFeatureEnabled } from "@/lib/access/indoor/feature-flags";
 
 export default function FloorPlansAdminPage() {
   const authoringEnabled = isIndoorFeatureEnabled("floorPlanAuthoring");

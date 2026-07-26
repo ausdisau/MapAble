@@ -3,7 +3,7 @@ import { jsonOk } from "@/lib/api/response";
 import {
   createAppStoreSubmission,
   getAppStoreReleaseDashboard,
-} from "@/lib/app-store-release/release-process-service";
+} from "@/lib/platform/app-store-release/release-process-service";
 
 export async function GET() {
   const user = await requireApiAdmin();

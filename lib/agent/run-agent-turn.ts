@@ -1,23 +1,23 @@
 import {
   getProviderFinderSession,
   priorAppliedFromSession,
-} from "@/lib/agent-sessions/provider-finder-session";
+} from "@/lib/ai/agent-sessions/provider-finder-session";
 import { searchAgentConfig } from "@/lib/config/search-agent";
 import type { PlanProviderFinderOptions } from "@/lib/copilot/plan-provider-finder";
 import {
   runProviderFinderAskTurn,
   type ProviderFinderAskTurn,
   type ProviderFinderSessionFields,
-} from "@/lib/provider-finder/ask-bridge";
-import { mergeProviderContextIntoQuery } from "@/lib/provider-finder/ask-bridge";
+} from "@/lib/provider/finder/ask-bridge";
+import { mergeProviderContextIntoQuery } from "@/lib/provider/finder/ask-bridge";
 import {
   buildClarificationQuestion,
   enrichCopilotAgentMeta,
   needsProviderFinderClarification,
-} from "@/lib/provider-finder/clarification";
-import { runProviderFinderConversationTurn } from "@/lib/provider-finder/conversation/run-turn";
-import { mergeAppliedFields } from "@/lib/provider-finder/merge-applied";
-import { searchProvidersForAppliedTurn } from "@/lib/provider-finder/ndis-search-from-applied";
+} from "@/lib/provider/finder/clarification";
+import { runProviderFinderConversationTurn } from "@/lib/provider/finder/conversation/run-turn";
+import { mergeAppliedFields } from "@/lib/provider/finder/merge-applied";
+import { searchProvidersForAppliedTurn } from "@/lib/provider/finder/ndis-search-from-applied";
 import { buildFinderSearchParams } from "@/lib/search/apply-interpretation";
 
 import { explainProvider } from "./tools/explain-provider";

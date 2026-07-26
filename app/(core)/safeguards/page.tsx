@@ -1,4 +1,4 @@
-import { listActiveSafeguards } from "@/lib/constitutional-safeguards/safeguards-service";
+import { listActiveSafeguards } from "@/lib/governance/constitutional-safeguards/safeguards-service";
 
 export default async function SafeguardsPage() {
   const articles = await listActiveSafeguards();

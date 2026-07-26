@@ -1,6 +1,6 @@
 "use client";
 
-import type { FloorPlanSummary } from "@/lib/floor-plan/schemas";
+import type { FloorPlanSummary } from "@/lib/access/floor-plan/schemas";
 
 type FloorSelectorProps = {
   floors: FloorPlanSummary[];

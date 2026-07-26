@@ -1,4 +1,4 @@
-import { getAiGovernanceDashboard } from "@/lib/ai-governance/governance-service";
+import { getAiGovernanceDashboard } from "@/lib/ai/governance/governance-service";
 import { requireAdmin } from "@/lib/auth/guards";
 
 export default async function AiGovernancePage() {

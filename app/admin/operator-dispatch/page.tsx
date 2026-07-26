@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/lib/auth/guards";
-import { getOperatorDispatchBoard } from "@/lib/operator-dispatch/operator-dispatch-service";
+import { getOperatorDispatchBoard } from "@/lib/transport/operator-dispatch/operator-dispatch-service";
 
 export default async function OperatorDispatchPage() {
   await requireAdmin();

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { extractLastUserText } from "@/lib/provider-finder/conversation/extract-user-text";
-import { formatFinderReplyFromInterpretation } from "@/lib/provider-finder/conversation/format-reply";
+import { extractLastUserText } from "@/lib/provider/finder/conversation/extract-user-text";
+import { formatFinderReplyFromInterpretation } from "@/lib/provider/finder/conversation/format-reply";
 
 describe("provider finder conversation", () => {
   it("extracts last user message text", () => {

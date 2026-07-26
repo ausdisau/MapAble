@@ -6,9 +6,9 @@ import { PeersHeritage } from "@/components/mapable-peers/PeersHeritage";
 import { PeersPrincipleList } from "@/components/mapable-peers/PeersPrincipleList";
 import { PeersRelatedLinks } from "@/components/mapable-peers/PeersRelatedLinks";
 import { PeersRoomGrid } from "@/components/mapable-peers/PeersRoomGrid";
-import { PEERS_DESCRIPTION, PEERS_TAGLINE } from "@/lib/mapable-peers/copy";
-import { getPeersLinkHelpers } from "@/lib/mapable-peers/peers-request";
-import { PEERS_ROOMS } from "@/lib/mapable-peers/rooms";
+import { PEERS_DESCRIPTION, PEERS_TAGLINE } from "@/lib/community/mapable-peers/copy";
+import { getPeersLinkHelpers } from "@/lib/community/mapable-peers/peers-request";
+import { PEERS_ROOMS } from "@/lib/community/mapable-peers/rooms";
 
 export const metadata = {
   title: "MapAble PEERS",

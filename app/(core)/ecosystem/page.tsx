@@ -1,4 +1,4 @@
-import { listPublicEcosystemDirectory } from "@/lib/certified-api-ecosystem/ecosystem-service";
+import { listPublicEcosystemDirectory } from "@/lib/api/certified-ecosystem/ecosystem-service";
 import { API_CERTIFICATION_DISCLAIMER } from "@/lib/config/y5-rights-infrastructure";
 
 export default async function EcosystemPage() {

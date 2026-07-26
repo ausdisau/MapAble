@@ -4,7 +4,7 @@ import {
   demoVenueHasFloorPlan,
   getDemoFloorPlanSummaries,
 } from "@/lib/demo/floor-plan-fixture";
-import { listVenueFloorPlans } from "@/lib/floor-plan/floor-plan-service";
+import { listVenueFloorPlans } from "@/lib/access/floor-plan/floor-plan-service";
 
 type RouteParams = { params: Promise<{ placeId: string }> };
 

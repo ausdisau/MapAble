@@ -1,4 +1,4 @@
-import type { AccessGraphEdgeListItem, AccessGraphListItem } from "@/lib/access-intelligence-next";
+import type { AccessGraphEdgeListItem, AccessGraphListItem } from "@/lib/access/intelligence-next";
 
 type Props = {
   nodes: AccessGraphListItem[];

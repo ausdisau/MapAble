@@ -3,7 +3,7 @@ import {
   authenticateEmploymentProvider,
   requireEmploymentConsentHeader,
   requireEmploymentScope,
-} from "@/lib/employment-providers/api-auth";
+} from "@/lib/employment/providers/api-auth";
 
 /**
  * Consent-gated job search activity + tenure tracking for DES/IEA partners.

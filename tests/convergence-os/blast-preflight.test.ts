@@ -3,11 +3,11 @@ import {
   computeBlastSeverity,
   finalizeSeverity,
   maxSeverity,
-} from "@/lib/convergence-os/blast/simulator";
+} from "@/lib/platform/convergence-os/blast/simulator";
 import {
   evaluateStopConditions,
   renderContractMarkdown,
-} from "@/lib/convergence-os/agent/preflight";
+} from "@/lib/platform/convergence-os/agent/preflight";
 
 describe("Blast radius severity", () => {
   it("never lets AI lower final severity", () => {
@@ -64,9 +64,9 @@ describe("Agent preflight", () => {
       objective: "Ship advisory twin",
       nonGoals: "No auto-merge",
       canonicalModels: ["RepositorySnapshot"],
-      reusableServices: ["lib/convergence-os"],
+      reusableServices: ["lib/platform/convergence-os"],
       prohibitedConcepts: ["parallel_User"],
-      allowedPaths: ["lib/convergence-os/"],
+      allowedPaths: ["lib/platform/convergence-os/"],
       protectedPaths: ["prisma/schema.prisma"],
       migrationsPermitted: false,
       testsRequired: ["tests/convergence-os"],

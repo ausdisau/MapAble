@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildTwinInventory } from "@/lib/convergence-os/twin/inventory";
+import { buildTwinInventory } from "@/lib/platform/convergence-os/twin/inventory";
 
 describe("Repository twin inventory", () => {
   it("builds package/module/route/flag inventories with hashes", () => {

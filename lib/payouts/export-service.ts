@@ -1,6 +1,6 @@
 import { format } from "date-fns";
 
-import { writeBillingAuditLog } from "@/lib/billing-core/audit";
+import { writeBillingAuditLog } from "@/lib/billing/core/audit";
 import { prisma } from "@/lib/prisma";
 
 export async function exportPaymentToCsv(paymentId: string) {

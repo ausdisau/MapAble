@@ -26,7 +26,7 @@ import {
   __resetBreakGlassSessionsForTests,
   BreakGlassRequiredError,
 } from "@/lib/security/break-glass";
-import { openHardenedBreakGlassSession } from "@/lib/trust-fabric/break-glass";
+import { openHardenedBreakGlassSession } from "@/lib/trust/fabric/break-glass";
 
 const admin: CurrentUser = {
   id: "admin-1",

@@ -1,14 +1,14 @@
 import { z } from "zod";
 
 import { requireApiSession } from "@/lib/api/auth-handler";
-import { featureDisabledResponse, indoorApiError } from "@/lib/indoor-accessibility/api-errors";
-import { isIndoorFeatureEnabled } from "@/lib/indoor-accessibility/feature-flags";
-import { canManageVisitPlan } from "@/lib/indoor-accessibility/permissions";
+import { featureDisabledResponse, indoorApiError } from "@/lib/access/indoor/api-errors";
+import { isIndoorFeatureEnabled } from "@/lib/access/indoor/feature-flags";
+import { canManageVisitPlan } from "@/lib/access/indoor/permissions";
 import {
   createVisitPlan,
   createVisitPlanShare,
   revokeVisitPlanShare,
-} from "@/lib/indoor-accessibility/sharing/visit-plan-service";
+} from "@/lib/access/indoor/sharing/visit-plan-service";
 
 const createSchema = z.object({
   placeId: z.string(),

@@ -1,7 +1,7 @@
 import { requireApiAdmin } from "@/lib/api/auth-handler";
 import { jsonOk } from "@/lib/api/response";
-import { requireConvergenceFeature } from "@/lib/convergence-os/gates";
-import { getTwinOverview } from "@/lib/convergence-os/twin/store";
+import { requireConvergenceFeature } from "@/lib/platform/convergence-os/gates";
+import { getTwinOverview } from "@/lib/platform/convergence-os/twin/store";
 import { prisma } from "@/lib/prisma";
 
 export async function GET(req: Request) {

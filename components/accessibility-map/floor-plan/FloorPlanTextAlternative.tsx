@@ -4,9 +4,9 @@ import {
   formatFeatureMeasurements,
   operationalStatusLabel,
   statusTrustLabel,
-} from "@/lib/floor-plan/accessibility-utils";
-import { getFeatureConfig, type FeatureCategory } from "@/lib/floor-plan/feature-config";
-import type { FloorPlanFeature, FloorPlanRoute } from "@/lib/floor-plan/schemas";
+} from "@/lib/access/floor-plan/accessibility-utils";
+import { getFeatureConfig, type FeatureCategory } from "@/lib/access/floor-plan/feature-config";
+import type { FloorPlanFeature, FloorPlanRoute } from "@/lib/access/floor-plan/schemas";
 
 type FloorPlanTextAlternativeProps = {
   features: FloorPlanFeature[];

@@ -1,6 +1,6 @@
 import { requireApiAdmin } from "@/lib/api/auth-handler";
 import { jsonOk } from "@/lib/api/response";
-import { getGovernmentPortalSummary } from "@/lib/government-portal/portal-service";
+import { getGovernmentPortalSummary } from "@/lib/public/government-portal/portal-service";
 import { prisma } from "@/lib/prisma";
 
 export async function GET(req: Request) {

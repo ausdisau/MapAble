@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { requirePermission } from "@/lib/auth/guards";
-import { listCoordinatorTasks } from "@/lib/support-coordinator/relationship-service";
+import { listCoordinatorTasks } from "@/lib/support/coordinator/relationship-service";
 
 export default async function CoordinatorTasksPage() {
   const user = await requirePermission("coordinator:portal");

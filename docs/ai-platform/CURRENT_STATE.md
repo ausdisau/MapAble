@@ -30,7 +30,7 @@ Positioning: *An evidence-aware, participant-controlled copilot for complete dis
 
 ## Advanced AI Expansion train (≤ 3)
 
-1. Evidence Intake contracts (`lib/ai-platform/intake/`)
+1. Evidence Intake contracts (`lib/ai/platform/intake/`)
 2. Mission Evidence Graph + hybrid retrieval
 3. Companion Edge AI broker + ProcessingReceipt
 

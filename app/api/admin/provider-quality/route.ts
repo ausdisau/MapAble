@@ -3,7 +3,7 @@ import { jsonError, jsonOk } from "@/lib/api/response";
 import {
   calculateProviderQualityScore,
   getProviderQualityDashboard,
-} from "@/lib/provider-quality/quality-service";
+} from "@/lib/provider/quality/quality-service";
 
 export async function GET() {
   const user = await requireApiAdmin();

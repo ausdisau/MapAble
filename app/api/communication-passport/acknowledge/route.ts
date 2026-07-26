@@ -11,7 +11,7 @@ import {
   acknowledgeCommunicationPassport,
   CommunicationPassportError,
   getWorkerFacingPassport,
-} from "@/lib/communication-passport/service";
+} from "@/lib/support/communication-passport/service";
 import { isCommunicationPassportEnabled } from "@/lib/config/communication-workforce";
 import { checkConsent } from "@/lib/consent/consent-service";
 import { assertAdminTenantAccess } from "@/lib/security/break-glass";

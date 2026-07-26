@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { defaultDashboardPath } from "@/lib/auth/roles";
-import { PROVIDER_NAV_LINKS } from "@/lib/core-ui/provider-nav";
+import { PROVIDER_NAV_LINKS } from "@/lib/platform/core-ui/provider-nav";
 import { getProviderControlPanelSummary } from "@/lib/provider/provider-control-panel-service";
 
 vi.mock("@/lib/onboarding/onboarding-evaluator", () => ({

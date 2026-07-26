@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { BillingInvoiceDetailClient } from "@/components/billing/BillingInvoiceDetailClient";
 import { requireAuth } from "@/lib/auth/guards";
-import { getInvoiceForUser } from "@/lib/billing-core/invoice-service";
+import { getInvoiceForUser } from "@/lib/billing/core/invoice-service";
 
 export default async function BillingInvoiceDetailPage({
   params,

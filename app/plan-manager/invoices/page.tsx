@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { requirePermission } from "@/lib/auth/guards";
-import { listAuthorisedInvoices } from "@/lib/plan-manager/invoice-review-service";
+import { listAuthorisedInvoices } from "@/lib/support/plan-manager/invoice-review-service";
 
 export default async function PlanManagerInvoicesPage() {
   const user = await requirePermission("plan_manager:portal");

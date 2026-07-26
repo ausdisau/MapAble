@@ -28,14 +28,14 @@ Shared shell, navigation and hub for the MapAble Core platform.
 
 ## Configuration
 
-`lib/core-ui/navigation.ts` — civic links, hub sections  
-`lib/core-ui/provider-nav.ts` — provider console links (control panel first)
+`lib/platform/core-ui/navigation.ts` — civic links, hub sections  
+`lib/platform/core-ui/provider-nav.ts` — provider console links (control panel first)
 
 Provider admins and transport operators land on `/provider` after sign-in (`defaultDashboardPath` in `lib/auth/roles.ts`). The control panel aggregates worker roster counts, pending invites, care inbox volume, roster gaps, and onboarding blockers via `lib/provider/provider-control-panel-service.ts`.
 
 Users with `enterprise:console` see an **Enterprise workspace** section on the control panel (`#enterprise-workspace`). `/enterprise-provider` redirects there.
 
-**Consolidated nav** (`lib/core-ui/provider-nav.ts`): nine section hubs (control panel, care, transport, workers, calendar, bookings, claiming, billing, insights). Care and transport use sub-nav (`lib/core-ui/provider-section-nav.ts`). Stub routes redirect: `scheduling`/`availability` → calendar; `invoices`/`documents` → billing; `messages` → notifications; `support` → safety; `workers/new` → `workers?invite=1`; `care` → inbox.
+**Consolidated nav** (`lib/platform/core-ui/provider-nav.ts`): nine section hubs (control panel, care, transport, workers, calendar, bookings, claiming, billing, insights). Care and transport use sub-nav (`lib/platform/core-ui/provider-section-nav.ts`). Stub routes redirect: `scheduling`/`availability` → calendar; `invoices`/`documents` → billing; `messages` → notifications; `support` → safety; `workers/new` → `workers?invite=1`; `care` → inbox.
 
 ## Accessibility
 

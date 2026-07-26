@@ -1,7 +1,7 @@
 import { BenchmarkCaptureForm } from "@/app/admin/provider-benchmarking/BenchmarkCaptureForm";
 import { requireAdmin } from "@/lib/auth/guards";
 import { BENCHMARK_DISCLAIMER } from "@/lib/config/y4-civic-platform";
-import { getProviderBenchmarkDashboard } from "@/lib/provider-benchmarking/benchmark-service";
+import { getProviderBenchmarkDashboard } from "@/lib/provider/benchmarking/benchmark-service";
 
 export default async function ProviderBenchmarkingPage() {
   await requireAdmin();

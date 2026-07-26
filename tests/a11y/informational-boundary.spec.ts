@@ -7,7 +7,7 @@ import {
   INFORMATIONAL_SAFE_CTAS,
   isExcludedTransactionalPath,
   isInformationalReleasePath,
-} from "@/lib/public-informational/routes";
+} from "@/lib/public/informational/routes";
 
 /**
  * Runtime informational release-boundary suite.

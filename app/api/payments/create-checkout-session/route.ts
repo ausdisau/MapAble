@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { requireApiSession } from "@/lib/api/auth-handler";
 import { jsonError, jsonOk, zodErrorResponse } from "@/lib/api/response";
-import { createCheckoutForInvoice } from "@/lib/billing-core/checkout-service";
+import { createCheckoutForInvoice } from "@/lib/billing/core/checkout-service";
 import { checkPriceRules } from "@/lib/payouts/price-rules";
 import { prisma } from "@/lib/prisma";
 

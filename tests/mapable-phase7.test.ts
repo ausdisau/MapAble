@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { hasPermission } from "@/lib/auth/permissions";
 import { phase7Config } from "@/lib/config/phase7";
-import { sandboxDataGuard } from "@/lib/partner-sandbox/sandbox-service";
+import { sandboxDataGuard } from "@/lib/partner/sandbox/sandbox-service";
 
 describe("Phase 7 config", () => {
   it("NDIA pilot off by default", () => {
@@ -25,7 +25,7 @@ describe("Phase 7 permissions", () => {
 describe("tenant isolation", () => {
   it("userCanAccessTenant returns false without membership", async () => {
     const { userCanAccessTenant } = await import(
-      "@/lib/multi-tenant-admin/tenant-service"
+      "@/lib/platform/multi-tenant-admin/tenant-service"
     );
     try {
       const ok = await userCanAccessTenant("nonexistent", "nonexistent");
@@ -38,7 +38,7 @@ describe("tenant isolation", () => {
 
 describe("NDIA pilot guard", () => {
   it("reports disabled when flag off", async () => {
-    const { getNdiaPilotStatus } = await import("@/lib/ndia-pilot/ndia-pilot-service");
+    const { getNdiaPilotStatus } = await import("@/lib/ndis/pilot/ndia-pilot-service");
     try {
       const s = await getNdiaPilotStatus();
       expect(s.pilotEnabled).toBe(false);
@@ -51,7 +51,7 @@ describe("NDIA pilot guard", () => {
 describe("social impact suppression", () => {
   it("flags small cohorts", async () => {
     const { recordSocialImpactOutcome } = await import(
-      "@/lib/social-impact/impact-service"
+      "@/lib/research/social-impact/impact-service"
     );
     try {
       const o = await recordSocialImpactOutcome({

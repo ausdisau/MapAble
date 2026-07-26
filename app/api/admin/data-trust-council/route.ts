@@ -3,7 +3,7 @@ import { jsonOk } from "@/lib/api/response";
 import {
   listCouncilRecords,
   scheduleCouncilMeeting,
-} from "@/lib/data-trust-council/council-service";
+} from "@/lib/governance/data-trust-council/council-service";
 
 export async function GET() {
   const user = await requireApiAdmin();

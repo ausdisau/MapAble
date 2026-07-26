@@ -13,9 +13,9 @@ import { buildPermissions } from "@/lib/transport/transport-response";
 import { reportTripSafetyIssue } from "@/lib/transport/transport-safety-service";
 import { detectScheduleConflicts } from "@/lib/transport/transport-schedule-conflict-service";
 import { assertStatusTransition } from "@/lib/transport/transport-status-service";
-import { mockRoutingAdapter } from "@/lib/transport-routing/mock-routing-adapter";
-import { OsrmRoutingAdapter } from "@/lib/transport-routing/osrm-routing-adapter";
-import { createOptimisationJob } from "@/lib/transport-routing/route-optimisation-service";
+import { mockRoutingAdapter } from "@/lib/transport/routing/mock-routing-adapter";
+import { OsrmRoutingAdapter } from "@/lib/transport/routing/osrm-routing-adapter";
+import { createOptimisationJob } from "@/lib/transport/routing/route-optimisation-service";
 
 const participantUser: CurrentUser = {
   id: "participant-1",

@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 
-import { ACCREDITATION_CRITERIA } from "@/lib/access-accreditation/accreditation-criteria-service";
+import { ACCREDITATION_CRITERIA } from "@/lib/access/accreditation/accreditation-criteria-service";
 import { mapableCareFocusRing } from "@/lib/marketing/mapable-care-tokens";
 
 const domains = Array.from(new Set(ACCREDITATION_CRITERIA.map((item) => item.domain)));

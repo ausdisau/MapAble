@@ -1,7 +1,7 @@
 import { PrivacyAnalyticsActions } from "@/app/admin/privacy-analytics/PrivacyAnalyticsActions";
 import { requireAdmin } from "@/lib/auth/guards";
 import { PRIVACY_ANALYTICS_DISCLAIMER } from "@/lib/config/y4-civic-platform";
-import { listAnalyticsRuns } from "@/lib/privacy-preserving-analytics/analytics-pilot-service";
+import { listAnalyticsRuns } from "@/lib/privacy/preserving-analytics/analytics-pilot-service";
 
 export default async function PrivacyAnalyticsPage() {
   await requireAdmin();

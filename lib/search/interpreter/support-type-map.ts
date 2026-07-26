@@ -1,4 +1,4 @@
-import type { SupportTypeId } from "@/lib/provider-finder/filters";
+import type { SupportTypeId } from "@/lib/provider/finder/filters";
 
 /** Map canonical service category slug → Provider Finder support type chip. */
 const SLUG_TO_SUPPORT_TYPE: Record<string, SupportTypeId> = {

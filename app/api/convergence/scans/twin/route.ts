@@ -1,7 +1,7 @@
 import { requireApiAdmin } from "@/lib/api/auth-handler";
 import { jsonOk } from "@/lib/api/response";
-import { requireConvergenceFeature } from "@/lib/convergence-os/gates";
-import { runTwinScan } from "@/lib/convergence-os/scans/twin-scan";
+import { requireConvergenceFeature } from "@/lib/platform/convergence-os/gates";
+import { runTwinScan } from "@/lib/platform/convergence-os/scans/twin-scan";
 
 export async function POST() {
   const user = await requireApiAdmin();

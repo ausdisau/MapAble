@@ -1,6 +1,6 @@
 import { runBookingServicesAgentTurn } from "@/lib/agent/booking-services-agent";
 import { runProviderFinderTurnWithAgentFlag } from "@/lib/agent/run-agent-turn";
-import { createAgentRun } from "@/lib/agent-ops/agent-run-service";
+import { createAgentRun } from "@/lib/ai/agent-ops/agent-run-service";
 import { requireApiSession } from "@/lib/api/auth-handler";
 import {
   DISABILITY_AGENT_OPERATIONS,
@@ -11,7 +11,7 @@ import { checkIpRateLimit, getClientIp } from "@/lib/api/ip-rate-limit";
 import { getOptionalApiUser } from "@/lib/api/optional-session";
 import { apiForbidden } from "@/lib/auth/guards";
 import { shouldRouteToBookingAgent } from "@/lib/bookings/rag/copilot-route";
-import { planCareTransportMapActions } from "@/lib/care-transport-map/map-actions";
+import { planCareTransportMapActions } from "@/lib/transport/care-map/map-actions";
 import { planCopilotActions } from "@/lib/copilot/actionPlanner";
 import { buildCopilotContext } from "@/lib/copilot/contextBuilder";
 import { applyGuardrails } from "@/lib/copilot/guardrails";
@@ -30,7 +30,7 @@ import {
 import {
   serialiseFinderPayload,
   type ProviderFinderSessionFields,
-} from "@/lib/provider-finder/ask-bridge";
+} from "@/lib/provider/finder/ask-bridge";
 
 function parseAskContext(raw: unknown): CopilotAskContext {
   if (raw === "provider_finder") return "provider_finder";

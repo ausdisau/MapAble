@@ -8,7 +8,7 @@ import {
   assertSafeParticipantFacingCopy,
   isAtContinuityEnabled,
   registerEquipmentAsset,
-} from "@/lib/at-continuity";
+} from "@/lib/platform/at-continuity";
 
 describe("AT Continuity Wave 1 scaffold", () => {
   const flag = "MAPABLE_AT_CONTINUITY_ENABLED";

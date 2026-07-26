@@ -3,10 +3,10 @@ import Link from "next/link";
 import { AccessMap } from "@/components/access/AccessMap";
 import { AccessPlaceProfile } from "@/components/access/AccessPlaceProfile";
 import { ReportPlaceIssueButton } from "@/components/access/ReportPlaceIssueButton";
-import { getAccreditationDisplayForPlace } from "@/lib/access-accreditation/accreditation-assessment-service";
-import { getPlaceById } from "@/lib/access-map/access-place-service";
-import { listPublishedReviewsForPlace } from "@/lib/access-reviews/access-review-service";
-import { publicReviewerDisplayName } from "@/lib/access-reviews/review-access-policy";
+import { getAccreditationDisplayForPlace } from "@/lib/access/accreditation/accreditation-assessment-service";
+import { getPlaceById } from "@/lib/access/map/access-place-service";
+import { listPublishedReviewsForPlace } from "@/lib/access/reviews/access-review-service";
+import { publicReviewerDisplayName } from "@/lib/access/reviews/review-access-policy";
 import { prisma } from "@/lib/prisma";
 
 export default async function AccessPlacePage({

@@ -56,12 +56,12 @@ On `/provider-finder`, the **Ask MapAble** panel calls `POST /api/mapable/ask` w
 - **Guests** — No sign-in required. Response includes NL interpretation, suggested filters (`finder` payload), and directory disclaimer. No PRMS drafts.
 - **Signed-in users** — Same finder payload plus Co-Pilot intents (care, transport, NDIS plan, etc.) when the question matches.
 
-Shared logic lives in `lib/provider-finder/ask-bridge.ts` (also used by hero search and `/api/search/interpret`).
+Shared logic lives in `lib/provider/finder/ask-bridge.ts` (also used by hero search and `/api/search/interpret`).
 
 **Agentic behaviour (optional):**
 
 - After interpretation, the server may query live `ndis_providers` via `searchNdisProviders` and return up to `PROVIDER_FINDER_RESULTS_LIMIT` rows in `results[]` (directory export — not MapAble-verified).
-- Multi-turn: send a stable `sessionId` (stored in `sessionStorage` on the panel) and `messages[]`; server session store merges filters across turns (`lib/agent-sessions/provider-finder-session.ts`).
+- Multi-turn: send a stable `sessionId` (stored in `sessionStorage` on the panel) and `messages[]`; server session store merges filters across turns (`lib/ai/agent-sessions/provider-finder-session.ts`).
 - Low confidence (`< 0.55`) or **unresolved access needs** (access mentioned but no chip id) can return `agent.status: needs_clarification` without running search until the user replies. See [nl-needs-interpreter.md](./nl-needs-interpreter.md).
 - `SEARCH_AGENT_ENABLED=true` uses `lib/agent/run-agent-turn.ts` (bounded tool steps, `toolsCalled` logged to `AgentRun` when persistence is on).
 - `PROVIDER_FINDER_AUTO_SHOW_RESULTS=true` auto-opens the result list when confidence ≥ `PROVIDER_FINDER_AUTO_SHOW_MIN_CONFIDENCE`.
@@ -72,7 +72,7 @@ Use **Show results** or the **Show matching providers** action card to apply fil
 
 `POST /api/provider-finder/chat` remains for Slack and other streaming clients. It uses the same ask bridge and emits `data-finderInterpretation` for AI SDK UI consumers.
 
-Optional **Slack** bot: `lib/provider-finder/chat-sdk/find-bot.ts` + `POST /api/chat/slack` when `SLACK_BOT_TOKEN` and `SLACK_SIGNING_SECRET` are set. Slash commands: `/finder`, `/providers`.
+Optional **Slack** bot: `lib/provider/finder/chat-sdk/find-bot.ts` + `POST /api/chat/slack` when `SLACK_BOT_TOKEN` and `SLACK_SIGNING_SECRET` are set. Slash commands: `/finder`, `/providers`.
 
 ## UI behaviour
 

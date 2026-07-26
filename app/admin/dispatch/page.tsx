@@ -1,6 +1,6 @@
 import { requireAdmin } from "@/lib/auth/guards";
 import { listOpenBackupRecoveries } from "@/lib/care/backup-shift-recovery-service";
-import { syncOperationalQueues } from "@/lib/dispatch-console/dispatch-service";
+import { syncOperationalQueues } from "@/lib/transport/dispatch-console/dispatch-service";
 import { awaitParticipantConfirmationState } from "@/lib/matching/matching-service";
 import { prisma } from "@/lib/prisma";
 

@@ -3,7 +3,7 @@ import { jsonOk } from "@/lib/api/response";
 import {
   createSustainabilityPlan,
   getSustainabilityDashboard,
-} from "@/lib/sustainability-plan/sustainability-service";
+} from "@/lib/platform/sustainability-plan/sustainability-service";
 
 export async function GET() {
   const user = await requireApiAdmin();

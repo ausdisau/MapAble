@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/lib/auth/guards";
-import { listSecurityAuditPacks } from "@/lib/external-security-audit/audit-pack-service";
+import { listSecurityAuditPacks } from "@/lib/security/external-audit/audit-pack-service";
 
 export default async function SecurityAuditPacksPage() {
   await requireAdmin();

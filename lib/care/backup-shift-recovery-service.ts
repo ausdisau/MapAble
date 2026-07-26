@@ -3,7 +3,7 @@ import type { CurrentUser } from "@/lib/auth/current-user";
 import { isAdminRole } from "@/lib/auth/roles";
 import { isBackupRecoveryEnabled } from "@/lib/config/y2-orchestration";
 import { requireMicroConsent } from "@/lib/consent/micro-consent-service";
-import { upsertDispatchQueueItem } from "@/lib/dispatch-console/dispatch-service";
+import { upsertDispatchQueueItem } from "@/lib/transport/dispatch-console/dispatch-service";
 import {
   runCareWorkerMatch,
   selectMatchCandidate,

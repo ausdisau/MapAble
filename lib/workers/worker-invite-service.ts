@@ -8,7 +8,7 @@ import { normalizeAuthEmail } from "@/lib/auth/auth-flow";
 import type { CurrentUser } from "@/lib/auth/current-user";
 import { refreshWorkerOnboarding } from "@/lib/onboarding/onboarding-service";
 import { prisma } from "@/lib/prisma";
-import { syncWorkersOnboardingTask } from "@/lib/provider-onboarding-automation/onboarding-service";
+import { syncWorkersOnboardingTask } from "@/lib/provider/onboarding-automation/onboarding-service";
 
 import { associateWorkerWithOrganisation } from "./worker-profile-service";
 

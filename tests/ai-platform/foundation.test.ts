@@ -15,7 +15,7 @@ import {
   requireAiCapability,
   resolveModelForCapability,
   separateConflictingAccounts,
-} from "@/lib/ai-platform";
+} from "@/lib/ai/platform";
 
 describe("AI platform capability registry", () => {
   it("registers required baseline capabilities", () => {

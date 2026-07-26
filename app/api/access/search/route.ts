@@ -1,4 +1,4 @@
-import { searchAccessPlaces } from "@/lib/access-map/access-search-service";
+import { searchAccessPlaces } from "@/lib/access/map/access-search-service";
 import { jsonOk, zodErrorResponse } from "@/lib/api/response";
 import { accessSearchQuerySchema } from "@/types/access-map";
 

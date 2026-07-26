@@ -5,7 +5,7 @@ import { z } from "zod";
 import {
   draftInfrastructureFromDescription,
   infrastructureDraftRequestSchema,
-} from "@/lib/care-transport-map/infrastructure-draft";
+} from "@/lib/transport/care-map/infrastructure-draft";
 import { isAddInfrastructureEnabled } from "@/lib/config/care-transport-map";
 import { isSearchInterpreterConfigured } from "@/lib/config/search-interpreter";
 import { forwardGeocodeAustralia } from "@/lib/map/nominatim-server";

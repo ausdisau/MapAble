@@ -1,7 +1,7 @@
 import { requireApiAdmin } from "@/lib/api/auth-handler";
 import { jsonOk } from "@/lib/api/response";
-import { requireConvergenceFeature } from "@/lib/convergence-os/gates";
-import { seedGoldenJourneys } from "@/lib/convergence-os/ops/ownership-fitness-federation";
+import { requireConvergenceFeature } from "@/lib/platform/convergence-os/gates";
+import { seedGoldenJourneys } from "@/lib/platform/convergence-os/ops/ownership-fitness-federation";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {

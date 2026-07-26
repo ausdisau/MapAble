@@ -1,6 +1,6 @@
 import { isConnectPayoutsEnabled } from "@/lib/billing/config";
-import { writeBillingAuditLog } from "@/lib/billing-core/audit";
-import { isBillingStripeConfigured } from "@/lib/billing-core/config";
+import { writeBillingAuditLog } from "@/lib/billing/core/audit";
+import { isBillingStripeConfigured } from "@/lib/billing/core/config";
 import { isPayoutsEnabled } from "@/lib/payouts/config";
 import { splitTransferIdempotencyKey } from "@/lib/payouts/payout-policy";
 import { canReleasePayout } from "@/lib/payouts/readiness-service";

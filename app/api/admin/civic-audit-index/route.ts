@@ -3,7 +3,7 @@ import { jsonOk } from "@/lib/api/response";
 import {
   listPublishedCivicAudits,
   publishCivicAuditIndex,
-} from "@/lib/institutional-permanence/permanence-service";
+} from "@/lib/platform/institutional-permanence/permanence-service";
 
 export async function GET() {
   const user = await requireApiAdminScope("accountability:publish");

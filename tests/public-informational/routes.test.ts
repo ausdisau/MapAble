@@ -10,7 +10,7 @@ import {
   informationalSitemapPaths,
   PUBLIC_INFORMATIONAL_ROUTES,
   PUBLIC_PROGRAMME_EXPLAINER_ROUTES,
-} from "@/lib/public-informational/routes";
+} from "@/lib/public/informational/routes";
 import { homepageHeroCtas } from "@/lib/marketing/mapable-care-combined-data";
 
 describe("public informational route allowlist (canonical)", () => {

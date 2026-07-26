@@ -13,7 +13,7 @@ Stored optionally in floor plan document as `routeGraph`.
 
 ## Algorithm
 
-Deterministic Dijkstra in `lib/indoor-accessibility/routing/route-planner.ts`.
+Deterministic Dijkstra in `lib/access/indoor/routing/route-planner.ts`.
 
 ## No-route explanations
 

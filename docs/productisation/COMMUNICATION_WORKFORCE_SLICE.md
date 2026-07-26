@@ -12,7 +12,7 @@ Flags (default **false**):
 | Communication instructions | Projection over `AccessibilityProfile` |
 | Disclosure authority | `ConsentRecord` / consent service |
 | Worker acknowledgement | `AuditEvent` (`communication_passport.acknowledged`) |
-| Readiness evaluation | `lib/workforce-readiness` (deterministic reasons) |
+| Readiness evaluation | `lib/workforce/readiness` (deterministic reasons) |
 | Assignment | **Human only** — `autoAssignmentEnabled` permanently false |
 
 ## APIs

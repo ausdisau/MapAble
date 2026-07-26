@@ -31,4 +31,4 @@ Text-first review, keyboard navigation, page/source references, plain-language f
 
 ## Module
 
-`lib/ai-platform/intake/`
+`lib/ai/platform/intake/`

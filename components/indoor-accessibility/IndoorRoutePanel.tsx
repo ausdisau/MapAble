@@ -3,9 +3,9 @@
 import { useMemo, useState } from "react";
 
 import { useIndoorFeatureEnabled } from "@/hooks/useIndoorFeatureFlags";
-import type { FloorPlanFeature } from "@/lib/floor-plan/schemas";
-import { planIndoorRoute } from "@/lib/indoor-accessibility/routing/route-planner";
-import type { IndoorRouteGraph, RouteMode } from "@/lib/indoor-accessibility/schemas/core";
+import type { FloorPlanFeature } from "@/lib/access/floor-plan/schemas";
+import { planIndoorRoute } from "@/lib/access/indoor/routing/route-planner";
+import type { IndoorRouteGraph, RouteMode } from "@/lib/access/indoor/schemas/core";
 import { mapableCareFocusRing } from "@/lib/marketing/mapable-care-tokens";
 
 type IndoorRoutePanelProps = {

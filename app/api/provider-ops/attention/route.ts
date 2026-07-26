@@ -5,7 +5,7 @@ import { isProviderOpsEnabled } from "@/lib/config/provider-ops";
 import {
   buildProviderAttentionQueue,
   ProviderOpsError,
-} from "@/lib/provider-ops/attention-queue";
+} from "@/lib/provider/ops/attention-queue";
 import { BreakGlassRequiredError } from "@/lib/security/break-glass";
 
 export async function GET(req: Request) {

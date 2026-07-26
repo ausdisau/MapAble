@@ -3,8 +3,8 @@ import { jsonOk, zodErrorResponse } from "@/lib/api/response";
 import {
   createFundingSource,
   listFundingSources,
-} from "@/lib/billing-core/funding-source-service";
-import { createFundingSourceSchema } from "@/lib/billing-core/schemas";
+} from "@/lib/billing/core/funding-source-service";
+import { createFundingSourceSchema } from "@/lib/billing/core/schemas";
 
 export async function GET() {
   const user = await requireApiSession();

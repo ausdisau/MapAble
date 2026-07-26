@@ -5,7 +5,7 @@ import {
   isParticipantAccessHistoryEnabled,
   isTrustFabricEnabled,
 } from "@/lib/config/trust-fabric";
-import { listParticipantAccessHistory } from "@/lib/trust-fabric/receipt-service";
+import { listParticipantAccessHistory } from "@/lib/trust/fabric/receipt-service";
 
 import { AccessHistoryActions } from "./AccessHistoryActions";
 import { ChallengeReceiptButton } from "./ChallengeReceiptButton";

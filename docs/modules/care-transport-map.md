@@ -51,9 +51,9 @@ Also depends on shared map env: `MAP_INTEGRATION_ENABLED`, `OPENSTREETMAP_ENABLE
 ## Code
 
 - Config: `lib/config/care-transport-map.ts`
-- Payload: `lib/care-transport-map/map-payload.ts`
-- Map actions: `lib/care-transport-map/map-actions.ts`
-- Draft: `lib/care-transport-map/infrastructure-draft.ts`
+- Payload: `lib/transport/care-map/map-payload.ts`
+- Map actions: `lib/transport/care-map/map-actions.ts`
+- Draft: `lib/transport/care-map/infrastructure-draft.ts`
 - UI: `components/care-transport/*`
 
 ## Related
