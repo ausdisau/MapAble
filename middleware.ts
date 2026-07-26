@@ -11,10 +11,12 @@ import {
 import {
   CSP_ENFORCE_HEADER,
   createScriptNonce,
-  isCspPreviewEnforceEnabled,
 } from "@/lib/security/csp-preview-enforce";
 import { buildForwardRequestHeaders } from "@/lib/security/forward-request-headers";
-import { buildContentSecurityPolicyEnforce } from "@/lib/security/headers";
+import {
+  buildContentSecurityPolicyEnforce,
+  resolveEmbedFrameAncestors,
+} from "@/lib/security/headers";
 import {
   CORRELATION_ID_HEADER,
   REQUEST_ID_HEADER,
@@ -89,21 +91,48 @@ function redirectToLogin(request: NextRequest): NextResponse {
   return NextResponse.redirect(login);
 }
 
+function isEmbedPath(pathname: string): boolean {
+  return pathname === "/embed" || pathname.startsWith("/embed/");
+}
+
 /**
- * Apply the resolved correlation ID and, when preview enforce is on, the
- * nonce-bearing Content-Security-Policy to the response. Request-side CSP and
- * correlation headers are applied in `buildForwardRequestHeaders`.
+ * Build the enforcing Content-Security-Policy for this request.
+ * Global: frame-ancestors 'none'. Embed routes: env allow-list or `*`.
+ */
+function buildEnforcePolicyForRequest(
+  request: NextRequest,
+  nonce: string,
+): string {
+  if (isEmbedPath(request.nextUrl.pathname)) {
+    return buildContentSecurityPolicyEnforce(nonce, {
+      frameAncestors: resolveEmbedFrameAncestors(),
+    });
+  }
+  return buildContentSecurityPolicyEnforce(nonce, {
+    frameAncestors: "'none'",
+  });
+}
+
+/**
+ * Apply correlation IDs and the enforcing Content-Security-Policy.
+ * Embed routes also clear clickjacking DENY so partners may frame them
+ * when frame-ancestors permits.
  */
 function withCorrelationAndCsp(
   response: NextResponse,
   correlationId: string,
-  enforcePolicy: string | null,
+  enforcePolicy: string,
+  embedRoute: boolean,
 ): NextResponse {
   response.headers.set(CORRELATION_ID_HEADER, correlationId);
   response.headers.set(REQUEST_ID_HEADER, correlationId);
+  response.headers.set(CSP_ENFORCE_HEADER, enforcePolicy);
 
-  if (enforcePolicy) {
-    response.headers.set(CSP_ENFORCE_HEADER, enforcePolicy);
+  if (embedRoute) {
+    // Prefer CSP frame-ancestors for embed; remove legacy DENY if present.
+    response.headers.delete("X-Frame-Options");
+  } else {
+    response.headers.set("X-Frame-Options", "DENY");
   }
 
   return response;
@@ -111,10 +140,9 @@ function withCorrelationAndCsp(
 
 export default async function middleware(request: NextRequest) {
   const nonce = createScriptNonce();
-  const enforceEnabled = isCspPreviewEnforceEnabled();
-  const enforcePolicy = enforceEnabled
-    ? buildContentSecurityPolicyEnforce(nonce)
-    : null;
+  // Strict enforcement (upgraded from report-only).
+  const enforcePolicy = buildEnforcePolicyForRequest(request, nonce);
+  const embedRoute = isEmbedPath(request.nextUrl.pathname);
 
   const correlationId = resolveCorrelationId(
     request.headers.get(CORRELATION_ID_HEADER) ??
@@ -130,12 +158,22 @@ export default async function middleware(request: NextRequest) {
 
   const legacySquare = redirectLegacySquarePath(request);
   if (legacySquare) {
-    return withCorrelationAndCsp(legacySquare, correlationId, enforcePolicy);
+    return withCorrelationAndCsp(
+      legacySquare,
+      correlationId,
+      enforcePolicy,
+      embedRoute,
+    );
   }
 
   const peerResponse = handlePeerPeersHost(request);
   if (peerResponse) {
-    return withCorrelationAndCsp(peerResponse, correlationId, enforcePolicy);
+    return withCorrelationAndCsp(
+      peerResponse,
+      correlationId,
+      enforcePolicy,
+      embedRoute,
+    );
   }
 
   if (shouldRunAuthMiddleware(request.nextUrl.pathname)) {
@@ -145,12 +183,14 @@ export default async function middleware(request: NextRequest) {
           authMisconfiguredResponse(request),
           correlationId,
           enforcePolicy,
+          embedRoute,
         );
       }
       return withCorrelationAndCsp(
         redirectToLogin(request),
         correlationId,
         enforcePolicy,
+        embedRoute,
       );
     }
   }
@@ -158,7 +198,12 @@ export default async function middleware(request: NextRequest) {
   const response = NextResponse.next({
     request: { headers: requestHeaders },
   });
-  return withCorrelationAndCsp(response, correlationId, enforcePolicy);
+  return withCorrelationAndCsp(
+    response,
+    correlationId,
+    enforcePolicy,
+    embedRoute,
+  );
 }
 
 export const config = {

@@ -2,7 +2,10 @@
 
 import { useEffect, useState } from "react";
 
-import { TelehealthVideoFrame } from "@/components/telehealth/TelehealthVideoFrame";
+import {
+  TelehealthVideoFrame,
+  type TelehealthVideoRoomToken,
+} from "@/components/telehealth/TelehealthVideoFrame";
 import { Button } from "@/components/ui/button";
 import {
   ICAN_V6_DOMAIN_LABELS,
@@ -30,6 +33,9 @@ export function VirtualCareHub({
 }: Props) {
   const [joinUrl, setJoinUrl] = useState<string | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
+  const [roomToken, setRoomToken] = useState<TelehealthVideoRoomToken | null>(
+    null
+  );
   const [error, setError] = useState<string | null>(null);
   const [captionIdx, setCaptionIdx] = useState(0);
   const [domains, setDomains] = useState<IcanV6Domain[]>([]);
@@ -54,8 +60,13 @@ export function VirtualCareHub({
         setError(json.error ?? "Could not start clinical session");
         return;
       }
+      if (!json.roomToken?.token) {
+        setError("Session response missing room token");
+        return;
+      }
       setJoinUrl(json.joinUrl);
       setSessionId(json.sessionId);
+      setRoomToken(json.roomToken as TelehealthVideoRoomToken);
     } catch {
       setError("Could not start clinical session");
     }
@@ -107,7 +118,17 @@ export function VirtualCareHub({
           </Button>
         ) : (
           <>
-            <TelehealthVideoFrame joinUrl={joinUrl} />
+            {roomToken ? (
+              <TelehealthVideoFrame
+                joinUrl={joinUrl}
+                roomToken={roomToken}
+                e2eeEnabled
+              />
+            ) : (
+              <p className="text-sm text-destructive" role="alert">
+                Missing room token — video cannot start.
+              </p>
+            )}
             <p className="text-xs text-muted-foreground">
               Session {sessionId} · support item {supportItemCode}
             </p>

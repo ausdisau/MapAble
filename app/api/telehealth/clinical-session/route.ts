@@ -2,10 +2,12 @@ import { z } from "zod";
 
 import { requireApiSession } from "@/lib/api/auth-handler";
 import { jsonError, jsonOk, zodErrorResponse } from "@/lib/api/response";
-import { apiForbidden } from "@/lib/auth/guards";
-import { hasPermission } from "@/lib/auth/permissions";
 import { isVirtualCareHubEnabled } from "@/lib/config/strategic-2026";
 import { createClinicalSession } from "@/lib/telehealth/clinical-session";
+import {
+  assertClinicalSessionAccess,
+  ClinicalSessionAccessError,
+} from "@/lib/telehealth/clinical-session-access";
 
 const BodySchema = z.object({
   participantId: z.string().min(1),
@@ -23,17 +25,19 @@ export async function POST(req: Request) {
   const user = await requireApiSession();
   if (user instanceof Response) return user;
 
-  const allowed =
-    hasPermission(user.primaryRole, "care:shift:work") ||
-    hasPermission(user.primaryRole, "provider:booking:respond") ||
-    hasPermission(user.primaryRole, "booking:create");
-  if (!allowed) return apiForbidden();
-
   const body = await req.json().catch(() => ({}));
   const parsed = BodySchema.safeParse(body);
   if (!parsed.success) return zodErrorResponse(parsed.error);
 
   try {
+    const accessRole = await assertClinicalSessionAccess({
+      user,
+      participantId: parsed.data.participantId,
+      workerId: parsed.data.workerId,
+      bookingId: parsed.data.bookingId,
+      appointmentId: parsed.data.appointmentId,
+    });
+
     const session = await createClinicalSession({
       participantId: parsed.data.participantId,
       workerId: parsed.data.workerId,
@@ -41,10 +45,15 @@ export async function POST(req: Request) {
       bookingId: parsed.data.bookingId,
       appointmentId: parsed.data.appointmentId,
       actorUserId: user.id,
+      accessRole,
     });
     return jsonOk(session, 201);
   } catch (e) {
-    const message = e instanceof Error ? e.message : "Clinical session create failed";
+    if (e instanceof ClinicalSessionAccessError) {
+      return jsonError(e.message, e.status);
+    }
+    const message =
+      e instanceof Error ? e.message : "Clinical session create failed";
     if (message === "VIRTUAL_CARE_HUB_DISABLED") {
       return jsonError("Virtual Care Hub is disabled", 404);
     }

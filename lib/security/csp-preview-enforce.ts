@@ -49,7 +49,10 @@ export function assertEnforcePolicyShape(
     failures.push("unrestricted_wildcard");
   }
   if (!policy.includes("object-src 'none'")) failures.push("object_src");
-  if (!policy.includes("frame-ancestors 'none'")) {
+  if (!policy.includes("'strict-dynamic'")) {
+    failures.push("strict_dynamic");
+  }
+  if (!/frame-ancestors\s+/.test(policy)) {
     failures.push("frame_ancestors");
   }
   if (!policy.includes("report-uri /api/security/csp-report")) {
