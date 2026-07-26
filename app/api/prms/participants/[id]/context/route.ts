@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
-import { requireApiSession } from "@/lib/api/auth-handler";
 import { apiForbidden } from "@/lib/auth/guards";
+import { withAuthorization } from "@/lib/auth/withAuthorization";
 import { buildCopilotContext } from "@/lib/copilot/contextBuilder";
 import {
   assertCanAccessParticipantData,
@@ -10,45 +10,68 @@ import {
 
 type RouteParams = { params: Promise<{ id: string }> };
 
-export async function GET(_request: Request, { params }: RouteParams) {
-  const user = await requireApiSession();
-  if (user instanceof Response) return user;
-
-  const { id } = await params;
-
-  try {
-    await assertCanAccessParticipantData(user, id);
-  } catch (e) {
-    if (e instanceof ParticipantAccessError) {
-      return apiForbidden(e.message);
-    }
-    throw e;
-  }
-
-  const context = await buildCopilotContext(id);
-
-  if (!context) {
-    return NextResponse.json(
-      {
-        error: "Participant context not found. Sign in or check your account.",
-      },
-      { status: 404 }
-    );
-  }
-
-  return NextResponse.json({
-    profileSummary: {
-      participantId: context.participantId,
-      profileCompletionPercent: context.profileCompletionPercent,
-      accessNeeds: context.accessNeeds,
-      mobilityAids: context.mobilityAids,
-      communicationPreferences: context.communicationPreferences,
+/**
+ * Participant context for PRMS / copilot.
+ * Requires the participant themself or an authorized care-adjacent role;
+ * resource-level consent checks remain in `assertCanAccessParticipantData`.
+ */
+export const GET = withAuthorization(
+  {
+    roles: [
+      "PARTICIPANT",
+      "participant",
+      "FAMILY",
+      "family_member",
+      "SUPPORT_COORDINATOR",
+      "support_coordinator",
+      "SUPPORT_WORKER",
+      "support_worker",
+      "PROVIDER",
+      "provider_admin",
+      "ADMIN",
+      "mapable_admin",
+    ],
+    authorize: async (user, _request, context) => {
+      const { id } = await (context as RouteParams).params;
+      try {
+        await assertCanAccessParticipantData(user, id);
+        return true;
+      } catch (e) {
+        if (e instanceof ParticipantAccessError) {
+          return apiForbidden(e.message);
+        }
+        throw e;
+      }
     },
-    planSummary: context.planSummary,
-    consentSummary: context.consentSummary,
-    upcomingEvents: context.upcomingEvents,
-    openRisks: context.openRisks,
-    missingEvidence: context.missingEvidence,
-    activeGoals: context.activeGoals,
-  });
-}
+  },
+  async (_request, context) => {
+    const { id } = await (context as RouteParams).params;
+    const ctx = await buildCopilotContext(id);
+
+    if (!ctx) {
+      return NextResponse.json(
+        {
+          error:
+            "Participant context not found. Sign in or check your account.",
+        },
+        { status: 404 },
+      );
+    }
+
+    return NextResponse.json({
+      profileSummary: {
+        participantId: ctx.participantId,
+        profileCompletionPercent: ctx.profileCompletionPercent,
+        accessNeeds: ctx.accessNeeds,
+        mobilityAids: ctx.mobilityAids,
+        communicationPreferences: ctx.communicationPreferences,
+      },
+      planSummary: ctx.planSummary,
+      consentSummary: ctx.consentSummary,
+      upcomingEvents: ctx.upcomingEvents,
+      openRisks: ctx.openRisks,
+      missingEvidence: ctx.missingEvidence,
+      activeGoals: ctx.activeGoals,
+    });
+  },
+);

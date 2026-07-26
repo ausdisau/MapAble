@@ -1,4 +1,4 @@
-import { CareShiftApproval } from "@/components/phase3/CareShiftApproval";
+import { CareShiftApproval } from "@/components/care/CareShiftApproval";
 import { StatusTextBadge } from "@/components/phase3/StatusTextBadge";
 import { requirePermission } from "@/lib/auth/guards";
 import { prisma } from "@/lib/prisma";
