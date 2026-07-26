@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { ConsentSharingPanel } from "@/components/consent/ConsentSharingPanel";
-import { MatchCandidateCard } from "@/components/phase4/MatchCandidateCard";
+import { MatchCandidateCard } from "@/components/matching/MatchCandidateCard";
 import { Button } from "@/components/ui/button";
 
 type RecoveryState = {

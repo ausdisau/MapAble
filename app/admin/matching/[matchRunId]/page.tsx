@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { MatchCandidateCard } from "@/components/phase4/MatchCandidateCard";
+import { MatchCandidateCard } from "@/components/matching/MatchCandidateCard";
 import { requireAdmin } from "@/lib/auth/guards";
 import { prisma } from "@/lib/prisma";
 

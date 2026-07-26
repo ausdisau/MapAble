@@ -1,4 +1,4 @@
-import { ProviderTransportActions } from "@/components/phase3/ProviderTransportActions";
+import { ProviderTransportActions } from "@/components/transport/ProviderTransportActions";
 import { StatusTextBadge } from "@/components/phase3/StatusTextBadge";
 import { VehicleSuitabilityWarning } from "@/components/phase3/VehicleSuitabilityWarning";
 import { requireAuth } from "@/lib/auth/guards";

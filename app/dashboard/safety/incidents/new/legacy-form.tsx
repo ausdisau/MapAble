@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { formInputClass } from "@/components/forms/AccessibleFormField";
-import { IncidentSeverityExplainer } from "@/components/phase4/IncidentSeverityExplainer";
+import { IncidentSeverityExplainer } from "@/components/incidents/IncidentSeverityExplainer";
 import { Button } from "@/components/ui/button";
 
 export default function LegacyNewIncidentPage() {

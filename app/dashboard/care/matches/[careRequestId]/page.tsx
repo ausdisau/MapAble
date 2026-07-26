@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-import { MatchCandidateCard } from "@/components/phase4/MatchCandidateCard";
+import { MatchCandidateCard } from "@/components/matching/MatchCandidateCard";
 
 type ReviewResponse = {
   run: {

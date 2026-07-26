@@ -69,6 +69,7 @@ export const authOptions = {
             email: user.email ?? null,
             name: user.name ?? null,
             role: user.primaryRole,
+            mfaVerified: true,
           };
         }
 
@@ -89,6 +90,7 @@ export const authOptions = {
             email: user.email ?? null,
             name: user.name ?? null,
             role: user.primaryRole,
+            mfaVerified: true,
           };
         }
 
@@ -202,6 +204,7 @@ export const authOptions = {
           email: user.email,
           name: user.name,
           role: (user as { role?: string }).role ?? null,
+          mfaVerified: Boolean((user as { mfaVerified?: boolean }).mfaVerified),
         });
         // #region agent log
         agentLog("B", "authOptions.ts:jwt", "jwt user merged", {
