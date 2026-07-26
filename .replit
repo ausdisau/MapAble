@@ -73,7 +73,7 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "npx tsx --test server/__tests__/smoke.test.ts server/__tests__/payments.test.ts"
+args = "npx tsx --test server/__tests__/smoke.test.ts server/__tests__/payments.test.ts server/__tests__/geo-domains.test.ts"
 
 [workflows.workflow.metadata]
 outputType = "console"
