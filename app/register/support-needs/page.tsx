@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
 
 import { SupportNeedsAssessor } from "@/components/onboarding/SupportNeedsAssessor";
-import { defaultDashboardPath } from "@/lib/auth/roles";
 import { requireAuth } from "@/lib/auth/guards";
+import { defaultDashboardPath } from "@/lib/auth/roles";
 import {
   REGISTRATION_ASSESSOR_STATUS,
 } from "@/lib/intake/support-needs-assessor";

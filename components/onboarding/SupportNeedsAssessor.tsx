@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 
 import { cn } from "@/app/lib/utils";
 import { AuthAlert } from "@/components/auth/AuthAlert";
@@ -333,9 +333,12 @@ export function SupportNeedsAssessor() {
             <div className="grid gap-2">
               {SUPPORT_NEEDS_INTENSITY_OPTIONS.map((option) => {
                 const checked = currentIntensity() === option.value;
+                const inputId = `sna-intensity-${currentArea}-${option.value}`;
                 return (
                   <label
                     key={option.value}
+                    htmlFor={inputId}
+                    aria-label={`${option.label}: ${option.description}`}
                     className={cn(
                       "flex cursor-pointer items-start gap-3 rounded-xl border px-4 py-3 focus-within:ring-2 focus-within:ring-ring",
                       checked
@@ -344,6 +347,7 @@ export function SupportNeedsAssessor() {
                     )}
                   >
                     <input
+                      id={inputId}
                       type="radio"
                       name={`intensity-${currentArea}`}
                       value={option.value}
