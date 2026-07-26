@@ -26,6 +26,21 @@ function scoreFromChecklist(items: OnboardingChecklistItem[]) {
   return Math.round((complete / items.length) * 100);
 }
 
+async function countSupportNeedsSnapshots(userId: string): Promise<number> {
+  try {
+    return await prisma.iCanV6IntakeSubmission.count({
+      where: {
+        participantId: userId,
+        status: { in: ["registration_lite", "submitted_draft"] },
+      },
+    });
+  } catch (error) {
+    // Fail soft when the I-CAN table is not migrated yet (prod lag).
+    console.error("[onboarding] support needs count failed", error);
+    return 0;
+  }
+}
+
 export async function evaluateParticipantOnboarding(
   userId: string
 ): Promise<OnboardingEvaluation> {
@@ -37,12 +52,7 @@ export async function evaluateParticipantOnboarding(
     prisma.participantFundingSource.count({
       where: { participantId: userId, status: "active" },
     }),
-    prisma.iCanV6IntakeSubmission.count({
-      where: {
-        participantId: userId,
-        status: { in: ["registration_lite", "submitted_draft"] },
-      },
-    }),
+    countSupportNeedsSnapshots(userId),
   ]);
 
   const supportNeedsComplete = supportNeedsCount > 0;
