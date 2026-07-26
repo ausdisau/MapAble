@@ -24,7 +24,7 @@ const SENSITIVE_PREFIXES = [
 ];
 
 const AUTH_IMPORT =
-  /requireApi|requireAuth|getServerSession|auth\(|requireAdmin|getToken|requirePermission|requireApiPermission|requireApiAdmin|requireAnyBillingPermission|requireBilling|requireOrganisation|requireParticipant|adminRoutes|getBillingHandler|getParticipantsHandler|getWorkersHandler|getBookingsHandler|getSafeguardingHandler|getComplianceHandler|getCommandCentreHandler|CronSecret|ADMIN_CRON|verifyCron|assertCron|withAdmin|canTriggerAdminIngestion|verifyN8nWebhookSignature|verifyWebhook|cron-auth/;
+  /requireApi|requireAuth|getServerSession|auth\(|requireAdmin|getToken|requirePermission|requireApiPermission|requireApiAdmin|requireAnyBillingPermission|requireBilling|requireOrganisation|requireParticipant|adminRoutes|getBillingHandler|getParticipantsHandler|getWorkersHandler|getBookingsHandler|getSafeguardingHandler|getComplianceHandler|getCommandCentreHandler|CronSecret|ADMIN_CRON|verifyCron|assertCron|withAdmin|withAuthorization|canTriggerAdminIngestion|verifyN8nWebhookSignature|verifyWebhook|cron-auth/;
 
 /** Intentionally public or low-sensitivity lookup routes (documented). */
 const ALLOWLIST = new Set(["app/api/care/platform-org/route.ts"]);
