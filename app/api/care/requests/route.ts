@@ -1,7 +1,7 @@
 import { ZodError } from "zod";
 
 import { requireApiPermission, requireApiSession } from "@/lib/api/auth-handler";
-import { participantCareWhere, providerCareWhere } from "@/lib/api/phase3-scope";
+import { participantCareWhere, providerCareWhere } from "@/lib/api/organisation-scope";
 import { jsonError, jsonOk, zodErrorResponse } from "@/lib/api/response";
 import { isAdminRole } from "@/lib/auth/roles";
 import { createCareRequest } from "@/lib/care/care-request-service";

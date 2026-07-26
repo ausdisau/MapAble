@@ -1,5 +1,5 @@
 import type { AccessSearchFilters } from "@/lib/access-map/access-filter-service";
-import { distanceKm } from "@/lib/geo";
+import { distanceKm } from "@/lib/map/geo";
 
 const RATING_VALUE_SCORE: Record<string, number> = {
   excellent: 5,

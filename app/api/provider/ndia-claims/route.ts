@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { requireApiPermission } from "@/lib/api/auth-handler";
-import { getUserOrganisationIds } from "@/lib/api/phase3-scope";
+import { getUserOrganisationIds } from "@/lib/api/organisation-scope";
 import { jsonError, jsonOk, zodErrorResponse } from "@/lib/api/response";
 import { isAdminRole } from "@/lib/auth/roles";
 import {

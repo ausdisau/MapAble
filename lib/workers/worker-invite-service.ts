@@ -2,7 +2,7 @@ import { randomBytes } from "crypto";
 
 import type { WorkerOrganisationInviteStatus } from "@prisma/client";
 
-import { OrganisationAccessError , assertOrganisationAccess } from "@/lib/api/phase3-scope";
+import { OrganisationAccessError , assertOrganisationAccess } from "@/lib/api/organisation-scope";
 import { createAuditEvent } from "@/lib/audit/audit-event-service";
 import { normalizeAuthEmail } from "@/lib/auth/auth-flow";
 import type { CurrentUser } from "@/lib/auth/current-user";

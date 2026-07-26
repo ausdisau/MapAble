@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { workersListWhere } from "@/lib/api/phase3-scope";
+import { workersListWhere } from "@/lib/api/organisation-scope";
 import type { CurrentUser } from "@/lib/auth/current-user";
 import {
   buildWorkerInviteUrl,

@@ -206,7 +206,7 @@ export async function listServiceLogsForUser(user: CurrentUser) {
     });
   }
   if (user.primaryRole === "provider_admin") {
-    const { getUserOrganisationIds } = await import("@/lib/api/phase3-scope");
+    const { getUserOrganisationIds } = await import("@/lib/api/organisation-scope");
     const orgIds = await getUserOrganisationIds(user.id);
     return prisma.careServiceLog.findMany({
       where: { organisationId: { in: orgIds } },

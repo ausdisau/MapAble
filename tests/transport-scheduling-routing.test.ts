@@ -137,7 +137,7 @@ vi.mock("@/lib/consent/consent-service", () => ({
   checkConsent: vi.fn().mockResolvedValue(false),
 }));
 
-vi.mock("@/lib/api/phase3-scope", () => ({
+vi.mock("@/lib/api/organisation-scope", () => ({
   getUserOrganisationIds: vi.fn().mockResolvedValue(["org-1"]),
 }));
 

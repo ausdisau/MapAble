@@ -29,7 +29,7 @@ import {
   distanceKm,
   getLocationAndPostcode,
   type UserPosition,
-} from "@/lib/geo";
+} from "@/lib/map/geo";
 import {
   supportAreaLandingRoutes,
   supportAreaToSupportTypeId,
@@ -45,7 +45,7 @@ import {
   buildFinderSearchParams,
 } from "@/lib/search/apply-interpretation";
 import { interpretSearchQueryClient } from "@/lib/search/interpreter-client";
-import { useProviderOutlets } from "@/lib/use-provider-outlets";
+import { useProviderOutlets } from "@/lib/provider-finder/use-provider-outlets";
 
 import { mapOutletsToProviders } from "./outletToProvider";
 import { type Provider } from "./providers";

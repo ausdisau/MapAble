@@ -1,6 +1,6 @@
 import { createHmac } from "node:crypto";
 
-import { resolveNextAuthSecret } from "@/lib/auth/resolve-nextauth-secret";
+import { resolveNextAuthSecret } from "@/lib/auth/nextauth-env";
 
 const SEPARATOR = ".";
 const TTL_SECONDS = 60 * 60; // 1 hour

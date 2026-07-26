@@ -16,7 +16,7 @@ describe("resolveNextAuthSecret", () => {
       NEXTAUTH_SECRET: "a".repeat(32),
     };
     const { resolveNextAuthSecret } =
-      await import("@/lib/auth/resolve-nextauth-secret");
+      await import("@/lib/auth/nextauth-env");
     expect(resolveNextAuthSecret()).toBe("a".repeat(32));
   });
 
@@ -29,7 +29,7 @@ describe("resolveNextAuthSecret", () => {
       SESSION_SECRET: "b".repeat(32),
     };
     const { resolveNextAuthSecret } =
-      await import("@/lib/auth/resolve-nextauth-secret");
+      await import("@/lib/auth/nextauth-env");
     expect(resolveNextAuthSecret()).toBe("b".repeat(32));
   });
 
@@ -42,7 +42,7 @@ describe("resolveNextAuthSecret", () => {
       MAPABLE_PREVIEW_AUTH_SECRET: "c".repeat(32),
     };
     const { resolveNextAuthSecret } =
-      await import("@/lib/auth/resolve-nextauth-secret");
+      await import("@/lib/auth/nextauth-env");
     expect(resolveNextAuthSecret()).toBe("c".repeat(32));
   });
 
@@ -57,7 +57,7 @@ describe("resolveNextAuthSecret", () => {
       MAPABLE_PREVIEW_AUTH_SECRET: "",
     };
     const { resolveNextAuthSecret } =
-      await import("@/lib/auth/resolve-nextauth-secret");
+      await import("@/lib/auth/nextauth-env");
     expect(resolveNextAuthSecret()).toBeUndefined();
   });
 
@@ -70,7 +70,7 @@ describe("resolveNextAuthSecret", () => {
       MAPABLE_PREVIEW_AUTH_SECRET: "",
     };
     const { resolveNextAuthSecret } =
-      await import("@/lib/auth/resolve-nextauth-secret");
+      await import("@/lib/auth/nextauth-env");
     expect(resolveNextAuthSecret()).toBeUndefined();
   });
 
@@ -84,7 +84,7 @@ describe("resolveNextAuthSecret", () => {
       AUTH_SECRET: "",
     };
     const { resolveNextAuthSecret } =
-      await import("@/lib/auth/resolve-nextauth-secret");
+      await import("@/lib/auth/nextauth-env");
     expect(resolveNextAuthSecret()).toMatch(/^mapable-dev-only-nextauth-secret/);
   });
 });

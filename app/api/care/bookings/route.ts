@@ -1,5 +1,5 @@
 import { requireApiPermission, requireApiSession } from "@/lib/api/auth-handler";
-import { getUserOrganisationIds, participantCareWhere } from "@/lib/api/phase3-scope";
+import { getUserOrganisationIds, participantCareWhere } from "@/lib/api/organisation-scope";
 import { jsonOk } from "@/lib/api/response";
 import { isAdminRole } from "@/lib/auth/roles";
 import { prisma } from "@/lib/prisma";

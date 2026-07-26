@@ -1,7 +1,7 @@
 import { NdisClaimLineStatus, NdisPaymentRoute } from "@prisma/client";
 
 import { requireApiPermission } from "@/lib/api/auth-handler";
-import { getUserOrganisationIds } from "@/lib/api/phase3-scope";
+import { getUserOrganisationIds } from "@/lib/api/organisation-scope";
 import { jsonError, jsonOk } from "@/lib/api/response";
 import { isAdminRole } from "@/lib/auth/roles";
 import { assertOrgAccess, searchClaimLines } from "@/lib/ndis/claiming/claim-service";

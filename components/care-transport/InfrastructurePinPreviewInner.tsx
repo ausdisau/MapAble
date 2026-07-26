@@ -5,7 +5,7 @@ import { MapContainer, Marker, TileLayer, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 
 import { mapMarkerIcons } from "@/lib/map/leaflet-markers";
-import "@/lib/leafletIcons";
+import "@/lib/map/leaflet-icons";
 
 const tileUrl =
   process.env.NEXT_PUBLIC_OSM_TILE_URL ??

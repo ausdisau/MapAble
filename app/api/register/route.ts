@@ -6,7 +6,7 @@ import {
   JURISDICTION_DEFAULTS,
   isMapAbleJurisdiction,
   type MapAbleJurisdiction,
-} from "@/lib/nz-schemes";
+} from "@/lib/config/nz-schemes";
 import { refreshParticipantOnboarding } from "@/lib/onboarding/onboarding-service";
 import { prisma } from "@/lib/prisma";
 import {

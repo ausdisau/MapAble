@@ -6,7 +6,7 @@ const getUserOrganisationIds = vi.fn();
 const findUniqueInvoice = vi.fn();
 const findUniquePayout = vi.fn();
 
-vi.mock("@/lib/api/phase3-scope", () => ({
+vi.mock("@/lib/api/organisation-scope", () => ({
   getUserOrganisationIds: (...args: unknown[]) =>
     getUserOrganisationIds(...args),
 }));

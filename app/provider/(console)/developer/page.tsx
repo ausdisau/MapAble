@@ -1,5 +1,5 @@
 import { CreateApiKeyDialog } from "@/components/provider/CreateApiKeyDialog";
-import { getUserOrganisationIds } from "@/lib/api/phase3-scope";
+import { getUserOrganisationIds } from "@/lib/api/organisation-scope";
 import { requireAuth } from "@/lib/auth/guards";
 import { isAdminRole } from "@/lib/auth/roles";
 import { PARTNER_API_KEY_SCOPES } from "@/lib/developer-api/partner-api-key-scopes";

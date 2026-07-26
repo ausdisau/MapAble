@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { verifyClaimToken } from "@/lib/claim-verify";
+import { verifyClaimToken } from "@/lib/provider/claim-verify";
 import { prisma } from "@/lib/prisma";
 
 export async function GET(request: Request) {

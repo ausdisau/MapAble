@@ -1,5 +1,5 @@
 import { requireApiPermission, requireApiSession } from "@/lib/api/auth-handler";
-import { OrganisationAccessError, assertOrganisationAccess, workersListWhere } from "@/lib/api/phase3-scope";
+import { OrganisationAccessError, assertOrganisationAccess, workersListWhere } from "@/lib/api/organisation-scope";
 import { jsonError, jsonOk } from "@/lib/api/response";
 import { prisma } from "@/lib/prisma";
 import { createWorkerProfile } from "@/lib/workers/worker-profile-service";

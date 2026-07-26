@@ -3,7 +3,7 @@ import {
   SUPPORTED_LOCALES,
   isSupportedLocale,
   type MapAbleLocale,
-} from "@/lib/nz-schemes";
+} from "@/lib/config/nz-schemes";
 import { prisma } from "@/lib/prisma";
 
 const DEFAULT_LOCALE: MapAbleLocale = "en-AU";

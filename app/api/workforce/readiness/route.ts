@@ -1,7 +1,7 @@
 import { ZodError, z } from "zod";
 
 import { requireApiSession } from "@/lib/api/auth-handler";
-import { assertOrganisationAccess, OrganisationAccessError } from "@/lib/api/phase3-scope";
+import { assertOrganisationAccess, OrganisationAccessError } from "@/lib/api/organisation-scope";
 import { jsonError, jsonOk, zodErrorResponse } from "@/lib/api/response";
 import { getCommunicationPassport } from "@/lib/communication-passport/service";
 import { isWorkforceReadinessEnabled } from "@/lib/config/communication-workforce";

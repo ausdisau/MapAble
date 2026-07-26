@@ -1,6 +1,6 @@
 import { ProviderNdiaClaimsClient } from "@/components/provider/ProviderNdiaClaimsClient";
 import { Badge } from "@/components/ui/badge";
-import { getUserOrganisationIds } from "@/lib/api/phase3-scope";
+import { getUserOrganisationIds } from "@/lib/api/organisation-scope";
 import { requirePermission } from "@/lib/auth/guards";
 import { mapableEyebrowBadgeClass, mapablePageContainerClass } from "@/lib/brand/styles";
 

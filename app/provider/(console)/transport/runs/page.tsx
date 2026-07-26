@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { ProviderRideRunsPanel } from "@/components/transport/ProviderRideRunsPanel";
-import { getUserOrganisationIds } from "@/lib/api/phase3-scope";
+import { getUserOrganisationIds } from "@/lib/api/organisation-scope";
 import { requireAuth } from "@/lib/auth/guards";
 import { prisma } from "@/lib/prisma";
 import { listRideRuns } from "@/lib/transport/ride-run-service";

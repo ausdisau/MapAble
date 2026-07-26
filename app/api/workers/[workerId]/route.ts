@@ -3,7 +3,7 @@ import {
   OrganisationAccessError,
   assertWorkerProfileRead,
   assertWorkerProfileWrite,
-} from "@/lib/api/phase3-scope";
+} from "@/lib/api/organisation-scope";
 import { jsonError, jsonOk } from "@/lib/api/response";
 import { createAuditEvent } from "@/lib/audit/audit-event-service";
 import { prisma } from "@/lib/prisma";

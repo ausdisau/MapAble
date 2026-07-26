@@ -3,7 +3,7 @@ import {
   OrganisationAccessError,
   assertOrganisationAccess,
   organisationScopedIds,
-} from "@/lib/api/phase3-scope";
+} from "@/lib/api/organisation-scope";
 import { jsonError, jsonOk, zodErrorResponse } from "@/lib/api/response";
 import { prisma } from "@/lib/prisma";
 import { BreakGlassRequiredError } from "@/lib/security/break-glass";

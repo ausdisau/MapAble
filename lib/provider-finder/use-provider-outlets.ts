@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 
-import { fetchProviderOutlets } from "@/lib/provider-outlets";
+import { fetchProviderOutlets } from "@/lib/provider-finder/provider-outlets";
 
 /** React Query key for provider-outlets; use for invalidation or prefetch. */
 export const PROVIDER_OUTLETS_QUERY_KEY = ["provider-outlets"] as const;

@@ -1,5 +1,5 @@
 import { requireApiPermission } from "@/lib/api/auth-handler";
-import { OrganisationAccessError } from "@/lib/api/phase3-scope";
+import { OrganisationAccessError } from "@/lib/api/organisation-scope";
 import { jsonError, jsonOk } from "@/lib/api/response";
 import { deactivateWorkerProfile } from "@/lib/workers/worker-invite-service";
 
