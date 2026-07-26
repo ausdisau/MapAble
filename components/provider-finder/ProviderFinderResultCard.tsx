@@ -87,8 +87,10 @@ export function ProviderFinderResultCard({
 
       <button
         type="button"
-        className="mt-3 w-full text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-lg"
+        className="mt-3 w-full rounded-lg text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         onClick={() => onSelect?.(provider)}
+        aria-label={`Select ${provider.name} in ${formatLocation(provider)}`}
+        aria-pressed={Boolean(isSelected)}
       >
         <h3 className="font-heading text-lg font-semibold text-foreground">
           {provider.name}
@@ -175,7 +177,12 @@ export function ProviderFinderResultCard({
           variant="outline"
           size="default"
           onClick={() => onToggleCompare?.(provider)}
-          aria-pressed={isCompared}
+          aria-pressed={Boolean(isCompared)}
+          aria-label={
+            isCompared
+              ? `Remove ${provider.name} from comparison`
+              : `Add ${provider.name} to comparison`
+          }
         >
           <Bookmark className="h-4 w-4" aria-hidden />
           {isCompared ? "Compared" : "Compare"}

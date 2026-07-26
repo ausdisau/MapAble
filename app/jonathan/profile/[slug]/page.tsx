@@ -17,6 +17,7 @@ import React, { useEffect, useState } from "react";
 
 import { mapOutletsToProviders } from "@/app/provider-finder/outletToProvider";
 import type { Provider } from "@/app/provider-finder/providers";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,6 +29,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { usePlatformCareLink } from "@/lib/provider/use-platform-care-link";
+import { buildProviderProfileJsonLd } from "@/lib/seo/provider-profile-json-ld";
 import { useProviderOutlets } from "@/lib/use-provider-outlets";
 
 function formatLocation(provider: Provider) {
@@ -57,12 +59,13 @@ function ProviderProfile({
 
   return (
     <div className="min-h-screen bg-background">
+      <JsonLd data={buildProviderProfileJsonLd(provider)} />
       <main className="container mx-auto max-w-3xl px-4 py-8">
         <Link
           href="/provider-finder"
-          className="mb-6 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          className="mb-6 inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
-          <ArrowLeft className="h-4 w-4" />
+          <ArrowLeft className="h-4 w-4" aria-hidden />
           Back to Provider Finder
         </Link>
 

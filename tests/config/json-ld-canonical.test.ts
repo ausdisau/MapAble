@@ -69,7 +69,9 @@ describe("canonical public URL surfaces", () => {
     expect(robotsSrc).toMatch(/getCanonicalPublicOrigin/);
     expect(sitemapSrc).toMatch(/getCanonicalPublicOrigin/);
     expect(layoutSrc).toMatch(/buildPublicJsonLd/);
-    expect(layoutSrc).toMatch(/serializeJsonLdForScript/);
+    expect(layoutSrc).toMatch(/JsonLd/);
+    expect(layoutSrc).toMatch(/lang="en-AU"/);
+    expect(layoutSrc).toMatch(/MapAble Australia/);
     expect(layoutSrc).not.toMatch(/www\.mapable\.com\.au/);
   });
 

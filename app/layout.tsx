@@ -12,14 +12,12 @@ import {
   GoogleAdSense,
 } from "@/components/ads/GoogleAdSense";
 import { Providers } from "@/components/providers";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { isFirstPartyAccessibilityPanelEnabled } from "@/lib/accessibility/feature-flags";
 import { getPreHydrationAccessibilityScript } from "@/lib/accessibility/ui-preferences";
 import { MAPABLE_LOGO_MARK_SRC } from "@/lib/brand/constants";
 import { getCanonicalPublicOrigin } from "@/lib/config/canonical-url";
-import {
-  buildPublicJsonLd,
-  serializeJsonLdForScript,
-} from "@/lib/config/json-ld";
+import { buildPublicJsonLd } from "@/lib/config/json-ld";
 import {
   CSP_NONCE_HEADER,
   isCspPreviewEnforceEnabled,
@@ -28,6 +26,9 @@ import {
 const canonicalOrigin = getCanonicalPublicOrigin();
 const publicJsonLd = buildPublicJsonLd();
 const firstPartyA11yPanel = isFirstPartyAccessibilityPanelEnabled();
+
+const DEFAULT_DESCRIPTION =
+  "MapAble Australia helps people find accessible places, NDIS providers, and inclusive community supports — with consent-aware care, transport, and discovery tools.";
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -46,12 +47,21 @@ const outfit = Outfit({
 export const metadata: Metadata = {
   metadataBase: new URL(canonicalOrigin),
   title: {
-    default: "MapAble | Disability support platform",
-    template: "%s | MapAble",
+    default:
+      "MapAble Australia | Accessible places, NDIS providers & inclusive community",
+    template: "%s | MapAble Australia",
   },
-  description:
-    "MapAble helps people explore disability support, provider discovery, accessible transport, employment pathways and consent-aware service tools.",
-  applicationName: "MapAble",
+  description: DEFAULT_DESCRIPTION,
+  applicationName: "MapAble Australia",
+  keywords: [
+    "accessible places",
+    "NDIS providers",
+    "inclusive community",
+    "disability support Australia",
+    "MapAble",
+    "accessible transport",
+    "disability mapping",
+  ],
   manifest: "/manifest.webmanifest",
   // Do not pin every page to the apex pathname. Route modules set
   // `alternates.canonical` relative to `metadataBase` so each path resolves
@@ -64,16 +74,17 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     url: canonicalOrigin,
-    siteName: "MapAble",
-    title: "MapAble | Disability support platform",
-    description:
-      "Explore disability support, provider discovery, accessible transport and consent-aware service tools.",
+    locale: "en_AU",
+    siteName: "MapAble Australia",
+    title:
+      "MapAble Australia | Accessible places, NDIS providers & inclusive community",
+    description: DEFAULT_DESCRIPTION,
   },
   twitter: {
     card: "summary_large_image",
-    title: "MapAble | Disability support platform",
-    description:
-      "Explore disability support, provider discovery, accessible transport and consent-aware service tools.",
+    title:
+      "MapAble Australia | Accessible places, NDIS providers & inclusive community",
+    description: DEFAULT_DESCRIPTION,
   },
   other: {
     "purpleads-verification": "832ea0b13123578b63ae2fe9",
@@ -101,7 +112,10 @@ export default async function RootLayout({
   const scriptNonce = await resolveScriptNonce();
 
   return (
-    <html lang="en" className={`${plusJakarta.variable} ${outfit.variable}`}>
+    <html
+      lang="en-AU"
+      className={`${plusJakarta.variable} ${outfit.variable}`}
+    >
       <head>
         <meta
           name="purpleads-verification"
@@ -118,21 +132,9 @@ export default async function RootLayout({
         ) : null}
       </head>
       <body className={plusJakarta.className}>
-        <script
-          type="application/ld+json"
+        <JsonLd
           nonce={scriptNonce}
-          suppressHydrationWarning
-          dangerouslySetInnerHTML={{
-            __html: serializeJsonLdForScript(publicJsonLd.organization),
-          }}
-        />
-        <script
-          type="application/ld+json"
-          nonce={scriptNonce}
-          suppressHydrationWarning
-          dangerouslySetInnerHTML={{
-            __html: serializeJsonLdForScript(publicJsonLd.website),
-          }}
+          data={[publicJsonLd.organization, publicJsonLd.website]}
         />
         <Providers>{children}</Providers>
         {firstPartyA11yPanel ? null : <AccessiBeWidget />}

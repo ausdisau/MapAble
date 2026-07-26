@@ -406,6 +406,7 @@ export function AccessibilityMapLanding({
                 aria-pressed={view === "list"}
                 aria-controls={RESULTS_PANEL_ID}
                 aria-expanded={view === "list"}
+                aria-label="Show accessible places as a list"
                 onClick={() => handleViewChange("list")}
               >
                 List
@@ -416,6 +417,7 @@ export function AccessibilityMapLanding({
                 aria-pressed={view === "map"}
                 aria-controls={RESULTS_PANEL_ID}
                 aria-expanded={view === "map"}
+                aria-label="Show accessible places on an interactive map"
                 onClick={() => handleViewChange("map")}
               >
                 Map

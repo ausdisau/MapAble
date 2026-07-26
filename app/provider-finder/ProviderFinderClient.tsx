@@ -6,6 +6,10 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 import { MapErrorBoundary } from "@/components/error/MapErrorBoundary";
+import {
+  LazyMapPanel,
+  type DirectoryViewMode,
+} from "@/components/map/LazyMapPanel";
 import type { MapLibreProvider } from "@/components/map/MapLibreMap";
 import { MapAbleCareCombinedSections } from "@/components/marketing/MapAbleCareCombinedSections";
 import { ProviderFinderAccessLayer } from "@/components/provider-finder/ProviderFinderAccessLayer";
@@ -143,6 +147,8 @@ export default function ProviderFinderClient({
   const [compareIds, setCompareIds] = useState<string[]>([]);
   const [interpretNote, setInterpretNote] = useState<string | null>(null);
   const [searchInterpreting, setSearchInterpreting] = useState(false);
+  /** List-first: MapLibre chunk only mounts when the user chooses map view. */
+  const [resultsView, setResultsView] = useState<DirectoryViewMode>("list");
   const [ndisMapPins, setNdisMapPins] = useState<MapLibreProvider[] | null>(
     null,
   );
@@ -346,6 +352,7 @@ export default function ProviderFinderClient({
 
   useEffect(() => {
     if (
+      resultsView !== "map" ||
       !searchSubmitted ||
       mapSource === "outlets" ||
       (!query.trim() &&
@@ -353,7 +360,7 @@ export default function ProviderFinderClient({
         !serviceQuery.trim() &&
         !providerName.trim())
     ) {
-      setNdisMapPins(null);
+      if (resultsView !== "map") setNdisMapPins(null);
       return;
     }
 
@@ -379,6 +386,7 @@ export default function ProviderFinderClient({
       cancelled = true;
     };
   }, [
+    resultsView,
     searchSubmitted,
     mapSource,
     query,
@@ -665,6 +673,7 @@ export default function ProviderFinderClient({
                     size="sm"
                     onClick={useMyLocation}
                     disabled={locationLoading}
+                    aria-label="Use my current location to sort and filter providers nearby"
                   >
                     {locationLoading ? (
                       <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
@@ -703,77 +712,96 @@ export default function ProviderFinderClient({
                 </p>
               ) : null}
 
-              <section id="map" className="scroll-mt-24">
-                {!userLocation && filteredSorted.length > MAP_PIN_LIMIT ? (
-                  <Card variant="outlined" className="mb-4 p-4">
-                    <p className="text-sm text-muted-foreground">
-                      Set a location or use &quot;Use my location&quot; to see
-                      providers on the map.
-                    </p>
-                  </Card>
-                ) : null}
-                <div className="min-h-[400px] overflow-hidden rounded-xl border border-border/60 shadow-sm">
-                  {mapPinsLoading ? (
-                    <p
-                      className="p-4 text-sm text-muted-foreground"
-                      role="status"
-                      aria-live="polite"
+              <LazyMapPanel
+                view={resultsView}
+                onViewChange={setResultsView}
+                resultsPanelId="provider-finder-results-panel"
+                listLabel="Show provider directory as a list"
+                mapLabel="Show providers on an interactive map"
+                statusMessage={
+                  resultsView === "map"
+                    ? `Map view ready with ${mapPinProviders.length} pin${mapPinProviders.length === 1 ? "" : "s"}.`
+                    : `List view showing ${total} provider${total === 1 ? "" : "s"}.`
+                }
+                list={
+                  total === 0 ? (
+                    <Card variant="outlined" className="p-8 text-center">
+                      <h3 className="text-lg font-semibold">No providers found</h3>
+                      <p className="mt-2 text-sm text-muted-foreground">
+                        Try broadening your search or removing a filter.
+                      </p>
+                    </Card>
+                  ) : (
+                    <ul className="space-y-4">
+                      {visible.map((p) => (
+                        <li key={p.id}>
+                          <ProviderFinderResultCard
+                            provider={p}
+                            isSelected={selectedProvider?.id === p.id}
+                            isCompared={compareIds.includes(p.id)}
+                            onSelect={setSelectedProvider}
+                            onToggleCompare={toggleCompare}
+                          />
+                        </li>
+                      ))}
+                    </ul>
+                  )
+                }
+                map={
+                  <section id="map" className="scroll-mt-24">
+                    {!userLocation && filteredSorted.length > MAP_PIN_LIMIT ? (
+                      <Card variant="outlined" className="mb-4 p-4">
+                        <p className="text-sm text-muted-foreground">
+                          Set a location or use &quot;Use my location&quot; to see
+                          providers on the map.
+                        </p>
+                      </Card>
+                    ) : null}
+                    {mapPinsLoading ? (
+                      <p
+                        className="p-4 text-sm text-muted-foreground"
+                        role="status"
+                        aria-live="polite"
+                      >
+                        Loading map pins…
+                      </p>
+                    ) : null}
+                    <MapErrorBoundary
+                      fallback={
+                        <ul
+                          className="space-y-3 p-4"
+                          aria-label="Provider list fallback"
+                        >
+                          {visible.slice(0, 6).map((p) => (
+                            <li key={p.id}>
+                              <button
+                                type="button"
+                                className="w-full rounded-lg border border-border/60 px-3 py-2 text-left text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                                onClick={() => setSelectedProvider(p)}
+                                aria-label={`Select ${p.name} in ${p.suburb}, ${p.state}`}
+                              >
+                                {p.name} — {p.suburb}, {p.state}
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      }
                     >
-                      Loading map pins…
-                    </p>
-                  ) : null}
-                  <MapErrorBoundary
-                    fallback={
-                      <ul className="space-y-3 p-4" aria-label="Provider list fallback">
-                        {visible.slice(0, 6).map((p) => (
-                          <li key={p.id}>
-                            <button
-                              type="button"
-                              className="w-full rounded-lg border border-border/60 px-3 py-2 text-left text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                              onClick={() => setSelectedProvider(p)}
-                            >
-                              {p.name} — {p.suburb}, {p.state}
-                            </button>
-                          </li>
-                        ))}
-                      </ul>
-                    }
-                  >
-                    <MapLibreMap
-                      providers={mapPinProviders}
-                      userPosition={userLocation}
-                      selectedProviderId={selectedProvider?.id ?? null}
-                      onProviderSelect={(id) => {
-                        const fromList = filteredSorted.find((x) => x.id === id);
-                        if (fromList) setSelectedProvider(fromList);
-                      }}
-                    />
-                  </MapErrorBoundary>
-                </div>
-              </section>
-
-              {total === 0 ? (
-                <Card variant="outlined" className="p-8 text-center">
-                  <h3 className="text-lg font-semibold">No providers found</h3>
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    Try broadening your search or removing a filter.
-                  </p>
-                </Card>
-              ) : (
-                <ul className="space-y-4">
-                  {visible.map((p) => (
-                    <li key={p.id}>
-                      <ProviderFinderResultCard
-                        provider={p}
-                        isSelected={selectedProvider?.id === p.id}
-                        isCompared={compareIds.includes(p.id)}
-                        onSelect={setSelectedProvider}
-                        onToggleCompare={toggleCompare}
+                      <MapLibreMap
+                        providers={mapPinProviders}
+                        userPosition={userLocation}
+                        selectedProviderId={selectedProvider?.id ?? null}
+                        onProviderSelect={(id) => {
+                          const fromList = filteredSorted.find(
+                            (x) => x.id === id,
+                          );
+                          if (fromList) setSelectedProvider(fromList);
+                        }}
                       />
-                    </li>
-                  ))}
-                </ul>
-              )}
+                    </MapErrorBoundary>
+                  </section>
+                }
+              />
 
               {totalPages > 1 ? (
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

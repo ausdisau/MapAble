@@ -33,6 +33,8 @@ type Props = {
   flyTo?: { lat: number; lng: number; zoom?: number } | null;
   selectedId?: string | null;
   onSelect?: (id: string) => void;
+  /** When false, omit the accessible list (parent already renders directory HTML). */
+  showResultsList?: boolean;
 };
 
 function emptyCollection(): MapFeatureCollection {
@@ -48,6 +50,7 @@ export function CareTransportMapView({
   flyTo,
   selectedId,
   onSelect,
+  showResultsList = true,
 }: Props) {
   const mapId = useId().replace(/:/g, "");
   const containerRef = useRef<HTMLDivElement>(null);
@@ -194,11 +197,13 @@ export function CareTransportMapView({
         controlsId={`map-region-${mapId}`}
       />
       <p className="text-xs text-muted-foreground">{attribution}</p>
-      <MapAccessibleResultsList
-        results={listResults}
-        selectedId={selectedId}
-        onSelect={handleSelect}
-      />
+      {showResultsList ? (
+        <MapAccessibleResultsList
+          results={listResults}
+          selectedId={selectedId}
+          onSelect={handleSelect}
+        />
+      ) : null}
     </div>
   );
 }
