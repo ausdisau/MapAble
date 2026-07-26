@@ -11,10 +11,8 @@ import { WhatToConfirmList } from "@/components/access-fit/WhatToConfirmList";
 import { ViewFloorPlanButton } from "@/components/accessibility-map/floor-plan/ViewFloorPlanButton";
 import { VenueAccessDetails } from "@/components/accessibility-map/VenueAccessDetails";
 import { MapAbleCareMarketingShell } from "@/components/marketing/MapAbleCareMarketingShell";
-import {
-  buildPlaceAccessibilityJsonLd,
-  serializePlaceJsonLd,
-} from "@/lib/access/place-json-ld";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { buildPlaceAccessibilityJsonLd } from "@/lib/access/place-json-ld";
 import { calculateAccessFit } from "@/lib/access-fit/calculate-access-fit";
 import { DEMO_ACCESS_NEEDS } from "@/lib/access-fit/types";
 import { getAccessMapPlaceBySlug } from "@/lib/access-map/access-map-places";
@@ -33,7 +31,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return { title: "Place not found | MapAble" };
   }
   return {
-    title: `${place.name} access details | MapAble`,
+    title: `${place.name} access details`,
     description: `Access score ${place.accessScore}, ${place.tier} tier, last checked ${place.lastChecked}. Evidence-based access information for ${place.suburb}.`,
   };
 }
@@ -74,10 +72,7 @@ export default async function AccessibilityMapPlacePage({ params }: PageProps) {
 
   return (
     <MapAbleCareMarketingShell>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: serializePlaceJsonLd(jsonLd) }}
-      />
+      <JsonLd data={jsonLd} />
       <article className="mx-auto max-w-4xl space-y-8 px-5 py-10 lg:px-8">
         <p className="text-xs font-black uppercase tracking-[0.16em] text-amber-800">
           Demo place profile

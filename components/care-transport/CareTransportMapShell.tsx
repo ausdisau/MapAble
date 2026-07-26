@@ -1,14 +1,17 @@
 "use client";
 
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { useSession } from "next-auth/react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { CareTransportAskPanel } from "@/components/care-transport/CareTransportAskPanel";
+import type { CareTransportLayerKey } from "@/components/care-transport/CareTransportMapView";
 import {
-  CareTransportMapView,
-  type CareTransportLayerKey,
-} from "@/components/care-transport/CareTransportMapView";
+  LazyMapPanel,
+  type DirectoryViewMode,
+} from "@/components/map/LazyMapPanel";
+import { MapAccessibleResultsList } from "@/components/map/MapAccessibleResultsList";
 import { MapProvider } from "@/components/map/MapProvider";
 import { Button } from "@/components/ui/button";
 import type { CareTransportMapPayload } from "@/lib/care-transport-map/map-payload";
@@ -18,6 +21,25 @@ import type { MapFeatureCollection } from "@/lib/map/types";
 function emptyCollection(): MapFeatureCollection {
   return { type: "FeatureCollection", features: [] };
 }
+
+const CareTransportMapView = dynamic(
+  () =>
+    import("@/components/care-transport/CareTransportMapView").then((m) => ({
+      default: m.CareTransportMapView,
+    })),
+  {
+    ssr: false,
+    loading: () => (
+      <div
+        className="flex h-[420px] items-center justify-center rounded-lg border border-border/60 bg-muted/20 text-sm text-muted-foreground"
+        role="status"
+        aria-label="Loading interactive map"
+      >
+        Loading map…
+      </div>
+    ),
+  },
+);
 
 const DEFAULT_LAYERS: Record<CareTransportLayerKey, boolean> = {
   careProviders: true,
@@ -44,6 +66,8 @@ export function CareTransportMapShell({
     useState<MapFeatureCollection | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [directoryView, setDirectoryView] =
+    useState<DirectoryViewMode>("list");
   const [flyTo, setFlyTo] = useState<{
     lat: number;
     lng: number;
@@ -188,6 +212,29 @@ export function CareTransportMapShell({
     layerButtons.push(["foundationalSupports", "Foundational supports"]);
   }
 
+  const directoryListResults = useMemo(() => {
+    const features = [
+      ...(layers.careProviders
+        ? (payload?.careProviders.features ?? [])
+        : []),
+      ...(layers.infrastructure
+        ? (payload?.infrastructure.features ?? [])
+        : []),
+      ...(layers.trips && payload?.trips ? payload.trips.features : []),
+      ...(layers.foundationalSupports && foundationalSupports
+        ? foundationalSupports.features
+        : []),
+    ];
+    return features.map((f) => ({
+      id: String(f.properties.id ?? ""),
+      name: String(f.properties.name ?? "Untitled"),
+      subtitle:
+        typeof f.properties.subtitle === "string"
+          ? f.properties.subtitle
+          : undefined,
+    }));
+  }, [payload, foundationalSupports, layers]);
+
   return (
     <MapProvider>
       <div className="mx-auto max-w-6xl space-y-4 px-4 py-6">
@@ -230,23 +277,35 @@ export function CareTransportMapShell({
           OpenStreetMap contributors.
         </div>
 
-        <div className="flex flex-wrap gap-2" role="group" aria-label="Map layers">
+        <div
+          className="flex flex-wrap gap-2"
+          role="group"
+          aria-label="Map layers"
+        >
           {layerButtons.map(([key, label]) => {
             const disabled = key === "trips" && !isSignedIn;
+            const pressed = layers[key];
             return (
               <button
                 key={key}
                 type="button"
                 disabled={disabled}
-                aria-pressed={layers[key]}
-                className={`min-h-11 rounded-lg border px-3 py-2 text-sm ${
-                  layers[key]
+                aria-pressed={pressed}
+                aria-label={
+                  disabled
+                    ? `${label} layer (sign in required)`
+                    : `${pressed ? "Hide" : "Show"} ${label} layer`
+                }
+                className={`min-h-11 rounded-lg border px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                  pressed
                     ? "border-primary bg-primary text-primary-foreground"
                     : "border-input bg-background"
                 } ${disabled ? "opacity-50" : ""}`}
                 onClick={() => toggleLayer(key)}
                 title={
-                  disabled ? "Sign in to show your masked trip points" : undefined
+                  disabled
+                    ? "Sign in to show your masked trip points"
+                    : undefined
                 }
               >
                 {label}
@@ -258,6 +317,7 @@ export function CareTransportMapShell({
             variant="outline"
             size="default"
             onClick={() => void loadMap()}
+            aria-label="Refresh directory data"
           >
             Refresh
           </Button>
@@ -278,19 +338,44 @@ export function CareTransportMapShell({
           </p>
         ) : null}
         {loading && !payload ? (
-          <p className="text-sm text-muted-foreground">Loading map…</p>
+          <p className="text-sm text-muted-foreground" role="status">
+            Loading directory…
+          </p>
         ) : null}
 
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
-          <CareTransportMapView
-            careProviders={payload?.careProviders ?? emptyCollection()}
-            infrastructure={payload?.infrastructure ?? emptyCollection()}
-            trips={payload?.trips ?? null}
-            foundationalSupports={foundationalSupports}
-            layers={layers}
-            flyTo={flyTo}
-            selectedId={selectedId}
-            onSelect={setSelectedId}
+          <LazyMapPanel
+            view={directoryView}
+            onViewChange={setDirectoryView}
+            resultsPanelId="care-transport-directory-panel"
+            listLabel="Show Care and Transport directory as a list"
+            mapLabel="Show Care and Transport locations on an interactive map"
+            statusMessage={
+              directoryView === "map"
+                ? `Map view with ${directoryListResults.length} result${directoryListResults.length === 1 ? "" : "s"}.`
+                : `List view showing ${directoryListResults.length} result${directoryListResults.length === 1 ? "" : "s"}.`
+            }
+            list={
+              <MapAccessibleResultsList
+                results={directoryListResults}
+                selectedId={selectedId}
+                onSelect={setSelectedId}
+                heading="Care and Transport directory"
+              />
+            }
+            map={
+              <CareTransportMapView
+                careProviders={payload?.careProviders ?? emptyCollection()}
+                infrastructure={payload?.infrastructure ?? emptyCollection()}
+                trips={payload?.trips ?? null}
+                foundationalSupports={foundationalSupports}
+                layers={layers}
+                flyTo={flyTo}
+                selectedId={selectedId}
+                onSelect={setSelectedId}
+                showResultsList={false}
+              />
+            }
           />
           <CareTransportAskPanel onMapActions={onMapActions} />
         </div>

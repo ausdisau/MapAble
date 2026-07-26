@@ -3,9 +3,9 @@ import { PublicModulePage } from "@/components/marketing/PublicModulePage";
 import { canonicalAlternate } from "@/lib/config/canonical-url";
 
 export const metadata = {
-  title: "MapAble Care | Disability support coordination",
+  title: "MapAble Care — NDIS providers & disability support",
   description:
-    "Learn how MapAble Care will help participants request support, compare providers and keep consent-controlled records.",
+    "Find NDIS providers and disability support coordination with MapAble Care. Discover accessible places and inclusive community services with consent at the centre.",
   alternates: canonicalAlternate("/care"),
 };
 

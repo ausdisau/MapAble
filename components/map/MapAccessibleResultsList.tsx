@@ -33,6 +33,11 @@ export function MapAccessibleResultsList({
               }`}
               onClick={() => onSelect?.(r.id)}
               aria-current={selectedId === r.id ? "true" : undefined}
+              aria-label={
+                r.subtitle
+                  ? `Select ${r.name}, ${r.subtitle}`
+                  : `Select ${r.name}`
+              }
             >
               <span className="font-medium">{r.name}</span>
               {r.subtitle ? (
