@@ -11,6 +11,7 @@ import {
 import {
   CSP_ENFORCE_HEADER,
   createScriptNonce,
+  isCspPreviewEnforceEnabled,
 } from "@/lib/security/csp-preview-enforce";
 import { buildForwardRequestHeaders } from "@/lib/security/forward-request-headers";
 import {
@@ -114,19 +115,25 @@ function buildEnforcePolicyForRequest(
 }
 
 /**
- * Apply correlation IDs and the enforcing Content-Security-Policy.
- * Embed routes also clear clickjacking DENY so partners may frame them
- * when frame-ancestors permits.
+ * Apply correlation IDs and, when preview CSP enforce is on, the
+ * nonce-bearing Content-Security-Policy. Embed routes also clear
+ * clickjacking DENY so partners may frame them when frame-ancestors permits.
+ *
+ * Enforce stays flag-gated (`MAPABLE_CSP_ENFORCE_PREVIEW`) so login/a11y CI
+ * and production keep working until layout nonce injection is always-on.
  */
 function withCorrelationAndCsp(
   response: NextResponse,
   correlationId: string,
-  enforcePolicy: string,
+  enforcePolicy: string | null,
   embedRoute: boolean,
 ): NextResponse {
   response.headers.set(CORRELATION_ID_HEADER, correlationId);
   response.headers.set(REQUEST_ID_HEADER, correlationId);
-  response.headers.set(CSP_ENFORCE_HEADER, enforcePolicy);
+
+  if (enforcePolicy) {
+    response.headers.set(CSP_ENFORCE_HEADER, enforcePolicy);
+  }
 
   if (embedRoute) {
     // Prefer CSP frame-ancestors for embed; remove legacy DENY if present.
@@ -140,8 +147,10 @@ function withCorrelationAndCsp(
 
 export default async function middleware(request: NextRequest) {
   const nonce = createScriptNonce();
-  // Strict enforcement (upgraded from report-only).
-  const enforcePolicy = buildEnforcePolicyForRequest(request, nonce);
+  const enforceEnabled = isCspPreviewEnforceEnabled();
+  const enforcePolicy = enforceEnabled
+    ? buildEnforcePolicyForRequest(request, nonce)
+    : null;
   const embedRoute = isEmbedPath(request.nextUrl.pathname);
 
   const correlationId = resolveCorrelationId(

@@ -36,6 +36,7 @@ describe("createClinicalSession", () => {
       participantId: "p1",
       supportItemCode: "15_037_0117_1_3",
       actorUserId: "u1",
+      accessRole: "clinician",
     });
 
     expect(result.mode).toBe("scaffold");
@@ -58,6 +59,7 @@ describe("createClinicalSession", () => {
       participantId: "p1",
       supportItemCode: "15_005_0117_1_3",
       actorUserId: "u1",
+      accessRole: "clinician",
       appointmentId: "appt-missing",
     });
 
@@ -72,6 +74,7 @@ describe("createClinicalSession", () => {
         participantId: "p1",
         supportItemCode: "15_037_0117_1_3",
         actorUserId: "u1",
+        accessRole: "clinician",
       })
     ).rejects.toThrow("VIRTUAL_CARE_HUB_DISABLED");
   });
