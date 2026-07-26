@@ -1,6 +1,6 @@
 import { jsonError, jsonOk } from "@/lib/api/response";
-import { getTranslations } from "@/lib/internationalisation/i18n-service";
 import { isSupportedLocale } from "@/lib/config/nz-schemes";
+import { getTranslations } from "@/lib/internationalisation/i18n-service";
 
 export async function GET(
   req: Request,

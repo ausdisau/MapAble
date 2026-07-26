@@ -1,9 +1,9 @@
-import { phase9Config } from "@/lib/config/phase9";
 import {
   SUPPORTED_LOCALES,
   isSupportedLocale,
   type MapAbleLocale,
 } from "@/lib/config/nz-schemes";
+import { phase9Config } from "@/lib/config/phase9";
 import { prisma } from "@/lib/prisma";
 
 const DEFAULT_LOCALE: MapAbleLocale = "en-AU";
