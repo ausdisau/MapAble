@@ -6,6 +6,8 @@ export type AuthJwtUser = {
   email?: string | null;
   name?: string | null;
   role?: string | null;
+  /** Set when the credentials authorize path completed MFA / passkey. */
+  mfaVerified?: boolean;
 };
 
 export function mergeUserIntoJwtToken(
@@ -16,6 +18,10 @@ export function mergeUserIntoJwtToken(
   if (user.role) token.role = user.role;
   if (user.email) token.email = user.email;
   if (user.name) token.name = user.name;
+  if (user.mfaVerified) {
+    token.mfaVerified = true;
+    token.mfaVerifiedAt = Date.now();
+  }
   return token;
 }
 
@@ -30,5 +36,6 @@ export function mergeJwtTokenIntoSession(
   if (typeof token.role === "string") session.user.role = token.role;
   if (typeof token.email === "string") session.user.email = token.email;
   if (typeof token.name === "string") session.user.name = token.name;
+  if (token.mfaVerified === true) session.user.mfaVerified = true;
   return session;
 }

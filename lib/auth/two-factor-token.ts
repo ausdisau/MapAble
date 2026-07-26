@@ -9,7 +9,9 @@ export type TwoFactorTokenPurpose =
   | "credentials-passkey"
   | "passkey-authentication"
   | "passkey-registration"
-  | "twilio-2fa-challenge";
+  | "twilio-2fa-challenge"
+  /** Short-lived step-up assertion for sensitive API mutations (e.g. break-glass). */
+  | "step-up-mfa";
 
 type TwoFactorTokenPayload = {
   challenge?: string;
