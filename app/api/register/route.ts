@@ -113,7 +113,15 @@ export async function POST(req: Request) {
           timezone: regionDefaults.timezone,
         },
       });
-      await refreshParticipantOnboarding(user.id, user.id);
+      // Onboarding checklist must not block account creation if schema/migrations lag.
+      try {
+        await refreshParticipantOnboarding(user.id, user.id);
+      } catch (onboardingError) {
+        console.error(
+          "[register] onboarding refresh failed (account kept)",
+          onboardingError,
+        );
+      }
     }
 
     if (inviteToken) {

@@ -59,11 +59,15 @@ export default function RegisterClient({
         return;
       }
 
+      const postRegisterPath = inviteToken
+        ? "/worker/onboarding"
+        : "/register/support-needs";
+
       const result = await signIn("credentials", {
         email: normalizedEmail,
         password: password.trim(),
         redirect: false,
-        callbackUrl: "/dashboard",
+        callbackUrl: postRegisterPath,
       });
 
       if (result?.error) {
@@ -74,7 +78,7 @@ export default function RegisterClient({
         return;
       }
 
-      router.push(inviteToken ? "/worker/onboarding" : "/dashboard");
+      router.push(postRegisterPath);
       router.refresh();
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Something went wrong");

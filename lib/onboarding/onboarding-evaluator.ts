@@ -9,6 +9,8 @@ export type OnboardingChecklistItem = {
   complete: boolean;
   blocker: boolean;
   detail?: string;
+  /** Optional deep-link for incomplete recommended steps. */
+  href?: string;
 };
 
 export type OnboardingEvaluation = {
@@ -24,10 +26,25 @@ function scoreFromChecklist(items: OnboardingChecklistItem[]) {
   return Math.round((complete / items.length) * 100);
 }
 
+async function countSupportNeedsSnapshots(userId: string): Promise<number> {
+  try {
+    return await prisma.iCanV6IntakeSubmission.count({
+      where: {
+        participantId: userId,
+        status: { in: ["registration_lite", "submitted_draft"] },
+      },
+    });
+  } catch (error) {
+    // Fail soft when the I-CAN table is not migrated yet (prod lag).
+    console.error("[onboarding] support needs count failed", error);
+    return 0;
+  }
+}
+
 export async function evaluateParticipantOnboarding(
   userId: string
 ): Promise<OnboardingEvaluation> {
-  const [profile, consents, funding] = await Promise.all([
+  const [profile, consents, funding, supportNeedsCount] = await Promise.all([
     prisma.participantProfile.findUnique({ where: { userId } }),
     prisma.consentRecord.count({
       where: { subjectUserId: userId, status: "active" },
@@ -35,7 +52,10 @@ export async function evaluateParticipantOnboarding(
     prisma.participantFundingSource.count({
       where: { participantId: userId, status: "active" },
     }),
+    countSupportNeedsSnapshots(userId),
   ]);
+
+  const supportNeedsComplete = supportNeedsCount > 0;
 
   const checklist: OnboardingChecklistItem[] = [
     {
@@ -52,6 +72,16 @@ export async function evaluateParticipantOnboarding(
       blocker: true,
       detail:
         consents > 0 ? undefined : "Grant at least one consent scope for care or transport",
+    },
+    {
+      id: "support_needs",
+      label: "Support needs snapshot",
+      complete: supportNeedsComplete,
+      blocker: false,
+      detail: supportNeedsComplete
+        ? undefined
+        : "Tell us where you need support so we can prepare your planning draft",
+      href: supportNeedsComplete ? undefined : "/register/support-needs",
     },
     {
       id: "funding",
