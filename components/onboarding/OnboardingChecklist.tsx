@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -87,6 +88,14 @@ export function OnboardingChecklist() {
               <p className="font-medium">{item.label}</p>
               {item.detail ? (
                 <p className="text-muted-foreground">{item.detail}</p>
+              ) : null}
+              {item.href && !item.complete ? (
+                <Link
+                  href={item.href}
+                  className="mt-1 inline-block text-sm font-medium text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  Continue
+                </Link>
               ) : null}
             </div>
           </li>
