@@ -163,7 +163,48 @@ export type LocalLandingParams = {
   service: string;
 };
 
+/**
+ * High-priority pairs pre-rendered at build time.
+ * Full cartesian expansion is avoided on Vercel (SSG RSS); remaining
+ * suburb/service URLs resolve on demand via `dynamicParams`.
+ */
 export function buildLocalLandingStaticParams(
+  providers: readonly Provider[] = PROVIDERS,
+): LocalLandingParams[] {
+  const pairs = new Set<string>();
+  const params: LocalLandingParams[] = [];
+
+  const push = (suburb: string, service: string) => {
+    const key = `${suburb}::${service}`;
+    if (pairs.has(key)) return;
+    pairs.add(key);
+    params.push({ suburb, service });
+  };
+
+  // Seed: every seed suburb × top facility-first services only.
+  const priorityServices = LOCAL_SEO_SERVICES.slice(0, 4);
+  for (const suburb of LOCAL_SEO_SEED_SUBURBS) {
+    for (const service of priorityServices) {
+      push(suburb, service.slug);
+    }
+  }
+
+  // Exact outlet suburb × matching service (demo providers) — small set.
+  for (const provider of providers) {
+    if (provider.suburb === "Remote") continue;
+    const suburb = toSeoSlug(provider.suburb);
+    for (const service of LOCAL_SEO_SERVICES) {
+      if (providerMatchesService(provider, service)) {
+        push(suburb, service.slug);
+      }
+    }
+  }
+
+  return params;
+}
+
+/** Full inventory for sitemap / crawl coverage (not all pre-rendered). */
+export function buildLocalLandingSitemapParams(
   providers: readonly Provider[] = PROVIDERS,
 ): LocalLandingParams[] {
   const pairs = new Set<string>();

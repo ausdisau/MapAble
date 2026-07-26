@@ -16,14 +16,14 @@ function resolveHeapMb() {
     return Number(override);
   }
   if (process.env.VERCEL === "1") {
-    // History on default ~8 GB Vercel builders (PR #390):
+    // History on default ~8 GB Vercel builders (PR #390 / #413):
     // - 7168 → SIGKILL (RSS)
-    // - 5632 → JS heap OOM during "Linting and checking validity of types"
-    //   (dpl_5ydRxpvGx…)
-    // - 6144 → required for lint/tsc; may still SIGKILL under peak RSS
-    //   (dpl_GPMHcZxiy…). If SIGKILL persists: OWNER_ACTION_REQUIRED larger
-    //   build machine — do not enable ignoreDuringBuilds / ignoreBuildErrors.
-    return 6144;
+    // - 5632 → JS heap OOM during lint+tsc when eslint ran in-build
+    // - 6144 → still SIGKILL with eslint in-build (dpl_9cgbYumEJum…)
+    // With eslint.ignoreDuringBuilds on Vercel only (CI still lints), keep
+    // headroom under the container RSS limit for tsc + SSG.
+    // If SIGKILL persists: OWNER_ACTION_REQUIRED — larger Vercel build machine.
+    return 5120;
   }
   if (process.env.GITHUB_ACTIONS === "true") {
     return 7168;

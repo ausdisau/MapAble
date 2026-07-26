@@ -4,6 +4,7 @@ import { PROVIDERS } from "@/app/provider-finder/providers";
 import { buildLocalBusinessSchemaGraph } from "@/components/seo/LocalBusinessSchema";
 import {
   buildLocalLandingCopy,
+  buildLocalLandingSitemapParams,
   buildLocalLandingStaticParams,
   filterProvidersForLocalLanding,
   resolveLocalService,
@@ -60,13 +61,23 @@ describe("programmatic local SEO landing helpers", () => {
     expect(copy.description.toLowerCase()).toContain("facilities");
   });
 
-  it("generates static params including seed suburb/service pairs", () => {
-    const params = buildLocalLandingStaticParams(PROVIDERS);
-    expect(params).toEqual(
+  it("generates priority static params and fuller sitemap inventory", () => {
+    const staticParams = buildLocalLandingStaticParams(PROVIDERS);
+    const sitemapParams = buildLocalLandingSitemapParams(PROVIDERS);
+    expect(staticParams).toEqual(
       expect.arrayContaining([
         {
           suburb: "allambie-heights",
           service: "accessible-physiotherapy",
+        },
+      ]),
+    );
+    expect(sitemapParams.length).toBeGreaterThan(staticParams.length);
+    expect(sitemapParams).toEqual(
+      expect.arrayContaining([
+        {
+          suburb: "allambie-heights",
+          service: "home-modifications",
         },
       ]),
     );

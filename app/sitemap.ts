@@ -5,7 +5,7 @@ import { getCanonicalPublicOrigin } from "@/lib/config/canonical-url";
 import { DEMO_ACCESS_PLACES } from "@/lib/demo/accessibility-places";
 import { LOCAL_ACCESS_LOCATIONS } from "@/lib/demo/local-access-pages";
 import { informationalSitemapPaths } from "@/lib/public-informational/routes";
-import { buildLocalLandingStaticParams } from "@/lib/seo/local-landing";
+import { buildLocalLandingSitemapParams } from "@/lib/seo/local-landing";
 
 const baseUrl = getCanonicalPublicOrigin();
 
@@ -67,7 +67,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.65,
   }));
 
-  const providerLocalEntries = buildLocalLandingStaticParams(PROVIDERS).map(
+  const providerLocalEntries = buildLocalLandingSitemapParams(PROVIDERS).map(
     (entry) => ({
       url: `${baseUrl}/provider-finder/${entry.suburb}/${entry.service}`,
       lastModified: now,

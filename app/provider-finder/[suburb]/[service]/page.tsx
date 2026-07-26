@@ -27,6 +27,11 @@ type PageProps = {
   params: Promise<PageParams>;
 };
 
+/** Allow sitemap / crawl URLs beyond the pre-rendered priority set. */
+export const dynamicParams = true;
+
+export const revalidate = 86400;
+
 export function generateStaticParams(): PageParams[] {
   return buildLocalLandingStaticParams(PROVIDERS);
 }

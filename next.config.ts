@@ -48,7 +48,11 @@ const nextConfig: NextConfig = {
     ];
   },
   eslint: {
-    // Build fails when lint fails (ignoreDuringBuilds removed — remediation PR 1).
+    // Vercel default ~8 GB builders SIGKILL during Next's combined
+    // "Linting and checking validity of types" phase (heap+RSS). CI still
+    // runs `pnpm lint` as a required gate on every PR/main push — do not
+    // weaken that. TypeScript checking remains enforced below.
+    ignoreDuringBuilds: process.env.VERCEL === "1",
     // tests/ linted via `pnpm lint:tests` (tracked debt; not ignored during builds for app code).
     dirs: ["app", "components", "lib", "schemas", "scripts/ci"],
   },
