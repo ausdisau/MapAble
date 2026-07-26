@@ -4,7 +4,7 @@ import {
   approvePartnerEnrollment,
   enrollPartnerApiProgram,
   listPartnerEnrollments,
-} from "@/lib/partner-api-program/enrollment-service";
+} from "@/lib/partner/api-program/enrollment-service";
 
 export async function GET() {
   const user = await requireApiAdmin();

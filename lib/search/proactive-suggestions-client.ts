@@ -1,4 +1,4 @@
-import { HERO_SUGGESTED_SEARCHES_FALLBACK } from "@/lib/provider-finder/filters";
+import { HERO_SUGGESTED_SEARCHES_FALLBACK } from "@/lib/provider/finder/filters";
 import { flattenSuggestions } from "@/lib/search/autocomplete-utils";
 import type {
   AutocompleteContext,

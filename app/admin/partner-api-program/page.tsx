@@ -1,6 +1,6 @@
 import { requireAdmin } from "@/lib/auth/guards";
 import { phase9Config } from "@/lib/config/phase9";
-import { listPartnerEnrollments } from "@/lib/partner-api-program/enrollment-service";
+import { listPartnerEnrollments } from "@/lib/partner/api-program/enrollment-service";
 
 export default async function PartnerApiProgramPage() {
   await requireAdmin();

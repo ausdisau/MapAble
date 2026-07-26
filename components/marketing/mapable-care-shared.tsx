@@ -27,7 +27,7 @@ import {
   buildGuidedSearchUrl,
   supportAreaToSupportTypeId,
 } from "@/lib/marketing/mapable-care-routes";
-import { SUPPORT_TYPES } from "@/lib/provider-finder/filters";
+import { SUPPORT_TYPES } from "@/lib/provider/finder/filters";
 
 function useDismissOnOutsideAndEscape(
   open: boolean,

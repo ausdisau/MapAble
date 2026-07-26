@@ -7,7 +7,7 @@ import {
   ACCESS_LEGACY_KML_FILENAME,
   MAPABLE_MY_MAPS_KML_URL,
   MAPABLE_MY_MAPS_SHARE_URL,
-} from "@/lib/access-map/copy";
+} from "@/lib/access/map/copy";
 import { requireAdmin } from "@/lib/auth/guards";
 import { prisma } from "@/lib/prisma";
 

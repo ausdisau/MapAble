@@ -1,7 +1,7 @@
 import {
   publishAlgorithmById,
   submitAlgorithmForReview,
-} from "@/lib/algorithm-register/register-service";
+} from "@/lib/compliance/algorithm-register/register-service";
 import { requireApiAdmin } from "@/lib/api/auth-handler";
 import { jsonError, jsonOk } from "@/lib/api/response";
 

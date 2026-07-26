@@ -4,7 +4,7 @@ import {
   AV_DRIVER_TRIP_TRANSITIONS,
   AV_TERMINAL_TRIP_STATUSES,
   AV_TRIP_TRANSITIONS,
-} from "@/lib/av-framework/trip-transitions";
+} from "@/lib/platform/av-framework/trip-transitions";
 import { TransportApiError } from "@/lib/transport/transport-api-error";
 
 const TRANSITIONS = AV_TRIP_TRANSITIONS;

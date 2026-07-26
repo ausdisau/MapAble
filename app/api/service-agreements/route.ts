@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 import {
   createServiceAgreement,
   sendAgreementForReview,
-} from "@/lib/service-agreements/agreement-service";
+} from "@/lib/contracts/service-agreements/agreement-service";
 
 export async function GET() {
   const user = await requireApiSession();

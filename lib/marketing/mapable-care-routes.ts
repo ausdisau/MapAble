@@ -1,5 +1,5 @@
 import type { ResultCategory, SupportArea } from "@/lib/marketing/mapable-care-combined-data";
-import type { SupportTypeId } from "@/lib/provider-finder/filters";
+import type { SupportTypeId } from "@/lib/provider/finder/filters";
 
 /** Public discovery entry points aligned with the combined homepage support areas. */
 export const supportAreaLandingRoutes: Record<SupportArea, string> = {

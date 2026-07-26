@@ -1,5 +1,5 @@
-import { canDeleteReview, canEditReview } from "@/lib/access-reviews/review-access-policy";
-import { recomputePlaceRatingSummaries } from "@/lib/access-reviews/review-summary-service";
+import { canDeleteReview, canEditReview } from "@/lib/access/reviews/review-access-policy";
+import { recomputePlaceRatingSummaries } from "@/lib/access/reviews/review-summary-service";
 import { requireApiSession } from "@/lib/api/auth-handler";
 import { jsonError, jsonOk, zodErrorResponse } from "@/lib/api/response";
 import { prisma } from "@/lib/prisma";

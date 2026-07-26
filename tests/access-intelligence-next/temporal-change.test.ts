@@ -7,7 +7,7 @@ import {
   fuseTemporalOverlay,
   type AccessChangeCandidate,
   type AccessEvidenceReference,
-} from "@/lib/access-intelligence-next";
+} from "@/lib/access/intelligence-next";
 
 afterEach(() => {
   clearShadowChangeReviews();

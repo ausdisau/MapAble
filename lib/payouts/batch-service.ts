@@ -1,4 +1,4 @@
-import { writeBillingAuditLog } from "@/lib/billing-core/audit";
+import { writeBillingAuditLog } from "@/lib/billing/core/audit";
 import { createTransferForPayoutSplit } from "@/lib/payouts/transfer-service";
 import { prisma } from "@/lib/prisma";
 

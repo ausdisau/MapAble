@@ -1,10 +1,10 @@
 import { requireApiAdmin } from "@/lib/api/auth-handler";
 import { jsonError, jsonOk } from "@/lib/api/response";
-import { requireConvergenceFeature } from "@/lib/convergence-os/gates";
+import { requireConvergenceFeature } from "@/lib/platform/convergence-os/gates";
 import {
   recordHumanSemanticDecision,
   seedSemanticCandidates,
-} from "@/lib/convergence-os/semantic/resolver";
+} from "@/lib/platform/convergence-os/semantic/resolver";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {

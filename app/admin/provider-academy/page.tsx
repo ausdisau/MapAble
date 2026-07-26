@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/lib/auth/guards";
-import { getAcademyCatalog } from "@/lib/provider-academy/academy-service";
+import { getAcademyCatalog } from "@/lib/provider/academy/academy-service";
 
 export default async function ProviderAcademyAdminPage() {
   await requireAdmin();

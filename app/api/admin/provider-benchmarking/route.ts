@@ -3,7 +3,7 @@ import { jsonOk } from "@/lib/api/response";
 import {
   captureProviderBenchmark,
   getProviderBenchmarkDashboard,
-} from "@/lib/provider-benchmarking/benchmark-service";
+} from "@/lib/provider/benchmarking/benchmark-service";
 
 export async function GET() {
   const user = await requireApiAdmin();

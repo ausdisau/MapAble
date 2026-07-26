@@ -71,7 +71,7 @@ In addition to one independent reviewer, changes touching these paths require a 
 - Authentication and sessions (`lib/auth/**`, NextAuth routes)
 - Consent (`lib/consent/**`, consent APIs)
 - Safeguarding / incidents (`lib/incidents/**`, safety routes)
-- Billing and invoices (`lib/billing/**`, `lib/billing-core/**`, `lib/invoices/**`)
+- Billing and invoices (`lib/billing/**`, `lib/billing/core/**`, `lib/invoices/**`)
 - Payments (`lib/stripe/**`, payment/payout APIs)
 - Tenancy / organisations (`lib/**/organisation*`, org membership)
 - Encryption (`lib/crypto/**`, NDIS encryption)

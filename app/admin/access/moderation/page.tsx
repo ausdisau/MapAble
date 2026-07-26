@@ -1,4 +1,4 @@
-import { listModerationQueue } from "@/lib/access-moderation/review-moderation-service";
+import { listModerationQueue } from "@/lib/access/moderation/review-moderation-service";
 import { requireAdmin } from "@/lib/auth/guards";
 
 export default async function AdminAccessModerationPage() {

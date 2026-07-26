@@ -4,7 +4,7 @@ import {
   handleStripeBillingEvent,
   markWebhookProcessed,
   storeWebhookEventIdempotent,
-} from "@/lib/billing-core/webhook-handler";
+} from "@/lib/billing/core/webhook-handler";
 import { getStripeClient } from "@/lib/stripe/client";
 import { isStripeSdkAvailable, stripeConfig } from "@/lib/stripe/config";
 import {

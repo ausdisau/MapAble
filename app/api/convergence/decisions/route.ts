@@ -1,6 +1,6 @@
 import { requireApiAdmin } from "@/lib/api/auth-handler";
 import { jsonOk } from "@/lib/api/response";
-import { requireConvergenceEnabled } from "@/lib/convergence-os/gates";
+import { requireConvergenceEnabled } from "@/lib/platform/convergence-os/gates";
 import { prisma } from "@/lib/prisma";
 
 export async function GET(req: Request) {

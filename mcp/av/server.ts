@@ -14,7 +14,7 @@ import {
   AV_DRIVER_TRIP_TRANSITIONS,
   AV_TRIP_TRANSITIONS,
   checkAvVehicleSuitability,
-} from "../../lib/av-framework";
+} from "../../lib/platform/av-framework";
 
 const server = new McpServer({
   name: "mapable-av",

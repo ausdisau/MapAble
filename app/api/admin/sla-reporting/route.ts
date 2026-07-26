@@ -3,7 +3,7 @@ import { jsonOk } from "@/lib/api/response";
 import {
   generateSlaReport,
   getSlaReportsDashboard,
-} from "@/lib/sla-reporting/sla-service";
+} from "@/lib/reporting/sla/sla-service";
 
 export async function GET() {
   const user = await requireApiAdmin();

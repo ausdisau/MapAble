@@ -7,7 +7,7 @@ import {
   createFederatedAgreement,
   listFederatedAgreements,
   submitAgreementForEthicsReview,
-} from "@/lib/federated-research/federation-service";
+} from "@/lib/research/federated/federation-service";
 
 export async function GET() {
   const user = await requireApiAdminScope("federated_research:manage");

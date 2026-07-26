@@ -67,7 +67,7 @@ vi.mock("@/lib/onboarding/onboarding-service", () => ({
   refreshWorkerOnboarding: vi.fn(),
 }));
 
-vi.mock("@/lib/provider-onboarding-automation/onboarding-service", () => ({
+vi.mock("@/lib/provider/onboarding-automation/onboarding-service", () => ({
   syncWorkersOnboardingTask: vi.fn(),
 }));
 

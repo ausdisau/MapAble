@@ -27,9 +27,9 @@
 | Concern | Owner |
 |---------|--------|
 | Place SoT | `AccessPlace` |
-| Envelope writer | `lib/access-intelligence-next/evidence/persist.ts` |
-| Change review writer | `lib/access-intelligence-next/change-detection/persist.ts` |
-| Freshness policy | `lib/access-intelligence-next/evidence/freshness-policy.ts` |
+| Envelope writer | `lib/access/intelligence-next/evidence/persist.ts` |
+| Change review writer | `lib/access/intelligence-next/change-detection/persist.ts` |
+| Freshness policy | `lib/access/intelligence-next/evidence/freshness-policy.ts` |
 
 ## Public-claim state
 

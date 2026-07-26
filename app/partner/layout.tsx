@@ -2,7 +2,7 @@ import { MapAbleUserBar } from "@/components/layout/MapAbleUserBar";
 import { PartnerNav } from "@/components/layout/PartnerNav";
 import { Badge } from "@/components/ui/badge";
 import { requireAuth } from "@/lib/auth/guards";
-import { resolvePartnerTierLabel } from "@/lib/partner-portal/partner-tier";
+import { resolvePartnerTierLabel } from "@/lib/partner/portal/partner-tier";
 import type { UserRole } from "@/types/mapable";
 
 export const dynamic = "force-dynamic";

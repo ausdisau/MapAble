@@ -4,7 +4,7 @@ import {
   EVAL_SCENARIOS,
   runAiEvaluationSuite,
   runEvalScenario,
-} from "@/lib/ai-platform/evaluations";
+} from "@/lib/ai/platform/evaluations";
 
 describe("AI evaluation harness", () => {
   it("includes required scenario coverage", () => {

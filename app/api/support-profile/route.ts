@@ -6,7 +6,7 @@ import {
   getOrCreateDraftSupportProfile,
   publishSupportProfile,
   saveSupportProfileDraft,
-} from "@/lib/support-profile/support-profile-service";
+} from "@/lib/support/profile/support-profile-service";
 
 const patchSchema = z.object({
   routinesJson: z

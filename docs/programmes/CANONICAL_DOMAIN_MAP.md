@@ -22,7 +22,7 @@ Authoritative source: **repository code on current `main`**, not closed PR descr
 | Participant profile        | `ParticipantProfile`                  | available on main          | Demographics                                                            |
 | Presentation prefs         | `AccessibilityProfile`                | available on main          | Operational UI/access prefs                                             |
 | Functional access passport | `AccessPassport`                      | **closed/unmerged** (#273) | **Adapter-backed** via Communication Passport over AccessibilityProfile |
-| Communication Passport     | TS projection                         | available on main          | `lib/communication-passport/` — not a second SoT                        |
+| Communication Passport     | TS projection                         | available on main          | `lib/support/communication-passport/` — not a second SoT                        |
 | Consent                    | `ConsentRecord`                       | available on main          | Extend via services; no parallel ledger                                 |
 | Scoped delegation          | `ParticipantAuthorityGrant`           | **this PR**                | Purpose/field/action/expiry grants                                      |
 | Audit                      | `AuditEvent`                          | available on main          | Programme correlation via metadata; no sensitive payloads               |
@@ -41,7 +41,7 @@ Authoritative source: **repository code on current `main`**, not closed PR descr
 | ------------------------ | --------------- | --------------------------------- | ---------------------------------------------------------------------- |
 | Mission graph            | `CareOSMission` | **Absent** (#252 closed/unmerged) | **adapter-backed** — `CaseMissionAdapter` / `MissionDependencyAdapter` |
 | Starting Work projection | —               | `StartingWorkJourneyProjection`   | available on main — temporary; not CareOSMission                       |
-| Mission portfolio        | —               | `lib/mission-portfolio/`          | available on main — read-only projection                               |
+| Mission portfolio        | —               | `lib/platform/mission-portfolio/`          | available on main — read-only projection                               |
 
 **Rule:** Programme code must not write speculative mission tables. Replace the Case adapter through the interface when a mission SoT is accepted.
 
@@ -49,7 +49,7 @@ Authoritative source: **repository code on current `main`**, not closed PR descr
 
 | Concept               | Canonical         | Status                                   |
 | --------------------- | ----------------- | ---------------------------------------- |
-| Public place identity | `AccessPlace`     | available on main — `lib/access-map/`    |
+| Public place identity | `AccessPlace`     | available on main — `lib/access/map/`    |
 | Legacy place          | `AccessiblePlace` | available on main — **read/legacy only** |
 
 Why `AccessiblePlace` still exists: historical data and older routes. Paths that could dual-write must be inventoried in Access domain ownership; **programme services are forbidden from creating `AccessiblePlace`**.

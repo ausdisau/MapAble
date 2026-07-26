@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
-import { verifyClaimToken } from "@/lib/provider/claim-verify";
 import { prisma } from "@/lib/prisma";
+import { verifyClaimToken } from "@/lib/provider/claim-verify";
 
 export async function GET(request: Request) {
   const url = new URL(request.url);

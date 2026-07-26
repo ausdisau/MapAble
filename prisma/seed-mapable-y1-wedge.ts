@@ -3,7 +3,7 @@
  * Import from prisma/seed.ts when wedge flags are enabled in environment.
  */
 import { prisma } from "@/lib/prisma";
-import { defaultSupportProfileSections } from "@/lib/support-profile/types";
+import { defaultSupportProfileSections } from "@/lib/support/profile/types";
 
 export async function seedMapableY1Wedge(participantEmail = "participant@mapable.test") {
   const participant = await prisma.user.findUnique({

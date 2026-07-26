@@ -6,8 +6,8 @@ import {
   routeModelBackedEdgeCapability,
   selectProcessingMode,
   summarizeVisitPackOffline,
-} from "@/lib/ai-platform";
-import type { DeviceCapabilitySnapshot } from "@/lib/ai-platform";
+} from "@/lib/ai/platform";
+import type { DeviceCapabilitySnapshot } from "@/lib/ai/platform";
 
 const baseDevice: DeviceCapabilitySnapshot = {
   hasOnDeviceModelRuntime: false,

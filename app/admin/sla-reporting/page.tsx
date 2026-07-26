@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/lib/auth/guards";
-import { getSlaReportsDashboard } from "@/lib/sla-reporting/sla-service";
+import { getSlaReportsDashboard } from "@/lib/reporting/sla/sla-service";
 
 export default async function SlaReportingPage() {
   await requireAdmin();

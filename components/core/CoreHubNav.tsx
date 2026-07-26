@@ -1,7 +1,7 @@
 "use client";
 
 import { MapAbleRoleNav } from "@/components/layout/MapAbleRoleNav";
-import { CORE_PLATFORM_LINKS } from "@/lib/core-ui/navigation";
+import { CORE_PLATFORM_LINKS } from "@/lib/platform/core-ui/navigation";
 
 export function CoreHubNav() {
   return (

@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { communicationPassportFromProfile } from "@/lib/communication-passport/from-profile";
-import { evaluateAssignmentReadiness } from "@/lib/workforce-readiness/evaluate";
+import { communicationPassportFromProfile } from "@/lib/support/communication-passport/from-profile";
+import { evaluateAssignmentReadiness } from "@/lib/workforce/readiness/evaluate";
 
 vi.mock("@/lib/config/communication-workforce", () => ({
   isCommunicationPassportEnabled: () => true,
@@ -15,9 +15,9 @@ vi.mock("@/lib/config/communication-workforce", () => ({
 
 const hasAck = vi.fn();
 
-vi.mock("@/lib/communication-passport/service", async (importOriginal) => {
+vi.mock("@/lib/support/communication-passport/service", async (importOriginal) => {
   const actual =
-    await importOriginal<typeof import("@/lib/communication-passport/service")>();
+    await importOriginal<typeof import("@/lib/support/communication-passport/service")>();
   return {
     ...actual,
     hasWorkerAcknowledgedPassport: (...args: unknown[]) => hasAck(...args),

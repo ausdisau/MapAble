@@ -3,7 +3,7 @@ import type { MatchFactorType, MatchType } from "@prisma/client";
 import {
   assertAgentRunAllowsAction,
   createAgentRun,
-} from "@/lib/agent-ops/agent-run-service";
+} from "@/lib/ai/agent-ops/agent-run-service";
 import { createAuditEvent } from "@/lib/audit/audit-event-service";
 import { recordBookingTimelineEvent } from "@/lib/bookings/timeline-service";
 import { phase4Config } from "@/lib/config/phase4";
@@ -15,8 +15,8 @@ import {
 import { isProviderReadyToServe } from "@/lib/onboarding/provider-service-ready";
 import { prisma } from "@/lib/prisma";
 import { getLatestReliabilityAdvisory } from "@/lib/reliability/reliability-service";
-import { getPublishedSupportProfileSections } from "@/lib/support-profile/support-profile-service";
-import type { SupportProfileSections } from "@/lib/support-profile/types";
+import { getPublishedSupportProfileSections } from "@/lib/support/profile/support-profile-service";
+import type { SupportProfileSections } from "@/lib/support/profile/types";
 import { getVehicleSuitabilityWarnings } from "@/lib/transport/vehicle-suitability";
 import type { GuardrailDecision } from "@/server/agents/care/types";
 

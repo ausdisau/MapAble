@@ -1,6 +1,6 @@
 # Natural-language access needs interpreter
 
-Maps free-text **access** phrases from provider search queries to canonical Provider Finder chip ids in [`ACCESS_NEEDS`](../../lib/provider-finder/filters.ts).
+Maps free-text **access** phrases from provider search queries to canonical Provider Finder chip ids in [`ACCESS_NEEDS`](../../lib/provider/finder/filters.ts).
 
 The needs stage runs inside the same pipeline as the [natural-language search interpreter](./nl-interpreter.md) (step 3). Service category resolution is unchanged.
 
@@ -47,7 +47,7 @@ OpenAPI: [`docs/api/openapi-search-interpret.yaml`](../api/openapi-search-interp
 
 When the user mentions access in NL but no chip id resolves (`accessNeedIds` empty and `accessNeeds.confidence < 0.4`), Ask may return `agent.status: needs_clarification` even if suburb and support type are already known. Question template: *Which access needs matter most — for example wheelchair access, Auslan, low sensory, or hoist support?*
 
-Logic: `lib/provider-finder/clarification.ts`.
+Logic: `lib/provider/finder/clarification.ts`.
 
 ## UI
 

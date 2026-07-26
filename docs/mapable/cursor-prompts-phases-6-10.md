@@ -36,7 +36,7 @@ Deploy baseline: `npx prisma db push && npx prisma generate && pnpm prisma db se
 
 ## Phase 6 — Production and ecosystem launch
 
-**Modules:** `lib/mobile-production`, `lib/ai-governance`, `lib/dispatch-console`, `lib/provider-quality`, `lib/plan-manager-integrations`, `lib/partner-sandbox`, `lib/accessibility-accreditation`, `lib/open-data`, `lib/government-reporting`, `lib/disaster-recovery`, `lib/evidence-automation`, `lib/launch-readiness`, `lib/board-reporting`, `lib/community-governance`
+**Modules:** `lib/platform/mobile-production`, `lib/ai/governance`, `lib/transport/dispatch-console`, `lib/provider/quality`, `lib/support/plan-manager-integrations`, `lib/partner/sandbox`, `lib/access/accessibility-accreditation`, `lib/api/open-data`, `lib/reporting/government`, `lib/platform/disaster-recovery`, `lib/evidence/automation`, `lib/platform/launch-readiness`, `lib/reporting/board`, `lib/governance/community`
 
 **Admin routes:** `/admin/launch-readiness`, `/admin/dispatch`, `/admin/provider-quality`, `/admin/ai-governance`, `/admin/partner-sandbox`, `/admin/accessibility-accreditation`, `/admin/open-data`, `/admin/government-reporting`, `/admin/disaster-recovery`, `/admin/evidence-automation`, `/admin/board-reporting`, `/admin/community-governance`
 

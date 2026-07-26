@@ -1,6 +1,6 @@
 import { requireApiSession } from "@/lib/api/auth-handler";
 import { jsonError, jsonOk } from "@/lib/api/response";
-import { approveCoordinatorAccess } from "@/lib/support-coordinator/relationship-service";
+import { approveCoordinatorAccess } from "@/lib/support/coordinator/relationship-service";
 
 export async function POST(
   req: Request,

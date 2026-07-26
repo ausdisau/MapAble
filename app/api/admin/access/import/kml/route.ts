@@ -1,19 +1,19 @@
 import {
   createImportJob,
   parseImportJobContent,
-} from "@/lib/access-import/access-import-job-service";
+} from "@/lib/access/import/access-import-job-service";
 import {
   MAX_ALLOWLISTED_KML_BYTES,
   MAX_ALLOWLISTED_KML_ITEMS,
   MAX_IMPORT_BYTES,
   MAX_IMPORT_ITEMS,
-} from "@/lib/access-import/import-limits";
+} from "@/lib/access/import/import-limits";
 import {
   fetchAllowlistedKml,
   isAllowlistedNetworkLinkUrl,
   toFetchableAllowlistedKmlUrl,
-} from "@/lib/access-import/kml-networklink-service";
-import { readTextWithByteLimit } from "@/lib/access-import/read-limited-body";
+} from "@/lib/access/import/kml-networklink-service";
+import { readTextWithByteLimit } from "@/lib/access/import/read-limited-body";
 import { requireApiAdmin } from "@/lib/api/auth-handler";
 import { jsonError, jsonOk } from "@/lib/api/response";
 

@@ -4,7 +4,7 @@ import { CoreHubCard } from "@/components/core/CoreHubCard";
 import { requireAuth, requirePermission } from "@/lib/auth/guards";
 import { hasPermission } from "@/lib/auth/permissions";
 import { roleLabel } from "@/lib/auth/roles";
-import { getEnterpriseWorkspaceSummaryV2 } from "@/lib/enterprise-provider/workspace-v2-service";
+import { getEnterpriseWorkspaceSummaryV2 } from "@/lib/provider/enterprise/workspace-v2-service";
 import { getProviderControlPanelSummaryForUser } from "@/lib/provider/provider-control-panel-service";
 
 export const metadata = { title: "Provider control panel | MapAble" };

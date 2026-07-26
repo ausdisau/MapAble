@@ -1,18 +1,18 @@
 import { z } from "zod";
 
 import { requireApiSession } from "@/lib/api/auth-handler";
-import { featureDisabledResponse, indoorApiError } from "@/lib/indoor-accessibility/api-errors";
-import { isIndoorFeatureEnabled } from "@/lib/indoor-accessibility/feature-flags";
+import { featureDisabledResponse, indoorApiError } from "@/lib/access/indoor/api-errors";
+import { isIndoorFeatureEnabled } from "@/lib/access/indoor/feature-flags";
 import {
   canModerateCorrection,
   canSubmitCorrection,
-} from "@/lib/indoor-accessibility/permissions";
-import { correctionTypeSchema } from "@/lib/indoor-accessibility/schemas/core";
+} from "@/lib/access/indoor/permissions";
+import { correctionTypeSchema } from "@/lib/access/indoor/schemas/core";
 import {
   createCorrectionProposal,
   listPendingCorrections,
   moderateCorrectionProposal,
-} from "@/lib/indoor-accessibility/verification/correction-service";
+} from "@/lib/access/indoor/verification/correction-service";
 
 const submitSchema = z.object({
   placeId: z.string(),

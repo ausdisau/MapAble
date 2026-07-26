@@ -1,12 +1,12 @@
 import type { BillingPaymentSplitRecipient } from "@prisma/client";
 
-import { writeBillingAuditLog } from "@/lib/billing-core/audit";
+import { writeBillingAuditLog } from "@/lib/billing/core/audit";
 import {
   calculateGstCents,
   calculateInvoiceTotals,
   calculatePlatformFeeCents,
-} from "@/lib/billing-core/calculations";
-import { createDraftInvoice } from "@/lib/billing-core/invoice-service";
+} from "@/lib/billing/core/calculations";
+import { createDraftInvoice } from "@/lib/billing/core/invoice-service";
 import { payoutPolicyDefaults } from "@/lib/payouts/config";
 import { transferGroupForBooking } from "@/lib/payouts/payout-policy";
 import { checkDuplicateActivePayment } from "@/lib/payouts/price-rules";

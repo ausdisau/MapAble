@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 
 import { hasPermission } from "@/lib/auth/permissions";
 import { phase6Config } from "@/lib/config/phase6";
-import { validatePriceRows } from "@/lib/ndis-pricing/catalogue-import-service";
-import { sandboxDataGuard } from "@/lib/partner-sandbox/sandbox-service";
+import { validatePriceRows } from "@/lib/ndis/pricing/catalogue-import-service";
+import { sandboxDataGuard } from "@/lib/partner/sandbox/sandbox-service";
 
 describe("Phase 6 config", () => {
   it("dispatch disabled by default (Wave 0 fail-closed)", () => {
@@ -41,7 +41,7 @@ describe("provider quality explainability", () => {
 describe("launch readiness service", () => {
   it("exports summary function", async () => {
     const { getLaunchReadinessSummary } = await import(
-      "@/lib/launch-readiness/launch-readiness-service"
+      "@/lib/platform/launch-readiness/launch-readiness-service"
     );
     try {
       const s = await getLaunchReadinessSummary();

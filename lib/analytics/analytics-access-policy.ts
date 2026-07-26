@@ -1,1 +1,1 @@
-export { canAccessAnalyticsView } from "@/lib/data-governance/analytics-view-policy";
+export { canAccessAnalyticsView } from "@/lib/governance/data/analytics-view-policy";

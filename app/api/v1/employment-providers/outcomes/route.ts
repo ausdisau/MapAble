@@ -5,7 +5,7 @@ import {
   authenticateEmploymentProvider,
   requireEmploymentConsentHeader,
   requireEmploymentScope,
-} from "@/lib/employment-providers/api-auth";
+} from "@/lib/employment/providers/api-auth";
 
 const outcomeSchema = z
   .object({

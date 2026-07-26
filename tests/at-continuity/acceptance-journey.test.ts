@@ -66,7 +66,7 @@ import {
   registerEquipmentAsset,
   requestHumanApprovedNotification,
   upsertBackupPlan,
-} from "@/lib/at-continuity";
+} from "@/lib/platform/at-continuity";
 
 describe("AT Continuity acceptance journey", () => {
   const flag = "MAPABLE_AT_CONTINUITY_ENABLED";

@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/lib/auth/guards";
-import { getSettlementBatchesDashboard } from "@/lib/settlement-batches/settlement-service";
+import { getSettlementBatchesDashboard } from "@/lib/billing/settlement-batches/settlement-service";
 
 export default async function SettlementBatchesPage() {
   await requireAdmin();

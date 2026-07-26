@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 
-import { seedDefaultLaunchItems } from "../lib/launch-readiness/launch-readiness-service";
+import { seedDefaultLaunchItems } from "../lib/platform/launch-readiness/launch-readiness-service";
 
 const prisma = new PrismaClient();
 

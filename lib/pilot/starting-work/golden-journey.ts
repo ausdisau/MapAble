@@ -5,7 +5,7 @@ import {
   type JourneyDependencyGraph,
   type StateHonestyMap,
 } from "@/lib/pilot/starting-work/dependency-graph";
-import type { AssignmentReadinessResult } from "@/lib/workforce-readiness/evaluate";
+import type { AssignmentReadinessResult } from "@/lib/workforce/readiness/evaluate";
 
 /**
  * Taylor @ Harbour Civic Centre — Starting Work golden journey state machine.

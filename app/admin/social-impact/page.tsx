@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/lib/auth/guards";
-import { getSocialImpactDashboard } from "@/lib/social-impact/impact-service";
+import { getSocialImpactDashboard } from "@/lib/research/social-impact/impact-service";
 
 export default async function SocialImpactPage() {
   await requireAdmin();

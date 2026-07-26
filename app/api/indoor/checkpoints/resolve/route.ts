@@ -1,8 +1,8 @@
 import { z } from "zod";
 
-import { featureDisabledResponse, indoorApiError } from "@/lib/indoor-accessibility/api-errors";
-import { verifyCheckpointToken } from "@/lib/indoor-accessibility/checkpoints/checkpoint-validator";
-import { isIndoorFeatureEnabled } from "@/lib/indoor-accessibility/feature-flags";
+import { featureDisabledResponse, indoorApiError } from "@/lib/access/indoor/api-errors";
+import { verifyCheckpointToken } from "@/lib/access/indoor/checkpoints/checkpoint-validator";
+import { isIndoorFeatureEnabled } from "@/lib/access/indoor/feature-flags";
 import { prisma } from "@/lib/prisma";
 
 

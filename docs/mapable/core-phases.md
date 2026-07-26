@@ -219,23 +219,23 @@ Phase 5 adds **regulated pilot maturity and production-readiness** on top of Pha
 
 | Module | Path | Purpose |
 |--------|------|---------|
-| AI matching | `lib/ai-matching` | Reviewable AI ranking atop Phase 4 rules |
+| AI matching | `lib/ai/matching` | Reviewable AI ranking atop Phase 4 rules |
 | Fairness | `lib/fairness` | Bias and suitability flags |
-| Provider verification | `lib/provider-verification` | Cases, checks, risk ratings |
-| NDIS pricing | `lib/ndis-pricing` | Catalogue import, validate, apply |
+| Provider verification | `lib/provider/verification` | Cases, checks, risk ratings |
+| NDIS pricing | `lib/ndis/pricing` | Catalogue import, validate, apply |
 | Xero | `lib/xero` | Safe invoice sync (no sensitive notes) |
-| Stripe billing | `lib/stripe-billing` | Private-pay, webhooks, refunds |
+| Stripe billing | `lib/billing/stripe-billing` | Private-pay, webhooks, refunds |
 | Mobile shell | `mobile-contracts/` | Future native app contracts |
-| Route optimisation | `lib/route-optimisation` | Placeholder travel plans |
-| Accessibility map | `lib/accessibility-map` | Places, features, links |
-| Support coordinator | `lib/support-coordinator` | Consent-gated portal |
-| Plan manager | `lib/plan-manager` | Invoice review (no NDIA submit) |
-| Employer ATS | `lib/employer-ats` | Pipeline, interviews, adjustments |
+| Route optimisation | `lib/transport/route-optimisation` | Placeholder travel plans |
+| Accessibility map | `lib/access/accessibility-map` | Places, features, links |
+| Support coordinator | `lib/support/coordinator` | Consent-gated portal |
+| Plan manager | `lib/support/plan-manager` | Invoice review (no NDIA submit) |
+| Employer ATS | `lib/employment/ats` | Pipeline, interviews, adjustments |
 | Reporting | `lib/reporting` | Snapshots, small-cell suppression |
-| Developer API | `lib/developer-api` | Apps, hashed keys, scopes |
-| Compliance evidence | `lib/compliance-evidence` | Controls, retention dry-run |
-| Security readiness | `lib/security-readiness` | SOC2/ISO scaffolding |
-| NDIA readiness | `lib/ndia-readiness` | Evidence bundles, dry-run only |
+| Developer API | `lib/api/developer` | Apps, hashed keys, scopes |
+| Compliance evidence | `lib/compliance/evidence` | Controls, retention dry-run |
+| Security readiness | `lib/security/readiness` | SOC2/ISO scaffolding |
+| NDIA readiness | `lib/ndis/readiness` | Evidence bundles, dry-run only |
 
 ## What Phase 5 does **not** add
 

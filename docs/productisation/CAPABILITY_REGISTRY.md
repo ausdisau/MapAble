@@ -1,6 +1,6 @@
 # Productisation Capability Registry (human mirror)
 
-**Authoritative runtime seed:** `lib/convergence-os/seed/capabilities.ts`  
+**Authoritative runtime seed:** `lib/platform/convergence-os/seed/capabilities.ts`  
 **Remediation inventory:** `docs/remediation/CAPABILITY_INVENTORY.md`  
 **Inspection date:** 2026-07-20 — post #378 on `main` + NDIS Expansion Wave 0 docs  
 **Public claim allowed:** false for all rows below unless registry + evidence say otherwise.
@@ -32,7 +32,7 @@ or assert registration.
 | ndis.claim_submission              | NDIA live submit                  | blocked_by_external_approval     | mock gateway                                 | off                                                                                   | Must stay disabled                                              |
 | managed.support_delivery           | MapAble Managed Support           | blocked_by_registration          | —                                            | —                                                                                     | Do not fabricate registration                                   |
 | ndis.expansion_foundation          | NDIS Expansion Wave 0 foundation  | documented                       | docs only                                    | —                                                                                     | No product schema; migrate-from-zero still blocks product waves |
-| ndis.at_continuity                 | Assistive Technology Continuity   | scaffolded Wave 1                | `at_*` Prisma tables; `lib/at-continuity/**` | `MAPABLE_AT_CONTINUITY_ENABLED=false`; precursor `MAPABLE_AT_LIFECYCLE_ENABLED=false` | Partner assessment/repair; no clinical suitability SoT          |
+| ndis.at_continuity                 | Assistive Technology Continuity   | scaffolded Wave 1                | `at_*` Prisma tables; `lib/platform/at-continuity/**` | `MAPABLE_AT_CONTINUITY_ENABLED=false`; precursor `MAPABLE_AT_LIFECYCLE_ENABLED=false` | Partner assessment/repair; no clinical suitability SoT          |
 | ndis.plan_evidence_navigator       | Plan and Evidence Navigator       | documented / planned Wave 2      | none yet                                     | `MAPABLE_PLAN_EVIDENCE_NAVIGATOR_ENABLED=false` (planned)                             | No eligibility/funding determination                            |
 | ndis.support_coordination_outcomes | Support Coordination Outcomes     | documented / planned Wave 3      | reuse SC on main                             | `MAPABLE_SUPPORT_COORDINATION_OUTCOMES_ENABLED=false` (planned)                       | #188/#243 not landed SoT                                        |
 | ndis.home_living_navigator         | Home and Living Navigator         | documented / planned Wave 4      | none yet                                     | `MAPABLE_HOME_LIVING_NAVIGATOR_ENABLED=false` (planned)                               | No SDA/SIL eligibility decisions                                |

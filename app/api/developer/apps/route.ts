@@ -1,6 +1,6 @@
 import { requireApiSession } from "@/lib/api/auth-handler";
 import { jsonOk } from "@/lib/api/response";
-import { createDeveloperApp } from "@/lib/developer-api/api-key-service";
+import { createDeveloperApp } from "@/lib/api/developer/api-key-service";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {

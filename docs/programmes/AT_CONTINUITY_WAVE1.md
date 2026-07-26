@@ -2,7 +2,7 @@
 
 **Status:** scaffold + durable schema (flag default **false**)  
 **Branch pattern:** `cursor/ndis-expansion-wave1-at-continuity-*`  
-**Owner path:** `lib/at-continuity/**`  
+**Owner path:** `lib/platform/at-continuity/**`  
 **Flag:** `MAPABLE_AT_CONTINUITY_ENABLED=false`
 
 ## Purpose
@@ -41,7 +41,7 @@ MapAble does **not** determine clinical suitability, prescribe AT, or replace 00
 ## Freeze waiver
 
 Narrow domain waiver recorded in `docs/remediation/FEATURE_FREEZE.md` for
-`lib/at-continuity/**` and the additive AT tables only. Flag remains default false.
+`lib/platform/at-continuity/**` and the additive AT tables only. Flag remains default false.
 
 ## Human preview
 
@@ -58,7 +58,7 @@ OOM was post-compile static generation at ~6 GB heap; mitigated via
 
 1. Keep `MAPABLE_AT_CONTINUITY_ENABLED=false`
 2. Revert migration `20260720120000_at_continuity_wave1` on non-prod if required
-3. Remove or leave dormant `lib/at-continuity/**` (no public routes in Wave 1)
+3. Remove or leave dormant `lib/platform/at-continuity/**` (no public routes in Wave 1)
 
 ## Related
 

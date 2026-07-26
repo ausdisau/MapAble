@@ -2,9 +2,9 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
   draftInfrastructureFromDescription,
-} from "@/lib/care-transport-map/infrastructure-draft";
-import { planCareTransportMapActions } from "@/lib/care-transport-map/map-actions";
-import { buildMaskedTripLayer } from "@/lib/care-transport-map/map-payload";
+} from "@/lib/transport/care-map/infrastructure-draft";
+import { planCareTransportMapActions } from "@/lib/transport/care-map/map-actions";
+import { buildMaskedTripLayer } from "@/lib/transport/care-map/map-payload";
 import {
   isAddInfrastructureEnabled,
   isCareTransportMapEnabled,

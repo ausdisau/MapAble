@@ -14,7 +14,7 @@ import { searchNdisProviders } from "@/lib/ingestion/ndis-providers-search";
 import {
   buildNdisSearchParamsFromApplied,
   ndisRowToCopilotResult,
-} from "@/lib/provider-finder/ndis-search-from-applied";
+} from "@/lib/provider/finder/ndis-search-from-applied";
 import { applyInterpretationToFields } from "@/lib/search/apply-interpretation";
 import { interpretSearchQuery } from "@/lib/search/interpreter";
 

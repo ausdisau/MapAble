@@ -3,7 +3,7 @@ import { jsonOk } from "@/lib/api/response";
 import {
   listTrustSafetyQueue,
   syncTrustSafetyQueue,
-} from "@/lib/trust-safety/queue-service";
+} from "@/lib/trust/safety/queue-service";
 import { adminListQuerySchema } from "@/server/admin/adminSchemas";
 
 export async function GET(req: Request) {

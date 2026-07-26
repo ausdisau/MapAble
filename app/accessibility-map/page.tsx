@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 
 import { AccessibilityMapLanding } from "@/components/accessibility-map/AccessibilityMapLanding";
 import { MapAbleCareMarketingShell } from "@/components/marketing/MapAbleCareMarketingShell";
-import { getAccessMapPlaces } from "@/lib/access-map/access-map-places";
-import { MAPABLE_ADL_SOURCE_LABEL } from "@/lib/access-map/copy";
+import { getAccessMapPlaces } from "@/lib/access/map/access-map-places";
+import { MAPABLE_ADL_SOURCE_LABEL } from "@/lib/access/map/copy";
 
 export const metadata: Metadata = {
   title: "Accessibility Map | MapAble",

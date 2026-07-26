@@ -1,6 +1,6 @@
 import type { BillingPaymentSplitStatus, PayoutBlockReason, PayoutBlockSeverity } from "@prisma/client";
 
-import { writeBillingAuditLog } from "@/lib/billing-core/audit";
+import { writeBillingAuditLog } from "@/lib/billing/core/audit";
 import { prisma } from "@/lib/prisma";
 
 export async function blockPayout(

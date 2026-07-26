@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import type { PeersThread } from "@/lib/mapable-peers/seed-threads";
+import type { PeersThread } from "@/lib/community/mapable-peers/seed-threads";
 
 function formatActivity(iso: string) {
   return new Intl.DateTimeFormat("en-AU", {

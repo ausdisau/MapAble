@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import type {
   VenueFloorPlanDetailResponse,
   VenueFloorPlanListResponse,
-} from "@/lib/floor-plan/schemas";
+} from "@/lib/access/floor-plan/schemas";
 
 async function fetchFloorPlanSummaries(
   venueId: string,

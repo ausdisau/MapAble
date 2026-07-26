@@ -5,7 +5,7 @@ import { jsonError } from "@/lib/api/response";
 import {
   presentCredential,
   verifyPresentation,
-} from "@/lib/trust-passport/trust-passport-service";
+} from "@/lib/trust/passport/trust-passport-service";
 
 export async function POST(req: Request) {
   const user = await requireApiSession();

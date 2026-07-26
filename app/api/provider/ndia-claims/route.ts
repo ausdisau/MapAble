@@ -7,7 +7,7 @@ import { isAdminRole } from "@/lib/auth/roles";
 import {
   createProviderClaimDraft,
   listProviderClaims,
-} from "@/lib/ndia-provider-claiming/claim-service";
+} from "@/lib/ndis/provider-claiming/claim-service";
 
 const createSchema = z
   .object({

@@ -4,7 +4,7 @@ import {
   createSecurityAuditPack,
   listSecurityAuditPacks,
   publishSecurityAuditPack,
-} from "@/lib/external-security-audit/audit-pack-service";
+} from "@/lib/security/external-audit/audit-pack-service";
 
 export async function GET() {
   const user = await requireApiAdmin();

@@ -4,8 +4,8 @@ import { y4CivicPlatformConfig } from "@/lib/config/y4-civic-platform";
 import {
   listAnalyticsRuns,
   runPrivacyAnalyticsPilot,
-} from "@/lib/privacy-preserving-analytics/analytics-pilot-service";
-import { runPrivacyPreservingAnalytics } from "@/lib/privacy-preserving-analytics/analytics-service";
+} from "@/lib/privacy/preserving-analytics/analytics-pilot-service";
+import { runPrivacyPreservingAnalytics } from "@/lib/privacy/preserving-analytics/analytics-service";
 
 export async function GET() {
   const user = await requireApiAdmin();

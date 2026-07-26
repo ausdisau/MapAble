@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/lib/auth/guards";
-import { getGrantReportsDashboard } from "@/lib/grant-reporting/grant-service";
+import { getGrantReportsDashboard } from "@/lib/reporting/grant/grant-service";
 
 export default async function GrantReportingPage() {
   await requireAdmin();

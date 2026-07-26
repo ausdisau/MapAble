@@ -1,5 +1,5 @@
-import type { AccessEvidenceClass } from "@/lib/access-intelligence-next";
-import { DEFAULT_TEMPORAL_TTL_DAYS } from "@/lib/access-intelligence-next";
+import type { AccessEvidenceClass } from "@/lib/access/intelligence-next";
+import { DEFAULT_TEMPORAL_TTL_DAYS } from "@/lib/access/intelligence-next";
 
 import type { AccessCastEvidenceItem, AccessCastForecastHorizon } from "./types";
 

@@ -4,7 +4,7 @@ import type {
 } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
-import { createComplaint } from "@/lib/trust-safety/queue-service";
+import { createComplaint } from "@/lib/trust/safety/queue-service";
 
 import { acknowledgementDueAt } from "./acknowledgement-sla";
 import {

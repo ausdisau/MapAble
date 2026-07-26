@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { clearAuspostPacClientCache } from "@/lib/auspost-pac/client";
-import { normalizePostcodeSearchResponse } from "@/lib/auspost-pac/normalize";
-import { searchPostcodes } from "@/lib/auspost-pac/postcode-search-service";
+import { clearAuspostPacClientCache } from "@/lib/integrations/auspost-pac/client";
+import { normalizePostcodeSearchResponse } from "@/lib/integrations/auspost-pac/normalize";
+import { searchPostcodes } from "@/lib/integrations/auspost-pac/postcode-search-service";
 import { auspostLocationAdapter } from "@/lib/search/auspost-location-adapter";
 import { compositeLocationAdapter } from "@/lib/search/composite-location-adapter";
 

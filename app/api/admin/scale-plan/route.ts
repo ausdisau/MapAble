@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import {
   approveScalePlan,
   createScalePlan,
-} from "@/lib/scale-plan/scale-plan-service";
+} from "@/lib/platform/scale-plan/scale-plan-service";
 
 export async function GET() {
   const user = await requireApiAdmin();

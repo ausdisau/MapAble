@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { requireAuth } from "@/lib/auth/guards";
-import { getCommunicationPassport } from "@/lib/communication-passport/service";
+import { getCommunicationPassport } from "@/lib/support/communication-passport/service";
 import { isCommunicationPassportEnabled } from "@/lib/config/communication-workforce";
 
 export const metadata = {

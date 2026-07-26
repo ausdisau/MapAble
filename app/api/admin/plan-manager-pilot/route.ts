@@ -1,6 +1,6 @@
 import { requireApiAdmin } from "@/lib/api/auth-handler";
 import { jsonOk } from "@/lib/api/response";
-import { createPilotExport } from "@/lib/plan-manager-pilot/pilot-service";
+import { createPilotExport } from "@/lib/support/plan-manager-pilot/pilot-service";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {

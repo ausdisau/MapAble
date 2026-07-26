@@ -4,7 +4,7 @@ vi.mock("@/lib/api/optional-session", () => ({
   getOptionalApiUser: vi.fn(),
 }));
 
-vi.mock("@/lib/care-transport-map/map-payload", () => ({
+vi.mock("@/lib/transport/care-map/map-payload", () => ({
   buildCareTransportMapPayload: vi.fn(),
 }));
 
@@ -30,7 +30,7 @@ vi.mock("@/lib/map/nominatim-server", () => ({
 import { GET as getMap } from "@/app/api/care-transport/map/route";
 import { POST as postDraft } from "@/app/api/infrastructure/draft/route";
 import { getOptionalApiUser } from "@/lib/api/optional-session";
-import { buildCareTransportMapPayload } from "@/lib/care-transport-map/map-payload";
+import { buildCareTransportMapPayload } from "@/lib/transport/care-map/map-payload";
 import {
   isAddInfrastructureEnabled,
   isCareTransportMapEnabled,

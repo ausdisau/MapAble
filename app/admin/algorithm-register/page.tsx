@@ -1,5 +1,5 @@
 import { AlgorithmRegisterActions } from "@/app/admin/algorithm-register/AlgorithmRegisterActions";
-import { listAllAlgorithms } from "@/lib/algorithm-register/register-service";
+import { listAllAlgorithms } from "@/lib/compliance/algorithm-register/register-service";
 import { requireAdmin } from "@/lib/auth/guards";
 import { ALGORITHM_TRANSPARENCY_DISCLAIMER } from "@/lib/config/y4-civic-platform";
 

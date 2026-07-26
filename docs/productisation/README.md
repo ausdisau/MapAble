@@ -10,7 +10,7 @@
 - [Productisation merge train](../convergence-os/PRODUCTISATION_MERGE_TRAIN.md)
 - [Public claim registry](../convergence-os/PUBLIC_CLAIM_REGISTRY.md)
 - [Capability registry (human mirror)](./CAPABILITY_REGISTRY.md)
-- Capability honesty extensions in `lib/convergence-os/seed/capabilities.ts`
+- Capability honesty extensions in `lib/platform/convergence-os/seed/capabilities.ts`
 - Strategy docs under `docs/strategy/`
 
 ## Landed productisation train (on main)

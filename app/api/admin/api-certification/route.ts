@@ -6,7 +6,7 @@ import {
   rejectApiApplication,
   startApiCertificationReview,
   submitApiCertificationApplication,
-} from "@/lib/api-certification/certification-service";
+} from "@/lib/api/certification/certification-service";
 
 export async function GET() {
   const user = await requireApiAdminScope("api_certification:manage");

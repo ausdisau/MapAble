@@ -1,7 +1,7 @@
 "use client";
 
-import type { FeatureCategory } from "@/lib/floor-plan/feature-config";
-import { FEATURE_CATEGORIES } from "@/lib/floor-plan/feature-config";
+import type { FeatureCategory } from "@/lib/access/floor-plan/feature-config";
+import { FEATURE_CATEGORIES } from "@/lib/access/floor-plan/feature-config";
 
 type FloorPlanFeatureFiltersProps = {
   activeCategories: Set<FeatureCategory>;

@@ -3,7 +3,7 @@ import type {
   StripeOnboardingStatus,
 } from "@prisma/client";
 
-import { writeBillingAuditLog } from "@/lib/billing-core/audit";
+import { writeBillingAuditLog } from "@/lib/billing/core/audit";
 import { connectRefreshUrl, connectReturnUrl } from "@/lib/payouts/config";
 import { prisma } from "@/lib/prisma";
 import {

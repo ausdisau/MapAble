@@ -1,4 +1,4 @@
-import type { PlaceAccessProfile } from "@/lib/access-fit/types";
+import type { PlaceAccessProfile } from "@/lib/access/fit/types";
 
 export type DemoAccessTier = "Bronze" | "Silver" | "Gold" | "Unverified";
 

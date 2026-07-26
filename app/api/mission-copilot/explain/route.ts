@@ -3,7 +3,7 @@ import { missionCopilotConfig } from "@/lib/config/mission-copilot";
 import {
   answerMissionQuestion,
   type MissionCopilotQuestion,
-} from "@/lib/mission-copilot";
+} from "@/lib/ai/mission-copilot";
 import {
   createStartingWorkJourney,
   runGoldenJourney,

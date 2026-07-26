@@ -1,4 +1,4 @@
-import { reportAccessPlace } from "@/lib/access-map/access-place-service";
+import { reportAccessPlace } from "@/lib/access/map/access-place-service";
 import { requireApiSession } from "@/lib/api/auth-handler";
 import {
   jsonBodyErrorResponse,

@@ -1,4 +1,4 @@
-import { listPublishedNationalInsights } from "@/lib/national-insights/insights-service";
+import { listPublishedNationalInsights } from "@/lib/research/national-insights/insights-service";
 
 export default async function NationalInsightsPage() {
   const snapshots = await listPublishedNationalInsights();

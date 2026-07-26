@@ -27,8 +27,8 @@ Published floor plans are immutable. Publishing supersedes prior published versi
 
 ## Trust states
 
-`TrustLevel` enum in `lib/indoor-accessibility/schemas/core.ts`. Feature `status` on floor-plan features maps to trust labels in the UI.
+`TrustLevel` enum in `lib/access/indoor/schemas/core.ts`. Feature `status` on floor-plan features maps to trust labels in the UI.
 
 ## Status precedence
 
-Deterministic resolver: `lib/indoor-accessibility/status/incident-resolver.ts`.
+Deterministic resolver: `lib/access/indoor/status/incident-resolver.ts`.

@@ -6,7 +6,7 @@ import { useCallback, useMemo, useState } from "react";
 import { MapErrorBoundary } from "@/components/error/MapErrorBoundary";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useUserLocation } from "@/hooks/useUserLocation";
-import type { AccessNeed } from "@/lib/access-fit/types";
+import type { AccessNeed } from "@/lib/access/fit/types";
 import type { DemoAccessPlace } from "@/lib/demo/accessibility-places";
 import {
   AUSTRALIA_FALLBACK_CENTER,

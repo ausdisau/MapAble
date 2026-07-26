@@ -1,7 +1,7 @@
 import { requireApiAdmin } from "@/lib/api/auth-handler";
 import { jsonOk } from "@/lib/api/response";
-import { requireConvergenceFeature } from "@/lib/convergence-os/gates";
-import { seedSyntheticPassportDoorwayLineage } from "@/lib/convergence-os/lineage/seed";
+import { requireConvergenceFeature } from "@/lib/platform/convergence-os/gates";
+import { seedSyntheticPassportDoorwayLineage } from "@/lib/platform/convergence-os/lineage/seed";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {

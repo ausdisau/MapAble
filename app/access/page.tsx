@@ -1,5 +1,5 @@
 import { MapAbleAccessShell } from "@/components/access/MapAbleAccessShell";
-import { listPublishedPlaces } from "@/lib/access-map/access-place-service";
+import { listPublishedPlaces } from "@/lib/access/map/access-place-service";
 
 export const metadata = {
   title: "MapAble Access | Accessibility map",

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { buildConvergenceTextReport } from "@/lib/convergence-os/text-report";
+import { buildConvergenceTextReport } from "@/lib/platform/convergence-os/text-report";
 
 describe("buildConvergenceTextReport", () => {
   it("produces a plain-language accessible report without requiring a graph", () => {

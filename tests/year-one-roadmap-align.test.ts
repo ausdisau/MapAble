@@ -7,7 +7,7 @@ import {
   isYearOneDeferredPathEnabled,
   yearOneScopeConfig,
 } from "@/lib/config/year-one-scope";
-import { EMPLOYMENT_PROVIDER_PROGRAMMES } from "@/lib/employment-providers/des-iea";
+import { EMPLOYMENT_PROVIDER_PROGRAMMES } from "@/lib/employment/providers/des-iea";
 import { POST_V1_GOVERNANCE_MESSAGE } from "@/lib/governance/post-v1-stub";
 import {
   SUPPORTED_LOCALES,

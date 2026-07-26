@@ -4,8 +4,8 @@ import {
   createAgentPreflightContract,
   createPostImplementationReview,
   type PreflightRequest,
-} from "@/lib/convergence-os/agent/preflight";
-import { requireConvergenceFeature } from "@/lib/convergence-os/gates";
+} from "@/lib/platform/convergence-os/agent/preflight";
+import { requireConvergenceFeature } from "@/lib/platform/convergence-os/gates";
 import { prisma } from "@/lib/prisma";
 
 export async function GET(req: Request) {

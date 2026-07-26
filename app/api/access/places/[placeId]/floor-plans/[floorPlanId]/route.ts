@@ -1,5 +1,5 @@
 import { jsonError, jsonOk } from "@/lib/api/response";
-import { getVenueFloorPlanDetail } from "@/lib/floor-plan/floor-plan-service";
+import { getVenueFloorPlanDetail } from "@/lib/access/floor-plan/floor-plan-service";
 
 type RouteParams = { params: Promise<{ placeId: string; floorPlanId: string }> };
 

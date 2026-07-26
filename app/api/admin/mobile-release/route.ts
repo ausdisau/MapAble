@@ -4,7 +4,7 @@ import {
   addReleaseBlocker,
   getReleaseHardeningStatus,
   registerReleaseCandidate,
-} from "@/lib/mobile-release/release-hardening-service";
+} from "@/lib/platform/mobile-release/release-hardening-service";
 
 export async function GET() {
   const user = await requireApiAdmin();

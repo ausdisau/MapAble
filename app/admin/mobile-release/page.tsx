@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/lib/auth/guards";
-import { getReleaseHardeningStatus } from "@/lib/mobile-release/release-hardening-service";
+import { getReleaseHardeningStatus } from "@/lib/platform/mobile-release/release-hardening-service";
 
 export default async function MobileReleaseAdminPage() {
   await requireAdmin();

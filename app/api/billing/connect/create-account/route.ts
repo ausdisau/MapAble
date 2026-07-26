@@ -1,6 +1,6 @@
 import { requireApiSession } from "@/lib/api/auth-handler";
 import { jsonError, jsonOk } from "@/lib/api/response";
-import { createConnectAccountAndLink } from "@/lib/billing-core/connect-service";
+import { createConnectAccountAndLink } from "@/lib/billing/core/connect-service";
 
 export async function POST() {
   const user = await requireApiSession();

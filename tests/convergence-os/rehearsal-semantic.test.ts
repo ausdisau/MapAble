@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { SEMANTIC_CANDIDATE_SEEDS } from "@/lib/convergence-os/semantic/resolver";
-import { FOUNDATION_MERGE_TRAIN } from "@/lib/convergence-os/trains/foundation-merge-train";
+import { SEMANTIC_CANDIDATE_SEEDS } from "@/lib/platform/convergence-os/semantic/resolver";
+import { FOUNDATION_MERGE_TRAIN } from "@/lib/platform/convergence-os/trains/foundation-merge-train";
 
 describe("Semantic resolver seeds", () => {
   it("includes known collision pairs without auto-merge authority", () => {

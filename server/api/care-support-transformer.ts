@@ -1,4 +1,4 @@
-import { createAgentRun } from "@/lib/agent-ops/agent-run-service";
+import { createAgentRun } from "@/lib/ai/agent-ops/agent-run-service";
 import { createAuditEvent } from "@/lib/audit/audit-event-service";
 import { classifySupportCategories } from "@/lib/care/support-category-classifier";
 import { applySupportJourneyPatch } from "@/lib/journey/journey-service";

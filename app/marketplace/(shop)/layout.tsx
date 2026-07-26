@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { MarketplaceCartBadge } from "@/components/marketplace/MarketplaceCartBadge";
 import { requireAuth } from "@/lib/auth/guards";
-import { enforceYearOneModulePath } from "@/lib/year-one/deferred-module-gate";
+import { enforceYearOneModulePath } from "@/lib/platform/year-one/deferred-module-gate";
 
 /**
  * Transactional Marketplace shop — auth + MAPABLE_MARKETPLACE_ENABLED.

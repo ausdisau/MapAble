@@ -6,7 +6,7 @@ import { useState, type FormEvent } from "react";
 
 import { InfrastructurePinPreview } from "@/components/care-transport/InfrastructurePinPreview";
 import { Button } from "@/components/ui/button";
-import type { InfrastructureDraft } from "@/lib/care-transport-map/infrastructure-draft";
+import type { InfrastructureDraft } from "@/lib/transport/care-map/infrastructure-draft";
 
 const CATEGORY_OPTIONS = [
   { value: "care_support_hub", label: "Care support hub" },

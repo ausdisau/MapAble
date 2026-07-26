@@ -10,7 +10,7 @@ describe("evaluateAdvisoryCiFindings", () => {
     vi.stubEnv("MAPABLE_CONVERGENCE_OS_ENABLED", "false");
     vi.stubEnv("MAPABLE_CONVERGENCE_CI_GATE_ENABLED", "false");
     const { evaluateAdvisoryCiFindings } = await import(
-      "@/lib/convergence-os/ci/advisory-gate"
+      "@/lib/platform/convergence-os/ci/advisory-gate"
     );
     const result = evaluateAdvisoryCiFindings();
     expect(result.mode).toBe("disabled");
@@ -23,7 +23,7 @@ describe("evaluateAdvisoryCiFindings", () => {
     vi.stubEnv("MAPABLE_CONVERGENCE_CI_GATE_ENABLED", "true");
     vi.stubEnv("MAPABLE_CONVERGENCE_MODE", "audit");
     const { evaluateAdvisoryCiFindings } = await import(
-      "@/lib/convergence-os/ci/advisory-gate"
+      "@/lib/platform/convergence-os/ci/advisory-gate"
     );
     const result = evaluateAdvisoryCiFindings();
     expect(result.mode).toBe("advisory");
@@ -37,7 +37,7 @@ describe("evaluateAdvisoryCiFindings", () => {
     vi.stubEnv("MAPABLE_CONVERGENCE_CI_GATE_ENABLED", "true");
     vi.stubEnv("MAPABLE_CONVERGENCE_MODE", "enforced");
     const { evaluateAdvisoryCiFindings } = await import(
-      "@/lib/convergence-os/ci/advisory-gate"
+      "@/lib/platform/convergence-os/ci/advisory-gate"
     );
     const result = evaluateAdvisoryCiFindings();
     expect(result.mode).toBe("enforced");

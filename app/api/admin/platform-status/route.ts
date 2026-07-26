@@ -3,7 +3,7 @@ import { jsonOk } from "@/lib/api/response";
 import {
   getLatestStatusPage,
   runPlatformHealthChecks,
-} from "@/lib/platform-status/status-service";
+} from "@/lib/platform/status/status-service";
 
 export async function GET() {
   const user = await requireApiAdmin();

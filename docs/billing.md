@@ -129,7 +129,7 @@ Participant billing UI targets WCAG 2.2 AA: semantic headings, `aria-live` statu
 
 ## Future: AbilityPay
 
-Models are prefixed `Billing*` and modular under `lib/billing-core/` so plan-management and AbilityPay can extend exports and funding rules without replacing Stripe primitives.
+Models are prefixed `Billing*` and modular under `lib/billing/core/` so plan-management and AbilityPay can extend exports and funding rules without replacing Stripe primitives.
 
 ## Payout system
 

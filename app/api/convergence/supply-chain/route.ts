@@ -1,7 +1,7 @@
 import { requireApiAdmin } from "@/lib/api/auth-handler";
 import { jsonOk } from "@/lib/api/response";
-import { requireConvergenceFeature } from "@/lib/convergence-os/gates";
-import { seedSupplyChain } from "@/lib/convergence-os/ops/drift-parity-supply";
+import { requireConvergenceFeature } from "@/lib/platform/convergence-os/gates";
+import { seedSupplyChain } from "@/lib/platform/convergence-os/ops/drift-parity-supply";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {

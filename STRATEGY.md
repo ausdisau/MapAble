@@ -19,7 +19,7 @@ MapAble delivers **managed accessible transport** on the existing `TransportTrip
 
 ## Non-goals
 
-- Autonomous dispatch or driver assignment (see `lib/av-framework/governance.ts`)
+- Autonomous dispatch or driver assignment (see `lib/platform/av-framework/governance.ts`)
 - Automatic NDIS payment approval or Commission submission
 - Unverified peer-to-peer drivers
 

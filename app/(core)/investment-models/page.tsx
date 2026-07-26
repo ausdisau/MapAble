@@ -1,5 +1,5 @@
 import { ACCOUNTABILITY_TRANSPARENCY_DISCLAIMER } from "@/lib/config/y5-rights-infrastructure";
-import { listPublishedInvestmentModels } from "@/lib/transport-investment-modelling/investment-model-service";
+import { listPublishedInvestmentModels } from "@/lib/transport/investment-modelling/investment-model-service";
 
 export default async function InvestmentModelsPage() {
   const models = await listPublishedInvestmentModels();

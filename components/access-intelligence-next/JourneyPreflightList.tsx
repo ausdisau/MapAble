@@ -1,4 +1,4 @@
-import type { DoorToRoomPreflight } from "@/lib/access-intelligence-next/journey/segments";
+import type { DoorToRoomPreflight } from "@/lib/access/intelligence-next/journey/segments";
 
 type Props = {
   preflight: DoorToRoomPreflight;

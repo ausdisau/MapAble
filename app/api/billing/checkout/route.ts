@@ -1,7 +1,7 @@
 import { requireApiSession } from "@/lib/api/auth-handler";
 import { jsonError, jsonOk, zodErrorResponse } from "@/lib/api/response";
-import { createCheckoutForInvoice } from "@/lib/billing-core/checkout-service";
-import { checkoutSchema } from "@/lib/billing-core/schemas";
+import { createCheckoutForInvoice } from "@/lib/billing/core/checkout-service";
+import { checkoutSchema } from "@/lib/billing/core/schemas";
 
 export async function POST(req: Request) {
   const user = await requireApiSession();

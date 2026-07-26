@@ -4,7 +4,7 @@
  * Usage: pnpm ai:evals
  * No production writes. No live participant data.
  */
-import { runAiEvaluationSuite } from "@/lib/ai-platform/evaluations";
+import { runAiEvaluationSuite } from "@/lib/ai/platform/evaluations";
 
 const ids = process.argv.includes("--id")
   ? process.argv.slice(process.argv.indexOf("--id") + 1).filter((a) => !a.startsWith("--"))

@@ -4,7 +4,7 @@ import { MapAbleUserBar } from "@/components/layout/MapAbleUserBar";
 import { PeersSiteHeader } from "@/components/mapable-peers/PeersSiteHeader";
 import { MapAbleAppShell } from "@/components/marketing/MapAbleAppShell";
 import { requireAuth } from "@/lib/auth/guards";
-import { isPeerPeersRequest } from "@/lib/mapable-peers/peers-request";
+import { isPeerPeersRequest } from "@/lib/community/mapable-peers/peers-request";
 import type { UserRole } from "@/types/mapable";
 
 export async function CoreShell({ children }: { children: React.ReactNode }) {

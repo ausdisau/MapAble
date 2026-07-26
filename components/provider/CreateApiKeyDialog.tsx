@@ -8,7 +8,7 @@ import {
   formInputClass,
 } from "@/components/forms/AccessibleFormField";
 import { Button } from "@/components/ui/button";
-import { PARTNER_API_KEY_SCOPES } from "@/lib/developer-api/partner-api-key-scopes";
+import { PARTNER_API_KEY_SCOPES } from "@/lib/api/developer/partner-api-key-scopes";
 
 type OrganisationOption = { id: string; name: string };
 

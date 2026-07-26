@@ -37,7 +37,7 @@ describe("Phase 10 permissions", () => {
 describe("algorithm register", () => {
   it("returns array when enabled", async () => {
     const { listPublishedAlgorithms } = await import(
-      "@/lib/algorithm-register/register-service"
+      "@/lib/compliance/algorithm-register/register-service"
     );
     try {
       const list = await listPublishedAlgorithms();

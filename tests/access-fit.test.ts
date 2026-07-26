@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { calculateAccessFit } from "@/lib/access-fit/calculate-access-fit";
+import { calculateAccessFit } from "@/lib/access/fit/calculate-access-fit";
 import {
   DEMO_ACCESS_NEEDS,
   EMPTY_ACCESS_NEEDS,
   type PlaceAccessProfile,
-} from "@/lib/access-fit/types";
+} from "@/lib/access/fit/types";
 import { DEMO_ACCESS_PLACES } from "@/lib/demo/accessibility-places";
 
 const strongProfile: PlaceAccessProfile = {

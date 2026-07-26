@@ -11,7 +11,7 @@ import {
   isMicroConsentEnabled,
   isMicroConsentV2Enabled,
 } from "@/lib/consent/micro-consent-service";
-import { whereOrganisationScope } from "@/lib/multi-tenant-admin/tenant-context";
+import { whereOrganisationScope } from "@/lib/platform/multi-tenant-admin/tenant-context";
 
 describe("Y2 orchestration config", () => {
   it("disables all Y2 features by default", () => {

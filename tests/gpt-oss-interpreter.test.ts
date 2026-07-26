@@ -37,8 +37,8 @@ import {
   getModel,
   isModelAllowedForTask,
   listModels,
-} from "@/lib/ai-platform/models/registry";
-import { resolveModelForCapability } from "@/lib/ai-platform/models/gateway";
+} from "@/lib/ai/platform/models/registry";
+import { resolveModelForCapability } from "@/lib/ai/platform/models/gateway";
 
 const ENV_KEYS = [
   "SEARCH_INTERPRETER_ENABLED",

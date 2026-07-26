@@ -1,4 +1,4 @@
-import { listPublishedAccreditation } from "@/lib/accreditation-public-program/public-accreditation-service";
+import { listPublishedAccreditation } from "@/lib/access/accreditation-public-program/public-accreditation-service";
 
 export default async function PublicAccreditationPage() {
   const profiles = await listPublishedAccreditation();

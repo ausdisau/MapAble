@@ -13,10 +13,10 @@ Governing rule: [`.cursor/rules/mapable-transport.mdc`](../../.cursor/rules/mapa
 | Pages / shells | `app/transport/**`, `app/dashboard/transport/**`, `app/provider/**/transport/**`, `app/driver/**`, `app/admin/transport/**` |
 | HTTP adapters | Thin `app/api/transport/**`, `app/api/provider/transport/**`, `app/api/driver/transport/**` route handlers |
 | Domain services | `lib/transport/*` |
-| Routing adapters | `lib/transport-routing/*`, config `lib/config/transport-routing.ts` |
+| Routing adapters | `lib/transport/routing/*`, config `lib/config/transport-routing.ts` |
 | Shared types | `types/transport*.ts` + Zod schemas colocated with services |
 | Persistence | Prisma models in `prisma/schema.prisma` + migrations under `prisma/migrations/` |
-| Cross-cutting | `lib/auth`, `lib/audit`, `lib/consent`, `lib/notifications`, `lib/incidents`, `lib/billing-core` |
+| Cross-cutting | `lib/auth`, `lib/audit`, `lib/consent`, `lib/notifications`, `lib/incidents`, `lib/billing/core` |
 
 **Rationale:** Substantial transport domain already exists here; rewriting the stack would break Care and other modules.
 
@@ -66,7 +66,7 @@ Avoid nested duplicate chrome (marketing shell vs dashboard shell).
 
 ## ADR-4: State machine
 
-**Decision:** Extend and document the existing `TransportTripStatus` enum and transition maps in `lib/av-framework/trip-transitions` + `lib/transport/transport-status-service.ts`. Do not create a second client-owned state machine.
+**Decision:** Extend and document the existing `TransportTripStatus` enum and transition maps in `lib/platform/av-framework/trip-transitions` + `lib/transport/transport-status-service.ts`. Do not create a second client-owned state machine.
 
 - Server validates actor, preconditions, and transition.
 - Persist event + status update in one transaction.

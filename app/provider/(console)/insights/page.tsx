@@ -1,6 +1,6 @@
 import { CoreHubCard } from "@/components/core/CoreHubCard";
 import { ProviderSectionNav } from "@/components/provider/ProviderSectionNav";
-import { PROVIDER_INSIGHTS_LINKS } from "@/lib/core-ui/provider-section-nav";
+import { PROVIDER_INSIGHTS_LINKS } from "@/lib/platform/core-ui/provider-section-nav";
 
 export const metadata = { title: "Insights | MapAble Provider" };
 

@@ -28,7 +28,7 @@
 | `/driver/trips` | under `app/driver/trips/` | Driver list |
 | `/admin/transport` | [`app/admin/transport/page.tsx`](../../app/admin/transport/page.tsx) | Admin transport |
 
-Middleware: [`lib/mapable-peers/peer-middleware.ts`](../../lib/mapable-peers/peer-middleware.ts) / [`middleware.ts`](../../middleware.ts) — `/transport` exact public; dashboard/provider/driver protected. **Needs verification:** exact matcher list for `/transport/*` vs public assets.
+Middleware: [`lib/community/mapable-peers/peer-middleware.ts`](../../lib/community/mapable-peers/peer-middleware.ts) / [`middleware.ts`](../../middleware.ts) — `/transport` exact public; dashboard/provider/driver protected. **Needs verification:** exact matcher list for `/transport/*` vs public assets.
 
 ### Pack target vs current
 
@@ -100,7 +100,7 @@ Source: [`prisma/schema.prisma`](../../prisma/schema.prisma).
 
 `TransportTripRequest`, `TransportTrip`, `TransportTripStop`, `TransportTripEvent`, `TransportDriver`, `TransportVehicle`, `TransportVehicleFeature`, `TransportDriverVerification`, `TransportVehicleVerification`, availability, `TransportDispatchAssignment`, schedule conflicts, `TransportRouteEstimate` / segments / optimisation jobs, `TransportLiveLocation`, `TransportEtaEvent`, pickup/dropoff points, `TransportSafetyCheck`, `TransportTripEvidence`, handover, safety events, `TransportIncidentLink`, `RideRun`.
 
-`TransportTripStatus` includes rich lifecycle (`requested` → `closed` / `disputed` / `service_recovery_required`, etc.). Transitions enforced via [`lib/transport/transport-status-service.ts`](../../lib/transport/transport-status-service.ts) + [`lib/av-framework/trip-transitions`](../../lib/av-framework/).
+`TransportTripStatus` includes rich lifecycle (`requested` → `closed` / `disputed` / `service_recovery_required`, etc.). Transitions enforced via [`lib/transport/transport-status-service.ts`](../../lib/transport/transport-status-service.ts) + [`lib/platform/av-framework/trip-transitions`](../../lib/platform/av-framework/).
 
 ### Legacy / parallel
 
@@ -129,7 +129,7 @@ Source: [`prisma/schema.prisma`](../../prisma/schema.prisma).
 |---------|----------|----------|
 | No `NDIS Covered` / `Companion Card` / `$25.50` / `$42.00` / `$4.80` strings | Repo-wide search (2026-07-17) | Cleared for those pack issues |
 | NDIS disclaimer (honest) | [`app/dashboard/transport/new/page.tsx`](../../app/dashboard/transport/new/page.tsx) — estimates not payment approval | OK |
-| Mock routing default | [`lib/config/transport-routing.ts`](../../lib/config/transport-routing.ts) — `TRANSPORT_ROUTING_PROVIDER` defaults to `"mock"`; mock duration ≈ distance/8 m/s in `lib/transport-routing/mock-routing-adapter.ts` | Risk if production omits env and still shows estimates without sandbox label |
+| Mock routing default | [`lib/config/transport-routing.ts`](../../lib/config/transport-routing.ts) — `TRANSPORT_ROUTING_PROVIDER` defaults to `"mock"`; mock duration ≈ distance/8 m/s in `lib/transport/routing/mock-routing-adapter.ts` | Risk if production omits env and still shows estimates without sandbox label |
 | Public landing “Available now” includes signed-in pilot routes | [`app/transport/page.tsx`](../../app/transport/page.tsx) L22–26 | Must not promote verification/live status/routing as available (Coming soon lists them — OK); pilot wording accuracy **needs verification** vs deploy flags |
 | Pilot copy: “Live GPS tracking is not available” | [`app/dashboard/transport/page.tsx`](../../app/dashboard/transport/page.tsx) L19–20 | Honest for live GPS |
 

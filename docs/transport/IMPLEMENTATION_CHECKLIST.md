@@ -38,7 +38,7 @@ Governing docs: [PRODUCT_REQUIREMENTS.md](./PRODUCT_REQUIREMENTS.md), [CURRENT_S
 
 - [ ] Goal: Deterministic transitions, eligibility, audit ledger before new UI
 - Depends on: Prompt 2
-- Touch paths: `lib/transport/transport-status-service.ts`, eligibility/assignment/event/audit modules, `lib/av-framework/trip-transitions`, `tests/**`
+- Touch paths: `lib/transport/transport-status-service.ts`, eligibility/assignment/event/audit modules, `lib/platform/av-framework/trip-transitions`, `tests/**`
 - Acceptance: full transition/eligibility tests; no route UI required; type-check + build
 
 ### Prompt 4 — Authorisation, consent, location privacy
@@ -59,7 +59,7 @@ Governing docs: [PRODUCT_REQUIREMENTS.md](./PRODUCT_REQUIREMENTS.md), [CURRENT_S
 
 - [ ] Goal: Honest adapter layer; sandbox fixtures; fail closed when misconfigured
 - Depends on: Prompts 2, 5
-- Touch paths: `lib/transport-routing/**`, quote/access-fit services, env validation, tests
+- Touch paths: `lib/transport/routing/**`, quote/access-fit services, env validation, tests
 - Acceptance: deterministic sandbox quotes/estimates; production fails closed; fit reasons; type-check + build
 
 ### Prompt 7 — Participant Transport Access Profile

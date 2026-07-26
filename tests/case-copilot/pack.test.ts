@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import {
   buildCaseCopilotPack,
   caseCopilotProhibitedActions,
-} from "@/lib/case-copilot";
+} from "@/lib/ai/case-copilot";
 import type { CaseSnapshot } from "@/lib/cases/ai/types";
 
 function snapshot(overrides: Partial<CaseSnapshot> = {}): CaseSnapshot {

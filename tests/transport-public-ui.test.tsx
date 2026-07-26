@@ -10,7 +10,7 @@ import { TransportPublicLanding } from "@/components/transport/public/TransportP
 import {
   EXCLUDED_TRANSACTIONAL_PATH_PREFIXES,
   isExcludedTransactionalPath,
-} from "@/lib/public-informational/routes";
+} from "@/lib/public/informational/routes";
 import {
   TRANSPORT_PUBLIC_CTAS,
   TRANSPORT_PUBLIC_HEADLINE,

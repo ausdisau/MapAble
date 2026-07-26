@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/lib/auth/guards";
-import { getContinuityDashboard } from "@/lib/institutional-continuity/continuity-service";
+import { getContinuityDashboard } from "@/lib/platform/institutional-continuity/continuity-service";
 
 export default async function InstitutionalContinuityPage() {
   await requireAdmin();

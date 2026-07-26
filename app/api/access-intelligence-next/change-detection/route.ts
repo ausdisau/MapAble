@@ -8,8 +8,8 @@ import {
   persistEvidenceObservation,
   storeShadowChangeReview,
   type AccessChangeCandidate,
-} from "@/lib/access-intelligence-next";
-import { HARBOUR_PILOT } from "@/lib/access-intelligence-next/evidence/harbour-pilot";
+} from "@/lib/access/intelligence-next";
+import { HARBOUR_PILOT } from "@/lib/access/intelligence-next/evidence/harbour-pilot";
 
 export const dynamic = "force-dynamic";
 

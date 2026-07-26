@@ -44,7 +44,7 @@ Blocked paths: `blocked`, `failed`, `reversed`, `canceled`
 
 ## Module layout
 
-- `lib/payouts/` — governance layer on top of `lib/billing-core/`
+- `lib/payouts/` — governance layer on top of `lib/billing/core/`
 - `lib/stripe/` — Stripe SDK wrappers
 - API: `/api/payout-recipients/*`, `/api/payouts/*`, `/api/payments/create-checkout-session`
 

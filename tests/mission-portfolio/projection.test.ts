@@ -5,7 +5,7 @@ import {
   getServiceStandardForMission,
   listMissions,
   projectStartingWorkMission,
-} from "@/lib/mission-portfolio";
+} from "@/lib/platform/mission-portfolio";
 import {
   createStartingWorkJourney,
   runGoldenJourney,
@@ -15,7 +15,7 @@ describe("mission portfolio registry", () => {
   it("registers Starting Work without claiming write ownership", () => {
     const missions = listMissions();
     expect(missions[0]?.key).toBe("mission.starting_work");
-    expect(missions[0]?.prohibitedWriters).toContain("lib/mission-portfolio");
+    expect(missions[0]?.prohibitedWriters).toContain("lib/platform/mission-portfolio");
     expect(missions[0]?.canonicalProjection).toContain("starting-work");
   });
 });

@@ -1,5 +1,5 @@
-import type { FloorPlanFeature } from "@/lib/floor-plan/schemas";
-import { formatVerificationFreshness } from "@/lib/indoor-accessibility/status/incident-resolver";
+import type { FloorPlanFeature } from "@/lib/access/floor-plan/schemas";
+import { formatVerificationFreshness } from "@/lib/access/indoor/status/incident-resolver";
 
 const TRUST_LABELS: Record<string, string> = {
   verified: "MapAble verified",

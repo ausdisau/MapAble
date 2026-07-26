@@ -4,7 +4,7 @@ import { QuarterlyPacingAlertScaffold } from "@/components/billing/QuarterlyPaci
 import { CoreHubCard } from "@/components/core/CoreHubCard";
 import { ProviderSectionNav } from "@/components/provider/ProviderSectionNav";
 import { isPaceQuarterlyPacingEnabled } from "@/lib/config/strategic-2026";
-import { PROVIDER_CLAIMING_LINKS } from "@/lib/core-ui/provider-section-nav";
+import { PROVIDER_CLAIMING_LINKS } from "@/lib/platform/core-ui/provider-section-nav";
 
 export const metadata = { title: "Claiming | MapAble Provider" };
 

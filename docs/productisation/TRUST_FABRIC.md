@@ -25,11 +25,11 @@
 
 | Concern | Owner |
 |---------|--------|
-| Access receipts | `lib/trust-fabric/receipt-service.ts` |
-| Decision notices | `lib/trust-fabric/decision-notice.ts` |
-| Hardened break-glass | `lib/trust-fabric/break-glass.ts` (+ process-local `lib/security/break-glass.ts`) |
+| Access receipts | `lib/trust/fabric/receipt-service.ts` |
+| Decision notices | `lib/trust/fabric/decision-notice.ts` |
+| Hardened break-glass | `lib/trust/fabric/break-glass.ts` (+ process-local `lib/security/break-glass.ts`) |
 | Consent | `lib/consent/consent-service.ts` |
-| Communication Passport | `lib/communication-passport/service.ts` (hooks receipt on disclosure) |
+| Communication Passport | `lib/support/communication-passport/service.ts` (hooks receipt on disclosure) |
 
 ## Public-claim state
 

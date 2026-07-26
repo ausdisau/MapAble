@@ -2,7 +2,7 @@ import type { CareRequest, CareShift } from "@prisma/client";
 
 import type { CurrentUser } from "@/lib/auth/current-user";
 import { isAdminRole } from "@/lib/auth/roles";
-import { getWorkerBriefSliceForShift } from "@/lib/support-profile/support-profile-service";
+import { getWorkerBriefSliceForShift } from "@/lib/support/profile/support-profile-service";
 
 export type WorkerParticipantView = {
   displayLabel: string;

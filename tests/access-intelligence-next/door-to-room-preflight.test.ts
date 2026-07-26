@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   runDoorToRoomPreflight,
   taylorRoom312Query,
-} from "@/lib/access-intelligence-next";
+} from "@/lib/access/intelligence-next";
 
 describe("Door-to-room journey preflight", () => {
   it("builds full segment chain including return stub", () => {

@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/lib/auth/guards";
-import { listPublishedInvestmentModels } from "@/lib/transport-investment-modelling/investment-model-service";
+import { listPublishedInvestmentModels } from "@/lib/transport/investment-modelling/investment-model-service";
 
 export default async function TransportInvestmentAdminPage() {
   await requireAdmin();

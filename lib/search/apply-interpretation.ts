@@ -1,4 +1,4 @@
-import type { SupportTypeId } from "@/lib/provider-finder/filters";
+import type { SupportTypeId } from "@/lib/provider/finder/filters";
 import type { SearchInterpretation } from "@/types/search";
 
 import { supportTypeFromCategorySlug } from "./interpreter/support-type-map";

@@ -2,7 +2,7 @@ import type { BillingInvoiceStatus } from "@prisma/client";
 
 import { requireApiAdmin } from "@/lib/api/auth-handler";
 import { jsonOk } from "@/lib/api/response";
-import { adminSearchInvoices } from "@/lib/billing-core/invoice-service";
+import { adminSearchInvoices } from "@/lib/billing/core/invoice-service";
 
 export async function GET(req: Request) {
   const user = await requireApiAdmin();

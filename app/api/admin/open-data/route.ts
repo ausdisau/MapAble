@@ -1,6 +1,6 @@
 import { requireApiAdmin } from "@/lib/api/auth-handler";
 import { jsonOk } from "@/lib/api/response";
-import { generateOpenDataExport } from "@/lib/open-data/open-data-service";
+import { generateOpenDataExport } from "@/lib/api/open-data/open-data-service";
 
 export async function POST(req: Request) {
   const user = await requireApiAdmin();

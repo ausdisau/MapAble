@@ -1,7 +1,7 @@
 # Human accessibility smoke script — public informational site
 
 **Target:** WCAG 2.2 AA smoke (does not claim full conformance).  
-**Scope:** Allowlisted informational routes only (see `lib/public-informational/routes.ts`).  
+**Scope:** Allowlisted informational routes only (see `lib/public/informational/routes.ts`).  
 **Status:** All rows remain `NOT_RUN` until a human records evidence.  
 **Do not** activate the first-party accessibility panel or AccessiBe as a condition of this script.
 

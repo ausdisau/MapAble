@@ -1,6 +1,6 @@
 # PR Action Ledger — Remediation control (2026-07-20)
 
-Source of structured actions: [`lib/convergence-os/seed/pr-action-ledger.ts`](../../lib/convergence-os/seed/pr-action-ledger.ts).
+Source of structured actions: [`lib/platform/convergence-os/seed/pr-action-ledger.ts`](../../lib/platform/convergence-os/seed/pr-action-ledger.ts).
 
 **Inspected main tip:** `6279ab9198df2ebefb15a1ec5fe22ac735d21aa1` (pre-#387 merge)  
 **Full Phase 0 rescan:** [RESCAN_RECONCILIATION.md](./RESCAN_RECONCILIATION.md)  

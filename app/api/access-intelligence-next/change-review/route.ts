@@ -7,7 +7,7 @@ import {
   decideChangeReview,
   isDurableEvidenceEnabled,
   listPendingChangeReviews,
-} from "@/lib/access-intelligence-next";
+} from "@/lib/access/intelligence-next";
 import { requireApiSession } from "@/lib/api/auth-handler";
 import { isAdminRole } from "@/lib/auth/roles";
 

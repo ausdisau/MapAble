@@ -1,13 +1,13 @@
 import { describe, expect, it } from "vitest";
 
-import { CANONICAL_DOMAIN_SEEDS } from "@/lib/convergence-os/seed/canonical-domains";
-import { CAPABILITY_SEEDS } from "@/lib/convergence-os/seed/capabilities";
+import { CANONICAL_DOMAIN_SEEDS } from "@/lib/platform/convergence-os/seed/canonical-domains";
+import { CAPABILITY_SEEDS } from "@/lib/platform/convergence-os/seed/capabilities";
 import {
   PILOT_DEPENDENCY_SEEDS,
   PILOT_PR_SEEDS,
-} from "@/lib/convergence-os/seed/pilot-prs";
-import { FOUNDATION_MERGE_TRAIN } from "@/lib/convergence-os/trains/foundation-merge-train";
-import { DECISION_PROPOSAL_SEEDS } from "@/lib/convergence-os/seed/decisions";
+} from "@/lib/platform/convergence-os/seed/pilot-prs";
+import { FOUNDATION_MERGE_TRAIN } from "@/lib/platform/convergence-os/trains/foundation-merge-train";
+import { DECISION_PROPOSAL_SEEDS } from "@/lib/platform/convergence-os/seed/decisions";
 
 describe("ConvergenceOS seed inventory", () => {
   it("includes CareOSMission, Vault, AccessPlace, TransportTrip domains", () => {

@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { ACCESS_NEEDS } from "@/lib/provider-finder/filters";
+import { ACCESS_NEEDS } from "@/lib/provider/finder/filters";
 vi.mock("@/lib/search/interpreter/load-categories", async (importOriginal) => {
   const actual =
     await importOriginal<typeof import("@/lib/search/interpreter/load-categories")>();

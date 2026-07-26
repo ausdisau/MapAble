@@ -1,6 +1,6 @@
 import { requireApiAdmin } from "@/lib/api/auth-handler";
 import { jsonOk } from "@/lib/api/response";
-import { generateBoardReport } from "@/lib/board-reporting/board-report-service";
+import { generateBoardReport } from "@/lib/reporting/board/board-report-service";
 
 export async function POST(req: Request) {
   const user = await requireApiAdmin();

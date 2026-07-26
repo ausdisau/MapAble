@@ -1,4 +1,4 @@
-import { PEERS_CONTRAST } from "@/lib/mapable-peers/copy";
+import { PEERS_CONTRAST } from "@/lib/community/mapable-peers/copy";
 
 export function PeersContrastTable() {
   return (

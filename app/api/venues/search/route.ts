@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { getAccessMapPlaces } from "@/lib/access-map/access-map-places";
+import { getAccessMapPlaces } from "@/lib/access/map/access-map-places";
 import { checkIpRateLimit, getClientIp } from "@/lib/api/ip-rate-limit";
 import { filterDemoPlaces } from "@/lib/demo/accessibility-places";
 import { toPublicVenueSpec } from "@/lib/offline/public-venue-dto";

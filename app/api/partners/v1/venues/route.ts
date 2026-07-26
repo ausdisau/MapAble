@@ -1,11 +1,11 @@
 import {
   authenticatePartnerRequest,
   requirePartnerScope,
-} from "@/lib/indoor-accessibility/partner/api-auth";
+} from "@/lib/access/indoor/partner/api-auth";
 import {
   PARTNER_API_DISCLAIMER,
   toPartnerVenueSummary,
-} from "@/lib/indoor-accessibility/partner/partner-dto";
+} from "@/lib/access/indoor/partner/partner-dto";
 import { prisma } from "@/lib/prisma";
 
 export async function GET(request: Request) {

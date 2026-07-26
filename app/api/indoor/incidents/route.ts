@@ -1,10 +1,10 @@
 import { z } from "zod";
 
 import { requireApiSession } from "@/lib/api/auth-handler";
-import { featureDisabledResponse, indoorApiError } from "@/lib/indoor-accessibility/api-errors";
-import { recordIndoorAuditEvent } from "@/lib/indoor-accessibility/audit/indoor-audit-service";
-import { isIndoorFeatureEnabled } from "@/lib/indoor-accessibility/feature-flags";
-import { canReportStatus, canVerifyStatus } from "@/lib/indoor-accessibility/permissions";
+import { featureDisabledResponse, indoorApiError } from "@/lib/access/indoor/api-errors";
+import { recordIndoorAuditEvent } from "@/lib/access/indoor/audit/indoor-audit-service";
+import { isIndoorFeatureEnabled } from "@/lib/access/indoor/feature-flags";
+import { canReportStatus, canVerifyStatus } from "@/lib/access/indoor/permissions";
 import { prisma } from "@/lib/prisma";
 
 const incidentSchema = z.object({

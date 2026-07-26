@@ -1,7 +1,7 @@
 import {
   getOutcomesDisclaimer,
   listPublishedOutcomesByWave,
-} from "@/lib/long-term-outcomes/outcomes-service";
+} from "@/lib/research/long-term-outcomes/outcomes-service";
 
 export default async function OutcomesPage() {
   const waves = await listPublishedOutcomesByWave();

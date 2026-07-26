@@ -1,4 +1,4 @@
-import { getActiveCharter } from "@/lib/governance-charter/charter-service";
+import { getActiveCharter } from "@/lib/governance/charter/charter-service";
 
 export default async function GovernanceCharterPage() {
   const charter = await getActiveCharter();

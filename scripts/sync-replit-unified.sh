@@ -23,7 +23,7 @@ MONOREPO_PATHS=(
   "app/core"
   "app/lib/modules.ts"
   "components/core"
-  "lib/core-ui"
+  "lib/platform/core-ui"
   "lib/auth"
   "app/api/auth"
   "prisma/schema.prisma"

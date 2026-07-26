@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { trackProductEvent } from "@/lib/analytics/product-analytics";
 import { mapableEyebrowBadgeClass } from "@/lib/brand/styles";
 import { useProactiveChipSuggestions } from "@/lib/hooks/use-proactive-chip-suggestions";
-import { ACCESS_NEEDS } from "@/lib/provider-finder/filters";
+import { ACCESS_NEEDS } from "@/lib/provider/finder/filters";
 import {
   applyInterpretationToFields,
   buildFinderSearchParams,

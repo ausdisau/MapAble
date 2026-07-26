@@ -2,7 +2,7 @@
 
 Advisory human-executed merge train for the **MapAble Productisation and Connected Service Programme**.
 
-Machine seed: `lib/convergence-os/trains/productisation-merge-train.ts` (`PRODUCTISATION_MERGE_TRAIN`).
+Machine seed: `lib/platform/convergence-os/trains/productisation-merge-train.ts` (`PRODUCTISATION_MERGE_TRAIN`).
 
 ## Foundational rules
 

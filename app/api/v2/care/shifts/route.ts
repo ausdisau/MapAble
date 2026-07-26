@@ -1,7 +1,7 @@
 import { requireApiSession } from "@/lib/api/auth-handler";
 import { getUserOrganisationIds } from "@/lib/api/organisation-scope";
 import { jsonError, jsonOk } from "@/lib/api/response";
-import { isPublicApiV2Enabled } from "@/lib/api-versioning/version-middleware";
+import { isPublicApiV2Enabled } from "@/lib/api/versioning/version-middleware";
 import { isAdminRole } from "@/lib/auth/roles";
 import { y3NationalTrustConfig } from "@/lib/config/y3-national-trust";
 import { prisma } from "@/lib/prisma";

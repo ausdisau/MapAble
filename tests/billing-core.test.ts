@@ -6,22 +6,22 @@ import {
   calculatePlatformFeeCents,
   calculateSubtotalCents,
   lineItemTotalCents,
-} from "@/lib/billing-core/calculations";
+} from "@/lib/billing/core/calculations";
 import {
   careShiftInvoiceFixture,
   combinedCareTransportFixture,
   marketplaceAtPurchaseFixture,
   transportTripInvoiceFixture,
-} from "@/lib/billing-core/fixtures";
+} from "@/lib/billing/core/fixtures";
 import {
   checkoutDecisionForFundingType,
   stripeCheckoutAllowed,
-} from "@/lib/billing-core/funding-logic";
-import { createInvoiceSchema } from "@/lib/billing-core/schemas";
+} from "@/lib/billing/core/funding-logic";
+import { createInvoiceSchema } from "@/lib/billing/core/schemas";
 import {
   markWebhookProcessed,
   storeWebhookEventIdempotent,
-} from "@/lib/billing-core/webhook-handler";
+} from "@/lib/billing/core/webhook-handler";
 import { prisma } from "@/lib/prisma";
 
 describe("invoice total calculation", () => {
@@ -125,8 +125,8 @@ describe("subscription and connect status helpers", () => {
   });
 });
 
-vi.mock("@/lib/billing-core/config", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@/lib/billing-core/config")>();
+vi.mock("@/lib/billing/core/config", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/billing/core/config")>();
   return {
     ...actual,
     billingCoreConfig: {

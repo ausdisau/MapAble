@@ -2,7 +2,7 @@
  * Development-only floor plan fixture for demo-parramatta-library.
  * Not included in production database seeding.
  */
-import type { FloorPlanDetail, VenueFloorPlanListResponse } from "@/lib/floor-plan/schemas";
+import type { FloorPlanDetail, VenueFloorPlanListResponse } from "@/lib/access/floor-plan/schemas";
 
 export const DEMO_FLOOR_PLAN_VENUE_IDS = new Set(["demo-parramatta-library"]);
 

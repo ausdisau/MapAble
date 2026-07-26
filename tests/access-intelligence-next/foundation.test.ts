@@ -15,7 +15,7 @@ import {
   runSyntheticJourneyPreflight,
   taylorRoom312Query,
   validateAccessQuery,
-} from "@/lib/access-intelligence-next";
+} from "@/lib/access/intelligence-next";
 
 const FLAG_KEYS = [
   "MAPABLE_ACCESS_INTELLIGENCE_NEXT_ENABLED",

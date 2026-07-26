@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import {
   ACCESS_ONTOLOGY_V1,
   accessIntelligenceNextFlags,
-} from "@/lib/access-intelligence-next";
+} from "@/lib/access/intelligence-next";
 
 export const dynamic = "force-dynamic";
 

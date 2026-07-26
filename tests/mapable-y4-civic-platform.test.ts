@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { assertTransparencyCopy } from "@/lib/algorithm-register/register-service";
+import { assertTransparencyCopy } from "@/lib/compliance/algorithm-register/register-service";
 import {
   ALGORITHM_TRANSPARENCY_DISCLAIMER,
   BENCHMARK_DISCLAIMER,

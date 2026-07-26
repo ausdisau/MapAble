@@ -61,7 +61,7 @@ flowchart TB
 | Element | Spec |
 | ------- | ---- |
 | Route | `/care/gpt` (App Router under care layout) |
-| Nav | Care hub card + link from `/care`; secondary link near Ask in `lib/core-ui/navigation.ts` labeled “CareGPT” |
+| Nav | Care hub card + link from `/care`; secondary link near Ask in `lib/platform/core-ui/navigation.ts` labeled “CareGPT” |
 | UI pattern | Reuse Copilot-style composer + summary + action cards + confirmation gates (`components/copilot/*`), care-branded chrome (MapAble Care, not generic Ask) |
 | Auth | Signed-in for status/drafts; guests get discovery + “sign in to request / view bookings” only |
 | Model label | “Responses powered by gpt-oss-120b” when that model is active (same pattern as Ask) |

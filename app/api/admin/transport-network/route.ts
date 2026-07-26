@@ -3,7 +3,7 @@ import { jsonOk } from "@/lib/api/response";
 import {
   getTransportNetworkRolloutSummary,
   upsertTransportRegion,
-} from "@/lib/transport-network-rollout/rollout-service";
+} from "@/lib/transport/network-rollout/rollout-service";
 
 export async function GET() {
   const user = await requireApiAdmin();

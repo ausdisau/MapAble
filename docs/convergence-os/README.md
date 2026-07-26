@@ -36,7 +36,7 @@ Extends ConvergenceOS with honest productisation controls (still advisory; no au
 - [PR action ledger](../remediation/PR_ACTION_LEDGER.md) — close / merge / split / consolidate actions
 - [Productisation programme README](../productisation/README.md)
 
-Seeds: `lib/convergence-os/seed/pr-action-ledger.ts`, `public-claims.ts`, `trains/productisation-merge-train.ts`.
+Seeds: `lib/platform/convergence-os/seed/pr-action-ledger.ts`, `public-claims.ts`, `trains/productisation-merge-train.ts`.
 
 ## Iteration 2 scope (Waves 9–17, advisory)
 

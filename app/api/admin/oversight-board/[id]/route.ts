@@ -3,7 +3,7 @@ import { jsonError, jsonOk } from "@/lib/api/response";
 import {
   markMeetingHeld,
   publishMeetingMinutes,
-} from "@/lib/oversight-board/oversight-service";
+} from "@/lib/governance/oversight-board/oversight-service";
 
 export async function PATCH(
   req: Request,

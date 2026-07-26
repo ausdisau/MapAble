@@ -8,7 +8,7 @@ import {
   hybridRetrieve,
   proposeCandidateEdge,
   requireAiCapability,
-} from "@/lib/ai-platform";
+} from "@/lib/ai/platform";
 import { runGoldenJourney } from "@/lib/pilot/starting-work/golden-journey";
 
 describe("Mission Evidence Graph", () => {

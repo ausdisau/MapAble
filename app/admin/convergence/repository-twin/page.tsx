@@ -6,7 +6,7 @@ import {
 } from "@/components/admin/convergence/ConvergenceDataTable";
 import { ConvergenceShell } from "@/components/admin/convergence/ConvergenceShell";
 import { isConvergenceTwinEnabled } from "@/lib/config/convergence-os";
-import { getTwinOverview } from "@/lib/convergence-os/twin/store";
+import { getTwinOverview } from "@/lib/platform/convergence-os/twin/store";
 import { prisma } from "@/lib/prisma";
 
 export const metadata = { title: "Repository Twin | ConvergenceOS" };

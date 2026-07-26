@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { CAPABILITY_SEEDS } from "@/lib/convergence-os/seed/capabilities";
+import { CAPABILITY_SEEDS } from "@/lib/platform/convergence-os/seed/capabilities";
 import {
   PR_ACTION_LEDGER,
   SUPERSEDED_CLOSE_TARGETS,
@@ -9,13 +9,13 @@ import {
   assertStackDepthPolicy,
   assertProductisationTrainDepth,
   ledgerEntriesByAction,
-} from "@/lib/convergence-os/seed/pr-action-ledger";
+} from "@/lib/platform/convergence-os/seed/pr-action-ledger";
 import {
   PUBLIC_CLAIM_REGISTRY,
   assertNoProductionClaimsWithoutEvidence,
-} from "@/lib/convergence-os/seed/public-claims";
-import { PRODUCTISATION_MERGE_TRAIN } from "@/lib/convergence-os/trains/productisation-merge-train";
-import { FOUNDATION_MERGE_TRAIN } from "@/lib/convergence-os/trains/foundation-merge-train";
+} from "@/lib/platform/convergence-os/seed/public-claims";
+import { PRODUCTISATION_MERGE_TRAIN } from "@/lib/platform/convergence-os/trains/productisation-merge-train";
+import { FOUNDATION_MERGE_TRAIN } from "@/lib/platform/convergence-os/trains/foundation-merge-train";
 import { readdirSync, existsSync } from "node:fs";
 import { join } from "node:path";
 

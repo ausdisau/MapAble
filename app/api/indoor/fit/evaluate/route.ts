@@ -1,10 +1,10 @@
 import { z } from "zod";
 
-import type { AccessNeed } from "@/lib/access-fit/types";
-import type { FloorPlanFeature } from "@/lib/floor-plan/schemas";
-import { featureDisabledResponse } from "@/lib/indoor-accessibility/api-errors";
-import { isIndoorFeatureEnabled } from "@/lib/indoor-accessibility/feature-flags";
-import { evaluateIndoorFit } from "@/lib/indoor-accessibility/fit/indoor-fit-engine";
+import type { AccessNeed } from "@/lib/access/fit/types";
+import type { FloorPlanFeature } from "@/lib/access/floor-plan/schemas";
+import { featureDisabledResponse } from "@/lib/access/indoor/api-errors";
+import { isIndoorFeatureEnabled } from "@/lib/access/indoor/feature-flags";
+import { evaluateIndoorFit } from "@/lib/access/indoor/fit/indoor-fit-engine";
 
 
 const fitRequestSchema = z.object({

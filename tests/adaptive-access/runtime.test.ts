@@ -15,7 +15,7 @@ import {
   resolveLayoutVersion,
   resolvePresentationPolicy,
   revokeAccessProfileField,
-} from "@/lib/adaptive-access";
+} from "@/lib/access/adaptive";
 
 describe("Adaptive Access Runtime", () => {
   afterEach(() => {

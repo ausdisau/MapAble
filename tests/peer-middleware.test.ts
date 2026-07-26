@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { shouldRunAuthMiddleware } from "@/lib/mapable-peers/peer-middleware";
+import { shouldRunAuthMiddleware } from "@/lib/community/mapable-peers/peer-middleware";
 
 describe("shouldRunAuthMiddleware", () => {
   it("guards authenticated app prefixes", () => {

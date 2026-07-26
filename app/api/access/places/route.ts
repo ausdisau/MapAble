@@ -1,12 +1,12 @@
 import {
   canEditPlace,
   canSuggestPlace,
-} from "@/lib/access-map/access-place-policy";
+} from "@/lib/access/map/access-place-policy";
 import {
   createAccessPlace,
   listPublishedPlaces,
   placeToGeoJsonFeature,
-} from "@/lib/access-map/access-place-service";
+} from "@/lib/access/map/access-place-service";
 import { requireApiSession } from "@/lib/api/auth-handler";
 import {
   jsonBodyErrorResponse,

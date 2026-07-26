@@ -4,7 +4,7 @@
 
 `draft` → `in_review` → `approved` → `published` | `changes_requested` | `rejected` | `archived` | `superseded`
 
-Implemented in `lib/indoor-accessibility/publication/state-machine.ts` and `floor-plan-authoring-service.ts`.
+Implemented in `lib/access/indoor/publication/state-machine.ts` and `floor-plan-authoring-service.ts`.
 
 ## Rules
 

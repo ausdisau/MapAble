@@ -5,7 +5,7 @@ import { useCallback, useState } from "react";
 import type { GuidedSearchSessionFields } from "@/components/guided-search/types";
 import type { SupportArea } from "@/lib/marketing/mapable-care-combined-data";
 import { supportAreaToSupportTypeId } from "@/lib/marketing/mapable-care-routes";
-import { SUPPORT_TYPES } from "@/lib/provider-finder/filters";
+import { SUPPORT_TYPES } from "@/lib/provider/finder/filters";
 
 const PROMPT_SERVICE_HINTS: Record<string, string> = {
   "Find a support worker": "Personal care",

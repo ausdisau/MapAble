@@ -1,6 +1,6 @@
 import { GovernanceCharterActions } from "@/app/admin/governance-charter/GovernanceCharterActions";
 import { requireAdmin } from "@/lib/auth/guards";
-import { listCharters } from "@/lib/governance-charter/charter-service";
+import { listCharters } from "@/lib/governance/charter/charter-service";
 
 export default async function GovernanceCharterAdminPage() {
   await requireAdmin();

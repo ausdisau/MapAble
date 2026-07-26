@@ -1,7 +1,7 @@
 import { FederatedAccountabilityForm } from "@/app/admin/federated-accountability/FederatedAccountabilityForm";
 import { requireAdmin } from "@/lib/auth/guards";
 import { isFederatedAccountabilityV2Enabled } from "@/lib/config/y5-rights-infrastructure";
-import { listAccountabilityPartners } from "@/lib/federated-accountability/federation-partner-service";
+import { listAccountabilityPartners } from "@/lib/governance/federated-accountability/federation-partner-service";
 
 export default async function FederatedAccountabilityPage() {
   await requireAdmin();

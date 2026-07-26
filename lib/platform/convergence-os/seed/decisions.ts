@@ -1,0 +1,72 @@
+import type { DecisionProposalSeed } from "@/lib/platform/convergence-os/types";
+
+/** AI/architecture proposals — not approved until a human records approval. */
+export const DECISION_PROPOSAL_SEEDS: DecisionProposalSeed[] = [
+  {
+    decisionKey: "ADR-CONV-001",
+    title: "CareOSMission canonical source of truth",
+    decisionType: "canonical_domain",
+    context:
+      "CareOSMission appears on CareOS #252, AURA tip, and Continuity #287",
+    alternatives: [
+      "PR #252 CareOS platform completion as SoR",
+      "AURA tip as SoR",
+      "Continuity as SoR",
+      "Keep Case forever",
+    ],
+    selectedOption: "PR #252 CareOSMission as SoR after rebase onto main",
+    rationale:
+      "CareOS completion PR establishes mission schema + outbox; AURA/Continuity should extend not redefine",
+    affectedPrs: [252, 267, 277, 287, 279],
+    isAiProposal: true,
+    owner: "architecture_reviewer",
+  },
+  {
+    decisionKey: "ADR-CONV-002",
+    title: "Personal Access Vault SoR",
+    decisionType: "canonical_domain",
+    context: "Vault #281 and RightsOS #280 both define PersonalVault",
+    alternatives: ["#281 Vault", "#280 RightsOS embedded vault", "main PersonalDataVaultRequest only"],
+    selectedOption: "PR #281 Personal Access Vault as SoR",
+    rationale: "Full vault registry; RightsOS should reference not redefine",
+    affectedPrs: [281, 280],
+    isAiProposal: true,
+    owner: "privacy_reviewer",
+  },
+  {
+    decisionKey: "ADR-CONV-003",
+    title: "AccessPlace remains place SoR",
+    decisionType: "canonical_domain",
+    context: "AiAccessPlace introduced on Access Intelligence / AURA stacks",
+    alternatives: ["AccessPlace", "AiAccessPlace", "AccessiblePlace"],
+    selectedOption: "AccessPlace canonical; AiAccess* as extensions",
+    rationale: "Main already has AccessPlace + indoor; avoid second place writer",
+    affectedPrs: [266, 273, 267],
+    isAiProposal: true,
+    owner: "architecture_reviewer",
+  },
+  {
+    decisionKey: "ADR-CONV-004",
+    title: "TransportTrip remains transport SoR",
+    decisionType: "canonical_domain",
+    context: "Transport MVP #283 vs Trip + production claims #276",
+    alternatives: ["TransportTrip", "TransportBooking", "Transport MVP rewrite"],
+    selectedOption: "TransportTrip canonical; Booking adapter; MVP rebuild/adapter",
+    rationale: "STRATEGY.md and active scheduling/evidence use TransportTrip",
+    affectedPrs: [276, 283],
+    isAiProposal: true,
+    owner: "architecture_reviewer",
+  },
+  {
+    decisionKey: "ADR-CONV-005",
+    title: "Indoor models must be preserved on rebase",
+    decisionType: "database",
+    context: "Many programme tips omit/delete AccessFloorPlan family from main",
+    alternatives: ["Allow indoor deletion", "Hard rebase gate preserving indoor"],
+    selectedOption: "Hard rebase gate preserving indoor",
+    rationale: "Indoor already merged to main; silent deletion is data/regression risk",
+    affectedPrs: [266, 267, 278, 280, 252],
+    isAiProposal: true,
+    owner: "database_reviewer",
+  },
+];

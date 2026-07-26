@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { runBookingServicesAgentTurn } from "@/lib/agent/booking-services-agent";
-import { createAgentRun } from "@/lib/agent-ops/agent-run-service";
+import { createAgentRun } from "@/lib/ai/agent-ops/agent-run-service";
 import { requireApiSession } from "@/lib/api/auth-handler";
 import {
   DISABILITY_AGENT_OPERATIONS,

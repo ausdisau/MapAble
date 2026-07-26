@@ -90,8 +90,8 @@ import {
   buildParticipantExplanation,
   buildScoreBreakdown,
   runAiCareMatch,
-} from "@/lib/ai-matching/ai-match-service";
-import { AiMatchingError } from "@/lib/ai-matching/types";
+} from "@/lib/ai/matching/ai-match-service";
+import { AiMatchingError } from "@/lib/ai/matching/types";
 
 function baseCandidate(overrides: Record<string, unknown> = {}) {
   return {

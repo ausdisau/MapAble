@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/lib/auth/guards";
-import { getReconciliationDashboard } from "@/lib/payment-reconciliation/reconciliation-service";
+import { getReconciliationDashboard } from "@/lib/billing/payment-reconciliation/reconciliation-service";
 
 export default async function PaymentReconciliationPage() {
   await requireAdmin();

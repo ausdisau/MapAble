@@ -10,7 +10,7 @@ import {
   projectGraphToList,
   runSyntheticJourneyPreflight,
   taylorRoom312Query,
-} from "@/lib/access-intelligence-next";
+} from "@/lib/access/intelligence-next";
 
 export const metadata: Metadata = {
   title: "Living Access Graph (synthetic) | Access Intelligence Next",

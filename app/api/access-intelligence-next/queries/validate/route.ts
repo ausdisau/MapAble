@@ -4,7 +4,7 @@ import {
   accessIntelligenceNextFlags,
   validateAccessQuery,
   type AccessQueryAst,
-} from "@/lib/access-intelligence-next";
+} from "@/lib/access/intelligence-next";
 
 export const dynamic = "force-dynamic";
 

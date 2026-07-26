@@ -5,7 +5,7 @@ import { getOptionalApiUser } from "@/lib/api/optional-session";
 import {
   buildCareTransportMapPayload,
   type CareTransportMapLayer,
-} from "@/lib/care-transport-map/map-payload";
+} from "@/lib/transport/care-map/map-payload";
 import { isCareTransportMapEnabled } from "@/lib/config/care-transport-map";
 
 const layerSchema = z.enum(["careProviders", "infrastructure", "trips"]);

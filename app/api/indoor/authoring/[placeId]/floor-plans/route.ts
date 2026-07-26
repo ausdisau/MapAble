@@ -1,18 +1,18 @@
 import { z } from "zod";
 
 import { requireApiSession } from "@/lib/api/auth-handler";
-import { featureDisabledResponse, indoorApiError } from "@/lib/indoor-accessibility/api-errors";
+import { featureDisabledResponse, indoorApiError } from "@/lib/access/indoor/api-errors";
 import {
   createFloorPlanDraft,
   transitionFloorPlanStatus,
   validateDraftForSubmission,
-} from "@/lib/indoor-accessibility/authoring/floor-plan-authoring-service";
-import { isIndoorFeatureEnabled } from "@/lib/indoor-accessibility/feature-flags";
+} from "@/lib/access/indoor/authoring/floor-plan-authoring-service";
+import { isIndoorFeatureEnabled } from "@/lib/access/indoor/feature-flags";
 import {
   canCreateFloorPlanDraft,
   canReviewFloorPlan,
   canSubmitFloorPlanReview,
-} from "@/lib/indoor-accessibility/permissions";
+} from "@/lib/access/indoor/permissions";
 
 const createDraftSchema = z.object({
   floorCode: z.string().min(1),

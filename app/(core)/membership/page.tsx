@@ -1,7 +1,7 @@
 import {
   getMembershipDisclaimer,
   listPublicMembershipDirectory,
-} from "@/lib/community-governance-membership/membership-service";
+} from "@/lib/governance/community-membership/membership-service";
 
 export default async function MembershipDirectoryPage() {
   const members = await listPublicMembershipDirectory();

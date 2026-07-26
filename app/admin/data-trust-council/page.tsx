@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/lib/auth/guards";
-import { listCouncilRecords } from "@/lib/data-trust-council/council-service";
+import { listCouncilRecords } from "@/lib/governance/data-trust-council/council-service";
 
 export default async function DataTrustCouncilPage() {
   await requireAdmin();

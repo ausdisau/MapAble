@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/lib/auth/guards";
-import { getSustainabilityDashboard } from "@/lib/sustainability-plan/sustainability-service";
+import { getSustainabilityDashboard } from "@/lib/platform/sustainability-plan/sustainability-service";
 
 export default async function SustainabilityPlanPage() {
   await requireAdmin();

@@ -3,8 +3,8 @@ import Link from "next/link";
 import {
   isAssessorNetworkPilotEnabled,
   listAssessorVerificationQueue,
-} from "@/lib/assessor-network/assessor-network-pilot-service";
-import { getAssessorNetworkDirectory } from "@/lib/assessor-network/network-service";
+} from "@/lib/assessor/network/assessor-network-pilot-service";
+import { getAssessorNetworkDirectory } from "@/lib/assessor/network/network-service";
 import { requireAdmin } from "@/lib/auth/guards";
 
 export default async function AssessorNetworkPage() {

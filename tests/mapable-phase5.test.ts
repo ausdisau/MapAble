@@ -2,12 +2,12 @@ import { createHash } from "crypto";
 
 import { describe, expect, it } from "vitest";
 
-import { participantSafeAiSummary } from "@/lib/ai-matching/ai-match-service";
+import { participantSafeAiSummary } from "@/lib/ai/matching/ai-match-service";
 import { hasPermission } from "@/lib/auth/permissions";
 import { phase5Config } from "@/lib/config/phase5";
-import { scopesAllow } from "@/lib/developer-api/api-key-service";
-import { validatePriceRows } from "@/lib/ndis-pricing/catalogue-import-service";
-import { isProviderEligibleForMatching } from "@/lib/provider-verification/verification-case-service";
+import { scopesAllow } from "@/lib/api/developer/api-key-service";
+import { validatePriceRows } from "@/lib/ndis/pricing/catalogue-import-service";
+import { isProviderEligibleForMatching } from "@/lib/provider/verification/verification-case-service";
 import { safeStripeMetadata, hashApiKey } from "@/lib/stripe/legacy-checkout-service";
 import { buildSafeXeroInvoicePayload } from "@/lib/xero/xero-invoice-service";
 

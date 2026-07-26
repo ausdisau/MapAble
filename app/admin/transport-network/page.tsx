@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/lib/auth/guards";
-import { getTransportNetworkRolloutSummary } from "@/lib/transport-network-rollout/rollout-service";
+import { getTransportNetworkRolloutSummary } from "@/lib/transport/network-rollout/rollout-service";
 
 export default async function TransportNetworkPage() {
   await requireAdmin();

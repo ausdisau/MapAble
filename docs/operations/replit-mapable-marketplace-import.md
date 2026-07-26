@@ -35,7 +35,7 @@ Default clone directory: `/tmp/mapable-marketplace-replit` (`IMPORT_DIR` to over
 
 1. **Catalog** — Diff Repl product schema against `lib/marketplace/catalog.ts` or add a `MarketplaceProduct` Prisma model and seed script.
 2. **Cart** — Prefer server-side cart session if Repl used DB carts; keep billing invoice as order record.
-3. **Checkout** — Route all payments through `lib/billing-core/` (GST, plan-managed export, Stripe checkout).
+3. **Checkout** — Route all payments through `lib/billing/core/` (GST, plan-managed export, Stripe checkout).
 4. **Copy** — Avoid “NDIS approved” badges; use support item references and plan-manager review language.
 5. **UI** — Port pages into `app/marketplace/`; keep layout nav aligned with Care/Transport module shells.
 6. **Verify** — `pnpm test tests/marketplace-catalog.test.ts tests/billing-core.test.ts`

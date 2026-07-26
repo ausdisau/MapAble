@@ -1,9 +1,9 @@
 import { z } from "zod";
 
-import { featureDisabledResponse } from "@/lib/indoor-accessibility/api-errors";
-import { isIndoorFeatureEnabled } from "@/lib/indoor-accessibility/feature-flags";
-import { planIndoorRoute } from "@/lib/indoor-accessibility/routing/route-planner";
-import { indoorRouteGraphSchema, routeModeSchema } from "@/lib/indoor-accessibility/schemas/core";
+import { featureDisabledResponse } from "@/lib/access/indoor/api-errors";
+import { isIndoorFeatureEnabled } from "@/lib/access/indoor/feature-flags";
+import { planIndoorRoute } from "@/lib/access/indoor/routing/route-planner";
+import { indoorRouteGraphSchema, routeModeSchema } from "@/lib/access/indoor/schemas/core";
 
 
 const routeRequestSchema = z.object({

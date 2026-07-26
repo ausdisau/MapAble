@@ -33,7 +33,7 @@ The script clones into `/tmp/mapable-transport-replit` by default (`IMPORT_DIR` 
 | --- | --- |
 | Trip scheduling | `lib/transport/`, `app/api/transport/trips/` |
 | Legacy bookings | `app/api/transport/bookings/`, `TransportBooking` model |
-| Routing | `lib/transport-routing/`, env `TRANSPORT_ROUTING_*` |
+| Routing | `lib/transport/routing/`, env `TRANSPORT_ROUTING_*` |
 | Participant UI | `/dashboard/transport`, `/dashboard/transport/new` |
 | Provider / driver | `/provider/transport`, `/driver/trips` |
 | Module hub (new) | `/transport` — public module entry aligned with `app/lib/modules.ts` |

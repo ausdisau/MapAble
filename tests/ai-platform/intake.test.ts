@@ -8,7 +8,7 @@ import {
   createSyntheticIntakeSession,
   requireAiCapability,
   sourceTextLooksLikeInjection,
-} from "@/lib/ai-platform";
+} from "@/lib/ai/platform";
 
 describe("AI Evidence Intake Studio", () => {
   afterEach(() => {

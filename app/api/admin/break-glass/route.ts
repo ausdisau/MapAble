@@ -19,11 +19,11 @@ import { verifyBreakGlassMfaToken } from "@/lib/security/break-glass-mfa";
 import {
   completeBreakGlassAfterAction,
   openHardenedBreakGlassSession,
-} from "@/lib/trust-fabric/break-glass";
+} from "@/lib/trust/fabric/break-glass";
 import {
   ACCESS_FIELD_CATEGORIES,
   type AccessFieldCategory,
-} from "@/lib/trust-fabric/types";
+} from "@/lib/trust/fabric/types";
 
 const fieldCategorySchema = z
   .string()

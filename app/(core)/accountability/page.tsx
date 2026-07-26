@@ -1,9 +1,9 @@
 import { isFederatedAccountabilityV2Enabled } from "@/lib/config/y5-rights-infrastructure";
-import { listPublicFederatedPartners } from "@/lib/federated-accountability/federation-partner-service";
+import { listPublicFederatedPartners } from "@/lib/governance/federated-accountability/federation-partner-service";
 import {
   getAccountabilityDisclaimer,
   listPublicAccountabilityReports,
-} from "@/lib/national-accountability/accountability-service";
+} from "@/lib/governance/national-accountability/accountability-service";
 
 export default async function AccountabilityPortalPage() {
   const [reports, partners] = await Promise.all([

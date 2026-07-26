@@ -1,8 +1,8 @@
 "use client";
 
-import { normalizedToPercent } from "@/lib/floor-plan/coordinates";
-import { buildFeatureAccessibleName, getFeatureConfig } from "@/lib/floor-plan/feature-config";
-import type { FloorPlanFeature } from "@/lib/floor-plan/schemas";
+import { normalizedToPercent } from "@/lib/access/floor-plan/coordinates";
+import { buildFeatureAccessibleName, getFeatureConfig } from "@/lib/access/floor-plan/feature-config";
+import type { FloorPlanFeature } from "@/lib/access/floor-plan/schemas";
 
 type FloorPlanFeatureLayerProps = {
   features: FloorPlanFeature[];

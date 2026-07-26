@@ -12,8 +12,8 @@ import {
 import { isAdminRole } from "@/lib/auth/roles";
 import { getAtRiskItems } from "@/lib/admin/service-ops";
 import { logAdminSensitiveAccess } from "@/lib/audit/audit-event-service";
-import { adminSearchInvoices } from "@/lib/billing-core/invoice-service";
-import { countOpenComplaints } from "@/lib/trust-safety/queue-service";
+import { adminSearchInvoices } from "@/lib/billing/core/invoice-service";
+import { countOpenComplaints } from "@/lib/trust/safety/queue-service";
 import { prisma } from "@/lib/prisma";
 import type { UserRole } from "@/types/mapable";
 

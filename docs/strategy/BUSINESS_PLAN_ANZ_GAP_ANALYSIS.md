@@ -3,7 +3,7 @@
 **Status:** strategy documentation — not a production readiness claim  
 **Source document:** *MapAble Business Plans for Australia & New Zealand* (uploaded analysis baseline, 2026-07)  
 **Repo contrast:** [COMPETITIVE_POSITION.md](./COMPETITIVE_POSITION.md), [cursor-five-year-masterplan.md](../mapable/cursor-five-year-masterplan.md), [BUILD_PARTNER_DEFER.md](./BUILD_PARTNER_DEFER.md)  
-**Public claim gate:** [PUBLIC_CLAIM_REGISTRY.md](../convergence-os/PUBLIC_CLAIM_REGISTRY.md), informational GO routes in `lib/public-informational/routes.ts`
+**Public claim gate:** [PUBLIC_CLAIM_REGISTRY.md](../convergence-os/PUBLIC_CLAIM_REGISTRY.md), informational GO routes in `lib/public/informational/routes.ts`
 
 This note captures a durable gap matrix between the ANZ business plan’s three pillars and what the codebase ships today. It does **not** authorise marketplace commissions, public booking claims, NZ funding integration, or GTFS production status.
 

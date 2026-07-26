@@ -3,7 +3,7 @@ import { jsonOk } from "@/lib/api/response";
 import {
   createReconciliationBatch,
   getReconciliationDashboard,
-} from "@/lib/payment-reconciliation/reconciliation-service";
+} from "@/lib/billing/payment-reconciliation/reconciliation-service";
 
 export async function GET() {
   const user = await requireApiAdmin();

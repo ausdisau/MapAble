@@ -30,7 +30,7 @@ describe("Phase 8 permissions", () => {
 describe("API version policy", () => {
   it("returns v1 as default when db available", async () => {
     const { getApiVersionPolicy } = await import(
-      "@/lib/api-versioning/version-policy-service"
+      "@/lib/api/versioning/version-policy-service"
     );
     try {
       const policy = await getApiVersionPolicy();
@@ -44,7 +44,7 @@ describe("API version policy", () => {
 describe("national insights guard", () => {
   it("list returns array when db available", async () => {
     const { listPublishedNationalInsights } = await import(
-      "@/lib/national-insights/insights-service"
+      "@/lib/research/national-insights/insights-service"
     );
     try {
       const list = await listPublishedNationalInsights();

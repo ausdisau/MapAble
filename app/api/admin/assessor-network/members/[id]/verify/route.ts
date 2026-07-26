@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 import { requireApiAdmin } from "@/lib/api/auth-handler";
 import { jsonError } from "@/lib/api/response";
-import { verifyAssessorCredential } from "@/lib/assessor-network/assessor-network-pilot-service";
+import { verifyAssessorCredential } from "@/lib/assessor/network/assessor-network-pilot-service";
 
 export async function POST(
   req: Request,

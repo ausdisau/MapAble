@@ -52,7 +52,7 @@ vi.mock("@/lib/audit/audit-event-service", () => ({
   createAuditEvent: auditMock,
 }));
 
-vi.mock("@/lib/communication-passport/service", () => ({
+vi.mock("@/lib/support/communication-passport/service", () => ({
   getCommunicationPassport: vi.fn().mockResolvedValue({
     version: 1,
     modes: ["speech"],
@@ -64,9 +64,9 @@ import {
   listParticipantAccessHistory,
   recordPurposeBoundAccessReceipt,
   TrustFabricError,
-} from "@/lib/trust-fabric/receipt-service";
-import { createDecisionNotice } from "@/lib/trust-fabric/decision-notice";
-import { exportParticipantTrustBundle } from "@/lib/trust-fabric/export-service";
+} from "@/lib/trust/fabric/receipt-service";
+import { createDecisionNotice } from "@/lib/trust/fabric/decision-notice";
+import { exportParticipantTrustBundle } from "@/lib/trust/fabric/export-service";
 
 beforeEach(() => {
   vi.clearAllMocks();

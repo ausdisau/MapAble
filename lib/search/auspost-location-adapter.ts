@@ -1,4 +1,4 @@
-import { searchPostcodes } from "@/lib/auspost-pac/postcode-search-service";
+import { searchPostcodes } from "@/lib/integrations/auspost-pac/postcode-search-service";
 import type { LocationAutocompleteAdapter } from "@/lib/search/location-autocomplete-adapter";
 import type { AusPostState } from "@/types/auspost-pac";
 import type { AutocompleteSuggestion } from "@/types/search";

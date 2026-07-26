@@ -1,7 +1,7 @@
 import { requireApiSession } from "@/lib/api/auth-handler";
 import { jsonError, jsonOk } from "@/lib/api/response";
 import { prisma } from "@/lib/prisma";
-import { signServiceAgreement } from "@/lib/service-agreements/agreement-service";
+import { signServiceAgreement } from "@/lib/contracts/service-agreements/agreement-service";
 
 export async function POST(
   req: Request,

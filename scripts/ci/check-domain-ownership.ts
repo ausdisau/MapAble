@@ -19,7 +19,7 @@ const OWNERSHIP: Array<{
     domain: "billing",
     ownerPrefixes: [
       "lib/billing/",
-      "lib/billing-core/",
+      "lib/billing/core/",
       "lib/invoices/",
       "app/api/billing/",
       "app/api/invoices/",
@@ -33,7 +33,7 @@ const OWNERSHIP: Array<{
     domain: "transport",
     ownerPrefixes: [
       "lib/transport/",
-      "lib/transport-routing/",
+      "lib/transport/routing/",
       "app/api/transport/",
       "app/api/driver/",
       "prisma/",
@@ -65,17 +65,17 @@ const OWNERSHIP: Array<{
 const CROSS_DOMAIN_ALLOWLIST = [
   "lib/orchestration/",
   "lib/matching/",
-  "lib/ai-matching/",
-  "lib/ai-platform/",
-  "lib/mission-portfolio/",
-  "lib/mission-copilot/",
-  "lib/case-copilot/",
+  "lib/ai/matching/",
+  "lib/ai/platform/",
+  "lib/platform/mission-portfolio/",
+  "lib/ai/mission-copilot/",
+  "lib/ai/case-copilot/",
   "lib/programmes/",
   "lib/payouts/",
-  "lib/national-insights/",
+  "lib/research/national-insights/",
   "lib/ndis/",
-  "lib/support-coordinator/",
-  "lib/booking-graph/",
+  "lib/support/coordinator/",
+  "lib/bookings/graph/",
   "lib/bookings/",
 ];
 

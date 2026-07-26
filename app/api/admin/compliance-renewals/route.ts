@@ -4,7 +4,7 @@ import {
   getComplianceRenewalsDashboard,
   markRenewalComplete,
   scheduleComplianceRenewal,
-} from "@/lib/compliance-renewals/renewal-service";
+} from "@/lib/compliance/renewals/renewal-service";
 
 export async function GET() {
   const user = await requireApiAdmin();

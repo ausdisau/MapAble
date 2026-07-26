@@ -1,7 +1,7 @@
 import { requireApiPermission } from "@/lib/api/auth-handler";
 import { jsonOk } from "@/lib/api/response";
 import { handleTransportRouteError } from "@/lib/transport/transport-route-handler";
-import { createRouteEstimate } from "@/lib/transport-routing/route-estimate-service";
+import { createRouteEstimate } from "@/lib/transport/routing/route-estimate-service";
 import { routeEstimateSchema } from "@/lib/validation/transport-routing-schemas";
 
 export async function POST(req: Request) {

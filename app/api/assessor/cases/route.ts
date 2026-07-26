@@ -4,7 +4,7 @@ import {
   closeAssessorCase,
   createAssessorCase,
   listAssessorCasesForUser,
-} from "@/lib/assessor-tools/assessor-service";
+} from "@/lib/assessor/tools/assessor-service";
 
 export async function GET() {
   const user = await requireApiPermission("assessor:portal");

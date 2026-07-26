@@ -3,7 +3,7 @@ import { jsonOk } from "@/lib/api/response";
 import {
   createSandboxApp,
   testSandboxWebhook,
-} from "@/lib/partner-sandbox/sandbox-service";
+} from "@/lib/partner/sandbox/sandbox-service";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {

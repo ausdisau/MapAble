@@ -6,7 +6,7 @@ import {
   MAIN_INDOOR_MODELS,
   modelsAreIdentical,
   SCHEMA_REF_FIXTURES,
-} from "@/lib/convergence-os/schema/collision-engine";
+} from "@/lib/platform/convergence-os/schema/collision-engine";
 
 describe("analyseSchemaCollisions", () => {
   const findings = analyseSchemaCollisions();

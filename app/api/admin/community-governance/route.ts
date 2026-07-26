@@ -3,7 +3,7 @@ import { jsonOk } from "@/lib/api/response";
 import {
   recordGovernanceMeeting,
   recordGovernanceDecision,
-} from "@/lib/community-governance/governance-service";
+} from "@/lib/governance/community/governance-service";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {

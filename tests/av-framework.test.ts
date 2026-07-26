@@ -4,7 +4,7 @@ import {
   avTripTransitionAllowed,
   checkAvVehicleSuitability,
   AV_CAPABILITY_MATRIX,
-} from "@/lib/av-framework";
+} from "@/lib/platform/av-framework";
 
 describe("av-framework", () => {
   it("allows requested → provider_review", () => {

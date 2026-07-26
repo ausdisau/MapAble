@@ -1,4 +1,4 @@
-import { getLatestStatusPage, runPlatformHealthChecks } from "@/lib/platform-status/status-service";
+import { getLatestStatusPage, runPlatformHealthChecks } from "@/lib/platform/status/status-service";
 
 export const dynamic = "force-dynamic";
 

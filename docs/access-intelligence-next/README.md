@@ -23,7 +23,7 @@ Optional durable evidence (still not production truth): see [EVIDENCE_PERSISTENC
 
 | Concept | Owner |
 | --- | --- |
-| Public place identity | `AccessPlace` (`lib/access-map`) |
+| Public place identity | `AccessPlace` (`lib/access/map`) |
 | Floor plans | `AccessFloorPlan` / indoor platform |
 | Participant presentation prefs | `AccessibilityProfile` |
 | Functional requirements (future) | AccessPassport (not yet on `main`) |

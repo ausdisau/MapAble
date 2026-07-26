@@ -8,7 +8,7 @@ import {
   removeOfflinePack,
   saveOfflinePack,
   type OfflineVenuePack,
-} from "@/lib/indoor-accessibility/offline/pack-manager";
+} from "@/lib/access/indoor/offline/pack-manager";
 import { mapableCareFocusRing } from "@/lib/marketing/mapable-care-tokens";
 
 type OfflinePackPanelProps = {

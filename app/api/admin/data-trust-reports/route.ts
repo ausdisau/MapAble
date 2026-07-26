@@ -3,7 +3,7 @@ import { jsonOk } from "@/lib/api/response";
 import {
   listPublishedAnnualReports,
   publishDataTrustAnnualReport,
-} from "@/lib/institutional-permanence/permanence-service";
+} from "@/lib/platform/institutional-permanence/permanence-service";
 
 export async function GET() {
   const user = await requireApiAdminScope("data_trust_report:publish");

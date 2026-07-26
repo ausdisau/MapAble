@@ -1,10 +1,10 @@
 import { runProviderFinderTurnWithAgentFlag } from "@/lib/agent/run-agent-turn";
-import { appendProviderFinderTurn } from "@/lib/agent-sessions/provider-finder-session";
+import { appendProviderFinderTurn } from "@/lib/ai/agent-sessions/provider-finder-session";
 import type { CopilotActionPlan } from "@/lib/copilot/types";
 import {
   serialiseFinderPayload,
   type ProviderFinderSessionFields,
-} from "@/lib/provider-finder/ask-bridge";
+} from "@/lib/provider/finder/ask-bridge";
 
 const DIRECTORY_DISCLAIMER =
   "Provider listings come from the public NDIS provider finder export. They are not verified by MapAble as current NDIS registration.";

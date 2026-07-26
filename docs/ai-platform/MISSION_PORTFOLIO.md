@@ -1,6 +1,6 @@
 # Mission Portfolio (read-only projection)
 
-`lib/mission-portfolio/` is a shared dependency projection and registry. It does **not** replace Care, Transport, Billing, Consent, or Starting Work writers.
+`lib/platform/mission-portfolio/` is a shared dependency projection and registry. It does **not** replace Care, Transport, Billing, Consent, or Starting Work writers.
 
 - Registry: `mission.starting_work` → canonical projection `lib/pilot/starting-work`
 - Service Standard: participant-visible promises with measurable signals

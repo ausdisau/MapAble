@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { AccreditationDisclaimer } from "@/components/access-accreditation/AccreditationDisclaimer";
 import { AccreditationTierBadge } from "@/components/access-accreditation/AccreditationTierBadge";
-import { getPublishedAssessmentForPlace } from "@/lib/access-accreditation/accreditation-assessment-service";
+import { getPublishedAssessmentForPlace } from "@/lib/access/accreditation/accreditation-assessment-service";
 import { prisma } from "@/lib/prisma";
 
 export default async function PublicAccreditationPage({

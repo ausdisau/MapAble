@@ -6,12 +6,12 @@ import {
   getProviderFinderSession,
   priorAppliedFromSession,
   touchProviderFinderSession,
-} from "@/lib/agent-sessions/provider-finder-session";
+} from "@/lib/ai/agent-sessions/provider-finder-session";
 import { checkIpRateLimit, getClientIp } from "@/lib/api/ip-rate-limit";
 import { isSearchInterpreterConfigured } from "@/lib/config/search-interpreter";
-import { runProviderFinderAskTurn } from "@/lib/provider-finder/ask-bridge";
-import { extractLastUserText } from "@/lib/provider-finder/conversation/extract-user-text";
-import { createFinderChatResponseStream } from "@/lib/provider-finder/conversation/stream-assistant";
+import { runProviderFinderAskTurn } from "@/lib/provider/finder/ask-bridge";
+import { extractLastUserText } from "@/lib/provider/finder/conversation/extract-user-text";
+import { createFinderChatResponseStream } from "@/lib/provider/finder/conversation/stream-assistant";
 import type { ProviderFinderChatUIMessage } from "@/types/provider-finder-chat";
 
 /** Streaming chat for guided search and Provider Finder dialogue. */

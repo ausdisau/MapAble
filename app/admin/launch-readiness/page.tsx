@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/lib/auth/guards";
-import { getLaunchReadinessSummary } from "@/lib/launch-readiness/launch-readiness-service";
+import { getLaunchReadinessSummary } from "@/lib/platform/launch-readiness/launch-readiness-service";
 
 export default async function LaunchReadinessPage() {
   await requireAdmin();

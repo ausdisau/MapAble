@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import {
   completeOnboardingTask,
   startProviderOnboarding,
-} from "@/lib/provider-onboarding-automation/onboarding-service";
+} from "@/lib/provider/onboarding-automation/onboarding-service";
 
 export async function GET() {
   const user = await requireApiAdmin();

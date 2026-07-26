@@ -14,11 +14,11 @@ See `lib/config/platform-patterns.ts` and environment variables such as `ONBOARD
 | Intake / categories | `lib/care/intake-service.ts`, `lib/care/support-category-classifier.ts` |
 | Journey graph | `lib/journey/journey-service.ts` |
 | Matching MVP | `lib/matching/matching-service.ts` |
-| Booking graph | `lib/booking-graph/` |
+| Booking graph | `lib/bookings/graph/` |
 | Consent sharing | `lib/consent/require-consent.ts`, `components/consent/ConsentSharingPanel.tsx` |
-| Transparent billing | `lib/billing-core/transparent-billing.ts` |
-| Trust & safety | `lib/trust-safety/queue-service.ts` |
-| Agent runs | `lib/agent-ops/agent-run-service.ts` |
+| Transparent billing | `lib/billing/core/transparent-billing.ts` |
+| Trust & safety | `lib/trust/safety/queue-service.ts` |
+| Agent runs | `lib/ai/agent-ops/agent-run-service.ts` |
 | Reliability (advisory) | `lib/reliability/reliability-service.ts` |
 
 ## Rules

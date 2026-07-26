@@ -15,8 +15,8 @@ import {
   assertSupersededCloseTargetsInLedger,
   assertStackDepthPolicy,
   assertProductisationTrainDepth,
-} from "../../lib/convergence-os/seed/pr-action-ledger";
-import { assertNoProductionClaimsWithoutEvidence } from "../../lib/convergence-os/seed/public-claims";
+} from "../../lib/platform/convergence-os/seed/pr-action-ledger";
+import { assertNoProductionClaimsWithoutEvidence } from "../../lib/platform/convergence-os/seed/public-claims";
 
 const ROOT = process.cwd();
 const errors: string[] = [];
@@ -66,9 +66,9 @@ function main(): void {
 
   // Required registry artefacts
   for (const rel of [
-    "lib/convergence-os/seed/pr-action-ledger.ts",
-    "lib/convergence-os/seed/public-claims.ts",
-    "lib/convergence-os/trains/productisation-merge-train.ts",
+    "lib/platform/convergence-os/seed/pr-action-ledger.ts",
+    "lib/platform/convergence-os/seed/public-claims.ts",
+    "lib/platform/convergence-os/trains/productisation-merge-train.ts",
     "docs/remediation/PR_ACTION_LEDGER.md",
     "docs/convergence-os/PRODUCTISATION_MERGE_TRAIN.md",
   ]) {

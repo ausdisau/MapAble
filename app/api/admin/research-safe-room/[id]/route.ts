@@ -4,7 +4,7 @@ import {
   activateResearchProject,
   archiveResearchProject,
   submitForEthicsReview,
-} from "@/lib/research-safe-room/safe-room-service";
+} from "@/lib/research/safe-room/safe-room-service";
 
 export async function PATCH(
   req: Request,

@@ -4,7 +4,7 @@ import {
   createPartnerInvoice,
   ensurePartnerBillingAccount,
   getPartnerBillingDashboard,
-} from "@/lib/partner-billing/billing-service";
+} from "@/lib/billing/partner/billing-service";
 
 export async function GET() {
   const user = await requireApiAdmin();

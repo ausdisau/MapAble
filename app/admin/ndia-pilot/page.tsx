@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/lib/auth/guards";
-import { getNdiaPilotStatus } from "@/lib/ndia-pilot/ndia-pilot-service";
+import { getNdiaPilotStatus } from "@/lib/ndis/pilot/ndia-pilot-service";
 
 export default async function NdiaPilotAdminPage() {
   await requireAdmin();

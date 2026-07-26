@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 
-import { ACCREDITATION_CRITERIA } from "../lib/access-accreditation/accreditation-criteria-service";
+import { ACCREDITATION_CRITERIA } from "../lib/access/accreditation/accreditation-criteria-service";
 
 const prisma = new PrismaClient();
 

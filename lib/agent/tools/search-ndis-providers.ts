@@ -1,4 +1,4 @@
-import { searchProvidersForAppliedTurn } from "@/lib/provider-finder/ndis-search-from-applied";
+import { searchProvidersForAppliedTurn } from "@/lib/provider/finder/ndis-search-from-applied";
 import type { AppliedSearchFields } from "@/lib/search/apply-interpretation";
 import type { SearchInterpretation } from "@/types/search";
 

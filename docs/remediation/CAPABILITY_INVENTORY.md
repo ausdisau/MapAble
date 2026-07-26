@@ -5,7 +5,7 @@ States used here match the remediation vocabulary
 `production_ready` | `generally_available` | `suspended` | `retired`).
 
 ConvergenceOS seeds use a parallel enum (`scaffolded`, `fixture_only`, `shadow`, …) —
-see `lib/convergence-os/seed/capabilities.ts` and
+see `lib/platform/convergence-os/seed/capabilities.ts` and
 [docs/productisation/CAPABILITY_REGISTRY.md](../productisation/CAPABILITY_REGISTRY.md).
 
 **Rule:** Feature flags and documentation are **not** evidence of production readiness.

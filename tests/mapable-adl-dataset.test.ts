@@ -3,19 +3,19 @@ import path from "path";
 
 import { describe, expect, it } from "vitest";
 
-import { isAllowlistedNetworkLinkUrl } from "@/lib/access-import/kml-networklink-service";
-import { parseKmlXml } from "@/lib/access-import/kml-parser-service";
+import { isAllowlistedNetworkLinkUrl } from "@/lib/access/import/kml-networklink-service";
+import { parseKmlXml } from "@/lib/access/import/kml-parser-service";
 import {
   ACCESS_ADL_KML_FILENAME,
   MAPABLE_ADL_DATASET_PUBLIC_PATH,
   MAPABLE_MY_MAPS_KML_URL,
   MAPABLE_MY_MAPS_SHARE_URL,
-} from "@/lib/access-map/copy";
+} from "@/lib/access/map/copy";
 import {
   mapAdlPlaceToAccessPlace,
   type MapableAdlCompactPlace,
-} from "@/lib/access-map/mapable-adl-dataset";
-import { resolveMapableMyMapsKmlUrl } from "@/lib/access-map/mapable-my-maps-url";
+} from "@/lib/access/map/mapable-adl-dataset";
+import { resolveMapableMyMapsKmlUrl } from "@/lib/access/map/mapable-my-maps-url";
 import { filterDemoPlaces } from "@/lib/demo/accessibility-places";
 
 describe("MapAble ADL KML integration", () => {

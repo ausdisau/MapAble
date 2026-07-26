@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { runDisabilityServicesAgentTurn } from "@/lib/agent/disability-services-agent";
-import { createAgentRun } from "@/lib/agent-ops/agent-run-service";
+import { createAgentRun } from "@/lib/ai/agent-ops/agent-run-service";
 import {
   DISABILITY_AGENT_OPERATIONS,
   disabilityAgentJsonError,

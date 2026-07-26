@@ -13,7 +13,7 @@ import {
 } from "@/lib/billing/calculations/charge";
 import { invoiceTotals, multiplyCents } from "@/lib/billing/money";
 import { validateChargeLinesAgainstPolicy } from "@/lib/billing/policy/validate";
-import { billingCoreConfig } from "@/lib/billing-core/config";
+import { billingCoreConfig } from "@/lib/billing/core/config";
 import { prisma } from "@/lib/prisma";
 
 export type CreateDraftFromServiceRecordsInput = {

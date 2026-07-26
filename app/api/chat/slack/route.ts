@@ -1,4 +1,4 @@
-import { getProviderFinderChatBot, isProviderFinderChatBotConfigured } from "@/lib/provider-finder/chat-sdk/find-bot";
+import { getProviderFinderChatBot, isProviderFinderChatBotConfigured } from "@/lib/provider/finder/chat-sdk/find-bot";
 
 export const maxDuration = 60;
 

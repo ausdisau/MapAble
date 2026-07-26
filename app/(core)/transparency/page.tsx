@@ -1,4 +1,4 @@
-import { listPublicTransparency } from "@/lib/public-transparency/transparency-service";
+import { listPublicTransparency } from "@/lib/public/transparency/transparency-service";
 
 export default async function TransparencyHubPage() {
   const publications = await listPublicTransparency();
