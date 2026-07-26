@@ -11,7 +11,7 @@ import {
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 
-import { getLocationCoords } from "@/lib/locationCoords";
+import { getLocationCoords } from "@/lib/map/location-coords";
 import { mapMarkerIcons } from "@/lib/map/leaflet-markers";
 
 import type { ProviderWithRelations } from "./types";

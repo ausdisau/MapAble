@@ -1,7 +1,7 @@
 import {
   OrganisationAccessError,
   assertOrganisationAccess,
-} from "@/lib/api/phase3-scope";
+} from "@/lib/api/organisation-scope";
 import { createAuditEvent } from "@/lib/audit/audit-event-service";
 import type { CurrentUser } from "@/lib/auth/current-user";
 import { isAdminRole } from "@/lib/auth/roles";

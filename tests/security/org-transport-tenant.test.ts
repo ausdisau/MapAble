@@ -4,7 +4,7 @@ import {
   OrganisationAccessError,
   assertOrganisationAccess,
   organisationScopedIds,
-} from "@/lib/api/phase3-scope";
+} from "@/lib/api/organisation-scope";
 import type { CurrentUser } from "@/lib/auth/current-user";
 import {
   createAvailabilityBodySchema,

@@ -6,7 +6,7 @@ import { InvoicePlaceholderCard } from "@/components/care/InvoicePlaceholderCard
 import { ProviderCareBookingActions } from "@/components/care/ProviderCareBookingActions";
 import { ServiceAgreementPlaceholder } from "@/components/care/ServiceAgreementPlaceholder";
 import { SupportTasksSummary } from "@/components/care/SupportTasksSummary";
-import { getUserOrganisationIds } from "@/lib/api/phase3-scope";
+import { getUserOrganisationIds } from "@/lib/api/organisation-scope";
 import { requirePermission } from "@/lib/auth/guards";
 import { assertProviderOrgAccess } from "@/lib/care/access-control";
 import { checkConsent } from "@/lib/consent/consent-service";

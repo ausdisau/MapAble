@@ -13,7 +13,7 @@ import {
   SUPPORTED_LOCALES,
   TOTAL_MOBILITY_SCHEME,
   resolveTransportSubsidyHint,
-} from "@/lib/nz-schemes";
+} from "@/lib/config/nz-schemes";
 import { ALL_ROLES, isAmbassadorRole } from "@/lib/auth/roles";
 
 describe("Year-One roadmap alignment", () => {

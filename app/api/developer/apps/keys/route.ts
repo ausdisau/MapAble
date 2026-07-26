@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { getUserOrganisationIds } from "@/lib/api/phase3-scope";
+import { getUserOrganisationIds } from "@/lib/api/organisation-scope";
 import { jsonError, jsonOk, zodErrorResponse } from "@/lib/api/response";
 import { withAuthorization } from "@/lib/api/with-authorization";
 import { isAdminRole } from "@/lib/auth/roles";

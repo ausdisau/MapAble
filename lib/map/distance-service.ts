@@ -1,5 +1,6 @@
-import { distanceKm } from "@/lib/geo";
+import { distanceKm } from "@/lib/map/geo";
 
+/** Re-export haversine helper; prefer importing from `@/lib/map/geo` directly. */
 export { distanceKm };
 
 export function sortByDistance<T extends { distanceKm?: number | null }>(

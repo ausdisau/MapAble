@@ -7,7 +7,7 @@ import "leaflet/dist/leaflet.css";
 
 import type { Provider } from "@/app/provider-finder/providers";
 import { mapMarkerIcons } from "@/lib/map/leaflet-markers";
-import "@/lib/leafletIcons";
+import "@/lib/map/leaflet-icons";
 
 const defaultMarkerIcon = mapMarkerIcons.provider;
 const redMarkerIcon = mapMarkerIcons.selected;

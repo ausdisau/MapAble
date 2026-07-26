@@ -1,5 +1,5 @@
 import { NdisDirectClaimingClient } from "@/components/provider/ndis-claiming/NdisDirectClaimingClient";
-import { getUserOrganisationIds } from "@/lib/api/phase3-scope";
+import { getUserOrganisationIds } from "@/lib/api/organisation-scope";
 import { requirePermission } from "@/lib/auth/guards";
 
 export const metadata = { title: "Export claim batch | NDIS claiming | MapAble" };

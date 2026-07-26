@@ -3,7 +3,7 @@ import Link from "next/link";
 import { StatusTextBadge } from "@/components/phase3/StatusTextBadge";
 import { ProviderWorkerDetailActions } from "@/components/provider/ProviderWorkerDetailActions";
 import { RegistrationShieldStatus } from "@/components/provider/RegistrationShieldStatus";
-import { getUserOrganisationIds } from "@/lib/api/phase3-scope";
+import { getUserOrganisationIds } from "@/lib/api/organisation-scope";
 import { requireAuth } from "@/lib/auth/guards";
 import { hasPermission } from "@/lib/auth/permissions";
 import { isPlatformShieldEnabled } from "@/lib/config/strategic-2026";

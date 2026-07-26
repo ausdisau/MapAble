@@ -4,7 +4,7 @@ import { requireApiSession } from "@/lib/api/auth-handler";
 import {
   getUserOrganisationIds,
   OrganisationAccessError,
-} from "@/lib/api/phase3-scope";
+} from "@/lib/api/organisation-scope";
 import { jsonError, jsonOk, zodErrorResponse } from "@/lib/api/response";
 import { isAdminRole } from "@/lib/auth/roles";
 import {

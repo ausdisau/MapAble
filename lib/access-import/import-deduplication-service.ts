@@ -1,4 +1,4 @@
-import { distanceKm } from "@/lib/geo";
+import { distanceKm } from "@/lib/map/geo";
 import { prisma } from "@/lib/prisma";
 
 const PROXIMITY_KM = 0.05;

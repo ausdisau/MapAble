@@ -24,7 +24,7 @@ vi.mock("@/lib/care/access-control", () => ({
   assertProviderOrgAccess: vi.fn(async () => undefined),
 }));
 
-vi.mock("@/lib/api/phase3-scope", () => ({
+vi.mock("@/lib/api/organisation-scope", () => ({
   OrganisationAccessError: class OrganisationAccessError extends Error {},
   assertOrganisationAccess: vi.fn(async () => undefined),
 }));

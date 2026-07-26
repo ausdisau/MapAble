@@ -1,5 +1,5 @@
 import { requireApiSession } from "@/lib/api/auth-handler";
-import { getUserOrganisationIds } from "@/lib/api/phase3-scope";
+import { getUserOrganisationIds } from "@/lib/api/organisation-scope";
 import { jsonError, jsonOk } from "@/lib/api/response";
 import { isPublicApiV2Enabled } from "@/lib/api-versioning/version-middleware";
 import { isAdminRole } from "@/lib/auth/roles";

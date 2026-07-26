@@ -8,7 +8,7 @@ import {
 
 const getUserOrganisationIds = vi.fn();
 
-vi.mock("@/lib/api/phase3-scope", () => ({
+vi.mock("@/lib/api/organisation-scope", () => ({
   getUserOrganisationIds: (...args: unknown[]) =>
     getUserOrganisationIds(...args),
 }));

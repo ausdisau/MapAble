@@ -18,7 +18,7 @@ import { canUserAccessIncident } from "@/lib/safety/incident-access";
 import { TransportApiError } from "@/lib/transport/transport-api-error";
 import { assertCanAccessTransportBooking } from "@/lib/transport/transport-booking-access";
 
-vi.mock("@/lib/api/phase3-scope", () => ({
+vi.mock("@/lib/api/organisation-scope", () => ({
   getUserOrganisationIds: vi.fn().mockResolvedValue(["org-allowed"]),
 }));
 

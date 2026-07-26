@@ -1,5 +1,5 @@
 import { getAppBaseUrl } from "@/lib/auth/app-base-url";
-import { sendEmail } from "@/lib/sendGrid";
+import { sendEmail } from "@/lib/notifications/sendgrid";
 
 export function isPasswordResetEmailConfigured(): boolean {
   return Boolean(

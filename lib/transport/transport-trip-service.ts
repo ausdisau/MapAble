@@ -134,7 +134,7 @@ export async function createTransportTrip(
 
 export async function listTransportTripsForUser(user: CurrentUser) {
   const { isAdminRole } = await import("@/lib/auth/roles");
-  const { getUserOrganisationIds } = await import("@/lib/api/phase3-scope");
+  const { getUserOrganisationIds } = await import("@/lib/api/organisation-scope");
 
   let where = {};
   if (!isAdminRole(user.primaryRole)) {

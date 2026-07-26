@@ -1,4 +1,4 @@
-import { getUserOrganisationIds } from "@/lib/api/phase3-scope";
+import { getUserOrganisationIds } from "@/lib/api/organisation-scope";
 import { prisma } from "@/lib/prisma";
 
 export type PartnerTierLabel =

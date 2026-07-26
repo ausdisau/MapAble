@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { getUserOrganisationIds } from "@/lib/api/phase3-scope";
+import { getUserOrganisationIds } from "@/lib/api/organisation-scope";
 import { requirePermission } from "@/lib/auth/guards";
 import { prisma } from "@/lib/prisma";
 

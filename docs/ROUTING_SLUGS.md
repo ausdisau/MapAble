@@ -26,7 +26,7 @@
 
 ## Central module
 
-Use `lib/routes.ts` for:
+Use `lib/routing/routes.ts` for:
 
 - `slugify(input)` – generate slug from string
 - `isValidSlug(slug)` – validate slug format

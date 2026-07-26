@@ -2,7 +2,7 @@ import { requireApiPermission } from "@/lib/api/auth-handler";
 import {
   OrganisationAccessError,
   assertOrganisationAccess,
-} from "@/lib/api/phase3-scope";
+} from "@/lib/api/organisation-scope";
 import { jsonError, jsonOk, zodErrorResponse } from "@/lib/api/response";
 import {
   createAvailabilityWindow,

@@ -7,7 +7,7 @@ import { AccessibilityPreferencesProvider } from "@/components/accessibility/Acc
 import { OfflineIndicatorBanner } from "@/components/offline/OfflineIndicatorBanner";
 import { ServiceWorkerRegister } from "@/components/offline/ServiceWorkerRegister";
 import { isFirstPartyAccessibilityPanelEnabled } from "@/lib/accessibility/feature-flags";
-import { QueryProvider } from "@/lib/query-provider";
+import { QueryProvider } from "@/lib/hooks/query-provider";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const content = isFirstPartyAccessibilityPanelEnabled() ? (
