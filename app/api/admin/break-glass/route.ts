@@ -1,7 +1,13 @@
+import { NextResponse } from "next/server";
 import { ZodError, z } from "zod";
 
 import { jsonError, jsonOk, zodErrorResponse } from "@/lib/api/response";
-import { withAuthorization } from "@/lib/auth/withAuthorization";
+import { createAuditEvent } from "@/lib/audit/audit-event-service";
+import type { CurrentUser } from "@/lib/auth/current-user";
+import {
+  verifyRequestMfa,
+  withAuthorization,
+} from "@/lib/auth/withAuthorization";
 import { isTrustFabricEnabled } from "@/lib/config/trust-fabric";
 import {
   BreakGlassRequiredError,
@@ -9,6 +15,7 @@ import {
   openBreakGlassSession,
   revokeBreakGlassSession,
 } from "@/lib/security/break-glass";
+import { verifyBreakGlassMfaToken } from "@/lib/security/break-glass-mfa";
 import {
   completeBreakGlassAfterAction,
   openHardenedBreakGlassSession,
@@ -61,16 +68,74 @@ const afterActionSchema = z
   })
   .strict();
 
-/** Strict platform ADMIN + MFA for all break-glass operations. */
+/**
+ * Immutable audit write before any PHI / session material is returned.
+ * Uses AuditEvent (`audit_events`) with admin ID, IP (via request meta),
+ * timestamp (DB default), and the break-glass reason.
+ */
+async function auditBreakGlassAction(input: {
+  admin: CurrentUser;
+  action: string;
+  reason: string;
+  entityId?: string | null;
+  organisationId?: string | null;
+  participantId?: string | null;
+  metadata?: Record<string, unknown>;
+}): Promise<void> {
+  await createAuditEvent({
+    actorUserId: input.admin.id,
+    actorRole: input.admin.primaryRole,
+    action: input.action,
+    entityType: "BreakGlassAccessSession",
+    entityId: input.entityId ?? null,
+    organisationId: input.organisationId ?? null,
+    participantId: input.participantId ?? null,
+    metadata: {
+      reason: input.reason,
+      immutable: true,
+      ...input.metadata,
+    },
+  });
+}
+
+/**
+ * Strict platform ADMIN + MFA for all break-glass operations.
+ * Accepts either platform step-up (`x-mfa-assertion` / session mfaVerified)
+ * or the break-glass `x-mfa-token` header (mock → passkey/TOTP).
+ */
 const breakGlassAuth = {
   roles: ["ADMIN", "mapable_admin"] as const,
-  requireMfa: true,
+  authorize: async (user: CurrentUser, request: Request) => {
+    if (await verifyRequestMfa(request, user.id)) return true;
+
+    const legacy = verifyBreakGlassMfaToken(request.headers.get("x-mfa-token"));
+    if (legacy.ok) return true;
+
+    return NextResponse.json(
+      {
+        error: "Forbidden",
+        code: "MFA_REQUIRED",
+        message:
+          "Multi-factor authentication is required. Provide x-mfa-assertion or x-mfa-token.",
+      },
+      { status: 403 },
+    );
+  },
 };
 
-export const GET = withAuthorization(breakGlassAuth, async (_req, _ctx, user) => {
-  const active = getActiveBreakGlass(user.id);
-  return jsonOk({ active });
-});
+export const GET = withAuthorization(
+  breakGlassAuth,
+  async (_req, _ctx, user) => {
+    await auditBreakGlassAction({
+      admin: user,
+      action: "break_glass.active_queried",
+      reason: "Admin queried active break-glass session status",
+    });
+
+    const active = getActiveBreakGlass(user.id);
+    return jsonOk({ active });
+  },
+);
 
 export const POST = withAuthorization(
   breakGlassAuth,
@@ -90,6 +155,15 @@ export const POST = withAuthorization(
     ) {
       try {
         const parsed = revokeSchema.parse(body);
+
+        await auditBreakGlassAction({
+          admin: user,
+          action: "break_glass.revoked",
+          reason: `Admin revoked break-glass session ${parsed.sessionId}`,
+          entityId: parsed.sessionId,
+          metadata: { sessionId: parsed.sessionId },
+        });
+
         const ok = revokeBreakGlassSession(parsed.sessionId);
         return jsonOk({ revoked: ok });
       } catch (err) {
@@ -106,6 +180,15 @@ export const POST = withAuthorization(
     ) {
       try {
         const parsed = afterActionSchema.parse(body);
+
+        await auditBreakGlassAction({
+          admin: user,
+          action: "break_glass.after_action",
+          reason: parsed.note,
+          entityId: parsed.sessionId,
+          metadata: { sessionId: parsed.sessionId },
+        });
+
         await completeBreakGlassAfterAction({
           sessionId: parsed.sessionId,
           adminUserId: user.id,
@@ -123,6 +206,22 @@ export const POST = withAuthorization(
 
     try {
       const parsed = openSchema.parse(body);
+
+      // Mandatory immutable audit BEFORE granting access / returning session PHI.
+      await auditBreakGlassAction({
+        admin: user,
+        action: "break_glass.opened",
+        reason: parsed.reason,
+        organisationId: parsed.organisationId ?? null,
+        participantId: parsed.participantId ?? null,
+        metadata: {
+          purpose: parsed.purpose,
+          ticketRef: parsed.ticketRef ?? null,
+          ttlMinutes: parsed.ttlMinutes ?? null,
+          fieldCategories: parsed.fieldCategories ?? null,
+          trustFabric: isTrustFabricEnabled(),
+        },
+      });
 
       if (isTrustFabricEnabled()) {
         if (!parsed.fieldCategories?.length) {

@@ -6,21 +6,31 @@ import { IntegrationSafetyBlockedError } from "@/lib/integrations/integration-er
 import { isAutomationEventAllowed } from "@/lib/integrations/integration-feature-policy";
 import { prisma } from "@/lib/prisma";
 
+/**
+ * Verify an n8n webhook HMAC-SHA256 signature against the raw body.
+ * Uses timing-safe comparison to prevent timing attacks.
+ */
 export function verifyN8nWebhookSignature(
   body: string,
-  signature: string | null
+  signature: string | null,
+  secret: string | undefined = getN8nConfig().webhookSecret
 ): boolean {
-  const { webhookSecret } = getN8nConfig();
-  if (!webhookSecret || !signature) return false;
-  const expected = createHmac("sha256", webhookSecret).update(body).digest("hex");
-  try {
-    return timingSafeEqual(
-      Buffer.from(expected),
-      Buffer.from(signature)
-    );
-  } catch {
+  if (!secret || !signature) return false;
+
+  const provided = signature.startsWith("sha256=")
+    ? signature.slice("sha256=".length).trim()
+    : signature.trim();
+  if (!provided) return false;
+
+  const expected = createHmac("sha256", secret).update(body, "utf8").digest("hex");
+  const expectedBuf = Buffer.from(expected, "utf8");
+  const providedBuf = Buffer.from(provided, "utf8");
+
+  if (expectedBuf.length !== providedBuf.length) {
     return false;
   }
+
+  return timingSafeEqual(expectedBuf, providedBuf);
 }
 
 export async function deliverN8nEvent(eventKey: string, payload: Record<string, unknown>) {

@@ -43,6 +43,13 @@ export type CspBuildOptions = {
   scriptNonce?: string;
   /** Include 'unsafe-eval' — only for report-only compatibility with current Next.js tooling. */
   allowUnsafeEval?: boolean;
+  /** When true, adds 'strict-dynamic' to script-src (enforce path). */
+  strictDynamic?: boolean;
+  /**
+   * Override frame-ancestors (default `'none'`).
+   * Embed routes may pass `*` or a host allow-list from env.
+   */
+  frameAncestors?: string;
 };
 
 function joinSources(sources: readonly string[]): string {
@@ -60,10 +67,17 @@ export function buildContentSecurityPolicy(
     // Report-only compatibility path still requires unsafe-inline until nonces ship.
     scriptSources.push("'unsafe-inline'");
   }
+  if (options.strictDynamic) {
+    scriptSources.push("'strict-dynamic'");
+  }
   if (allowUnsafeEval) {
     scriptSources.push("'unsafe-eval'");
   }
+  // Host allow-lists are ignored by browsers that honour strict-dynamic,
+  // but remain for older clients as a defence-in-depth fallback.
   scriptSources.push(...CSP_EXTERNAL_ORIGINS.scripts);
+
+  const frameAncestors = options.frameAncestors?.trim() || "'none'";
 
   const directives = [
     "default-src 'self'",
@@ -77,7 +91,7 @@ export function buildContentSecurityPolicy(
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'self'",
-    "frame-ancestors 'none'",
+    `frame-ancestors ${frameAncestors}`,
     // Report sink redacts URI query/secrets — see app/api/security/csp-report
     "report-uri /api/security/csp-report",
   ];
@@ -90,17 +104,29 @@ export function buildContentSecurityPolicyReportOnly(): string {
 }
 
 /**
- * Future enforce builder. Do not wire into next.config until smoke tests prove
- * Next.js/auth/Stripe/maps survive without unsafe-eval (nonce injection required).
+ * Enforcing CSP builder: nonce + strict-dynamic, no unsafe-eval, object-src none.
  */
-export function buildContentSecurityPolicyEnforce(scriptNonce: string): string {
+export function buildContentSecurityPolicyEnforce(
+  scriptNonce: string,
+  options: Pick<CspBuildOptions, "frameAncestors"> = {},
+): string {
   if (!scriptNonce.trim()) {
     throw new Error("CSP enforce requires a non-empty script nonce");
   }
   return buildContentSecurityPolicy({
     scriptNonce: scriptNonce.trim(),
     allowUnsafeEval: false,
+    strictDynamic: true,
+    frameAncestors: options.frameAncestors,
   });
+}
+
+/** frame-ancestors value for `/embed/*` routes (env override or `*`). */
+export function resolveEmbedFrameAncestors(
+  env: NodeJS.ProcessEnv = process.env,
+): string {
+  const fromEnv = env.MAPABLE_EMBED_FRAME_ANCESTORS?.trim();
+  return fromEnv && fromEnv.length > 0 ? fromEnv : "*";
 }
 
 export type SecurityHeader = { key: string; value: string };
