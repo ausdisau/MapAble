@@ -114,7 +114,7 @@ export function QuarterlyPacingAlert({
         {data.consentRequestQueued ? " · consent request queued" : ""}
       </p>
       {hasWarnings ? (
-        <ul className="space-y-1" role="list">
+        <ul className="space-y-1">
           {pacing.warnings.map((w) => (
             <li key={w}>
               <span className="inline-flex rounded-md bg-amber-500/20 px-2 py-1 text-sm text-amber-950 dark:text-amber-100">

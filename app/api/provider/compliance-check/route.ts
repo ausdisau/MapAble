@@ -5,8 +5,8 @@ import { jsonError, jsonOk, zodErrorResponse } from "@/lib/api/response";
 import { createAuditEvent } from "@/lib/audit/audit-event-service";
 import { apiForbidden } from "@/lib/auth/guards";
 import { hasPermission } from "@/lib/auth/permissions";
-import { isPlatformShieldEnabled } from "@/lib/compliance/platform-shield-config";
 import { evaluateProviderComplianceShield } from "@/lib/compliance/platform-shield";
+import { isPlatformShieldEnabled } from "@/lib/compliance/platform-shield-config";
 
 const BodySchema = z.object({
   workerId: z.string().min(1),

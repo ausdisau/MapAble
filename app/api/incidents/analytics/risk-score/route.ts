@@ -1,11 +1,11 @@
 import { z } from "zod";
 
+import { calculateBehavioralRiskIndex } from "@/lib/ai/behavioral-risk-matrix";
 import { requireApiSession } from "@/lib/api/auth-handler";
 import { jsonError, jsonOk, zodErrorResponse } from "@/lib/api/response";
 import { apiForbidden } from "@/lib/auth/guards";
-import { calculateBehavioralRiskIndex } from "@/lib/ai/behavioral-risk-matrix";
-import { isBehavioralRiskEnabled } from "@/lib/config/strategic-2026";
 import { isAdminRole } from "@/lib/auth/roles";
+import { isBehavioralRiskEnabled } from "@/lib/config/strategic-2026";
 
 const QuerySchema = z.object({
   participantId: z.string().min(1),

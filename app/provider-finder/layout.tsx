@@ -1,9 +1,9 @@
 import { MapAbleCareMarketingShell } from "@/components/marketing/MapAbleCareMarketingShell";
 
 export const metadata = {
-  title: "Provider Finder | MapAble",
+  title: "Provider Finder",
   description:
-    "Find disability support, transport, therapy and employment providers with access needs and funding filters.",
+    "Find NDIS providers, accessible transport, therapy and employment supports with facility-first filters across Australia.",
 };
 
 export default function ProviderFinderLayout({
