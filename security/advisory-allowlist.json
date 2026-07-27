@@ -1,4 +1,32 @@
 {
   "$schema_comment": "High/critical production audit exceptions. Each entry must include advisoryId, package, path, rationale, owner, compensatingControl, and expiry (ISO date). Expired entries fail CI.",
-  "exceptions": []
+  "exceptions": [
+    {
+      "advisoryId": "GHSA-88FW-HQM2-52QC",
+      "package": "hono",
+      "path": ".>@openai/agents>@openai/agents-core>@modelcontextprotocol/sdk>hono",
+      "rationale": "Transitive via @openai/agents MCP SDK; no first-party Hono server surface. Track upstream agents-core bump.",
+      "owner": "platform-security",
+      "compensatingControl": "MCP SDK is not exposed as a public HTTP edge; production CareOS AI paths remain flag-gated fail-closed.",
+      "expiry": "2026-08-27"
+    },
+    {
+      "advisoryId": "GHSA-V2HH-GCRM-F6HX",
+      "package": "fast-uri",
+      "path": ".>@openai/agents>@openai/agents-core>@modelcontextprotocol/sdk>ajv>fast-uri",
+      "rationale": "Transitive ajv/fast-uri via @openai/agents MCP SDK; awaiting upstream patch.",
+      "owner": "platform-security",
+      "compensatingControl": "No direct fast-uri usage; dependency confined to agent SDK internals behind feature flags.",
+      "expiry": "2026-08-27"
+    },
+    {
+      "advisoryId": "GHSA-4C8G-83QW-93J6",
+      "package": "fast-uri",
+      "path": ".>@openai/agents>@openai/agents-core>@modelcontextprotocol/sdk>ajv>fast-uri",
+      "rationale": "Second fast-uri advisory on same transitive path; track with agents-core upgrade.",
+      "owner": "platform-security",
+      "compensatingControl": "No direct fast-uri usage; dependency confined to agent SDK internals behind feature flags.",
+      "expiry": "2026-08-27"
+    }
+  ]
 }

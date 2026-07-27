@@ -4,8 +4,8 @@
  * Runs one auto-debit scheduler tick. Should be called from a Vercel Cron
  * job (e.g. every 4 hours) rather than invoked directly by users.
  *
- * Cron config in vercel.json:
- *   { "crons": [{ "path": "/api/billing/auto-debit/tick", "schedule": "0 */4 * * *" }] }
+ * Cron config in vercel.json (schedule: every 4 hours):
+ *   { "crons": [{ "path": "/api/billing/auto-debit/tick", "schedule": "0 every-4h" }] }
  *
  * Ported from REPL server/auto-debit.ts + cron setup.
  */

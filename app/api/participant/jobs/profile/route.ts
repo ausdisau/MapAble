@@ -1,3 +1,4 @@
+import type { Prisma } from "@prisma/client";
 import { z } from "zod";
 
 import { requireApiSession } from "@/lib/api/auth-handler";
@@ -40,11 +41,24 @@ export async function PATCH(request: Request) {
   const parsed = profileSchema.safeParse(await request.json());
   if (!parsed.success) return zodErrorResponse(parsed.error);
   try {
+    const {
+      communicationPrefs,
+      adjustmentPrefs,
+      disclosureChoices,
+      ...rest
+    } = parsed.data;
     return jsonOk({
       profile: await upsertEmploymentProfile({
         participantId: user.id,
         actorUserId: user.id,
-        ...parsed.data,
+        ...rest,
+        communicationPrefs: communicationPrefs as
+          | Prisma.InputJsonValue
+          | undefined,
+        adjustmentPrefs: adjustmentPrefs as Prisma.InputJsonValue | undefined,
+        disclosureChoices: disclosureChoices as
+          | Prisma.InputJsonValue
+          | undefined,
       }),
     });
   } catch (e) {

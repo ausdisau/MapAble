@@ -8,7 +8,7 @@ type WalletGrant = {
   actions: string[];
   purpose: string | null;
   expiresAt: string;
-  delegate: { id: string; name: string | null; email: string };
+  delegate: { id: string; name: string | null; email: string } | null;
 };
 
 type WalletDocument = {
@@ -89,7 +89,10 @@ export function ConsentWalletPanel(props: {
               >
                 <div>
                   <div className="font-medium">
-                    {grant.delegate.name ?? grant.delegate.email} · {grant.domain}
+                    {grant.delegate?.name ??
+                      grant.delegate?.email ??
+                      "Unknown delegate"}{" "}
+                    · {grant.domain}
                   </div>
                   <div className="text-muted-foreground">
                     {grant.purpose ?? "No purpose recorded"} · expires{" "}

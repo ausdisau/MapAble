@@ -11,10 +11,12 @@ export function DashboardAppShell({
   children,
   userName,
   role,
+  showCareOsNav = false,
 }: {
   children: ReactNode;
   userName: string;
   role: UserRole;
+  showCareOsNav?: boolean;
 }) {
   return (
     <MapAbleAppShell
@@ -22,7 +24,13 @@ export function DashboardAppShell({
       headerTitle="Dashboard"
       logoHref="/dashboard"
       headerActions={<MapAbleUserBar userName={userName} role={role} />}
-      secondaryNav={<DashboardNav userName={userName} role={role} />}
+      secondaryNav={
+        <DashboardNav
+          userName={userName}
+          role={role}
+          showCareOsNav={showCareOsNav}
+        />
+      }
     >
       {children}
     </MapAbleAppShell>

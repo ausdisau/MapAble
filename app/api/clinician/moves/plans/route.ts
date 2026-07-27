@@ -16,14 +16,14 @@ import {
 const createPlanSchema = z.object({
   participantId: z.string().min(1),
   title: z.string().min(1).max(200),
-  initialInstructions: z.record(z.unknown()).optional(),
+  initialInstructions: z.record(z.string(), z.unknown()).optional(),
   changeSummary: z.string().max(2000).optional(),
   goals: z.array(z.string().min(1).max(200)).optional(),
 });
 
 const addVersionSchema = z.object({
   planId: z.string().min(1),
-  instructionsJson: z.record(z.unknown()),
+  instructionsJson: z.record(z.string(), z.unknown()),
   changeSummary: z.string().min(1).max(2000),
   approve: z.boolean().optional(),
 });

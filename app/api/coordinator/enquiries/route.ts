@@ -1,3 +1,4 @@
+import type { Prisma } from "@prisma/client";
 import { z } from "zod";
 
 import { requireApiSession } from "@/lib/api/auth-handler";
@@ -32,7 +33,7 @@ const patchSchema = z.discriminatedUnion("action", [
   z.object({
     enquiryId: z.string().min(1),
     action: z.literal("record_response"),
-    responseJson: z.record(z.unknown()),
+    responseJson: z.record(z.string(), z.unknown()),
   }),
 ]);
 
@@ -131,7 +132,7 @@ export async function PATCH(request: Request) {
         return jsonOk({
           enquiry: await recordResponse({
             enquiryId: parsed.data.enquiryId,
-            responseJson: parsed.data.responseJson,
+            responseJson: parsed.data.responseJson as Prisma.InputJsonValue,
             actorUserId: user.id,
           }),
         });

@@ -67,11 +67,11 @@ describe("match explanation service", () => {
       statement: "We are inclusive",
     } as never);
     vi.mocked(prisma.jobMatchExplanation.upsert).mockImplementation(
-      async ({ create }) => ({
-        ...(create as object),
+      (async ({ create }: { create: object }) => ({
+        ...create,
         id: "match-1",
         job: { title: "Retail assistant" },
-      }),
+      })) as never,
     );
 
     const match = await generateMatchExplanation("job-1", "p1", "p1");

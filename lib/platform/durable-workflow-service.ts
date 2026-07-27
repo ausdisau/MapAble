@@ -21,7 +21,7 @@ export async function createDurableWorkflow(input: {
       maximumAttempts: input.maximumAttempts ?? 5,
       status: "pending",
       metadataJson: { input: input.input } as Prisma.InputJsonValue,
-    },
+    } as any,
   });
 }
 
@@ -32,7 +32,7 @@ export async function claimDueWorkflow(now = new Date()) {
         status: { in: ["pending", "retry_scheduled"] },
         attempts: { lt: 5 },
         OR: [{ nextRunAt: null }, { nextRunAt: { lte: now } }],
-      },
+      } as any,
       orderBy: { startedAt: "asc" },
     });
     if (!due) return null;
@@ -42,7 +42,7 @@ export async function claimDueWorkflow(now = new Date()) {
         status: "running_local",
         attempts: { increment: 1 },
         lastError: null,
-      },
+      } as any,
     });
   });
 }
@@ -81,7 +81,7 @@ export async function scheduleWorkflowRetry(input: {
           retryable: true,
         },
       },
-    },
+    } as any,
   });
 }
 

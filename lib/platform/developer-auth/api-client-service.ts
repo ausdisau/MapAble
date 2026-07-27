@@ -79,7 +79,7 @@ export async function issueApiKey(
   const keyHash = hashApiKey(raw);
   const keyPrefix = raw.slice(0, 14);
 
-  const record = await prisma.apiKey.create({
+  const record = await prisma.platformApiKey.create({
     data: { clientId, keyHash, keyPrefix, scopes },
   });
 
@@ -104,7 +104,7 @@ export async function issueApiKey(
 }
 
 export async function revokeApiKey(keyId: string, actorUserId: string) {
-  await prisma.apiKey.update({
+  await prisma.platformApiKey.update({
     where: { id: keyId },
     data: { revokedAt: new Date() },
   });

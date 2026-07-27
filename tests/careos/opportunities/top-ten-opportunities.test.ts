@@ -148,9 +148,24 @@ import {
 import { PROHIBITED_CAREOS_CAPABILITIES } from "@/lib/intelligence/careos/policy/prohibited-uses";
 import { MAPABLE_PROHIBITED_AI_USES } from "@/intelligence/policies/prohibited-uses";
 
+const OPPORTUNITY_ENV_FLAGS = [
+  "MAPABLE_CAREOS_PLATFORM_REGISTRATION_ENABLED",
+  "MAPABLE_CAREOS_CONSENT_WALLET_ENABLED",
+  "MAPABLE_CAREOS_SAFETY_GATE_ENABLED",
+  "MAPABLE_CAREOS_WORKFORCE_PASSPORT_ENABLED",
+  "MAPABLE_CAREOS_SCHEME_COORDINATION_ENABLED",
+  "MAPABLE_CAREOS_ACCESS_EVIDENCE_GRAPH_ENABLED",
+  "MAPABLE_CAREOS_THIN_MARKET_CONTINUITY_ENABLED",
+  "MAPABLE_CAREOS_LIFESPAN_LIAISON_ENABLED",
+  "MAPABLE_CAREOS_TENANT_ISOLATION_ENABLED",
+] as const;
+
 describe("CareOS top-ten opportunity MVPs", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    for (const key of OPPORTUNITY_ENV_FLAGS) {
+      process.env[key] = "true";
+    }
   });
 
   it("O1 unifies prohibited-use registries", () => {

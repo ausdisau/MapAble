@@ -16,7 +16,7 @@ type GrantRow = {
     id: string;
     name: string | null;
     email: string;
-  };
+  } | null;
 };
 
 export function PeopleWithAccess({ grants }: { grants: GrantRow[] }) {
@@ -53,10 +53,12 @@ export function PeopleWithAccess({ grants }: { grants: GrantRow[] }) {
         >
           <div>
             <p className="font-medium">
-              {grant.delegate.name ?? grant.delegate.email}
+              {grant.delegate?.name ??
+                grant.delegate?.email ??
+                "Unknown delegate"}
             </p>
             <p className="text-sm text-muted-foreground">
-              {grant.delegate.email}
+              {grant.delegate?.email ?? "—"}
             </p>
             <dl className="mt-2 space-y-1 text-xs text-muted-foreground">
               <div>

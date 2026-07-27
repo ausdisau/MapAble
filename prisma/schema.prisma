@@ -155,6 +155,7 @@ model User {
   // Shared programme foundation (Prompt 0)
   participantAuthorityGrantsAsParticipant ParticipantAuthorityGrant[] @relation("AuthorityGrantParticipant")
   participantAuthorityGrantsAsGrantee     ParticipantAuthorityGrant[] @relation("AuthorityGrantGrantee")
+  authorityGrantsAsDelegate               ParticipantAuthorityGrant[] @relation("AuthorityGrantDelegate")
   participantAuthorityGrantsCreated       ParticipantAuthorityGrant[] @relation("AuthorityGrantCreatedBy")
   participantAuthorityGrantsRevoked       ParticipantAuthorityGrant[] @relation("AuthorityGrantRevokedBy")
   navigatorProfiles                       NavigatorProfile[]          @relation("NavigatorProfileUser")
@@ -1798,12 +1799,16 @@ model CareShift {
   recurringScheduleId     String?
   recurringSchedule       CareRecurringSchedule? @relation(fields: [recurringScheduleId], references: [id], onDelete: SetNull)
   occurrenceDate          DateTime?
+  missionId               String?
+  mission                 CareOSMission? @relation(fields: [missionId], references: [id], onDelete: SetNull)
+  workerAcceptanceStatus  String         @default("pending")
 
   @@index([participantId, status])
   @@index([organisationId])
   @@index([workerProfileId])
   @@index([careBookingId])
   @@index([recurringScheduleId, occurrenceDate])
+  @@index([missionId])
   shiftOffers ShiftOffer[]
 }
 
@@ -2404,11 +2409,14 @@ model Job {
   createdAt                 DateTime     @default(now())
   updatedAt                 DateTime     @updatedAt
 
+  workplaceLocationId       String?
+  workplaceLocation         WorkplaceLocation? @relation(fields: [workplaceLocationId], references: [id], onDelete: SetNull)
   applications              JobApplication[]
   calendarEvents            CalendarEvent[]
 
   @@index([status])
   @@index([employerOrganisationId])
+  @@index([workplaceLocationId])
   matchExplanations JobMatchExplanation[]
   requirements JobRequirement[]
 }
@@ -2432,10 +2440,10 @@ model JobApplication {
   updatedAt                 DateTime             @updatedAt
 
   calendarEvents            CalendarEvent[]
+  disclosurePreview         ApplicationDisclosurePreview?
 
   @@index([jobId])
   @@index([participantId, status])
-  applicationDisclosurePreviews ApplicationDisclosurePreview[]
 }
 
 model CalendarEvent {
@@ -8226,6 +8234,7 @@ model TransportTrip {
   booking                 Booking?         @relation("BookingTransportTrip")
   rideRunId               String?
   rideRun                 RideRun?         @relation(fields: [rideRunId], references: [id], onDelete: SetNull)
+  returnAssuranceStatus   String?
 
   @@index([participantId, status])
   @@index([providerOrganisationId, status])
@@ -10903,9 +10912,15 @@ model ParticipantAuthorityGrant {
   granteeUserId   String?
   granteeUser     User?                           @relation("AuthorityGrantGrantee", fields: [granteeUserId], references: [id], onDelete: SetNull)
   granteeOrganisationId String?
+  delegateId      String?
+  delegate        User?                           @relation("AuthorityGrantDelegate", fields: [delegateId], references: [id], onDelete: SetNull)
+  domain          String                          @default("general")
   purpose         String
   allowedFields   String[]                        @default([])
   allowedActions  String[]                        @default([])
+  actions         String[]                        @default([])
+  consentScopes   String[]                        @default([])
+  recipientRole   String?
   status          ParticipantAuthorityGrantStatus @default(active)
   consentRecordId String?
   expiresAt       DateTime?
@@ -11949,6 +11964,7 @@ model ApiClient {
   createdAt           DateTime             @default(now())
   updatedAt           DateTime             @updatedAt
 
+  apiKeys               PlatformApiKey[]
   oauthClients          OAuthClient[]
   serviceAccounts       ServiceAccount[]
   accessLogs            ApiAccessLog[]
@@ -11957,6 +11973,22 @@ model ApiClient {
   @@index([organisationId])
   @@index([status])
   @@map("api_clients")
+}
+
+model PlatformApiKey {
+  id         String     @id @default(cuid())
+  clientId   String
+  client     ApiClient  @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  keyHash    String
+  keyPrefix  String
+  scopes     ApiScope[]
+  lastUsedAt DateTime?
+  revokedAt  DateTime?
+  createdAt  DateTime   @default(now())
+
+  @@index([keyHash])
+  @@index([clientId])
+  @@map("platform_api_keys")
 }
 
 model ApplicationDisclosurePreview {
@@ -12126,6 +12158,8 @@ model CareOSMission {
   @@index([correlationId])
   @@index([missionType, status])
   @@map("careos_missions")
+  careShifts           CareShift[]
+
 }
 
 model CareOSMissionEvent {
@@ -14430,6 +14464,7 @@ model WorkplaceLocation {
   updatedAt      DateTime     @updatedAt
 
   evidence       WorkplaceAccessibilityEvidence[]
+  jobs           Job[]
 
   @@index([organisationId])
   @@map("workplace_locations")
