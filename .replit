@@ -71,12 +71,12 @@ outputType = "console"
 name = "test"
 author = "agent"
 
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npx tsx --test server/__tests__/smoke.test.ts server/__tests__/payments.test.ts server/__tests__/geo-domains.test.ts"
-
 [workflows.workflow.metadata]
 outputType = "console"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npx tsx --test server/__tests__/smoke.test.ts server/__tests__/payments.test.ts server/__tests__/geo-domains.test.ts server/__tests__/geo-domain-validation.test.ts"
 
 [objectStorage]
 defaultBucketID = "replit-objstore-23684864-b650-42b0-b4fb-f420ba4db463"
