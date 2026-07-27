@@ -50,6 +50,26 @@
       "path": "prisma/migrations/20260717020000_billing_centre_foundations/migration.sql",
       "reason": "Use ADD VALUE IF NOT EXISTS so empty-DB deploy succeeds when bootstrap already contains labels.",
       "pr": "cursor/migration-trust-repair-0a20"
+    },
+    {
+      "path": "prisma/migrations/20260714044000_cloud_platform_foundation/migration.sql",
+      "reason": "Create WorkflowRun base table before ALTER columns; CareOS #442 migration assumed WorkflowRun already existed from db push. Empty-DB migrate deploy failed with P3018/42P01.",
+      "pr": "cursor/careos-prod-harden-vercel-a08f"
+    },
+    {
+      "path": "prisma/migrations/20260714001426_provider_workforce_evidence/migration.sql",
+      "reason": "FK target worker_profiles → WorkerProfile (canonical table from mapable_core_phase_1). Empty-DB migrate deploy failed with undefined relation worker_profiles.",
+      "pr": "cursor/careos-prod-harden-vercel-a08f"
+    },
+    {
+      "path": "prisma/migrations/20260714053000_provider_workforce_operations/migration.sql",
+      "reason": "FK target worker_profiles → WorkerProfile for shift_offers.workerProfileId.",
+      "pr": "cursor/careos-prod-harden-vercel-a08f"
+    },
+    {
+      "path": "prisma/migrations/20260714062000_home_living_governance/migration.sql",
+      "reason": "FK target worker_profiles → WorkerProfile for worker_competency_evidence.workerProfileId.",
+      "pr": "cursor/careos-prod-harden-vercel-a08f"
     }
   ]
 }
