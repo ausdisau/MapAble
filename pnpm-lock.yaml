@@ -36,6 +36,18 @@ importers:
       '@chat-adapter/state-memory':
         specifier: ^4.30.0
         version: 4.30.0(ai@6.0.196(zod@4.3.6))(zod@4.3.6)
+      '@mapable/domain-provider':
+        specifier: workspace:*
+        version: link:packages/domain-provider
+      '@mapable/domain-transport':
+        specifier: workspace:*
+        version: link:packages/domain-transport
+      '@mapable/domain-workforce':
+        specifier: workspace:*
+        version: link:packages/domain-workforce
+      '@openai/agents':
+        specifier: ^0.13.2
+        version: 0.13.5(ws@8.21.1)(zod@4.3.6)
       '@prisma/client':
         specifier: 6.19.2
         version: 6.19.2(prisma@6.19.2(typescript@5.9.3))(typescript@5.9.3)
@@ -245,6 +257,42 @@ importers:
       typescript:
         specifier: ^5.0.0
         version: 5.9.3
+
+  packages/contracts:
+    dependencies:
+      zod:
+        specifier: ^4.3.6
+        version: 4.3.6
+
+  packages/domain-provider:
+    dependencies:
+      zod:
+        specifier: ^4.3.6
+        version: 4.3.6
+
+  packages/domain-transport:
+    dependencies:
+      '@mapable/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      zod:
+        specifier: ^4.3.6
+        version: 4.3.6
+
+  packages/domain-workforce:
+    dependencies:
+      zod:
+        specifier: ^4.3.6
+        version: 4.3.6
+
+  packages/intelligence-kernel:
+    dependencies:
+      '@mapable/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      zod:
+        specifier: ^4.3.6
+        version: 4.3.6
 
   packages/mapable-sdk:
     devDependencies:
@@ -1051,6 +1099,29 @@ packages:
   '@nolyfill/is-core-module@1.0.39':
     resolution: {integrity: sha512-nn5ozdjYQpUCZlWGuxcJY/KpxkWQs4DcbMCmKojjyrYDEAGy4Ce19NN4v5MduafTwJlbKc99UA8YhSVqq9yPZA==}
     engines: {node: '>=12.4.0'}
+
+  '@openai/agents-core@0.13.5':
+    resolution: {integrity: sha512-RI9OwHG94c6ZTLNeEB7mfIpHbncgVxu4YElAmCAhq04EqLPzsLyouWhDgli8wZL/IhN/cYTaBwHvxktFzEbeyQ==}
+    peerDependencies:
+      zod: ^4.0.0
+    peerDependenciesMeta:
+      zod:
+        optional: true
+
+  '@openai/agents-openai@0.13.5':
+    resolution: {integrity: sha512-DfItyOZxE7znrJMj8V8zV7qg9Ig1Q3u6/GfpkG0aTyj3NCAY8BbaxzLz0Qynlon9K4XBvo7LL8Nvxb5/FMeQcA==}
+    peerDependencies:
+      zod: ^4.0.0
+
+  '@openai/agents-realtime@0.13.5':
+    resolution: {integrity: sha512-8rCApGStttqZpPigEWQ1RaiqoKgoisqzQhp0pAnJvzCcZnYgTf/13AWa0wMcP9OQl/hfLcH4YQ+uipRYiVgMzg==}
+    peerDependencies:
+      zod: ^4.0.0
+
+  '@openai/agents@0.13.5':
+    resolution: {integrity: sha512-zmVEQrl2gIvD0Xq9ZcxPMXRkfafgaitESHU/CHA+ill10A8OQu4/pKgKW4oWb99KnJD/lP4Tnn9vX0LgCx9ouw==}
+    peerDependencies:
+      zod: ^4.0.0
 
   '@opentelemetry/api@1.9.1':
     resolution: {integrity: sha512-gLyJlPHPZYdAk1JENA9LeHejZe1Ti77/pTeFm/nMXmQH/HFZlcS/O2XJB+L8fkbrNSqhdtlvjBVjxwUYanNH5Q==}
@@ -3526,6 +3597,26 @@ packages:
     resolution: {integrity: sha512-VXJjc87FScF88uafS3JllDgvAm+c/Slfz06lorj2uAY34rlUu0Nt+v8wreiImcrgAjjIHp1rXpTDlLOGw29WwQ==}
     engines: {node: '>=18'}
 
+  openai@6.49.0:
+    resolution: {integrity: sha512-aYCc0C6L864eR6WSYIwQGyXriw/nIyZx0ObvhzOEVuk0zoBDpynjSbrionWI7q65B5H8jJX0DXR9snEzM6bfPg==}
+    peerDependencies:
+      '@aws-sdk/credential-provider-node': '>=3.972.0 <4'
+      '@smithy/hash-node': '>=4.3.0 <5'
+      '@smithy/signature-v4': '>=5.4.0 <6'
+      ws: '>=8.21.0'
+      zod: ^3.25 || ^4.0
+    peerDependenciesMeta:
+      '@aws-sdk/credential-provider-node':
+        optional: true
+      '@smithy/hash-node':
+        optional: true
+      '@smithy/signature-v4':
+        optional: true
+      ws:
+        optional: true
+      zod:
+        optional: true
+
   openid-client@5.7.1:
     resolution: {integrity: sha512-jDBPgSVfTnkIh71Hg9pRvtJc6wTwqjRkN88+gCFtYWrlP4Yx2Dsrow8uPi3qLr/aeymPF3o2+dS+wOpglK04ew==}
 
@@ -5258,6 +5349,69 @@ snapshots:
       fastq: 1.20.1
 
   '@nolyfill/is-core-module@1.0.39': {}
+
+  '@openai/agents-core@0.13.5(ws@8.21.1)(zod@4.3.6)':
+    dependencies:
+      debug: 4.4.3
+      openai: 6.49.0(ws@8.21.1)(zod@4.3.6)
+    optionalDependencies:
+      '@modelcontextprotocol/sdk': 1.29.0(zod@4.3.6)
+      zod: 4.3.6
+    transitivePeerDependencies:
+      - '@aws-sdk/credential-provider-node'
+      - '@cfworker/json-schema'
+      - '@smithy/hash-node'
+      - '@smithy/signature-v4'
+      - supports-color
+      - ws
+
+  '@openai/agents-openai@0.13.5(ws@8.21.1)(zod@4.3.6)':
+    dependencies:
+      '@openai/agents-core': 0.13.5(ws@8.21.1)(zod@4.3.6)
+      debug: 4.4.3
+      openai: 6.49.0(ws@8.21.1)(zod@4.3.6)
+      zod: 4.3.6
+    transitivePeerDependencies:
+      - '@aws-sdk/credential-provider-node'
+      - '@cfworker/json-schema'
+      - '@smithy/hash-node'
+      - '@smithy/signature-v4'
+      - supports-color
+      - ws
+
+  '@openai/agents-realtime@0.13.5(zod@4.3.6)':
+    dependencies:
+      '@openai/agents-core': 0.13.5(ws@8.21.1)(zod@4.3.6)
+      '@types/ws': 8.18.1
+      debug: 4.4.3
+      ws: 8.21.1
+      zod: 4.3.6
+    transitivePeerDependencies:
+      - '@aws-sdk/credential-provider-node'
+      - '@cfworker/json-schema'
+      - '@smithy/hash-node'
+      - '@smithy/signature-v4'
+      - bufferutil
+      - supports-color
+      - utf-8-validate
+
+  '@openai/agents@0.13.5(ws@8.21.1)(zod@4.3.6)':
+    dependencies:
+      '@openai/agents-core': 0.13.5(ws@8.21.1)(zod@4.3.6)
+      '@openai/agents-openai': 0.13.5(ws@8.21.1)(zod@4.3.6)
+      '@openai/agents-realtime': 0.13.5(zod@4.3.6)
+      debug: 4.4.3
+      openai: 6.49.0(ws@8.21.1)(zod@4.3.6)
+      zod: 4.3.6
+    transitivePeerDependencies:
+      - '@aws-sdk/credential-provider-node'
+      - '@cfworker/json-schema'
+      - '@smithy/hash-node'
+      - '@smithy/signature-v4'
+      - bufferutil
+      - supports-color
+      - utf-8-validate
+      - ws
 
   '@opentelemetry/api@1.9.1': {}
 
@@ -8149,6 +8303,11 @@ snapshots:
   onetime@7.0.0:
     dependencies:
       mimic-function: 5.0.1
+
+  openai@6.49.0(ws@8.21.1)(zod@4.3.6):
+    optionalDependencies:
+      ws: 8.21.1
+      zod: 4.3.6
 
   openid-client@5.7.1:
     dependencies:

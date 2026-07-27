@@ -1,11 +1,15 @@
 import { requireApiSession } from "@/lib/api/auth-handler";
 import { jsonError, jsonOk } from "@/lib/api/response";
+import { participantMarketplaceConfig } from "@/lib/config/participant-marketplace";
 import {
   compareProviderEvidence,
   discoverProviders,
 } from "@/lib/marketplace/participant-marketplace-service";
 
 export async function GET(request: Request) {
+  if (!participantMarketplaceConfig.enabled) {
+    return jsonError("Participant marketplace is unavailable", 503);
+  }
   const participant = await requireApiSession();
   if (participant instanceof Response) return participant;
   try {

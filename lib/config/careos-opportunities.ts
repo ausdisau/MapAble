@@ -1,4 +1,4 @@
-function enabled(name: string, defaultOn = true) {
+function enabled(name: string, defaultOn = false) {
   const value = process.env[name];
   if (value === undefined) return defaultOn;
   return value === "true";

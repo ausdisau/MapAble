@@ -14,9 +14,14 @@ import { MapAbleCoreBrief } from "@/components/intelligence/MapAbleCoreBrief";
 
 type Props = {
   modelLabel?: string;
+  /** Server-derived: only show CareOS panels when MAPABLE_AI_ENABLED=true. */
+  careOsPanelsEnabled?: boolean;
 };
 
-export function AskPageClient({ modelLabel }: Props) {
+export function AskPageClient({
+  modelLabel,
+  careOsPanelsEnabled = false,
+}: Props) {
   const searchParams = useSearchParams();
   const initialQuery = useMemo(() => {
     const q = searchParams.get("q")?.trim();
@@ -27,6 +32,10 @@ export function AskPageClient({ modelLabel }: Props) {
     const name = provider.replace(/-/g, " ");
     return `Tell me about ${name} and what supports they offer`;
   }, [searchParams]);
+
+  if (!careOsPanelsEnabled) {
+    return <CopilotPanel initialQuery={initialQuery} modelLabel={modelLabel} />;
+  }
 
   return (
     <div className="space-y-12">

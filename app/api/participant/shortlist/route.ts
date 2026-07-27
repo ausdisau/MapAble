@@ -1,7 +1,8 @@
 import { z } from "zod";
 
 import { requireApiSession } from "@/lib/api/auth-handler";
-import { jsonOk, zodErrorResponse } from "@/lib/api/response";
+import { jsonError, jsonOk, zodErrorResponse } from "@/lib/api/response";
+import { participantMarketplaceConfig } from "@/lib/config/participant-marketplace";
 import {
   hideProvider,
   setProviderShortlist,
@@ -13,6 +14,9 @@ const schema = z.object({
 });
 
 export async function POST(request: Request) {
+  if (!participantMarketplaceConfig.enabled) {
+    return jsonError("Participant marketplace is unavailable", 503);
+  }
   const participant = await requireApiSession();
   if (participant instanceof Response) return participant;
   const parsed = schema.safeParse(await request.json());
