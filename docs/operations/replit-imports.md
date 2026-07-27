@@ -9,6 +9,17 @@ Guides for pulling code from `@ausdisau1` Repls into `ausdisau/mapableau-new`.
 | [MapAble-Transport](https://replit.com/@ausdisau1/MapAble-Transport) | `scripts/import-replit-transport.sh` | [replit-mapable-transport-import.md](./replit-mapable-transport-import.md) |
 | [MapAble-Marketplace](https://replit.com/@ausdisau1/MapAble-Marketplace) | `scripts/import-replit-marketplace.sh` | [replit-mapable-marketplace-import.md](./replit-mapable-marketplace-import.md) |
 
+## Cursor ↔ Replit branch bridge
+
+Day-to-day sync between Replit and Cursor uses Git branches `replit-agent` and
+`cursor-main` (not a literal `cursor` branch — GitHub forbids that name as a
+prefix of `cursor/*`). See:
+
+- [cursor-replit-branch-sync.md](./cursor-replit-branch-sync.md)
+- `pnpm sync:cursor-replit -- report`
+
+`cursor/replit-agent-main-reconcile-a08f` is **retired** in favour of that pair.
+
 ## Import both Care and Unified
 
 ```bash

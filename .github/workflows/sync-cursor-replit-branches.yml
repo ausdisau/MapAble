@@ -1,0 +1,50 @@
+name: Sync Cursor ↔ Replit branches
+
+on:
+  schedule:
+    # Weekly Monday 06:00 UTC drift advisory
+    - cron: "0 6 * * 1"
+  push:
+    branches:
+      - replit-agent
+      - cursor-main
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "Sync step to run"
+        required: true
+        default: report
+        type: choice
+        options:
+          - report
+          - check-secrets
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch sync branches
+        run: |
+          git fetch origin main cursor-main replit-agent || true
+          git branch -r | grep -E 'origin/(cursor-main|replit-agent|main)' || true
+
+      - name: Drift report
+        if: github.event_name != 'workflow_dispatch' || inputs.action == 'report'
+        run: bash scripts/sync-cursor-replit-branches.sh report
+        continue-on-error: true
+
+      - name: Secret scan
+        if: github.event_name == 'workflow_dispatch' && inputs.action == 'check-secrets'
+        run: bash scripts/sync-cursor-replit-branches.sh check-secrets
+
+      - name: Upload sync report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cursor-replit-branch-sync-report
+          path: /tmp/cursor-replit-branch-sync-report/
+          if-no-files-found: ignore
