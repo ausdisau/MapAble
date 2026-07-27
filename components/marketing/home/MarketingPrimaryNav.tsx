@@ -88,13 +88,12 @@ export function MarketingPrimaryNav() {
   const navRef = useRef<HTMLDivElement>(null);
   useDismissOnOutsideAndEscape(mobileOpen, () => setMobileOpen(false), navRef);
 
-  const searchHref = isHome
-    ? "#guided-search-panel"
-    : marketingFeatureRoutes.providerFinder;
-
   const primaryLinks = [
-    { label: "Search", href: searchHref },
-    { label: "Places", href: isHome ? "#map-preview" : "/accessibility-map" },
+    {
+      label: "Pre-register",
+      href: isHome ? "#pre-register" : "/#pre-register",
+    },
+    { label: "Places", href: "/accessibility-map" },
     { label: "Transport", href: "/transport" },
     { label: "Providers", href: "/providers" },
     { label: "NDIS Guidance", href: marketingFeatureRoutes.ask },

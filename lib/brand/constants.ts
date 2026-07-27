@@ -4,6 +4,9 @@ export const MAPABLE_MARKETING_URL = "https://mapable.com.au";
 /** MapAble PEERS community — https://peer.mapable.com.au */
 export const MAPABLE_PEER_PEERS_URL = "https://peer.mapable.com.au";
 
+/** Short brand suite tagline (Canva MapAble brand kit). */
+export const MAPABLE_BRAND_TAGLINE = "Empowering Independence";
+
 export const MAPABLE_TAGLINE =
   "Enabling people with disabilities to live independent and dignified lives through innovative technology in care, transport, and employment.";
 

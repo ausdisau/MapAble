@@ -238,9 +238,9 @@ export const GOVERNED_AUTH_PATHS = ["/login", "/register"] as const;
 
 /** Homepage / marketing CTAs permitted for the informational release. */
 export const INFORMATIONAL_SAFE_CTAS = [
-  { label: "Find accessible places", href: "/accessibility-map" },
-  { label: "Learn about Care", href: "/care" },
-  { label: "Learn about Transport", href: "/transport" },
+  { label: "Pre-register interest", href: "#pre-register" },
+  { label: "Explore accessible places", href: "/accessibility-map" },
+  { label: "About MapAble", href: "/about" },
   { label: "Contact MapAble", href: "/contact" },
 ] as const;
 

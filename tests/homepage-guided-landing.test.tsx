@@ -44,55 +44,64 @@ afterEach(() => {
   mockPush.mockClear();
 });
 
-describe("homepage guided landing", () => {
+describe("homepage marketing splash", () => {
   beforeEach(() => {
     render(<MapAbleCareCombinedHomepage />);
   });
 
-  it("renders primary nav links with homepage search anchor", () => {
+  it("renders primary nav with pre-register and places links", () => {
     const nav = screen.getByRole("navigation", { name: "Primary" });
     expect(nav).toBeTruthy();
-    expect(nav.querySelector('a[href="#guided-search-panel"]')?.textContent).toBe("Search");
-    expect(nav.querySelector('a[href="#map-preview"]')?.textContent).toBe("Places");
-    expect(nav.querySelector('a[href="/providers"]')?.textContent).toBe("Providers");
-    expect(nav.querySelector('a[href="/ask"]')?.textContent).toBe("NDIS Guidance");
+    expect(nav.querySelector('a[href="#pre-register"]')?.textContent).toBe(
+      "Pre-register",
+    );
+    expect(nav.querySelector('a[href="/accessibility-map"]')?.textContent).toBe(
+      "Places",
+    );
+    expect(nav.querySelector('a[href="/providers"]')?.textContent).toBe(
+      "Providers",
+    );
+    expect(nav.querySelector('a[href="/ask"]')?.textContent).toBe(
+      "NDIS Guidance",
+    );
   });
 
   it("renders updated hero headline and single h1", () => {
-    expect(screen.getByLabelText(homepageHeroCopy.headline)).toBeTruthy();
+    const h1 = screen.getByRole("heading", {
+      level: 1,
+      name: homepageHeroCopy.headline,
+    });
+    expect(h1.getAttribute("aria-label")).toBe(homepageHeroCopy.headline);
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
   });
 
-  it("renders hero CTAs targeting informational destinations", () => {
-    expect(
-      screen.getByRole("link", { name: /Find accessible places/i }).getAttribute("href"),
-    ).toBe("/accessibility-map");
-    const contactLinks = screen.getAllByRole("link", {
-      name: homepageHeroCopy.secondaryCta,
+  it("renders hero CTAs for splash destinations", () => {
+    const preRegLinks = screen.getAllByRole("link", {
+      name: /Pre-register interest/i,
     });
-    expect(contactLinks.length).toBeGreaterThan(0);
-    expect(contactLinks.every((link) => link.getAttribute("href") === "/contact")).toBe(
-      true,
-    );
+    expect(preRegLinks[0]?.getAttribute("href")).toBe("#pre-register");
+    expect(
+      screen
+        .getByRole("link", { name: homepageHeroCopy.secondaryCta })
+        .getAttribute("href"),
+    ).toBe("/accessibility-map");
     expect(
       screen.queryByRole("link", { name: /^Request support$/i }),
     ).toBeNull();
   });
 
-  it("renders guided search panel with labeled input", () => {
-    const panel = document.getElementById("guided-search-panel");
-    expect(panel).toBeTruthy();
-    expect(screen.getByLabelText("What support do you need?")).toBeTruthy();
-    expect(screen.getByRole("heading", { name: "Build your support pathway" })).toBeTruthy();
+  it("hides coming-soon progress signals and guided search panel", () => {
+    expect(screen.queryByText("Honest progress signals")).toBeNull();
+    expect(screen.queryByText("Coming soon")).toBeNull();
+    expect(document.getElementById("guided-search-panel")).toBeNull();
+    expect(document.getElementById("map-preview")).toBeNull();
   });
 
-  it("renders accessibility map preview and final CTA", () => {
-    expect(document.getElementById("map-preview")).toBeTruthy();
-    expect(screen.getByRole("heading", { name: /Help build Australia/i })).toBeTruthy();
-  });
-
-  it("renders map preview sample places", () => {
-    expect(screen.getByRole("heading", { name: /Know before you go/i })).toBeTruthy();
+  it("renders pre-registration and final CTA", () => {
+    expect(document.getElementById("pre-register")).toBeTruthy();
+    expect(
+      screen.getByRole("heading", { name: /Help build Australia/i }),
+    ).toBeTruthy();
   });
 });
 
@@ -117,7 +126,9 @@ describe("GuidedSearchPanel chat launch", () => {
     fireEvent.change(input, { target: { value: "ot" } });
     fireEvent.submit(input.closest("form")!);
 
-    expect(screen.getByRole("status").textContent).toMatch(/at least 3 characters/i);
+    expect(screen.getByRole("status").textContent).toMatch(
+      /at least 3 characters/i,
+    );
     expect(screen.queryByTestId("guided-search-dialogue")).toBeNull();
   });
 

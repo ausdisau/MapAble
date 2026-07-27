@@ -4,15 +4,15 @@ import { MapAbleCareCombinedHomepageSections } from "@/components/marketing/MapA
 import { canonicalAlternate } from "@/lib/config/canonical-url";
 
 export const metadata: Metadata = {
-  title: "MapAble | Accessible places, supports, and journeys",
+  title: "MapAble | Accessibility you can plan around",
   description:
-    "Find accessible places, NDIS-aware providers, accessible transport, and support journeys you can actually use. Evidence-based access information for Australia.",
+    "Explore MapAble’s evidence-based accessibility map and programme explainers, then pre-register for the controlled pilot as a participant or provider.",
   alternates: canonicalAlternate("/"),
   openGraph: {
     url: "/",
-    title: "MapAble | Accessible places, supports, and journeys",
+    title: "MapAble | Accessibility you can plan around",
     description:
-      "MapAble connects verified accessibility information, providers, transport, and support coordination.",
+      "Public accessibility information for Australia — plus pilot interest for participants and providers. Not general bookings or NDIS claims.",
   },
 };
 

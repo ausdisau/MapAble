@@ -35,19 +35,21 @@ describe("MapAbleCareMarketingHeader", () => {
     render(<MapAbleCareMarketingHeader />);
 
     expect(screen.getByRole("navigation", { name: "Primary" })).toBeTruthy();
-    expect(screen.getByRole("link", { name: "Search" }).getAttribute("href")).toBe(
-      "#guided-search-panel",
-    );
+    expect(
+      screen.getByRole("link", { name: "Pre-register" }).getAttribute("href"),
+    ).toBe("#pre-register");
     expect(screen.queryByLabelText("Search MapAble")).toBeNull();
   });
 
   it("renders auth links in header", () => {
     render(<MapAbleCareMarketingHeader />);
 
-    expect(screen.getByRole("link", { name: "Log in" }).getAttribute("href")).toBe("/login");
-    expect(screen.getByRole("link", { name: "Get started" }).getAttribute("href")).toBe(
-      "/register",
-    );
+    expect(
+      screen.getByRole("link", { name: "Log in" }).getAttribute("href"),
+    ).toBe("/login");
+    expect(
+      screen.getByRole("link", { name: "Get started" }).getAttribute("href"),
+    ).toBe("/register");
   });
 
   it("renders donate link to Australian Disability", () => {

@@ -4,7 +4,13 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import React from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -39,13 +45,10 @@ vi.mock("next/link", () => ({
   ),
 }));
 
-vi.mock("@/components/guided-search/GuidedSearchDialogue", () => ({
-  GuidedSearchDialogue: () => <div data-testid="guided-search-dialogue" />,
-}));
-
 afterEach(() => {
   cleanup();
   mockPush.mockClear();
+  vi.unstubAllGlobals();
 });
 
 describe("mapAbleCareCombinedDesignTests", () => {
@@ -69,7 +72,9 @@ describe("mapAbleCareCombinedDesignTests", () => {
 
   it("support selector uses user-facing areas instead of agents", () => {
     const spec = mapAbleCareCombinedDesignTests.find(
-      (item) => item.name === "support selector uses user-facing areas instead of agents",
+      (item) =>
+        item.name ===
+        "support selector uses user-facing areas instead of agents",
     );
     expect(spec?.expectedAreas).toEqual(supportAreas);
   });
@@ -84,22 +89,27 @@ describe("mapAbleCareCombinedDesignTests", () => {
   it("footer displays company ABN and NDIS registration number", () => {
     const spec = mapAbleCareCombinedDesignTests.find(
       (item) =>
-        item.name === "footer displays company ABN and NDIS registration number",
+        item.name ===
+        "footer displays company ABN and NDIS registration number",
     );
-    expect(spec?.expectedRegistrationDetails).toEqual(companyRegistrationDetails);
+    expect(spec?.expectedRegistrationDetails).toEqual(
+      companyRegistrationDetails,
+    );
   });
 
   it("typography uses static wavy display treatment without animation", () => {
     const spec = mapAbleCareCombinedDesignTests.find(
       (item) =>
-        item.name === "typography uses static wavy display treatment without animation",
+        item.name ===
+        "typography uses static wavy display treatment without animation",
     );
     expect(spec?.expectedTypography).toBe("mapable-display + static WavyText");
   });
 
   it("wavy typography keeps clear spacing between words", () => {
     const spec = mapAbleCareCombinedDesignTests.find(
-      (item) => item.name === "wavy typography keeps clear spacing between words",
+      (item) =>
+        item.name === "wavy typography keeps clear spacing between words",
     );
     expect(spec?.expectedWordSpacing).toBe("0.34em");
   });
@@ -107,52 +117,65 @@ describe("mapAbleCareCombinedDesignTests", () => {
   it("design includes clearly labelled sponsored partner placements", () => {
     const spec = mapAbleCareCombinedDesignTests.find(
       (item) =>
-        item.name === "design includes clearly labelled sponsored partner placements",
+        item.name ===
+        "design includes clearly labelled sponsored partner placements",
     );
-    expect(spec?.expectedSponsoredPlacements).toEqual(["primary", "search", "footer"]);
+    expect(spec?.expectedSponsoredPlacements).toEqual([
+      "primary",
+      "search",
+      "footer",
+    ]);
   });
 
   it("hero section is extracted to dedicated component", () => {
     const spec = mapAbleCareCombinedDesignTests.find(
-      (item) => item.name === "hero section is extracted to dedicated component",
+      (item) =>
+        item.name === "hero section is extracted to dedicated component",
     );
     const source = readFileSync(
-      join(process.cwd(), "components/marketing/MapAbleCareCombinedHomepage.tsx"),
+      join(
+        process.cwd(),
+        "components/marketing/MapAbleCareCombinedHomepage.tsx",
+      ),
       "utf8",
     );
     expect(spec?.expectedDeclaration).toBe("HeroSection");
     expect(source).toContain("<HeroSection />");
   });
 
-  it("guided landing includes primary homepage sections", () => {
+  it("splash homepage includes primary marketing sections", () => {
     const spec = mapAbleCareCombinedDesignTests.find(
-      (item) => item.name === "guided landing includes primary homepage sections",
+      (item) =>
+        item.name === "guided landing includes primary homepage sections",
     );
     const source = readFileSync(
-      join(process.cwd(), "components/marketing/MapAbleCareCombinedHomepage.tsx"),
+      join(
+        process.cwd(),
+        "components/marketing/MapAbleCareCombinedHomepage.tsx",
+      ),
       "utf8",
     );
     expect(spec?.expectedSections).toEqual([
       "HeroSection",
-      "HomepageProofStrip",
+      "HomepageExploreStrip",
       "CompetitorContrastStrip",
-      "HomepageMapPreview",
-      "HomepageSupportJourney",
-      "HomepageProviderPitch",
+      "PreRegistrationSection",
       "HomepageFinalCta",
-      "GuidedSearchPanel",
       "BoundaryNotice",
     ]);
     for (const section of spec?.expectedSections ?? []) {
       expect(source).toContain(`<${section}`);
     }
+    expect(source).not.toContain("HomepageProofStrip");
+    expect(source).not.toContain("GuidedSearchPanel");
   });
 
-  it("homepage has single guided search panel anchor", () => {
+  it("homepage has single pre-registration panel anchor", () => {
     const spec = mapAbleCareCombinedDesignTests.find(
-      (item) => item.name === "homepage has single guided search panel anchor",
+      (item) =>
+        item.name === "homepage has single pre-registration panel anchor",
     );
-    expect(spec?.expectedGuidedSearchAnchor).toBe("guided-search-panel");
+    expect(spec?.expectedPreRegistrationAnchor).toBe("pre-register");
   });
 });
 
@@ -161,12 +184,21 @@ describe("MapAbleCareCombinedHomepage", () => {
     render(<MapAbleCareCombinedHomepage />);
   });
 
-  it("renders guided landing headline and blank panel search field", () => {
-    expect(screen.getByLabelText(homepageHeroCopy.headline)).toBeTruthy();
-    const searchInput = screen.getByLabelText(
-      "What support do you need?",
-    ) as HTMLInputElement;
-    expect(searchInput.value).toBe("");
+  it("renders splash headline without Coming soon progress signals", () => {
+    expect(
+      screen.getByRole("heading", {
+        level: 1,
+        name: homepageHeroCopy.headline,
+      }),
+    ).toBeTruthy();
+    expect(screen.getByText(/Empowering Independence/i)).toBeTruthy();
+    expect(
+      screen.getByRole("heading", {
+        name: /What you can use on the public site today/i,
+      }),
+    ).toBeTruthy();
+    expect(screen.queryByText("Honest progress signals")).toBeNull();
+    expect(screen.queryByText("Coming soon")).toBeNull();
   });
 
   it("renders a header donate link to Australian Disability", () => {
@@ -176,12 +208,20 @@ describe("MapAbleCareCombinedHomepage", () => {
     expect(donate.getAttribute("rel")).toBe("noopener noreferrer");
   });
 
-  it("renders category chips and marketplace section", () => {
-    expect(screen.getAllByRole("link", { name: "NDIS Guidance" }).length).toBeGreaterThan(0);
-    expect(screen.getByRole("heading", { name: /Help build Australia/i })).toBeTruthy();
-    expect(document.getElementById("map-preview")).toBeTruthy();
+  it("renders pre-registration and marketing proof sections", () => {
+    expect(document.getElementById("pre-register")).toBeTruthy();
+    expect(
+      screen.getByRole("heading", {
+        name: /Pre-register for the MapAble pilot/i,
+      }),
+    ).toBeTruthy();
+    expect(
+      screen.getByRole("heading", { name: /Accessibility proof/i }),
+    ).toBeTruthy();
+    expect(
+      screen.getByRole("heading", { name: /Help build Australia/i }),
+    ).toBeTruthy();
   });
-
 
   it("renders footer contact and registration details", () => {
     expect(screen.getByText("0434 083 624")).toBeTruthy();
@@ -189,17 +229,57 @@ describe("MapAbleCareCombinedHomepage", () => {
     expect(screen.getByText("To be confirmed")).toBeTruthy();
   });
 
-  it("renders informational final CTA instead of sponsored home band", () => {
-    expect(screen.getByRole("heading", { name: /Help build Australia/i })).toBeTruthy();
-    expect(screen.getAllByRole("link", { name: "Contact MapAble" }).length).toBeGreaterThan(0);
+  it("renders informational final CTA with pre-register anchor", () => {
+    expect(
+      screen.getByRole("heading", { name: /Help build Australia/i }),
+    ).toBeTruthy();
+    expect(
+      screen.getAllByRole("link", { name: "Pre-register interest" }).length,
+    ).toBeGreaterThan(0);
     expect(screen.queryByRole("link", { name: "Verify my venue" })).toBeNull();
   });
 
-  it("opens guided chat on panel search submit", () => {
-    const searchInput = screen.getByLabelText("What support do you need?");
-    fireEvent.change(searchInput, { target: { value: "wheelchair transport" } });
-    fireEvent.submit(searchInput.closest("form")!);
-    expect(screen.getByTestId("guided-search-dialogue")).toBeTruthy();
-    expect(mockPush).not.toHaveBeenCalled();
+  it("submits participant pre-registration with consent", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          message: "Thanks — your pre-registration was received.",
+        }),
+      }),
+    );
+
+    fireEvent.change(
+      document.getElementById("prereg-name") as HTMLInputElement,
+      {
+        target: { value: "Alex Taylor" },
+      },
+    );
+    fireEvent.change(
+      document.getElementById("prereg-email") as HTMLInputElement,
+      {
+        target: { value: "alex@example.com" },
+      },
+    );
+    fireEvent.click(
+      screen.getByLabelText(
+        /MapAble may use my contact details for pilot pre-registration follow-up/i,
+      ),
+    );
+    fireEvent.click(
+      screen.getByLabelText(/I confirm I have not pasted NDIS plan documents/i),
+    );
+    fireEvent.click(
+      screen.getByRole("button", { name: /Pre-register interest/i }),
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText(/You are on the list/i)).toBeTruthy();
+    });
+    expect(fetch).toHaveBeenCalledWith(
+      "/api/pre-register",
+      expect.objectContaining({ method: "POST" }),
+    );
   });
 });
