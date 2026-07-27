@@ -36,7 +36,7 @@ override Next Tailwind / Vite / Drizzle config.
 | `server/admin/**`, `server/agents/**`, `server/api/**` | **Cursor** | CareOS server modules used by Next API routes |
 | `.replit`, `replit.md`, `replit.nix`, `attached_assets/**` | **Replit** | Repl config + reference assets |
 | `tsconfig.json`, `pnpm-lock.yaml`, `next.config.ts`, `tailwind.config.js` | **Cursor** | Next CI/build |
-| `vite.config.replit.ts`, `drizzle.config.replit.ts`, `tailwind.config.replit.ts`, `components.replit.json`, `tsconfig.replit.json`, `package.replit.json` | **Replit** | Renamed / isolated overlay configs |
+| `vite.config.replit.ts`, `drizzle.config.replit.ts`, `tailwind.config.replit.ts`, `components.replit.json`, `tsconfig.replit.json`, `package.replit.json`, `scripts/load-env-file.sh`, `.env.replit.example` | **Replit** | Renamed / isolated overlay configs + Cursor-local env loader |
 | `package.json` scripts | **Merge both** | Keep `pnpm`/`next` scripts and Replit `dev`/`build` entrypoints |
 
 **Promotion path (Replit → production):** Port through `ports/mapableau-new/`
