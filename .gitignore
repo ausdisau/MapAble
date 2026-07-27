@@ -96,6 +96,10 @@ attached_assets/vercelAPI_*.txt
 attached_assets/**/*secret*
 attached_assets/**/*token*
 
+# Isolated Replit npm install tree (see scripts/bootstrap-replit-deps.sh)
+.replit-node_modules/
+.replit-node-path.env
+
 # Local open-weight model checkouts (serve via GPT_OSS_BASE_URL)
 /gpt-oss-120b/
 /gpt-oss-20b/

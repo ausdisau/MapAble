@@ -36,7 +36,7 @@ override Next Tailwind / Vite / Drizzle config.
 | `server/admin/**`, `server/agents/**`, `server/api/**` | **Cursor** | CareOS server modules used by Next API routes |
 | `.replit`, `replit.md`, `replit.nix`, `attached_assets/**` | **Replit** | Repl config + reference assets |
 | `tsconfig.json`, `pnpm-lock.yaml`, `next.config.ts`, `tailwind.config.js` | **Cursor** | Next CI/build |
-| `vite.config.replit.ts`, `drizzle.config.replit.ts`, `tailwind.config.replit.ts`, `components.replit.json` | **Replit** | Renamed overlay configs |
+| `vite.config.replit.ts`, `drizzle.config.replit.ts`, `tailwind.config.replit.ts`, `components.replit.json`, `tsconfig.replit.json`, `package.replit.json` | **Replit** | Renamed / isolated overlay configs |
 | `package.json` scripts | **Merge both** | Keep `pnpm`/`next` scripts and Replit `dev`/`build` entrypoints |
 
 **Promotion path (Replit → production):** Port through `ports/mapableau-new/`
@@ -50,8 +50,25 @@ In the Repl (**Tools → Version control → GitHub**):
 
 1. Connect `ausdisau/mapableau-new`.
 2. Set the default branch to **`replit-agent`**.
-3. Pull on start; push after validated work:
-   `npx tsx --test server/__tests__/*.test.ts` (see `.replit` test workflow).
+3. Pull on start.
+4. Bootstrap Replit deps (root `package.json` is the Next app; Replit deps live in `package.replit.json`):
+   `npm run bootstrap:replit-deps`
+5. Start / test via `.replit` workflows, or:
+   - `npm run bootstrap:replit-deps`
+   - `npm run dev:replit` (Express+Vite on port 5000)
+   - `npm run test:replit` (full suite when `DATABASE_URL`/`NEON_DATABASE_URL` is set; otherwise offline smoke + migration-journal)
+6. Push to `origin/replit-agent` after green tests.
+
+### Dual package manifests
+
+| File | Owner | Purpose |
+| --- | --- | --- |
+| `package.json` + `pnpm-lock.yaml` | Cursor | Next.js / Vercel production |
+| `package.replit.json` | Replit | Express+Vite+Drizzle dependency list |
+
+Do **not** overwrite root `package.json` with the Replit manifest. Use
+`npm run bootstrap:replit-deps` (installs into `.replit-node_modules/`) and
+`npm run dev:replit` / `test:replit` (sets `NODE_PATH` via `scripts/run-replit.sh`).
 
 ### Secrets hygiene
 
