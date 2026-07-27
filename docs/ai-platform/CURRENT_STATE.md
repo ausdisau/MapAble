@@ -29,7 +29,7 @@ Positioning: *An evidence-aware, participant-controlled copilot for complete dis
 | edge.what_changed_explain | deterministic | controlled_pilot | MAPABLE_EDGE_AI off |
 | agent.aura_harness | deterministic | experimental | MAPABLE_AURA_HARNESS off |
 | agent.aura_recognise | deterministic | experimental | rides AURA harness flag |
-
+| understanding.contextual | model_backed | experimental | MAPABLE_UNDERSTANDING off |
 ## Advanced AI Expansion train (≤ 3)
 
 1. Evidence Intake contracts (`lib/ai/platform/intake/`)

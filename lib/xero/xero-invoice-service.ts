@@ -19,6 +19,10 @@ export function buildSafeXeroInvoicePayload(invoice: {
   };
 }
 
+/**
+ * Build an honest Xero export pack. Does not claim live OAuth sync as SoT.
+ * Returns `export_pack_ready` — NDIA/live invoice push remains stubbed.
+ */
 export async function syncInvoiceToXero(invoiceId: string, actorUserId: string) {
   if (!phase5Config.xeroEnabled || !isXeroConfigured()) {
     return { ok: false as const, ...integrationDisabledMessage("Xero") };
@@ -46,37 +50,46 @@ export async function syncInvoiceToXero(invoiceId: string, actorUserId: string) 
     ? await prisma.xeroInvoiceSyncRecord.update({
         where: { id: existing.id },
         data: {
-          syncStatus: "synced",
-          xeroInvoiceId: `xero_placeholder_${invoiceId.slice(0, 8)}`,
-          syncedAt: new Date(),
-          lastError: null,
+          syncStatus: "export_pack_ready",
+          xeroInvoiceId: null,
+          syncedAt: null,
+          lastError: "Live Xero sync disabled — export pack only",
         },
       })
     : await prisma.xeroInvoiceSyncRecord.create({
         data: {
           invoiceId,
-          syncStatus: "synced",
-          xeroInvoiceId: `xero_placeholder_${invoiceId.slice(0, 8)}`,
-          syncedAt: new Date(),
+          syncStatus: "export_pack_ready",
+          xeroInvoiceId: null,
+          syncedAt: null,
+          lastError: "Live Xero sync disabled — export pack only",
         },
       });
 
   await prisma.xeroSyncLog.create({
     data: {
       invoiceId,
-      action: "invoice_sync",
-      status: "synced",
-      message: "Placeholder sync — configure Xero API for production",
+      action: "invoice_export_pack",
+      status: "export_pack_ready",
+      message:
+        "Export pack ready — refuse live sync claims; configure OAuth only after human SoT review",
     },
   });
 
   await createAuditEvent({
     actorUserId,
-    action: "xero.invoice_synced",
+    action: "xero.export_pack_ready",
     entityType: "Invoice",
     entityId: invoiceId,
     participantId: invoice.participantId,
+    metadata: { liveSync: false, status: "export_pack_ready" },
   });
 
-  return { ok: true as const, record, payload };
+  return {
+    ok: true as const,
+    status: "export_pack_ready" as const,
+    liveSync: false as const,
+    record,
+    payload,
+  };
 }

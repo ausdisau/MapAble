@@ -8,6 +8,7 @@ import type {
 
 import { confidenceFromSource } from "@/lib/access/map/access-confidence-service";
 import { createAuditEvent } from "@/lib/audit/audit-event-service";
+import { runInTransaction } from "@/lib/db/transaction-service";
 import { prisma } from "@/lib/prisma";
 import type { CreateAccessPlaceInput } from "@/types/access-map";
 
@@ -61,57 +62,67 @@ export async function createAccessPlace(params: {
   status?: AccessPlaceStatus;
   sourceType?: AccessPlaceSourceType;
   sourceReference?: string;
+  /** When provided, place + audit share the caller transaction. */
+  tx?: Prisma.TransactionClient;
 }) {
   const status = params.status ?? "pending_moderation";
   const sourceType = params.sourceType ?? "user_suggested";
 
-  const place = await prisma.accessPlace.create({
-    data: {
-      name: params.input.name,
-      category: params.input.category as AccessPlaceCategory,
-      description: params.input.description,
-      addressText: params.input.addressText,
-      suburb: params.input.suburb,
-      stateOrRegion: params.input.stateOrRegion,
-      country: params.input.country,
-      status,
-      sourceType,
-      sourceReference: params.sourceReference,
-      createdById: params.createdById,
-      confidence: "user_reported",
-      location: {
-        create: {
-          latitude: params.input.latitude,
-          longitude: params.input.longitude,
+  const run = async (db: Prisma.TransactionClient) => {
+    const place = await db.accessPlace.create({
+      data: {
+        name: params.input.name,
+        category: params.input.category as AccessPlaceCategory,
+        description: params.input.description,
+        addressText: params.input.addressText,
+        suburb: params.input.suburb,
+        stateOrRegion: params.input.stateOrRegion,
+        country: params.input.country,
+        status,
+        sourceType,
+        sourceReference: params.sourceReference,
+        createdById: params.createdById,
+        confidence: "user_reported",
+        location: {
+          create: {
+            latitude: params.input.latitude,
+            longitude: params.input.longitude,
+          },
+        },
+        features: params.input.features?.length
+          ? {
+              create: params.input.features.map((type) => ({
+                type: type as AccessPlaceFeatureType,
+              })),
+            }
+          : undefined,
+        events: {
+          create: {
+            actorId: params.createdById,
+            action: "place.created",
+            metadata: { status, sourceType },
+          },
         },
       },
-      features: params.input.features?.length
-        ? {
-            create: params.input.features.map((type) => ({
-              type: type as AccessPlaceFeatureType,
-            })),
-          }
-        : undefined,
-      events: {
-        create: {
-          actorId: params.createdById,
-          action: "place.created",
-          metadata: { status, sourceType },
-        },
-      },
-    },
-    include: { location: true, features: true },
-  });
+      include: { location: true, features: true },
+    });
 
-  await createAuditEvent({
-    actorUserId: params.createdById,
-    action: "access_place.created",
-    entityType: "AccessPlace",
-    entityId: place.id,
-    metadata: { status, sourceType },
-  });
+    await createAuditEvent({
+      actorUserId: params.createdById,
+      action: "access_place.created",
+      entityType: "AccessPlace",
+      entityId: place.id,
+      metadata: { status, sourceType },
+      tx: db,
+    });
 
-  return place;
+    return place;
+  };
+
+  if (params.tx) {
+    return run(params.tx);
+  }
+  return runInTransaction((tx) => run(tx));
 }
 
 export async function updateAccessPlace(

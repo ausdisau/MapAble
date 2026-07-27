@@ -5,6 +5,7 @@ import {
   disabilityAgentJsonError,
   disabilityAgentJsonOk,
 } from "@/lib/api/disability-agent-api-contract";
+import { checkIpRateLimit, getClientIp } from "@/lib/api/ip-rate-limit";
 import { searchNdisProviders } from "@/lib/ingestion/ndis-providers-search";
 
 const OPERATION = DISABILITY_AGENT_OPERATIONS.ndisProviderSearch;
@@ -18,6 +19,20 @@ const querySchema = z.object({
 });
 
 export async function GET(request: Request) {
+  const ip = getClientIp(request);
+  if (
+    !checkIpRateLimit(`providers-ndis-search:${ip}`, {
+      windowMs: 60_000,
+      max: 60,
+    })
+  ) {
+    return disabilityAgentJsonError(OPERATION, 429, {
+      error: "Too many requests. Please wait a moment.",
+      code: "RATE_LIMITED",
+      retryable: true,
+    });
+  }
+
   const { searchParams } = new URL(request.url);
   const parsed = querySchema.safeParse({
     q: searchParams.get("q") ?? undefined,

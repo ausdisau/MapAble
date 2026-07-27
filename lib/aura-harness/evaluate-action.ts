@@ -406,13 +406,15 @@ export async function evaluateToolAction(
   };
 }
 
-export function buildAuraBlockedToolResult(decision: HarnessDecision): {
-  aura: {
+export function buildAuraBlockedToolResult(
+  decision: HarnessDecision,
+  extras?: { handoffId?: string },
+): {  aura: {
     blocked: true;
     pendingHumanReview?: boolean;
     reason: string;
     outcome: HarnessDecision["outcome"];
-    profile: {
+    handoffId?: string;    profile: {
       normalizedGamma: number;
       concentrationCoeff: number;
       variance: number;
@@ -426,7 +428,7 @@ export function buildAuraBlockedToolResult(decision: HarnessDecision): {
       pendingHumanReview: decision.outcome === "HITL_PENDING",
       reason: decision.reason,
       outcome: decision.outcome,
-      profile: {
+      handoffId: extras?.handoffId,      profile: {
         normalizedGamma: decision.profile.normalizedGamma,
         concentrationCoeff: decision.profile.concentrationCoeff,
         variance: decision.profile.variance,

@@ -1,6 +1,7 @@
 import { hash } from "bcryptjs";
 import { NextResponse } from "next/server";
 
+import { checkIpRateLimit, getClientIp } from "@/lib/api/ip-rate-limit";
 import { normalizeAuthEmail } from "@/lib/auth/auth-flow";
 import {
   JURISDICTION_DEFAULTS,
@@ -15,6 +16,14 @@ import {
 } from "@/lib/workers/worker-invite-service";
 
 export async function POST(req: Request) {
+  const ip = getClientIp(req);
+  if (!checkIpRateLimit(`register:${ip}`, { windowMs: 60_000, max: 10 })) {
+    return NextResponse.json(
+      { error: "Too many requests. Please wait a moment." },
+      { status: 429 },
+    );
+  }
+
   try {
     const body = (await req.json()) as {
       email?: string;

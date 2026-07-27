@@ -13,6 +13,7 @@ const SHARED_INTERPRETER_TASKS = [
   "provider_finder.reply_generator",
   "agent.disability_services",
   "agent.booking_services",
+  "understanding.contextual",
 ];
 
 const MODELS: ModelRegistration[] = [

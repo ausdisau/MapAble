@@ -254,6 +254,16 @@ model User {
   trainingCompletionRecords TrainingCompletionRecord[] @relation("TrainingCompletionUser")
   trustedDevices TrustedDevice[]
   workplaceEvidenceVerified WorkplaceAccessibilityEvidence[] @relation("WorkplaceEvidenceVerifiedBy")
+// Understanding layer (CSNN Sprint 2)
+  understandingContexts                   UnderstandingContext[]      @relation("UnderstandingContextParticipant")
+  understandingGraphEdges                 UnderstandingGraphEdge[]    @relation("UnderstandingGraphEdgeParticipant")
+  informalSupportLinksAsParticipant       InformalSupportLink[]       @relation("InformalSupportParticipant")
+  informalSupportLinksAsSupporter         InformalSupportLink[]       @relation("InformalSupportSupporterUser")
+  livingArrangementSignal                 LivingArrangementSignal?    @relation("LivingArrangementSignalParticipant")
+
+  // Act layer A2H handoffs (CSNN Sprint 4)
+  actHandoffsRequested                    ActHandoff[]                @relation("ActHandoffRequester")
+  actHandoffsAssigned                     ActHandoff[]                @relation("ActHandoffAssignee")
 }
 
 model PasskeyCredential {
@@ -11382,6 +11392,122 @@ model AtDependencyLink {
   @@index([participantUserId])
   @@index([targetType, targetEntityId])
   @@map("at_dependency_links")
+}
+
+// --- Understanding layer (CSNN Sprint 2) ---
+
+enum InformalSupportStabilityTrend {
+  stable
+  declining
+  improving
+  unknown
+}
+
+enum LivingArrangementRiskLevel {
+  low
+  moderate
+  high
+}
+
+/// Named life context (home, community, work) for Understanding KG.
+model UnderstandingContext {
+  id            String   @id @default(cuid())
+  participantId String
+  participant   User     @relation("UnderstandingContextParticipant", fields: [participantId], references: [id], onDelete: Restrict)
+  key           String
+  label         String
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([participantId, key])
+  @@index([participantId])
+  @@map("understanding_contexts")
+}
+
+/// Typed edge between Understanding entity refs (goals, routines, events, contexts, …).
+model UnderstandingGraphEdge {
+  id            String   @id @default(cuid())
+  participantId String
+  participant   User     @relation("UnderstandingGraphEdgeParticipant", fields: [participantId], references: [id], onDelete: Restrict)
+  sourceType    String
+  sourceId      String
+  targetType    String
+  targetId      String
+  relationship  String
+  metadataJson  Json     @default("{}")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([participantId, sourceType, sourceId, targetType, targetId, relationship])
+  @@index([participantId, relationship])
+  @@map("understanding_graph_edges")
+}
+
+/// Informal support network link (family/carer) — not formal service relationships.
+model InformalSupportLink {
+  id                    String                        @id @default(cuid())
+  participantId         String
+  participant           User                          @relation("InformalSupportParticipant", fields: [participantId], references: [id], onDelete: Restrict)
+  supporterDisplayName  String
+  supporterUserId       String?
+  supporterUser         User?                         @relation("InformalSupportSupporterUser", fields: [supporterUserId], references: [id], onDelete: SetNull)
+  relationshipLabel     String
+  capacityScore         Int                           @default(50)
+  stabilityTrend        InformalSupportStabilityTrend @default(unknown)
+  notes                 String?
+  createdAt             DateTime                      @default(now())
+  updatedAt             DateTime                      @updatedAt
+
+  @@index([participantId, stabilityTrend])
+  @@map("informal_support_links")
+}
+
+/// Cached living-arrangement review signal (informational only — never SDA eligibility).
+model LivingArrangementSignal {
+  id                 String                     @id @default(cuid())
+  participantId      String                     @unique
+  participant        User                       @relation("LivingArrangementSignalParticipant", fields: [participantId], references: [id], onDelete: Restrict)
+  riskLevel          LivingArrangementRiskLevel @default(low)
+  score              Int                        @default(0)
+  reasonsJson        Json                       @default("[]")
+  informationalOnly  Boolean                    @default(true)
+  createdAt          DateTime                   @default(now())
+  updatedAt          DateTime                   @updatedAt
+
+  @@map("living_arrangement_signals")
+}
+
+enum ActHandoffStatus {
+  pending
+  approved
+  denied
+  expired
+}
+
+/// Agent-to-Human handoff queue from AURA HITL_PENDING (Act layer).
+model ActHandoff {
+  id              String           @id @default(cuid())
+  fingerprint     String
+  toolName        String
+  payloadJson     Json
+  gamma           Float
+  cConc           Float
+  riskTier        String
+  status          ActHandoffStatus @default(pending)
+  reason          String
+  requesterUserId String
+  requester       User             @relation("ActHandoffRequester", fields: [requesterUserId], references: [id], onDelete: Restrict)
+  assigneeUserId  String?
+  assignee        User?            @relation("ActHandoffAssignee", fields: [assigneeUserId], references: [id], onDelete: SetNull)
+  resolveNote     String?
+  createdAt       DateTime         @default(now())
+  resolvedAt      DateTime?
+
+  @@index([status, createdAt])
+  @@index([fingerprint, status])
+  @@index([requesterUserId])
+  @@map("act_handoffs")
 }
 
 // --- Absorbed from agent/careos-top-ten-implement (models/enums not on main) ---

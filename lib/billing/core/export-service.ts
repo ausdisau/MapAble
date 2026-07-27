@@ -25,11 +25,45 @@ export async function exportInvoice(
   }
 
   if (formatType === "xero") {
+    // Honest export pack only — not live OAuth invoice sync (SoT stays Billing Centre).
+    const exportPack = {
+      invoiceId: invoice.id,
+      currency: invoice.currency,
+      subtotalCents: invoice.subtotalCents,
+      gstCents: invoice.gstCents,
+      totalCents: invoice.totalCents,
+      lineItems: invoice.lineItems.map((li) => ({
+        description: li.description,
+        quantity: Number(li.quantity),
+        unitAmountCents: li.unitAmountCents,
+        totalCents: li.totalCents,
+        ndisLineItem: li.ndisLineItem,
+      })),
+      liveSync: false as const,
+      message:
+        "Xero export pack ready for human download — live sync is not enabled as source of truth.",
+    };
+
+    await prisma.billingInvoice.update({
+      where: { id: invoiceId },
+      data: { xeroExportStatus: "export_pack_ready" },
+    });
+
+    await writeBillingAuditLog({
+      actorUserId: userId,
+      entityType: "BillingInvoice",
+      entityId: invoiceId,
+      action: "exported_xero_pack",
+      after: exportPack,
+    });
+
     return {
       ok: true as const,
       format: "xero",
-      status: "not_implemented",
-      message: "Xero export scaffold — configure Xero integration to enable.",
+      status: "export_pack_ready",
+      liveSync: false as const,
+      payload: exportPack,
+      message: exportPack.message,
     };
   }
 

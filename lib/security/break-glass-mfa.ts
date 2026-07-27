@@ -1,30 +1,42 @@
 /**
- * Break-glass step-up MFA verification (mock).
- * Wire to passkey / TOTP verification service before production hardening sign-off.
+ * Break-glass step-up MFA verification via WebAuthn / passkey assertion tokens.
+ * Fail-closed — no mock accept-any path.
  */
+
+import { verifyTwoFactorToken } from "@/lib/auth/two-factor-token";
 
 export type BreakGlassMfaVerificationResult =
-  | { ok: true; method: "mock_passkey_or_totp" }
+  | { ok: true; method: "webauthn_step_up"; userId: string }
   | { ok: false; reason: "missing" | "invalid" };
 
+const STEP_UP_PURPOSES = [
+  "step-up-mfa",
+  "credentials-2fa",
+  "credentials-passkey",
+  "passkey-authentication",
+] as const;
+
 /**
- * Mock verification for the `x-mfa-token` header.
- * Accepts any non-empty token with length >= 16 until the real passkey/TOTP
- * verifier is connected.
+ * Verify `x-mfa-token` / assertion material as a signed step-up token.
+ * Optionally bind to an expected userId when known.
  */
 export function verifyBreakGlassMfaToken(
-  token: string | null
+  token: string | null,
+  expectedUserId?: string,
 ): BreakGlassMfaVerificationResult {
   if (!token || !token.trim()) {
     return { ok: false, reason: "missing" };
   }
 
   const normalized = token.trim();
-  // Placeholder: reject obviously forged short tokens.
-  if (normalized.length < 16) {
-    return { ok: false, reason: "invalid" };
+  for (const purpose of STEP_UP_PURPOSES) {
+    const verified = verifyTwoFactorToken(normalized, purpose);
+    if (!verified?.userId) continue;
+    if (expectedUserId && verified.userId !== expectedUserId) {
+      return { ok: false, reason: "invalid" };
+    }
+    return { ok: true, method: "webauthn_step_up", userId: verified.userId };
   }
 
-  // TODO: verify against passkey assertion or TOTP challenge service.
-  return { ok: true, method: "mock_passkey_or_totp" };
+  return { ok: false, reason: "invalid" };
 }

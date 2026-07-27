@@ -12,8 +12,7 @@ describe("evaluateToolAction", () => {
   });
 
   afterEach(() => {
-    __resetAuraMemoryForTests();
-    vi.unstubAllEnvs();
+    __resetAuraMemoryForTests();    vi.unstubAllEnvs();
   });
 
   it("approves routine search", async () => {
@@ -56,8 +55,7 @@ describe("evaluateToolAction", () => {
 
 describe("wrapToolsWithAuraHarness", () => {
   afterEach(() => {
-    __resetAuraMemoryForTests();
-    vi.unstubAllEnvs();
+    __resetAuraMemoryForTests();    vi.unstubAllEnvs();
   });
 
   it("is a no-op when harness flag is off", async () => {
@@ -97,7 +95,6 @@ describe("wrapToolsWithAuraHarness", () => {
       "@/lib/aura-harness/memory-store"
     );
     reset();
-
     const execute = vi.fn(async () => ({ deleted: true }));
     const session = createSession();
     const wrapped = wrap(
@@ -136,7 +133,6 @@ describe("wrapToolsWithAuraHarness", () => {
       "@/lib/aura-harness/memory-store"
     );
     reset();
-
     const session = createSession();
     const wrapped = wrap(
       {

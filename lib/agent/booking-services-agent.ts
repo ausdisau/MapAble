@@ -55,6 +55,7 @@ export function createBookingServicesAgent(
     agentType: "transport",
     capabilityKey: CAPABILITY_KEY,
     session,
+    userId: user.id,
   });
 
   return new ToolLoopAgent({

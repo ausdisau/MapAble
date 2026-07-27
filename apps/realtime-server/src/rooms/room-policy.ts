@@ -87,7 +87,7 @@ export async function authorizeRoomJoin(
     throw new RoomAuthorizationError("Invalid room id");
   }
 
-  // Explicit grants issued with the auth token (server-minted allow list).
+  // Explicit grants issued inside the HMAC-signed auth token.
   if (identity.roomGrants?.includes(parsed.raw)) {
     return parsed;
   }
@@ -104,19 +104,15 @@ export async function authorizeRoomJoin(
 
 /**
  * Membership check for a specific session/resource.
- * Scaffold implementation — replace lookup internals with API/DB calls that
- * verify participant, assigned worker, or dispatcher relationships.
+ * Uses optional HTTP internal lookup (`SOCKETIO_MEMBERSHIP_URL`) when set;
+ * otherwise self-id rooms only (booking/care/trip require signed grants).
  */
 async function resolveRoomMembership(
   identity: SocketIdentity,
   room: ParsedRoom,
 ): Promise<boolean> {
-  // Yield once so this remains a true async boundary for future I/O.
-  await Promise.resolve();
-
   switch (room.kind) {
     case "user":
-      // Private user channel — only the owning user.
       return identity.userId === room.resourceId;
 
     case "provider":
@@ -128,34 +124,59 @@ async function resolveRoomMembership(
     case "thread":
     case "support-ticket":
     case "quality":
-      // Require an explicit server-minted grant (no ambient join by guessable id).
       return false;
 
     case "booking":
     case "care":
-      // Participant self-join by matching id, or assigned worker / dispatcher roles
-      // that have been granted via roomGrants. Ambient role alone is insufficient
-      // for booking/care rooms (prevents IDOR via care_456 enumeration).
+    case "trip": {
       if (identity.userId === room.resourceId) return true;
-      if (WORKER_ROLES.has(identity.role) || DISPATCHER_ROLES.has(identity.role)) {
-        // Role is necessary but not sufficient — require grant for the specific session.
+      // Role alone is insufficient — require grant or membership API allow.
+      const membershipOk = await lookupMembershipViaHttp(identity, room);
+      if (membershipOk) return true;
+      if (
+        WORKER_ROLES.has(identity.role) ||
+        DISPATCHER_ROLES.has(identity.role)
+      ) {
         return false;
       }
       return false;
-
-    case "trip":
-      // Trip rooms: only the trip participant (matching id) or a dispatcher
-      // with an explicit grant for that trip.
-      if (identity.userId === room.resourceId) return true;
-      if (DISPATCHER_ROLES.has(identity.role)) {
-        return false;
-      }
-      return false;
+    }
 
     default: {
       const _exhaustive: never = room;
       return _exhaustive;
     }
+  }
+}
+
+async function lookupMembershipViaHttp(
+  identity: SocketIdentity,
+  room: ParsedRoom,
+): Promise<boolean> {
+  const base = process.env.SOCKETIO_MEMBERSHIP_URL?.trim();
+  if (!base) return false;
+
+  try {
+    const url = new URL(base);
+    url.searchParams.set("userId", identity.userId);
+    url.searchParams.set("role", identity.role);
+    url.searchParams.set("room", room.raw);
+    url.searchParams.set("kind", room.kind);
+    url.searchParams.set("resourceId", room.resourceId);
+
+    const res = await fetch(url, {
+      method: "GET",
+      headers: {
+        "x-socketio-internal":
+          process.env.SOCKETIO_INTERNAL_TOKEN?.trim() || "1",
+      },
+      signal: AbortSignal.timeout(2500),
+    });
+    if (!res.ok) return false;
+    const body = (await res.json()) as { allowed?: unknown };
+    return body.allowed === true;
+  } catch {
+    return false;
   }
 }
 

@@ -53,6 +53,7 @@ export async function commitImportJob(jobId: string, actorId: string) {
         status: "pending_moderation",
         sourceType: "imported",
         sourceReference: item.externalRef ?? item.id,
+        tx,
       });
 
       await tx.accessPlaceSource.create({

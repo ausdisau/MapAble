@@ -4,7 +4,6 @@ import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { AU_JURISDICTIONS } from "@/lib/workers/worker-screening-shared";
-
 export function WorkerScreeningForm({
   onSubmitted,
 }: {

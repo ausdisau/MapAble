@@ -1,3 +1,5 @@
+import { calculateNdisItemDraft } from "@/lib/act/billing/ndis-item-calculator";
+import { isActLayerEnabled } from "@/lib/act/flags";
 import { createAuditEvent } from "@/lib/audit/audit-event-service";
 import { createInvoiceDraftFromBooking } from "@/lib/invoices/invoice-service";
 import { prisma } from "@/lib/prisma";
@@ -129,22 +131,69 @@ export async function createInvoiceLineFromTimesheet(
     }
   }
 
+  const supportItemCode =
+    ts.supportItemCode ?? shift.careRequest?.supportItemCode ?? null;
+
+  let unitAmountCents = 0;
+  let totalAmountCents = 0;
+  let quantity = 1;
+  let description = "Approved support session — requires review";
+
+  // Act layer: non-zero draft amounts behind flag; still requires human review.
+  if (isActLayerEnabled() && supportItemCode) {
+    const start = ts.actualStart ?? ts.scheduledStart;
+    const end = ts.actualEnd ?? ts.scheduledEnd;
+    const hours = Math.max(
+      0.25,
+      (end.getTime() - start.getTime()) / (1000 * 60 * 60),
+    );
+    try {
+      const draft = calculateNdisItemDraft({
+        supportItemCode,
+        hours,
+      });
+      unitAmountCents = draft.unitRateCents;
+      totalAmountCents = draft.totalAmountCents;
+      quantity = draft.quantityHours;
+      description = `${draft.description} [draft_requires_review]`;
+    } catch {
+      // Unknown catalogue code — keep $0 draft for human pricing.
+      description =
+        "Approved support session — Act draft unavailable; requires review";
+    }
+  }
+
   await prisma.invoiceLine.create({
     data: {
       invoiceId: invoice.id,
-      description: "Approved support session — requires review",
+      description,
       serviceDate: ts.actualStart ?? ts.scheduledStart,
-      quantity: 1,
-      unitAmountCents: 0,
-      totalAmountCents: 0,
-      supportItemCode: ts.supportItemCode ?? shift.careRequest?.supportItemCode,
-      claimableByNdis: Boolean(ts.supportItemCode),
+      quantity,
+      unitAmountCents,
+      totalAmountCents,
+      supportItemCode,
+      claimableByNdis: Boolean(supportItemCode),
     },
   });
 
   await prisma.timesheet.update({
     where: { id: timesheetId },
     data: { status: "invoice_ready" },
+  });
+
+  await createAuditEvent({
+    actorUserId: adminUserId,
+    action: "timesheet.invoice_line_drafted",
+    entityType: "Timesheet",
+    entityId: timesheetId,
+    metadata: {
+      invoiceId: invoice.id,
+      supportItemCode,
+      unitAmountCents,
+      totalAmountCents,
+      actLayer: isActLayerEnabled(),
+      status: "draft_requires_review",
+    },
   });
 
   return { invoice };

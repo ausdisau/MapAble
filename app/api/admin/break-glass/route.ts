@@ -99,24 +99,28 @@ async function auditBreakGlassAction(input: {
 }
 
 /**
- * Strict platform ADMIN + MFA for all break-glass operations.
- * Accepts either platform step-up (`x-mfa-assertion` / session mfaVerified)
- * or the break-glass `x-mfa-token` header (mock → passkey/TOTP).
+ * Strict platform admin + fresh MFA for all break-glass operations.
+ * Accepts platform step-up (`x-mfa-assertion` / session mfaVerified) or a
+ * cryptographically verified `x-mfa-token` (WebAuthn / passkey step-up).
+ * Mock short-token acceptance is removed — fail closed.
  */
 const breakGlassAuth = {
-  roles: ["ADMIN", "mapable_admin"] as const,
+  roles: ["mapable_admin"] as const,
   authorize: async (user: CurrentUser, request: Request) => {
     if (await verifyRequestMfa(request, user.id)) return true;
 
-    const legacy = verifyBreakGlassMfaToken(request.headers.get("x-mfa-token"));
-    if (legacy.ok) return true;
+    const token =
+      request.headers.get("x-mfa-token") ??
+      request.headers.get("x-mfa-assertion");
+    const verified = verifyBreakGlassMfaToken(token, user.id);
+    if (verified.ok) return true;
 
     return NextResponse.json(
       {
         error: "Forbidden",
         code: "MFA_REQUIRED",
         message:
-          "Multi-factor authentication is required. Provide x-mfa-assertion or x-mfa-token.",
+          "Multi-factor authentication is required. Provide a valid x-mfa-assertion step-up token.",
       },
       { status: 403 },
     );

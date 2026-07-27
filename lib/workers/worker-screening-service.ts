@@ -15,7 +15,6 @@ export type {
   ScreeningSubmissionView,
 } from "@/lib/workers/worker-screening-shared";
 export { AU_JURISDICTIONS } from "@/lib/workers/worker-screening-shared";
-
 function parseJurisdiction(description: string | null): string {
   if (!description) return "Unknown";
   try {

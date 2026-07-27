@@ -1,5 +1,6 @@
 import type { Prisma, ServiceRelationshipRole } from "@prisma/client";
 
+import { runInTransaction } from "@/lib/db/transaction-service";
 import { prisma } from "@/lib/prisma";
 import { emitProgrammeAuditEvent } from "@/lib/programmes/audit";
 
@@ -103,30 +104,32 @@ export async function captureTrustRelationshipSnapshot(input: {
   actorUserId: string;
   participantId: string;
 }) {
-  await prisma.trustRelationshipSnapshot.updateMany({
-    where: { relationshipId: input.relationshipId, status: "active" },
-    data: { status: "superseded" },
-  });
+  const snapshot = await runInTransaction(async (tx) => {
+    await tx.trustRelationshipSnapshot.updateMany({
+      where: { relationshipId: input.relationshipId, status: "active" },
+      data: { status: "superseded" },
+    });
 
-  const snapshot = await prisma.trustRelationshipSnapshot.create({
-    data: {
-      relationshipId: input.relationshipId,
-      feeComponentsJson: (input.feeComponentsJson ??
-        []) as Prisma.InputJsonValue,
-      quoteSnapshotJson: input.quoteSnapshotJson as
-        | Prisma.InputJsonValue
-        | undefined,
-      agreementSnapshotJson: input.agreementSnapshotJson as
-        | Prisma.InputJsonValue
-        | undefined,
-      invoiceSnapshotJson: input.invoiceSnapshotJson as
-        | Prisma.InputJsonValue
-        | undefined,
-      disclosureJson: (input.disclosureJson ?? {}) as Prisma.InputJsonValue,
-      informationalOnly: true,
-      correlationId: input.correlationId,
-      status: "active",
-    },
+    return tx.trustRelationshipSnapshot.create({
+      data: {
+        relationshipId: input.relationshipId,
+        feeComponentsJson: (input.feeComponentsJson ??
+          []) as Prisma.InputJsonValue,
+        quoteSnapshotJson: input.quoteSnapshotJson as
+          | Prisma.InputJsonValue
+          | undefined,
+        agreementSnapshotJson: input.agreementSnapshotJson as
+          | Prisma.InputJsonValue
+          | undefined,
+        invoiceSnapshotJson: input.invoiceSnapshotJson as
+          | Prisma.InputJsonValue
+          | undefined,
+        disclosureJson: (input.disclosureJson ?? {}) as Prisma.InputJsonValue,
+        informationalOnly: true,
+        correlationId: input.correlationId,
+        status: "active",
+      },
+    });
   });
 
   await emitProgrammeAuditEvent({

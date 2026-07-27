@@ -95,8 +95,17 @@ export async function saveSupportProfileDraft(params: {
   participantId: string;
   actorUserId: string;
   patch: Partial<SupportProfileSections>;
+  /** When set, fail closed if the stored version does not match (CAS). */
+  expectedVersion?: number;
 }) {
   const current = await getOrCreateDraftSupportProfile(params.participantId);
+  if (
+    params.expectedVersion != null &&
+    current.version !== params.expectedVersion
+  ) {
+    throw new Error("VERSION_CONFLICT");
+  }
+
   const merged = mergeSupportProfileSections(current.sections, params.patch);
 
   const updated = await prisma.supportProfile.update({
@@ -127,13 +136,35 @@ export async function saveSupportProfileDraft(params: {
 export async function publishSupportProfile(params: {
   participantId: string;
   actorUserId: string;
+  /** When set, atomic compare-and-swap on version before publish increment. */
+  expectedVersion?: number;
 }) {
-  const updated = await prisma.supportProfile.update({
+  if (params.expectedVersion != null) {
+    const cas = await prisma.supportProfile.updateMany({
+      where: {
+        participantId: params.participantId,
+        version: params.expectedVersion,
+      },
+      data: {
+        publishedAt: new Date(),
+        version: { increment: 1 },
+      },
+    });
+    if (cas.count === 0) {
+      throw new Error("VERSION_CONFLICT");
+    }
+  } else {
+    await prisma.supportProfile.update({
+      where: { participantId: params.participantId },
+      data: {
+        publishedAt: new Date(),
+        version: { increment: 1 },
+      },
+    });
+  }
+
+  const updated = await prisma.supportProfile.findUniqueOrThrow({
     where: { participantId: params.participantId },
-    data: {
-      publishedAt: new Date(),
-      version: { increment: 1 },
-    },
   });
 
   await createAuditEvent({

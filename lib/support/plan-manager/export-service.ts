@@ -1,3 +1,5 @@
+import { listActCatalogueItems } from "@/lib/act/billing/catalogue";
+import { isActLayerEnabled } from "@/lib/act/flags";
 import { createAuditEvent } from "@/lib/audit/audit-event-service";
 import { y2OrchestrationConfig } from "@/lib/config/y2-orchestration";
 import { prisma } from "@/lib/prisma";
@@ -15,6 +17,14 @@ export type PlanManagerExportRow = {
     quantity: string;
     unitAmountCents: number;
     totalAmountCents: number;
+    supportItemCode?: string;
+    draftStatus?: string;
+  }[];
+  actDraftLines?: {
+    supportItemCode: string;
+    name: string;
+    unitRateCents: number;
+    status: "draft_requires_review";
   }[];
 };
 
@@ -28,6 +38,15 @@ export async function createPlanManagerExportV1(params: {
   }
 
   const invoices = await listAuthorisedInvoices(params.planManagerId);
+
+  const actCatalogue = isActLayerEnabled()
+    ? listActCatalogueItems().map((item) => ({
+        supportItemCode: item.supportItemCode,
+        name: item.name,
+        unitRateCents: item.unitRateCents,
+        status: "draft_requires_review" as const,
+      }))
+    : undefined;
 
   const rows: PlanManagerExportRow[] = invoices.map((inv) => ({
     invoiceId: inv.id,
@@ -45,8 +64,16 @@ export async function createPlanManagerExportV1(params: {
             quantity: String(l.quantity),
             unitAmountCents: Number(l.unitAmountCents),
             totalAmountCents: Number(l.totalAmountCents),
+            supportItemCode:
+              typeof l.supportItemCode === "string"
+                ? l.supportItemCode
+                : undefined,
+            draftStatus: isActLayerEnabled()
+              ? "draft_requires_review"
+              : undefined,
           }))
         : [],
+    actDraftLines: actCatalogue,
   }));
 
   const fileName = `plan-manager-export-${Date.now()}.${params.format}`;

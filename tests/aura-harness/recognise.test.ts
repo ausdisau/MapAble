@@ -18,16 +18,14 @@ import { resolvePolicyAction } from "@/lib/aura-harness/policy-engine";
 
 describe("Recognise autonomy criteria", () => {
   beforeEach(() => {
-    __resetAuraMemoryForTests();
-    __resetRiskCriterionEvaluatorsForTests();
+    __resetAuraMemoryForTests();    __resetRiskCriterionEvaluatorsForTests();
     __resetDefaultAutonomyRegistrationForTests();
   });
 
   afterEach(() => {
     __resetRiskCriterionEvaluatorsForTests();
     __resetDefaultAutonomyRegistrationForTests();
-    __resetAuraMemoryForTests();
-  });
+    __resetAuraMemoryForTests();  });
 
   it("scores routine search autonomy as low/uniform", async () => {
     const rec = await evaluateRecogniseContext("searchNdisProviders", {

@@ -12,6 +12,9 @@
 | `lib/api/ip-rate-limit.ts`           | In-memory `Map` per process | `VERIFIED` (code)                                   |
 | Multi-instance / multi-region safety | None                        | `FAILED` for production-sensitive claims            |
 | Abuse protection for CSP report sink | Uses process-local helper   | Acceptable for Preview/CI; **not** production-grade |
+| Search interpret / autocomplete      | `checkIpRateLimit`          | Process-local (Sprint 4 Act)                        |
+| Register + NDIS provider search      | `checkIpRateLimit`          | Process-local (Sprint 4 Act)                        |
+| Act handoff resolve                  | `checkIpRateLimit`          | Process-local (Sprint 4 Act)                        |
 
 ## Approved shared store scan (2026-07-21)
 

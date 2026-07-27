@@ -4,7 +4,6 @@ import {
   type IdentityVerificationStatusView,
   isStripeIdentityConfigured,
 } from "@/lib/workers/identity-verification-shared";
-
 export type {
   IdentityVerificationProvider,
   IdentityVerificationStatusView,
@@ -13,7 +12,6 @@ export {
   IDENTITY_VERIFICATION_STEPS,
   isStripeIdentityConfigured,
 } from "@/lib/workers/identity-verification-shared";
-
 function publicDisplayName(displayName: string): string {
   const parts = displayName.trim().split(/\s+/).filter(Boolean);
   if (parts.length === 0) return "Worker";

@@ -1,3 +1,5 @@
+import { isA2hHandoffEnabled } from "@/lib/act/flags";
+import { createActHandoffFromHitl } from "@/lib/act/handoff/service";
 import { isAuraHarnessEnabled } from "@/lib/aura-harness/config";
 import {
   buildAuraBlockedToolResult,
@@ -9,6 +11,8 @@ export type AuraHarnessWrapContext = {
   agentType: string;
   capabilityKey?: string;
   session: HarnessSessionAccumulator;
+  /** Session user id for A2H handoff requester attribution. */
+  userId?: string;
 };
 
 type AnyTool = {
@@ -48,13 +52,30 @@ export function wrapToolsWithAuraHarness<T extends Record<string, AnyTool>>(
         const evaluation = await evaluateToolAction(name, input);
         ctx.session.record(evaluation);
 
-        const { decision } = evaluation;
-        if (
+        const { decision, fingerprint } = evaluation;        if (
           decision.outcome === "DENIED" ||
           decision.outcome === "HITL_PENDING"
         ) {
-          return buildAuraBlockedToolResult(decision);
-        }
+          let handoffId: string | undefined;
+          if (
+            decision.outcome === "HITL_PENDING" &&
+            isA2hHandoffEnabled() &&
+            ctx.userId
+          ) {
+            try {
+              const handoff = await createActHandoffFromHitl({
+                fingerprint,
+                toolName: name,
+                payload: input,
+                decision,
+                requesterUserId: ctx.userId,
+              });
+              handoffId = handoff?.id;
+            } catch {
+              // Fail closed on the tool call without losing the HITL block.
+            }
+          }
+          return buildAuraBlockedToolResult(decision, { handoffId });        }
 
         const args =
           decision.outcome === "MITIGATED" && decision.safeArgs !== undefined
