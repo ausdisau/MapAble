@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 
 import { BillingShell } from "@/components/billing/BillingShell";
+import { InvoiceToolsOrb } from "@/components/billing/InvoiceToolsOrb";
 import { AuthenticatedRoleAppShell } from "@/components/layout/AuthenticatedRoleAppShell";
 import { requireAuth } from "@/lib/auth/guards";
 import { canAccessBillingCentre } from "@/lib/billing/permissions";
@@ -66,6 +67,7 @@ export default async function BillingCentreLayout({
       secondaryNav={<BillingSecondaryNav />}
     >
       <BillingShell>{children}</BillingShell>
+      <InvoiceToolsOrb />
     </AuthenticatedRoleAppShell>
   );
 }

@@ -1,4 +1,4 @@
-import type { RealtimeEvent } from "@/lib/realtime/supabase-realtime-adapter";
+import type { RealtimeEvent } from "@/lib/realtime/types";
 
 export function createPollingSubscription(
   conversationId: string,

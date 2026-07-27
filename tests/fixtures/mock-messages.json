@@ -1,0 +1,15 @@
+
+[
+  {
+    "from": "Support Worker - Maya",
+    "to": "Participant - Alex",
+    "body": "Hi Alex, I’m confirming our 2pm session tomorrow.",
+    "timestamp": "2026-01-27 12:20"
+  },
+  {
+    "from": "Participant - Alex",
+    "to": "Support Worker - Maya",
+    "body": "Thanks Maya, looking forward to it!",
+    "timestamp": "2026-01-27 12:22"
+  }
+]

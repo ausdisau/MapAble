@@ -19,9 +19,13 @@ export function WorkersAdmin() {
   return (
     <AdminOpsListPage<Row>
       title="Workers"
-      description="Credential and verification status across active workers."
+      description="Credential and verification status across active workers. Screening certificate queue: /admin/ops/screening"
       apiPath="/api/admin/workers"
-      breadcrumb={[{ label: "Operations", href: "/admin/ops" }, { label: "Workers", href: "/admin/ops/workers" }]}
+      breadcrumb={[
+        { label: "Operations", href: "/admin/ops" },
+        { label: "Workers", href: "/admin/ops/workers" },
+        { label: "Screening", href: "/admin/ops/screening" },
+      ]}
       showAtRiskFilter
       columns={[
         {
