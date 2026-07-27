@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { adsenseAdvertisingProvider } from "@/components/ads/adsense-provider";
 import {
@@ -12,6 +12,10 @@ import {
   isAdSenseEnabled,
 } from "@/lib/ads/adsense-config";
 import { isContentRichMarketingPath } from "@/lib/ads/content-rich-routes";
+
+afterEach(() => {
+  vi.unstubAllEnvs();
+});
 
 describe("ad unit registry", () => {
   it("resolves marketing.footer to an AdSense display unit", () => {
@@ -79,9 +83,9 @@ describe("AdSense config and provider", () => {
   });
 
   it("reads the footer slot from env", () => {
-    expect(getAdSenseFooterSlot({ NEXT_PUBLIC_ADSENSE_FOOTER_SLOT: " 99 " })).toBe(
-      "99",
-    );
+    expect(
+      getAdSenseFooterSlot({ NEXT_PUBLIC_ADSENSE_FOOTER_SLOT: " 99 " }),
+    ).toBe("99");
     expect(getAdSenseFooterSlot({})).toBeUndefined();
   });
 
@@ -90,34 +94,16 @@ describe("AdSense config and provider", () => {
     expect(unit).toBeDefined();
     if (!unit) return;
 
-    const previousSlot = process.env.NEXT_PUBLIC_ADSENSE_FOOTER_SLOT;
-    const previousEnabled = process.env.NEXT_PUBLIC_ADSENSE_ENABLED;
-    const previousNodeEnv = process.env.NODE_ENV;
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("NEXT_PUBLIC_ADSENSE_FOOTER_SLOT", "");
+    vi.stubEnv("NEXT_PUBLIC_ADSENSE_ENABLED", "");
+    expect(adsenseAdvertisingProvider.canRender(unit)).toBe(false);
 
-    try {
-      process.env.NODE_ENV = "production";
-      delete process.env.NEXT_PUBLIC_ADSENSE_FOOTER_SLOT;
-      delete process.env.NEXT_PUBLIC_ADSENSE_ENABLED;
-      expect(adsenseAdvertisingProvider.canRender(unit)).toBe(false);
+    vi.stubEnv("NEXT_PUBLIC_ADSENSE_FOOTER_SLOT", "1234567890");
+    expect(adsenseAdvertisingProvider.canRender(unit)).toBe(true);
 
-      process.env.NEXT_PUBLIC_ADSENSE_FOOTER_SLOT = "1234567890";
-      expect(adsenseAdvertisingProvider.canRender(unit)).toBe(true);
-
-      process.env.NEXT_PUBLIC_ADSENSE_ENABLED = "false";
-      expect(adsenseAdvertisingProvider.canRender(unit)).toBe(false);
-      expect(isAdSenseEnabled(process.env)).toBe(false);
-    } finally {
-      if (previousSlot === undefined) {
-        delete process.env.NEXT_PUBLIC_ADSENSE_FOOTER_SLOT;
-      } else {
-        process.env.NEXT_PUBLIC_ADSENSE_FOOTER_SLOT = previousSlot;
-      }
-      if (previousEnabled === undefined) {
-        delete process.env.NEXT_PUBLIC_ADSENSE_ENABLED;
-      } else {
-        process.env.NEXT_PUBLIC_ADSENSE_ENABLED = previousEnabled;
-      }
-      process.env.NODE_ENV = previousNodeEnv;
-    }
+    vi.stubEnv("NEXT_PUBLIC_ADSENSE_ENABLED", "false");
+    expect(adsenseAdvertisingProvider.canRender(unit)).toBe(false);
+    expect(isAdSenseEnabled(process.env)).toBe(false);
   });
 });
