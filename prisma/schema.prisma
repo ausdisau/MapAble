@@ -174,6 +174,85 @@ model User {
   atBackupPlans                           AtBackupPlan[]              @relation("AtBackupPlanParticipant")
   atRepairPartnerRefs                     AtRepairPartnerRef[]        @relation("AtRepairPartnerRefParticipant")
   atDependencyLinks                       AtDependencyLink[]          @relation("AtDependencyLinkParticipant")
+  analyticsExportsRequested AnalyticsExport[] @relation("AnalyticsExportRequester")
+  analyticsExportsApproved AnalyticsExport[] @relation("AnalyticsExportApprover")
+  applicationDisclosurePreviews ApplicationDisclosurePreview[] @relation("DisclosurePreviewParticipant")
+  authSessionRecords AuthSessionRecord[]
+  authorityDecisionsAsParticipant AuthorityDecision[] @relation("AuthorityDecisionParticipant")
+  authorityDecisionsAsActor AuthorityDecision[] @relation("AuthorityDecisionActor")
+  careOSActionReceipts CareOSActionReceipt[]
+  careOSActivityEvents CareOSActivityEvent[]
+  careOSHumanReviews CareOSHumanReview[]
+  careOSMissions CareOSMission[]
+  careOSMissionEvents CareOSMissionEvent[]
+  careOSParticipantPreferences CareOSParticipantPreference[]
+  clinicalAuthors ClinicalAuthor[]
+  communicationPassports CommunicationPassport[] @relation("CommunicationPassportParticipant")
+  complianceEvidenceSubmitted ComplianceEvidence[] @relation("ComplianceEvidenceSubmittedBy")
+  consentReceiptsAsParticipant ConsentReceipt[] @relation("ConsentReceiptParticipant")
+  consentReceiptsAsActor ConsentReceipt[] @relation("ConsentReceiptActor")
+  coordinationCasesAsParticipant CoordinationCase[] @relation("CoordinationCaseParticipant")
+  coordinationCasesAsCoordinator CoordinationCase[] @relation("CoordinationCaseCoordinator")
+  coordinationCaseAssignments CoordinationCaseAssignment[] @relation("CoordinationCaseAssignmentAssignee")
+  coordinationCaseNotesAuthored CoordinationCaseNote[] @relation("CoordinationCaseNoteAuthor")
+  coordinationSupervisionGiven CoordinationSupervisionRecord[] @relation("CoordinationSupervisor")
+  coordinationTasksCreated CoordinationTask[] @relation("CoordinationTaskCreator")
+  coordinationTasksAssigned CoordinationTask[] @relation("CoordinationTaskAssignee")
+  correctiveActionsAssigned CorrectiveAction[] @relation("CorrectiveActionAssignee")
+  correctiveActionHistory CorrectiveActionHistory[] @relation("CorrectiveActionHistoryActor")
+  delegateInvitationsSent DelegateInvitation[] @relation("DelegateInvitationParticipant")
+  delegateInvitationsReceived DelegateInvitation[] @relation("DelegateInvitationInvitee")
+  documentAccessGrants DocumentAccessGrant[]
+  emergencyAccessRequestsAsParticipant EmergencyAccessRequest[] @relation("EmergencyAccessParticipant")
+  emergencyAccessRequestsAsRequester EmergencyAccessRequest[] @relation("EmergencyAccessRequester")
+  emergencyAccessReviews EmergencyAccessReview[] @relation("EmergencyAccessReviewer")
+  employerEvidenceVerified EmployerAccessibilityEvidence[] @relation("EmployerEvidenceVerifiedBy")
+  employmentGoals EmploymentGoal[] @relation("EmploymentGoalParticipant")
+  employmentProfiles EmploymentProfile[] @relation("EmploymentProfileParticipant")
+  evidenceAssessmentsAuthored EvidenceAssessment[] @relation("EvidenceAssessmentAssessor")
+  evidenceRequestsAsParticipant EvidenceRequest[] @relation("EvidenceRequestParticipant")
+  expectedCostContexts ExpectedCostContext[]
+  healthDeviceImports HealthDeviceImport[] @relation("HealthDeviceImportParticipant")
+  homeLivingProfiles HomeLivingProfile[]
+  improvementActionHistory ImprovementActionHistory[] @relation("ImprovementActionHistoryActor")
+  jobMatchExplanations JobMatchExplanation[] @relation("JobMatchExplanationParticipant")
+  loginAuditEvents LoginAuditEvent[]
+  mfaEnrolments MfaEnrolment[]
+  participantContacts ParticipantContact[] @relation("ParticipantContactOwner")
+  participantGoals ParticipantGoal[]
+  hiddenProviders ParticipantHiddenProvider[]
+  participantLifeTwins ParticipantLifeTwin[]
+  providerPrivateNotes ParticipantProviderNote[]
+  providerShortlist ParticipantProviderShortlist[]
+  participantResearchConsents ParticipantResearchConsent[] @relation("ResearchConsentParticipant")
+  supportPlans ParticipantSupportPlan[]
+  planAcknowledgements PlanAcknowledgement[] @relation("PlanAcknowledgementParticipant")
+  planReviewsAuthored PlanReview[] @relation("PlanReviewReviewer")
+  policyAcknowledgements PolicyAcknowledgement[] @relation("PolicyAcknowledgementUser")
+  providerAccreditationAppeals ProviderAccreditationAppealRecord[] @relation("ProviderAccreditationAppellant")
+  providerAccreditationAppealDecisions ProviderAccreditationAppealRecord[] @relation("ProviderAccreditationAppealDecider")
+  providerAccreditationApplicationsSubmitted ProviderAccreditationApplication[] @relation("ProviderAccreditationApplicant")
+  providerAccreditationAssessments ProviderAccreditationAssessment[] @relation("ProviderAccreditationAssessor")
+  providerAccreditationClarifications ProviderAccreditationClarification[] @relation("ProviderAccreditationClarificationRequester")
+  providerAccreditationDecisions ProviderAccreditationDecision[] @relation("ProviderAccreditationDecider")
+  providerEnquiriesAsParticipant ProviderEnquiry[] @relation("ProviderEnquiryParticipant")
+  qualityAuditFindingsAssigned QualityAuditFinding[] @relation("QualityAuditFindingAssignee")
+  qualityAuditPlansCreated QualityAuditPlan[] @relation("QualityAuditPlanCreator")
+  rehabilitationGoalsAsParticipant RehabilitationGoal[] @relation("RehabilitationGoalParticipant")
+  rehabilitationPlansAsParticipant RehabilitationPlan[] @relation("RehabilitationPlanParticipant")
+  rehabilitationPlansAuthored RehabilitationPlan[] @relation("RehabilitationPlanClinicianAuthor")
+  rehabilitationPlanVersionsAuthored RehabilitationPlanVersion[] @relation("RehabilitationPlanVersionAuthor")
+  researchExportsRequested ResearchExport[] @relation("ResearchExportRequester")
+  researchExportsApproved ResearchExport[] @relation("ResearchExportApprover")
+  researchWithdrawals ResearchWithdrawal[] @relation("ResearchWithdrawalParticipant")
+  restoreDrillsConducted RestoreDrillRecord[] @relation("RestoreDrillConductor")
+  shiftOffersAsParticipant ShiftOffer[] @relation("ShiftOfferParticipant")
+  stepUpChallenges StepUpChallenge[]
+  telehealthSessionsAsParticipant TelehealthSessionRecord[] @relation("TelehealthSessionParticipant")
+  telehealthSessionsAsClinician TelehealthSessionRecord[] @relation("TelehealthSessionClinician")
+  trainingCompletionRecords TrainingCompletionRecord[] @relation("TrainingCompletionUser")
+  trustedDevices TrustedDevice[]
+  workplaceEvidenceVerified WorkplaceAccessibilityEvidence[] @relation("WorkplaceEvidenceVerifiedBy")
 }
 
 model PasskeyCredential {
@@ -770,6 +849,26 @@ model Organisation {
 
   // AT Continuity (NDIS Expansion Wave 1)
   atRepairPartnerRefs                  AtRepairPartnerRef[] @relation("AtRepairPartnerOrganisation")
+  accessibleProperties AccessibleProperty[]
+  analyticsExports AnalyticsExport[]
+  complianceEvidence ComplianceEvidence[]
+  coordinationCases CoordinationCase[]
+  employerAccessibilityEvidence EmployerAccessibilityEvidence[]
+  improvementActions ImprovementAction[]
+  hiddenByParticipants ParticipantHiddenProvider[]
+  privateParticipantNotes ParticipantProviderNote[]
+  shortlistedBy ParticipantProviderShortlist[]
+  policyDocuments PolicyDocument[]
+  providerAccreditationApplications ProviderAccreditationApplication[]
+  providerCapabilityEvidence ProviderCapabilityEvidence[]
+  providerEnquiries ProviderEnquiry[]
+  serviceOfferings ProviderServiceOffering[]
+  qualityAuditFindings QualityAuditFinding[]
+  qualityAuditPlans QualityAuditPlan[]
+  regionalOrganisations RegionalOrganisation[]
+  researchProjects ResearchProject[]
+  trainingRequirements TrainingRequirement[]
+  workplaceLocations WorkplaceLocation[]
 }
 
 model OrganisationMember {
@@ -1264,6 +1363,8 @@ model Document {
   @@index([participantId])
   @@index([organisationId])
   @@index([bookingId])
+  accessGrants DocumentAccessGrant[]
+  versions DocumentVersion[]
 }
 
 model ParticipantFundingSource {
@@ -1703,6 +1804,7 @@ model CareShift {
   @@index([workerProfileId])
   @@index([careBookingId])
   @@index([recurringScheduleId, occurrenceDate])
+  shiftOffers ShiftOffer[]
 }
 
 model CareBooking {
@@ -2057,6 +2159,10 @@ model WorkerProfile {
 
   @@unique([userId, organisationId])
   @@index([organisationId, active])
+  shiftOffers ShiftOffer[]
+  competencyEvidence WorkerCompetencyEvidence[]
+  credentialEvidence WorkerCredentialEvidence[]
+  equipmentEvidence WorkerEquipmentEvidence[]
 }
 
 enum WorkerOrganisationInviteStatus {
@@ -2303,6 +2409,8 @@ model Job {
 
   @@index([status])
   @@index([employerOrganisationId])
+  matchExplanations JobMatchExplanation[]
+  requirements JobRequirement[]
 }
 
 model JobApplication {
@@ -2327,6 +2435,7 @@ model JobApplication {
 
   @@index([jobId])
   @@index([participantId, status])
+  applicationDisclosurePreviews ApplicationDisclosurePreview[]
 }
 
 model CalendarEvent {
@@ -4500,6 +4609,7 @@ model Tenant {
   memberships TenantMembership[]
   enterpriseWorkspaces EnterpriseProviderWorkspace[]
   governmentWorkspaces GovernmentPartnerWorkspace[]
+  outboxEvents CloudEventOutbox[]
 }
 
 model TenantMembership {
@@ -5021,6 +5131,7 @@ model ApiKey {
   @@index([partnerId])
   @@index([partnerId, createdAt])
   @@map("api_keys")
+  accessLogs ApiAccessLog[]
 }
 
 model AssessorNetworkMember {
@@ -5766,6 +5877,8 @@ model BillingInvoice {
   @@index([invoiceNumber])
   @@index([status, dueAt])
   @@index([providerId, status])
+  reconciliations InvoiceReconciliationRecord[]
+  financialDecisions ParticipantInvoiceDecision[]
 }
 
 model BillingInvoiceLineItem {
@@ -7737,6 +7850,7 @@ model AccessAccreditationAssessment {
 
   @@index([placeId, status])
   @@map("access_accreditation_assessments")
+  providerAccreditationApplications ProviderAccreditationApplication[]
 }
 
 model AccessAccreditationScore {
@@ -8118,6 +8232,9 @@ model TransportTrip {
   @@index([rideRunId])
   @@index([scheduledStart])
   @@map("transport_trips")
+  continuityRecoveries TransportContinuityRecoveryRequest[]
+  disruptionEvents TransportDisruptionEvent[]
+  returnTripAssurances TransportReturnTripAssurance[]
 }
 
 enum RideRunStatus {
@@ -8246,6 +8363,10 @@ model TransportVehicle {
 
   @@index([organisationId])
   @@map("transport_vehicles")
+  mobilityCompatibilities MobilityDeviceCompatibility[]
+  restraintCapabilities RestraintCapability[]
+  accessibilityEvidence VehicleAccessibilityEvidence[]
+  inspections VehicleInspection[]
 }
 
 model TransportVehicleFeature {
@@ -8643,6 +8764,7 @@ model Case {
   @@index([assignedToId])
   @@index([status])
   @@map("cases")
+  linkedCoordinationCases CoordinationCase[] @relation("CoordinationCaseLinkedCase")
 }
 
 model CaseNote {
@@ -10800,6 +10922,8 @@ model ParticipantAuthorityGrant {
   @@index([granteeUserId])
   @@index([expiresAt])
   @@map("participant_authority_grants")
+  decisions AuthorityDecision[]
+  invitations DelegateInvitation[]
 }
 
 model NavigatorOrganisation {
@@ -11203,3 +11327,3110 @@ model AtDependencyLink {
   @@map("at_dependency_links")
 }
 
+// --- Absorbed from agent/careos-top-ten-implement (models/enums not on main) ---
+
+enum AacMethodType {
+  text_to_speech
+  picture_board
+  sign_language_interpreter
+  written
+  gesture
+  device
+  other
+}
+
+enum AccessibilityEvidenceKind {
+  ramp_measurement
+  lift_capacity
+  door_width
+  floor_height
+  restraint_system
+  boarding_angle
+  wheelchair_space
+  other
+}
+
+enum AccessibilityEvidenceSource {
+  audit
+  self_assessment
+  third_party_verification
+  participant_report
+  inspection
+}
+
+enum AccessibilityEvidenceStatus {
+  pending
+  verified
+  expired
+  disputed
+}
+
+enum AnalyticsEventStatus {
+  received
+  processed
+  suppressed
+}
+
+enum AnalyticsExportStatus {
+  draft
+  pending_approval
+  approved
+  rejected
+  completed
+  withdrawn
+}
+
+enum ApiClientEnvironment {
+  sandbox
+  production
+}
+
+enum ApiClientStatus {
+  draft
+  pending_review
+  active
+  suspended
+  revoked
+}
+
+enum CommunicationPassportStatus {
+  draft
+  published
+  archived
+}
+
+enum ComplianceEvidenceSource {
+  self_submitted
+  audit
+  third_party
+  access_mark
+  incident_record
+  policy_record
+  training_record
+  system_import
+}
+
+enum CoordinationCaseStatus {
+  open
+  active
+  on_hold
+  closed
+}
+
+enum CoordinationMilestoneStatus {
+  pending
+  completed
+  cancelled
+}
+
+enum CoordinationNoteVisibility {
+  participant_visible
+  internal
+}
+
+enum CoordinationOperationalPriority {
+  low
+  medium
+  high
+  urgent
+}
+
+enum CoordinationTaskStatus {
+  open
+  done
+  cancelled
+}
+
+enum CorrectiveActionStatus {
+  open
+  in_progress
+  verification_pending
+  closed
+}
+
+enum DataUseAgreementStatus {
+  draft
+  pending
+  active
+  revoked
+}
+
+enum DelegateInvitationStatus {
+  pending
+  accepted
+  declined
+  expired
+  revoked
+}
+
+enum DisclosurePreviewStatus {
+  draft
+  previewed
+  confirmed
+}
+
+enum EmergencyAccessStatus {
+  requested
+  under_review
+  approved
+  denied
+  expired
+  revoked
+}
+
+enum EmploymentGoalCategory {
+  skills_development
+  employment_type
+  hours_and_schedule
+  location_and_access
+  disclosure_and_support
+  other
+}
+
+enum EmploymentGoalStatus {
+  active
+  achieved
+  paused
+  archived
+}
+
+enum EthicsApprovalStatus {
+  pending
+  approved
+  rejected
+  expired
+}
+
+enum EvidenceAssessmentStatus {
+  pending
+  met
+  partially_met
+  not_met
+  requires_clarification
+}
+
+enum EvidenceRequestPurpose {
+  plan_review
+  change_of_circumstances
+  home_living
+  assistive_technology
+  service_continuity
+  participant_outcomes
+}
+
+enum EvidenceRequestStatus {
+  draft
+  requested
+  partially_fulfilled
+  fulfilled
+  cancelled
+}
+
+enum FederationProtocol {
+  oidc
+  saml
+}
+
+enum FederationTrustStatus {
+  pending
+  active
+  suspended
+  revoked
+}
+
+enum ImprovementActionStatus {
+  planned
+  in_progress
+  completed
+  cancelled
+}
+
+enum JobRequirementCategory {
+  skill
+  experience
+  qualification
+  certification
+  access_need
+  schedule
+  location
+  transport
+  support
+  other
+}
+
+enum MatchRequirementStatus {
+  matched
+  not_matched
+  unknown
+  participant_decision_required
+}
+
+enum MetricDefinitionStatus {
+  draft
+  published
+  deprecated
+}
+
+enum MobilityDeviceType {
+  manual_wheelchair
+  power_wheelchair
+  mobility_scooter
+  walker
+  other
+}
+
+enum PlanReviewStatus {
+  pending
+  approved
+  changes_requested
+  rejected
+}
+
+enum PlatformHealthStatus {
+  ok
+  degraded
+  critical
+  unknown
+}
+
+enum PolicyDocumentStatus {
+  draft
+  published
+  archived
+}
+
+enum ProviderAccreditationAppealStatus {
+  submitted
+  under_review
+  upheld
+  dismissed
+}
+
+enum ProviderAccreditationApplicationStatus {
+  draft
+  submitted
+  under_review
+  clarification_requested
+  assessment_in_progress
+  pending_decision
+  approved
+  conditionally_approved
+  rejected
+  suspended
+  expired
+  renewal_due
+  appealed
+  withdrawn
+}
+
+enum ProviderAccreditationClarificationStatus {
+  open
+  responded
+  closed
+}
+
+enum ProviderAccreditationDecisionOutcome {
+  approved
+  conditionally_approved
+  rejected
+  suspended
+}
+
+enum ProviderEnquiryStatus {
+  draft
+  sent
+  responded
+  withdrawn
+  expired
+}
+
+enum PublicationRecordStatus {
+  draft
+  submitted
+  published
+  retracted
+}
+
+enum QualityAuditFindingSeverity {
+  minor
+  major
+  critical
+}
+
+enum QualityAuditFindingStatus {
+  open
+  action_required
+  closed
+}
+
+enum QualityAuditPlanStatus {
+  draft
+  scheduled
+  in_progress
+  completed
+  cancelled
+}
+
+enum RegionalOrganisationStatus {
+  draft
+  active
+  suspended
+  archived
+}
+
+enum RehabilitationActivityStatus {
+  scheduled
+  completed
+  missed
+  cancelled
+}
+
+enum RehabilitationGoalStatus {
+  active
+  achieved
+  paused
+  archived
+}
+
+enum RehabilitationPlanStatus {
+  draft
+  active
+  paused
+  archived
+}
+
+enum ResearchConsentStatus {
+  invited
+  granted
+  declined
+  withdrawn
+}
+
+enum ResearchExportStatus {
+  draft
+  pending_approval
+  approved
+  rejected
+  completed
+  blocked_withdrawal
+}
+
+enum ResearchProjectStatus {
+  draft
+  ethics_review
+  active
+  paused
+  completed
+  archived
+}
+
+enum RestoreDrillOutcome {
+  passed
+  failed
+  partial
+  not_run
+}
+
+enum RestraintType {
+  wheelchair_tie_down
+  occupant_belt
+  scooter_lock
+  other
+}
+
+enum ReturnTripAssuranceStatus {
+  not_required
+  pending
+  assured
+  at_risk
+  missing
+}
+
+enum StandardFrameworkStatus {
+  draft
+  published
+  archived
+}
+
+enum TelehealthSessionRecordStatus {
+  scheduled
+  in_progress
+  completed
+  cancelled
+  no_show
+}
+
+enum TrainingRequirementStatus {
+  active
+  archived
+}
+
+enum TransportContinuityRecoveryStatus {
+  options_presented
+  awaiting_confirmation
+  confirmed
+  declined
+  expired
+  escalated
+}
+
+enum TransportContinuityTrigger {
+  driver_cancel
+  vehicle_failure
+  late_pickup
+  route_disruption
+  lift_outage
+  appointment_change
+  missing_return_trip
+}
+
+enum TransportDisruptionKind {
+  route_disruption
+  lift_outage
+  service_alert
+  traffic_hazard
+  appointment_change
+  missing_return_trip
+}
+
+enum TransportDisruptionStatus {
+  open
+  acknowledged
+  recovery_in_progress
+  resolved
+}
+
+enum TransportTripDirection {
+  standalone
+  outbound
+  return
+}
+
+enum VehicleInspectionOutcome {
+  pass
+  conditional
+  fail
+}
+
+enum WebhookDeliveryStatus {
+  pending
+  delivered
+  failed
+  dead_letter
+}
+
+model AacMethodPreference {
+  id         String                @id @default(cuid())
+  passportId String
+  passport   CommunicationPassport @relation(fields: [passportId], references: [id], onDelete: Cascade)
+  method     AacMethodType
+  label      String?
+  preferred  Boolean               @default(false)
+  notes      String?
+  sortOrder  Int                   @default(0)
+  createdAt  DateTime              @default(now())
+  updatedAt  DateTime              @updatedAt
+
+  @@index([passportId])
+  @@map("aac_method_preferences")
+}
+
+model AcademyCompetencyProposal {
+  id                   String    @id @default(cuid())
+  workerProfileId      String
+  courseId             String?
+  trainingCompletionId String?
+  competencyType       String
+  evidenceId           String?
+  status               String    @default("pending")
+  proposedByUserId     String
+  verifiedByUserId     String?
+  verifiedAt           DateTime?
+  rejectionReason      String?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  @@index([workerProfileId, status])
+  @@index([status, createdAt])
+  @@map("academy_competency_proposals")
+}
+
+model AccessibleProperty {
+  id                   String       @id @default(cuid())
+  providerOrganisationId String
+  providerOrganisation Organisation @relation(fields: [providerOrganisationId], references: [id], onDelete: Cascade)
+  title                String
+  addressSummary       String
+  propertyType         String
+  availabilityStatus   String       @default("unknown")
+  availableFrom        DateTime?
+  tenancyTermsSummary  String?
+  supportProviderIndependent Boolean @default(true)
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
+  deletedAt            DateTime?
+  evidence             PropertyAccessibilityEvidence[]
+
+  @@index([providerOrganisationId, availabilityStatus, availableFrom])
+  @@map("accessible_properties")
+}
+
+model AnalyticsEvent {
+  id                   String               @id @default(cuid())
+  metricDefinitionId   String?
+  metricDefinition     MetricDefinition?    @relation(fields: [metricDefinitionId], references: [id], onDelete: SetNull)
+  eventType            String
+  organisationId       String?
+  participantPseudonym String?
+  payloadJson          Json
+  status               AnalyticsEventStatus @default(received)
+  occurredAt           DateTime
+  createdAt            DateTime             @default(now())
+
+  @@index([eventType, occurredAt])
+  @@index([organisationId])
+  @@map("analytics_events")
+}
+
+model AnalyticsExport {
+  id                    String                @id @default(cuid())
+  requestedById         String
+  requestedBy           User                  @relation("AnalyticsExportRequester", fields: [requestedById], references: [id], onDelete: Cascade)
+  organisationId        String?
+  organisation          Organisation?         @relation(fields: [organisationId], references: [id], onDelete: SetNull)
+  exportLabel           String
+  status                AnalyticsExportStatus @default(draft)
+  deidentificationLevel String                @default("pseudonymised")
+  suppressedFields      String[]              @default([])
+  smallCellApplied      Boolean               @default(false)
+  approvedById          String?
+  approvedBy            User?                 @relation("AnalyticsExportApprover", fields: [approvedById], references: [id], onDelete: SetNull)
+  approvedAt            DateTime?
+  rejectionReason       String?
+  bundleJson            Json?
+  completedAt           DateTime?
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
+
+  @@index([status])
+  @@index([organisationId])
+  @@map("analytics_exports")
+}
+
+model ApiAccessLog {
+  id               String          @id @default(cuid())
+  apiClientId      String
+  apiClient        ApiClient       @relation(fields: [apiClientId], references: [id], onDelete: Cascade)
+  apiKeyId         String?
+  apiKey           ApiKey?         @relation(fields: [apiKeyId], references: [id], onDelete: SetNull)
+  serviceAccountId String?
+  serviceAccount   ServiceAccount? @relation(fields: [serviceAccountId], references: [id], onDelete: SetNull)
+  path             String
+  method           String
+  statusCode       Int
+  durationMs       Int?
+  ipAddress        String?
+  userAgent        String?
+  participantId    String?
+  createdAt        DateTime        @default(now())
+
+  @@index([apiClientId, createdAt])
+  @@map("api_access_logs")
+}
+
+model ApiClient {
+  id                  String               @id @default(cuid())
+  organisationId      String?
+  developerAppId      String?
+  partnerSandboxAppId String?
+  name                String
+  status              ApiClientStatus      @default(draft)
+  environment         ApiClientEnvironment @default(sandbox)
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+
+  oauthClients          OAuthClient[]
+  serviceAccounts       ServiceAccount[]
+  accessLogs            ApiAccessLog[]
+  webhookSubscriptions  WebhookSubscription[]
+
+  @@index([organisationId])
+  @@index([status])
+  @@map("api_clients")
+}
+
+model ApplicationDisclosurePreview {
+  id              String                  @id @default(cuid())
+  applicationId   String                  @unique
+  application     JobApplication          @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  participantId   String
+  participant     User                    @relation("DisclosurePreviewParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  fieldsToDisclose Json                   @default("{}")
+  fieldsWithheld   Json                   @default("{}")
+  employerVisible  Json                   @default("{}")
+  status          DisclosurePreviewStatus @default(draft)
+  confirmedAt     DateTime?
+  createdAt       DateTime                @default(now())
+  updatedAt       DateTime                @updatedAt
+
+  @@index([participantId])
+  @@map("application_disclosure_previews")
+}
+
+model AuthSessionRecord {
+  id               String    @id @default(cuid())
+  userId           String
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionTokenHash String    @unique
+  userAgent        String?
+  ipHash           String?
+  createdAt        DateTime  @default(now())
+  lastSeenAt       DateTime  @default(now())
+  expiresAt        DateTime
+  revokedAt        DateTime?
+  revokedReason    String?
+
+  @@index([userId, revokedAt])
+  @@map("auth_session_records")
+}
+
+model AuthorityDecision {
+  id            String   @id @default(cuid())
+  grantId       String?
+  grant         ParticipantAuthorityGrant? @relation(fields: [grantId], references: [id], onDelete: SetNull)
+  participantId String
+  participant   User     @relation("AuthorityDecisionParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  actorUserId   String
+  actor         User     @relation("AuthorityDecisionActor", fields: [actorUserId], references: [id], onDelete: Cascade)
+  domain        String
+  action        String
+  decision      String
+  reason        String
+  purpose       String?
+  createdAt     DateTime @default(now())
+
+  @@index([participantId, createdAt])
+  @@index([actorUserId, createdAt])
+  @@map("authority_decisions")
+}
+
+model CareOSActionReceipt {
+  id               String         @id @default(cuid())
+  tokenId          String         @unique
+  proposalId       String
+  requestId        String
+  participantId    String
+  participant      User           @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  missionId        String?
+  mission          CareOSMission? @relation(fields: [missionId], references: [id], onDelete: SetNull)
+  actionType       String
+  payloadHash      String
+  status           String         @default("claimed")
+  resultEntityType String?
+  resultEntityId   String?
+  errorCode        String?
+  claimedAt        DateTime       @default(now())
+  completedAt      DateTime?
+
+  @@index([participantId, claimedAt])
+  @@index([requestId])
+  @@index([missionId])
+  @@map("careos_action_receipts")
+}
+
+model CareOSActivityEvent {
+  id            String   @id @default(cuid())
+  participantId String
+  participant   User     @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  requestId     String?
+  eventType     String
+  summary       String
+  metadata      Json?
+  auditEventId  String?
+  createdAt     DateTime @default(now())
+
+  @@index([participantId, createdAt])
+  @@map("careos_activity_events")
+}
+
+model CareOSEvidenceReference {
+  id               String               @id @default(cuid())
+  recommendationId String
+  recommendation   CareOSRecommendation @relation(fields: [recommendationId], references: [id], onDelete: Cascade)
+  sourceType       String
+  sourceId         String?
+  sourceDate       DateTime?
+  summary          String
+  verificationStatus String
+  createdAt        DateTime             @default(now())
+
+  @@index([recommendationId])
+  @@map("careos_evidence_references")
+}
+
+model CareOSHumanReview {
+  id                         String        @id @default(cuid())
+  missionId                  String
+  mission                    CareOSMission @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  requestId                  String
+  participantId              String
+  participant                User          @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  category                   String
+  priority                   String
+  title                      String
+  summary                    String
+  assignedRole               String
+  status                     String        @default("open")
+  dueAt                      DateTime
+  participantContactRequired Boolean       @default(true)
+  evidenceJson               Json          @default("[]")
+  resolvedAt                 DateTime?
+  createdAt                  DateTime      @default(now())
+  updatedAt                  DateTime      @updatedAt
+
+  @@index([participantId, status])
+  @@index([assignedRole, status])
+  @@index([missionId, createdAt])
+  @@map("careos_human_reviews")
+}
+
+model CareOSMission {
+  id                  String   @id @default(cuid())
+  participantId       String
+  participant         User     @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  tenantId            String?
+  requestId           String   @unique
+  missionType         String
+  /// Participant-facing desired outcome (fabric: goal).
+  desiredOutcome      String   @default("")
+  status              String   @default("proposed")
+  authorityDecisionId String?
+  inputSummary        Json     @default("{}")
+  graphJson           Json     @default("{}")
+  modulesJson         Json     @default("[]")
+  alertsJson          Json     @default("[]")
+  proposalsJson       Json     @default("[]")
+  stateVersion        Int      @default(1)
+  correlationId       String   @default(cuid())
+  workflowRunId       String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  recommendations     CareOSRecommendation[]
+  events              CareOSMissionEvent[]
+  humanReviews        CareOSHumanReview[]
+  actionReceipts      CareOSActionReceipt[]
+  linkedCoordinationCases CoordinationCase[] @relation("CoordinationCaseLinkedMission")
+
+  @@index([participantId, createdAt])
+  @@index([tenantId, status])
+  @@index([correlationId])
+  @@index([missionType, status])
+  @@map("careos_missions")
+}
+
+model CareOSMissionEvent {
+  id             String        @id @default(cuid())
+  missionId      String
+  mission        CareOSMission @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  participantId  String
+  participant    User          @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  eventType      String
+  sourceModule   String
+  sourceEntityId String?
+  severity       String        @default("information")
+  summary        String
+  payloadJson    Json?
+  /// Idempotency key for replay-safe appends.
+  eventKey       String?
+  createdAt      DateTime      @default(now())
+
+  @@unique([missionId, eventKey])
+  @@index([missionId, createdAt])
+  @@index([participantId, createdAt])
+  @@map("careos_mission_events")
+}
+
+model CareOSParticipantPreference {
+  id            String    @id @default(cuid())
+  participantId String
+  participant   User      @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  preferenceKey String
+  valueJson     Json
+  source        String    @default("participant_confirmed")
+  status        String    @default("active")
+  confirmedAt   DateTime  @default(now())
+  expiresAt     DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@unique([participantId, preferenceKey])
+  @@index([participantId, status])
+  @@map("careos_participant_preferences")
+}
+
+model CareOSRecommendation {
+  id            String   @id @default(cuid())
+  missionId     String
+  mission       CareOSMission @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  title         String
+  summary       String
+  confidence    String
+  uncertainty   Json     @default("[]")
+  result        Json
+  createdAt     DateTime @default(now())
+  evidence      CareOSEvidenceReference[]
+
+  @@index([missionId, createdAt])
+  @@map("careos_recommendations")
+}
+
+model ClinicalAuthor {
+  id              String    @id @default(cuid())
+  userId          String    @unique
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  profession      String
+  registrationRef String?
+  verifiedAt      DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@map("clinical_authors")
+}
+
+model ClinicalReviewRecord {
+  id            String   @id @default(cuid())
+  participantId String
+  supportPlanId String?
+  reviewType    String
+  status        String   @default("required")
+  assignedRole  String
+  reasonCodes   String[] @default([])
+  dueAt         DateTime?
+  resolvedById  String?
+  resolvedAt    DateTime?
+  createdAt     DateTime @default(now())
+
+  @@index([participantId, status, dueAt])
+  @@map("clinical_review_records")
+}
+
+model CloudEventOutbox {
+  id             String   @id
+  eventType      String
+  schemaVersion  Int      @default(1)
+  topic          String
+  tenantId       String
+  tenant         Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  participantId  String?
+  missionId      String?
+  sourceModule   String
+  sourceEntityId String?
+  correlationId  String
+  causationId    String?
+  traceId        String
+  payloadJson    Json
+  occurredAt     DateTime
+  publishedAt    DateTime?
+  attempts       Int      @default(0)
+  nextAttemptAt  DateTime?
+  lastError      String?
+  deadLetteredAt DateTime?
+  createdAt      DateTime @default(now())
+
+  @@index([publishedAt, nextAttemptAt])
+  @@index([tenantId, topic, occurredAt])
+  @@index([correlationId])
+  @@index([missionId, occurredAt])
+  @@map("cloud_event_outbox")
+}
+
+model CommunicationPassport {
+  id              String                      @id @default(cuid())
+  participantId   String
+  participant     User                        @relation("CommunicationPassportParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  title           String                      @default("My communication passport")
+  status          CommunicationPassportStatus @default(draft)
+  aboutMe         String?
+  howICommunicate String?
+  pleaseDo        String?
+  pleaseDont      String?
+  capacityNotes   String?
+  shareScope      String[]                    @default([])
+  publishedAt     DateTime?
+  createdAt       DateTime                    @default(now())
+  updatedAt       DateTime                    @updatedAt
+
+  preferredQuestions   PreferredQuestion[]
+  savedPhrases         SavedPhrase[]
+  aacMethodPreferences AacMethodPreference[]
+  emergencyCard        EmergencyCommunicationCard?
+
+  @@index([participantId])
+  @@map("communication_passports")
+}
+
+model ComplianceEvidence {
+  id             String                   @id @default(cuid())
+  organisationId String
+  organisation   Organisation             @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+  requirementId  String
+  requirement    EvidenceRequirement      @relation(fields: [requirementId], references: [id], onDelete: Cascade)
+  version        Int                      @default(1)
+  sourceType     ComplianceEvidenceSource
+  sourceRef      String?
+  storagePath    String?
+  caption        String?
+  submittedById  String
+  submittedBy    User                     @relation("ComplianceEvidenceSubmittedBy", fields: [submittedById], references: [id])
+  supersededById String?
+  supersededBy   ComplianceEvidence?      @relation("ComplianceEvidenceSupersession", fields: [supersededById], references: [id], onDelete: SetNull)
+  supersedes     ComplianceEvidence[]     @relation("ComplianceEvidenceSupersession")
+  createdAt      DateTime                 @default(now())
+
+  assessments EvidenceAssessment[]
+
+  @@index([organisationId, requirementId])
+  @@index([submittedById])
+  @@map("compliance_evidence")
+}
+
+model ConsentReceipt {
+  id              String   @id @default(cuid())
+  consentRecordId String?
+  participantId   String
+  participant     User     @relation("ConsentReceiptParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  actorUserId     String
+  actor           User     @relation("ConsentReceiptActor", fields: [actorUserId], references: [id], onDelete: Cascade)
+  scope           String
+  purpose         String
+  recipientType   String?
+  recipientId     String?
+  action          String
+  createdAt       DateTime @default(now())
+
+  @@index([participantId, createdAt])
+  @@map("consent_receipts")
+}
+
+model CoordinationCase {
+  id                  String                        @id @default(cuid())
+  participantId       String
+  participant         User                          @relation("CoordinationCaseParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  organisationId      String?
+  organisation        Organisation?                 @relation(fields: [organisationId], references: [id], onDelete: SetNull)
+  coordinatorId       String
+  coordinator         User                          @relation("CoordinationCaseCoordinator", fields: [coordinatorId], references: [id], onDelete: Cascade)
+  title               String
+  status              CoordinationCaseStatus        @default(open)
+  operationalPriority CoordinationOperationalPriority @default(medium)
+  linkedCaseId        String?
+  linkedCase          Case?                         @relation("CoordinationCaseLinkedCase", fields: [linkedCaseId], references: [id], onDelete: SetNull)
+  linkedMissionId     String?
+  linkedMission       CareOSMission?                @relation("CoordinationCaseLinkedMission", fields: [linkedMissionId], references: [id], onDelete: SetNull)
+  openedAt            DateTime                      @default(now())
+  closedAt            DateTime?
+  createdAt           DateTime                      @default(now())
+  updatedAt           DateTime                      @updatedAt
+
+  tasks               CoordinationTask[]
+  assignments         CoordinationCaseAssignment[]
+  notes               CoordinationCaseNote[]
+  enquiries           ProviderEnquiry[]
+  evidenceRequests    EvidenceRequest[]
+  milestones          CoordinationMilestone[]
+  supervisionRecords  CoordinationSupervisionRecord[]
+  evidencePacks       EvidencePack[]
+
+  @@index([participantId])
+  @@index([coordinatorId])
+  @@index([organisationId])
+  @@index([status])
+  @@index([operationalPriority])
+  @@map("coordination_cases")
+}
+
+model CoordinationCaseAssignment {
+  id         String           @id @default(cuid())
+  caseId     String
+  case       CoordinationCase @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  assigneeId String
+  assignee   User             @relation("CoordinationCaseAssignmentAssignee", fields: [assigneeId], references: [id], onDelete: Cascade)
+  role       String
+  assignedAt DateTime         @default(now())
+  endsAt     DateTime?
+
+  @@index([caseId])
+  @@index([assigneeId])
+  @@map("coordination_case_assignments")
+}
+
+model CoordinationCaseNote {
+  id         String                     @id @default(cuid())
+  caseId     String
+  case       CoordinationCase           @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  authorId   String
+  author     User                       @relation("CoordinationCaseNoteAuthor", fields: [authorId], references: [id])
+  body       String
+  visibility CoordinationNoteVisibility @default(internal)
+  createdAt  DateTime                   @default(now())
+
+  @@index([caseId])
+  @@index([authorId])
+  @@map("coordination_case_notes")
+}
+
+model CoordinationMilestone {
+  id          String                    @id @default(cuid())
+  caseId      String
+  case        CoordinationCase          @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  title       String
+  status      CoordinationMilestoneStatus @default(pending)
+  dueAt       DateTime?
+  completedAt DateTime?
+
+  @@index([caseId])
+  @@map("coordination_milestones")
+}
+
+model CoordinationSupervisionRecord {
+  id           String           @id @default(cuid())
+  caseId       String
+  case         CoordinationCase @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  supervisorId String
+  supervisor   User             @relation("CoordinationSupervisor", fields: [supervisorId], references: [id])
+  notes        String
+  createdAt    DateTime         @default(now())
+
+  @@index([caseId])
+  @@index([supervisorId])
+  @@map("coordination_supervision_records")
+}
+
+model CoordinationTask {
+  id          String                 @id @default(cuid())
+  caseId      String
+  case        CoordinationCase       @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  title       String
+  status      CoordinationTaskStatus @default(open)
+  waitingOn   String?
+  dueAt       DateTime?
+  createdById String
+  createdBy   User                   @relation("CoordinationTaskCreator", fields: [createdById], references: [id])
+  assigneeId  String?
+  assignee    User?                  @relation("CoordinationTaskAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
+  createdAt   DateTime               @default(now())
+
+  @@index([caseId])
+  @@index([assigneeId])
+  @@index([status])
+  @@map("coordination_tasks")
+}
+
+model CorrectiveAction {
+  id           String                 @id @default(cuid())
+  findingId    String
+  finding      QualityAuditFinding    @relation(fields: [findingId], references: [id], onDelete: Cascade)
+  title        String
+  description  String?
+  dueDate      DateTime?
+  status       CorrectiveActionStatus @default(open)
+  assignedToId String?
+  assignedTo   User?                  @relation("CorrectiveActionAssignee", fields: [assignedToId], references: [id], onDelete: SetNull)
+  createdAt    DateTime               @default(now())
+  updatedAt    DateTime               @updatedAt
+
+  history CorrectiveActionHistory[]
+
+  @@index([findingId])
+  @@index([status])
+  @@map("corrective_actions")
+}
+
+model CorrectiveActionHistory {
+  id         String                  @id @default(cuid())
+  actionId   String
+  action     CorrectiveAction        @relation(fields: [actionId], references: [id], onDelete: Cascade)
+  actorId    String?
+  actor      User?                   @relation("CorrectiveActionHistoryActor", fields: [actorId], references: [id], onDelete: SetNull)
+  fromStatus CorrectiveActionStatus?
+  toStatus   CorrectiveActionStatus
+  notes      String?
+  createdAt  DateTime                @default(now())
+
+  @@index([actionId, createdAt])
+  @@map("corrective_action_history")
+}
+
+model DataUseAgreement {
+  id          String                 @id @default(cuid())
+  projectId   String
+  project     ResearchProject        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  partnerName String
+  scope       String
+  status      DataUseAgreementStatus @default(draft)
+  approvedAt  DateTime?
+  revokedAt   DateTime?
+  createdAt   DateTime               @default(now())
+  updatedAt   DateTime               @updatedAt
+
+  @@index([projectId])
+  @@map("data_use_agreements")
+}
+
+model DelegateInvitation {
+  id                     String                   @id @default(cuid())
+  participantId          String
+  participant            User                     @relation("DelegateInvitationParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  inviteeEmail           String
+  inviteeUserId          String?
+  invitee                User?                    @relation("DelegateInvitationInvitee", fields: [inviteeUserId], references: [id], onDelete: SetNull)
+  roleType               String
+  proposedDomain         String
+  proposedActions        String[]                 @default([])
+  proposedConsentScopes  String[]                 @default([])
+  status                 DelegateInvitationStatus @default(pending)
+  message                String?
+  expiresAt              DateTime
+  acceptedAt             DateTime?
+  declinedAt             DateTime?
+  revokedAt              DateTime?
+  resultingGrantId       String?
+  resultingGrant         ParticipantAuthorityGrant? @relation(fields: [resultingGrantId], references: [id], onDelete: SetNull)
+  createdAt              DateTime                 @default(now())
+  updatedAt              DateTime                 @updatedAt
+
+  @@index([participantId, status])
+  @@index([inviteeEmail, status])
+  @@map("delegate_invitations")
+}
+
+model DocumentAccessGrant {
+  id          String   @id @default(cuid())
+  documentId  String
+  document    Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  purpose     String
+  expiresAt   DateTime
+  revokedAt   DateTime?
+  createdById String
+  createdAt   DateTime @default(now())
+
+  @@index([documentId, userId, expiresAt])
+  @@map("document_access_grants")
+}
+
+model DocumentVersion {
+  id              String   @id @default(cuid())
+  documentId      String
+  document        Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  version         Int
+  fileKey         String
+  storageVersion  String?
+  mimeType        String
+  fileSize        Int
+  scanStatus      DocumentScanStatus @default(not_configured)
+  createdById     String
+  createdAt       DateTime @default(now())
+
+  @@unique([documentId, version])
+  @@index([documentId, createdAt])
+  @@map("document_versions")
+}
+
+model EmergencyAccessRequest {
+  id              String                @id @default(cuid())
+  participantId   String
+  participant     User                  @relation("EmergencyAccessParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  requesterId     String
+  requester       User                  @relation("EmergencyAccessRequester", fields: [requesterId], references: [id], onDelete: Cascade)
+  purpose         String
+  justification   String
+  requestedScopes String[]              @default([])
+  status          EmergencyAccessStatus @default(requested)
+  expiresAt       DateTime?
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+  reviews         EmergencyAccessReview[]
+
+  @@index([participantId, status])
+  @@index([requesterId, status])
+  @@map("emergency_access_requests")
+}
+
+model EmergencyAccessReview {
+  id         String                 @id @default(cuid())
+  requestId  String
+  request    EmergencyAccessRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  reviewerId String
+  reviewer   User                   @relation("EmergencyAccessReviewer", fields: [reviewerId], references: [id], onDelete: Cascade)
+  decision   String
+  notes      String?
+  createdAt  DateTime               @default(now())
+
+  @@index([requestId])
+  @@map("emergency_access_reviews")
+}
+
+model EmergencyCommunicationCard {
+  id                    String                @id @default(cuid())
+  passportId            String                @unique
+  passport              CommunicationPassport @relation(fields: [passportId], references: [id], onDelete: Cascade)
+  emergencyContactName  String?
+  emergencyContactPhone String?
+  medicalNotes          String?
+  communicationNeeds    String?
+  accessInstructions    String?
+  lastReviewedAt        DateTime?
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
+
+  @@map("emergency_communication_cards")
+}
+
+model EmployerAccessibilityEvidence {
+  id             String                      @id @default(cuid())
+  organisationId String
+  organisation   Organisation                @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+  evidenceType   String
+  description    String
+  source         AccessibilityEvidenceSource
+  status         AccessibilityEvidenceStatus @default(pending)
+  verifiedAt     DateTime?
+  expiresAt      DateTime?
+  verifiedById   String?
+  verifiedBy     User?                       @relation("EmployerEvidenceVerifiedBy", fields: [verifiedById], references: [id], onDelete: SetNull)
+  attachmentRef  String?
+  createdAt      DateTime                    @default(now())
+  updatedAt      DateTime                    @updatedAt
+
+  @@index([organisationId])
+  @@index([status])
+  @@map("employer_accessibility_evidence")
+}
+
+model EmploymentGoal {
+  id            String                 @id @default(cuid())
+  profileId     String
+  profile       EmploymentProfile      @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  participantId String
+  participant   User                   @relation("EmploymentGoalParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  title         String
+  description   String?
+  category      EmploymentGoalCategory @default(other)
+  targetDate    DateTime?
+  status        EmploymentGoalStatus   @default(active)
+  createdAt     DateTime               @default(now())
+  updatedAt     DateTime               @updatedAt
+
+  @@index([profileId])
+  @@index([participantId, status])
+  @@map("employment_goals")
+}
+
+model EmploymentProfile {
+  id                 String   @id @default(cuid())
+  participantId      String   @unique
+  participant        User     @relation("EmploymentProfileParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  skills             String[] @default([])
+  interests          String[] @default([])
+  preferredWorkTypes String[] @default([])
+  preferredHours     String[] @default([])
+  preferredLocations String[] @default([])
+  remotePreference   String?
+  communicationPrefs Json     @default("{}")
+  adjustmentPrefs    Json     @default("{}")
+  disclosureChoices  Json     @default("{}")
+  transportDependency Boolean @default(false)
+  supportDependency   Boolean @default(false)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  goals              EmploymentGoal[]
+
+  @@map("employment_profiles")
+}
+
+model EthicsApproval {
+  id             String               @id @default(cuid())
+  projectId      String
+  project        ResearchProject      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  approvalNumber String?
+  status         EthicsApprovalStatus @default(pending)
+  approvedAt     DateTime?
+  expiresAt      DateTime?
+  conditions     String?
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+
+  @@index([projectId])
+  @@map("ethics_approvals")
+}
+
+model EvidenceAssessment {
+  id          String                   @id @default(cuid())
+  evidenceId  String
+  evidence    ComplianceEvidence       @relation(fields: [evidenceId], references: [id], onDelete: Cascade)
+  assessorId  String
+  assessor    User                     @relation("EvidenceAssessmentAssessor", fields: [assessorId], references: [id])
+  status      EvidenceAssessmentStatus @default(pending)
+  notes       String?
+  assessedAt  DateTime                 @default(now())
+
+  @@index([evidenceId])
+  @@index([assessorId])
+  @@map("evidence_assessments")
+}
+
+model EvidencePack {
+  id         String           @id @default(cuid())
+  caseId     String
+  case       CoordinationCase @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  packType   String
+  claimsJson Json             @default("[]")
+  createdAt  DateTime         @default(now())
+
+  @@index([caseId])
+  @@map("evidence_packs")
+}
+
+model EvidenceRequest {
+  id             String                 @id @default(cuid())
+  caseId         String
+  case           CoordinationCase       @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  participantId  String
+  participant    User                   @relation("EvidenceRequestParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  purpose        EvidenceRequestPurpose
+  status         EvidenceRequestStatus  @default(draft)
+  dueAt          DateTime?
+  provenanceJson Json                   @default("[]")
+  createdAt      DateTime               @default(now())
+
+  @@index([caseId])
+  @@index([participantId])
+  @@index([status])
+  @@map("evidence_requests")
+}
+
+model EvidenceRequirement {
+  id           String            @id @default(cuid())
+  indicatorId  String
+  indicator    StandardIndicator @relation(fields: [indicatorId], references: [id], onDelete: Cascade)
+  code         String
+  description  String
+  evidenceType String
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+
+  complianceEvidence ComplianceEvidence[]
+  applicationEvidence ProviderAccreditationApplicationEvidence[]
+
+  @@unique([indicatorId, code])
+  @@index([indicatorId])
+  @@map("evidence_requirements")
+}
+
+model ExpectedCostContext {
+  id                     String   @id @default(cuid())
+  participantId          String
+  participant            User     @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  missionId              String?
+  serviceAgreementId     String
+  bookingId              String?
+  providerOrganisationId String
+  supportItemCode        String?
+  supportDescription     String
+  expectedQuantity       Decimal?
+  expectedUnit           String?
+  expectedUnitPriceCents Int?
+  expectedTotalCents     Int?
+  travelTerms            Json?
+  cancellationTerms      Json?
+  fundingCategory        String?
+  evidenceSourceIds      String[] @default([])
+  validFrom              DateTime?
+  validUntil             DateTime?
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  @@index([participantId, providerOrganisationId, validUntil])
+  @@index([missionId])
+  @@index([bookingId])
+  @@map("expected_cost_contexts")
+}
+
+model FederationTrust {
+  id                String               @id @default(cuid())
+  partnerName       String
+  protocol          FederationProtocol
+  issuerUrl         String
+  clientId          String?
+  metadataUrl       String?
+  status            FederationTrustStatus @default(pending)
+  scopesAllowed     String[]             @default([])
+  participantAuthorityBlocked Boolean      @default(true)
+  notes             String?
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+
+  regionalOrganisations RegionalOrganisation[]
+
+  @@index([status])
+  @@index([protocol])
+  @@map("federation_trusts")
+}
+
+model HealthDeviceImport {
+  id            String    @id @default(cuid())
+  participantId String
+  participant   User      @relation("HealthDeviceImportParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  sourceLabel   String
+  payloadJson   Json      @default("{}")
+  importedAt    DateTime  @default(now())
+  revokedAt     DateTime?
+
+  @@index([participantId])
+  @@index([sourceLabel])
+  @@map("health_device_imports")
+}
+
+model HomeLivingProfile {
+  id                             String   @id @default(cuid())
+  participantId                  String   @unique
+  participant                    User     @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  desiredLivingArrangements      String[] @default([])
+  preferredLocations             String[] @default([])
+  householdPreferences           String[] @default([])
+  privacyPreferences             String[] @default([])
+  accessibilityRequirements      String[] @default([])
+  communicationRequirements      String[] @default([])
+  personalSupportRequirements    String[] @default([])
+  overnightSupportRequirements   String[] @default([])
+  equipmentRequirements          String[] @default([])
+  environmentalRequirements      String[] @default([])
+  communityConnectionPreferences String[] @default([])
+  transportRequirements          String[] @default([])
+  dignityOfRiskChoices           String[] @default([])
+  nonNegotiables                 String[] @default([])
+  informationSharingRules        String[] @default([])
+  createdAt                      DateTime @default(now())
+  updatedAt                      DateTime @updatedAt
+
+  @@map("home_living_profiles")
+}
+
+model ImprovementAction {
+  id             String                  @id @default(cuid())
+  organisationId String
+  organisation   Organisation            @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+  sourceFindingId String?
+  title          String
+  description    String?
+  status         ImprovementActionStatus @default(planned)
+  targetDate     DateTime?
+  createdAt      DateTime                @default(now())
+  updatedAt      DateTime                @updatedAt
+
+  history ImprovementActionHistory[]
+
+  @@index([organisationId, status])
+  @@map("improvement_actions")
+}
+
+model ImprovementActionHistory {
+  id         String                   @id @default(cuid())
+  actionId   String
+  action     ImprovementAction        @relation(fields: [actionId], references: [id], onDelete: Cascade)
+  actorId    String?
+  actor      User?                    @relation("ImprovementActionHistoryActor", fields: [actorId], references: [id], onDelete: SetNull)
+  fromStatus ImprovementActionStatus?
+  toStatus   ImprovementActionStatus
+  notes      String?
+  createdAt  DateTime                 @default(now())
+
+  @@index([actionId, createdAt])
+  @@map("improvement_action_history")
+}
+
+model InvoiceReconciliationRecord {
+  id                  String         @id @default(cuid())
+  invoiceId           String
+  invoice             BillingInvoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  expectedCostContextId String?
+  overallStatus       String
+  lineResults         Json
+  duplicateIndicators Json
+  differences         Json
+  missingEvidence     String[]       @default([])
+  uncertainty         String[]       @default([])
+  policyVersion       String
+  createdAt           DateTime       @default(now())
+
+  @@index([invoiceId, createdAt])
+  @@index([expectedCostContextId])
+  @@map("invoice_reconciliation_records")
+}
+
+model JobMatchExplanation {
+  id                          String   @id @default(cuid())
+  jobId                       String
+  job                         Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  participantId               String
+  participant                 User     @relation("JobMatchExplanationParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  requirementsMatched         Json     @default("[]")
+  requirementsNotMatched      Json     @default("[]")
+  adjustmentsAvailable        Json     @default("[]")
+  adjustmentsUnknown          Json     @default("[]")
+  locationAccess              Json     @default("{}")
+  transportDependency         Boolean?
+  supportDependency           Boolean?
+  applicationDecisionRequired Boolean  @default(false)
+  explanationSummary          String
+  generatedAt                 DateTime @default(now())
+
+  @@unique([jobId, participantId])
+  @@index([participantId])
+  @@map("job_match_explanations")
+}
+
+model JobRequirement {
+  id          String                 @id @default(cuid())
+  jobId       String
+  job         Job                    @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  category    JobRequirementCategory
+  label       String
+  description String?
+  isEssential Boolean                @default(true)
+  sortOrder   Int                    @default(0)
+  createdAt   DateTime               @default(now())
+
+  @@index([jobId])
+  @@map("job_requirements")
+}
+
+model LifeTwinDomainRecord {
+  id                  String               @id @default(cuid())
+  lifeTwinId          String
+  lifeTwin            ParticipantLifeTwin  @relation(fields: [lifeTwinId], references: [id], onDelete: Cascade)
+  participantId       String
+  domain              String
+  value               Json
+  source              String
+  verificationStatus  String
+  consentScopes       String[]             @default([])
+  version             Int                  @default(1)
+  supersedesRecordId  String?
+  expiresAt           DateTime?
+  disputedAt          DateTime?
+  deletedAt           DateTime?
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+
+  @@index([participantId, domain, deletedAt])
+  @@index([lifeTwinId, domain, version])
+  @@map("life_twin_domain_records")
+}
+
+model LifespanLiaisonBrief {
+  id                  String   @id @default(cuid())
+  participantId       String
+  missionId           String?
+  schemeFrom          String
+  schemeTo            String
+  summary             String
+  ypiracCautionShown  Boolean  @default(true)
+  authorityDecisionId String?
+  createdById         String
+  tenantId            String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@index([participantId, createdAt])
+  @@index([missionId])
+  @@map("lifespan_liaison_briefs")
+}
+
+model LoginAuditEvent {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  emailHash String?
+  eventType String
+  method    String?
+  metadata  Json     @default("{}")
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([eventType, createdAt])
+  @@map("login_audit_events")
+}
+
+model MetricDefinition {
+  id          String                 @id @default(cuid())
+  key         String                 @unique
+  name        String
+  description String?
+  unit        String?
+  module      String
+  status      MetricDefinitionStatus @default(draft)
+  formula     String?
+  createdAt   DateTime               @default(now())
+  updatedAt   DateTime               @updatedAt
+
+  dimensions MetricDimension[]
+  snapshots  MetricSnapshot[]
+  events     AnalyticsEvent[]
+
+  @@index([module, status])
+  @@map("metric_definitions")
+}
+
+model MetricDimension {
+  id                 String           @id @default(cuid())
+  metricDefinitionId String
+  metricDefinition   MetricDefinition @relation(fields: [metricDefinitionId], references: [id], onDelete: Cascade)
+  key                String
+  label              String
+  dataType           String           @default("string")
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+
+  @@unique([metricDefinitionId, key])
+  @@index([metricDefinitionId])
+  @@map("metric_dimensions")
+}
+
+model MetricSnapshot {
+  id                    String           @id @default(cuid())
+  metricDefinitionId    String
+  metricDefinition      MetricDefinition @relation(fields: [metricDefinitionId], references: [id], onDelete: Cascade)
+  periodStart           DateTime
+  periodEnd             DateTime
+  value                 Float?
+  dimensionsJson        Json?
+  cohortSize            Int              @default(0)
+  suppressed            Boolean          @default(false)
+  suppressionReason     String?
+  /// aggregated | pseudonymised | de-identified — never "anonymous" without basis
+  deidentificationLevel String           @default("aggregated")
+  createdAt             DateTime         @default(now())
+
+  @@index([metricDefinitionId, periodStart])
+  @@map("metric_snapshots")
+}
+
+model MfaEnrolment {
+  id         String    @id @default(cuid())
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  method     String
+  status     String    @default("pending")
+  enrolledAt DateTime?
+  disabledAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@unique([userId, method])
+  @@index([userId, status])
+  @@map("mfa_enrolments")
+}
+
+model MobilityDeviceCompatibility {
+  id              String             @id @default(cuid())
+  vehicleId       String
+  vehicle         TransportVehicle   @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  deviceType      MobilityDeviceType
+  compatible      Boolean            @default(false)
+  evidenceSource  String
+  maxWeightKg     Float?
+  maxWidthMm      Int?
+  maxLengthMm     Int?
+  verifiedAt      DateTime?
+  expiresAt       DateTime?
+  notes           String?
+  metadata        Json?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  @@unique([vehicleId, deviceType])
+  @@index([vehicleId, compatible])
+  @@index([expiresAt])
+  @@map("mobility_device_compatibilities")
+}
+
+model OAuthClient {
+  id                 String    @id @default(cuid())
+  apiClientId        String
+  apiClient          ApiClient @relation(fields: [apiClientId], references: [id], onDelete: Cascade)
+  clientId           String    @unique
+  clientSecretHash   String
+  clientSecretPrefix String
+  redirectUris       String[]  @default([])
+  grantTypes         String[]  @default(["authorization_code", "refresh_token"])
+  scopes             ApiScope[]
+  active             Boolean   @default(true)
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  grants OAuthGrant[]
+
+  @@index([apiClientId])
+  @@map("oauth_clients")
+}
+
+model OAuthGrant {
+  id               String      @id @default(cuid())
+  oauthClientId    String
+  oauthClient      OAuthClient @relation(fields: [oauthClientId], references: [id], onDelete: Cascade)
+  participantId    String?
+  userId           String?
+  scopes           ApiScope[]
+  accessTokenHash  String?
+  refreshTokenHash String?
+  expiresAt        DateTime
+  revokedAt        DateTime?
+  createdAt        DateTime    @default(now())
+
+  @@index([oauthClientId])
+  @@index([participantId])
+  @@map("oauth_grants")
+}
+
+model ParticipantContact {
+  id            String   @id @default(cuid())
+  participantId String
+  participant   User     @relation("ParticipantContactOwner", fields: [participantId], references: [id], onDelete: Cascade)
+  label         String
+  channel       String
+  value         String
+  preferred     Boolean  @default(false)
+  createdAt     DateTime @default(now())
+
+  @@index([participantId])
+  @@map("participant_contacts")
+}
+
+model ParticipantGoal {
+  id                  String   @id @default(cuid())
+  participantId       String
+  participant         User     @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  title               String
+  description         String
+  category            String
+  desiredBy           DateTime?
+  importance          String?
+  participantLanguage String
+  status              String   @default("active")
+  revision            Int      @default(1)
+  supersedesGoalId    String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@index([participantId, status, updatedAt])
+  @@map("participant_goals")
+}
+
+model ParticipantHiddenProvider {
+  id            String       @id @default(cuid())
+  participantId String
+  participant   User         @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  providerOrgId String
+  providerOrg   Organisation @relation(fields: [providerOrgId], references: [id], onDelete: Cascade)
+  createdAt     DateTime     @default(now())
+
+  @@unique([participantId, providerOrgId])
+  @@index([participantId, createdAt])
+  @@map("participant_hidden_providers")
+}
+
+model ParticipantInvoiceDecision {
+  id            String         @id @default(cuid())
+  invoiceId     String
+  invoice       BillingInvoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  participantId String
+  actorUserId   String
+  decision      String
+  reason        String?
+  authorityGrantId String?
+  createdAt     DateTime       @default(now())
+
+  @@index([participantId, createdAt])
+  @@index([invoiceId, createdAt])
+  @@map("participant_invoice_decisions")
+}
+
+model ParticipantLifeTwin {
+  id            String   @id @default(cuid())
+  participantId String   @unique
+  participant   User     @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  preferences   Json     @default("{}")
+  version       Int      @default(1)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  deletedAt     DateTime?
+  memories      ParticipantPreferenceMemory[]
+  domainRecords LifeTwinDomainRecord[]
+
+  @@index([participantId, deletedAt])
+  @@map("participant_life_twins")
+}
+
+model ParticipantPreferenceMemory {
+  id            String               @id @default(cuid())
+  lifeTwinId    String
+  lifeTwin      ParticipantLifeTwin  @relation(fields: [lifeTwinId], references: [id], onDelete: Cascade)
+  participantId String
+  key           String
+  value         Json
+  source        String
+  verifiedAt    DateTime?
+  consentScope  String?
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+  deletedAt     DateTime?
+
+  @@unique([lifeTwinId, key])
+  @@index([participantId, deletedAt])
+  @@map("participant_preference_memories")
+}
+
+model ParticipantProviderNote {
+  id            String       @id @default(cuid())
+  participantId String
+  participant   User         @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  providerOrgId String
+  providerOrg   Organisation @relation(fields: [providerOrgId], references: [id], onDelete: Cascade)
+  note          String
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  @@unique([participantId, providerOrgId])
+  @@index([participantId, updatedAt])
+  @@map("participant_provider_notes")
+}
+
+model ParticipantProviderShortlist {
+  id            String       @id @default(cuid())
+  participantId String
+  participant   User         @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  providerOrgId String
+  providerOrg   Organisation @relation(fields: [providerOrgId], references: [id], onDelete: Cascade)
+  createdAt     DateTime     @default(now())
+
+  @@unique([participantId, providerOrgId])
+  @@index([participantId, createdAt])
+  @@map("participant_provider_shortlists")
+}
+
+model ParticipantResearchConsent {
+  id            String                @id @default(cuid())
+  projectId     String
+  project       ResearchProject       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  participantId String
+  participant   User                  @relation("ResearchConsentParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  status        ResearchConsentStatus @default(invited)
+  grantedAt     DateTime?
+  withdrawnAt   DateTime?
+  consentNotes  String?
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @updatedAt
+
+  @@unique([projectId, participantId])
+  @@index([participantId])
+  @@map("participant_research_consents")
+}
+
+model ParticipantSupportPlan {
+  id            String   @id @default(cuid())
+  participantId String
+  participant   User     @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  title         String
+  status        String   @default("draft")
+  currentVersion Int?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  versions      SupportPlanVersion[]
+
+  @@index([participantId, status])
+  @@map("participant_support_plans")
+}
+
+model PlanAcknowledgement {
+  id             String                    @id @default(cuid())
+  planVersionId  String
+  planVersion    RehabilitationPlanVersion @relation(fields: [planVersionId], references: [id], onDelete: Cascade)
+  participantId  String
+  participant    User                      @relation("PlanAcknowledgementParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  acknowledgedAt DateTime                  @default(now())
+
+  @@unique([planVersionId, participantId])
+  @@index([participantId])
+  @@map("plan_acknowledgements")
+}
+
+model PlanReview {
+  id         String             @id @default(cuid())
+  planId     String
+  plan       RehabilitationPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+  reviewerId String
+  reviewer   User               @relation("PlanReviewReviewer", fields: [reviewerId], references: [id])
+  status     PlanReviewStatus   @default(pending)
+  notes      String             @default("")
+  createdAt  DateTime           @default(now())
+
+  @@index([planId])
+  @@index([reviewerId])
+  @@index([status])
+  @@map("plan_reviews")
+}
+
+model PlatformHealthCheck {
+  id          String               @id @default(cuid())
+  component   String
+  region      String               @default("ap-southeast-2")
+  status      PlatformHealthStatus @default(unknown)
+  message     String?
+  latencyMs   Int?
+  redacted    Boolean              @default(true)
+  checkedAt   DateTime             @default(now())
+  createdAt   DateTime             @default(now())
+
+  @@index([component, checkedAt])
+  @@index([region, status])
+  @@map("platform_health_checks")
+}
+
+model PlatformRegistrationChecklistItem {
+  id            String                   @id @default(cuid())
+  packId        String
+  pack          PlatformRegistrationPack @relation(fields: [packId], references: [id], onDelete: Cascade)
+  standardKey   String
+  label         String
+  status        String                   @default("not_started")
+  evidenceRefs  String[]                 @default([])
+  notes         String?
+  completedAt   DateTime?
+  completedById String?
+  createdAt     DateTime                 @default(now())
+  updatedAt     DateTime                 @updatedAt
+
+  @@unique([packId, standardKey])
+  @@index([packId, status])
+  @@map("platform_registration_checklist_items")
+}
+
+model PlatformRegistrationPack {
+  id                     String   @id @default(cuid())
+  organisationId         String?
+  tenantId               String?
+  title                  String
+  status                 String   @default("draft")
+  notes                  String?
+  /// Hard safety: live claim submission must remain false on every pack.
+  claimSubmissionEnabled Boolean  @default(false)
+  createdById            String
+  exportedAt             DateTime?
+  exportJson             Json?
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+  items                  PlatformRegistrationChecklistItem[]
+
+  @@index([organisationId, status])
+  @@index([tenantId, status])
+  @@map("platform_registration_packs")
+}
+
+model PolicyAcknowledgement {
+  id                  String         @id @default(cuid())
+  policyDocumentId    String
+  policyDocument      PolicyDocument @relation(fields: [policyDocumentId], references: [id], onDelete: Cascade)
+  userId              String
+  user                User           @relation("PolicyAcknowledgementUser", fields: [userId], references: [id], onDelete: Cascade)
+  versionAcknowledged String
+  acknowledgedAt      DateTime       @default(now())
+
+  @@unique([policyDocumentId, userId, versionAcknowledged])
+  @@index([userId])
+  @@map("policy_acknowledgements")
+}
+
+model PolicyDocument {
+  id             String               @id @default(cuid())
+  organisationId String
+  organisation   Organisation         @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+  title          String
+  version        String
+  storagePath    String?
+  contentSummary String?
+  status         PolicyDocumentStatus @default(draft)
+  publishedAt    DateTime?
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+
+  acknowledgements PolicyAcknowledgement[]
+
+  @@unique([organisationId, title, version])
+  @@index([organisationId, status])
+  @@map("policy_documents")
+}
+
+model PreferredQuestion {
+  id           String                @id @default(cuid())
+  passportId   String
+  passport     CommunicationPassport @relation(fields: [passportId], references: [id], onDelete: Cascade)
+  prompt       String
+  responseHint String?
+  sortOrder    Int                   @default(0)
+  createdAt    DateTime              @default(now())
+  updatedAt    DateTime              @updatedAt
+
+  @@index([passportId])
+  @@map("preferred_questions")
+}
+
+model PricingRuleSet {
+  id              String   @id @default(cuid())
+  jurisdiction    String
+  scheme          String
+  version         String
+  effectiveFrom   DateTime
+  effectiveTo     DateTime?
+  sourceReference String
+  status          String   @default("draft")
+  rulesJson       Json
+  createdAt       DateTime @default(now())
+
+  @@unique([jurisdiction, scheme, version])
+  @@index([jurisdiction, scheme, status, effectiveFrom])
+  @@map("pricing_rule_sets")
+}
+
+model PropertyAccessibilityEvidence {
+  id                 String             @id @default(cuid())
+  propertyId         String
+  property           AccessibleProperty @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  feature            String
+  value              String
+  source             String
+  verificationStatus String
+  observedAt         DateTime
+  expiresAt          DateTime?
+  disputedAt         DateTime?
+  createdAt          DateTime           @default(now())
+
+  @@index([propertyId, feature, verificationStatus])
+  @@index([expiresAt])
+  @@map("property_accessibility_evidence")
+}
+
+model ProviderAccreditationAppealRecord {
+  id            String                               @id @default(cuid())
+  applicationId String
+  application   ProviderAccreditationApplication   @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  appellantId   String
+  appellant     User                                 @relation("ProviderAccreditationAppellant", fields: [appellantId], references: [id])
+  reason        String
+  status        ProviderAccreditationAppealStatus    @default(submitted)
+  decidedById   String?
+  decidedBy     User?                                @relation("ProviderAccreditationAppealDecider", fields: [decidedById], references: [id], onDelete: SetNull)
+  decisionNotes String?
+  submittedAt   DateTime                             @default(now())
+  decidedAt     DateTime?
+
+  @@index([applicationId])
+  @@map("provider_accreditation_appeal_records")
+}
+
+model ProviderAccreditationApplication {
+  id                             String                               @id @default(cuid())
+  organisationId                 String
+  organisation                   Organisation                         @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+  frameworkId                    String
+  framework                      StandardFramework                    @relation(fields: [frameworkId], references: [id])
+  status                         ProviderAccreditationApplicationStatus @default(draft)
+  submittedById                  String?
+  submittedBy                    User?                                @relation("ProviderAccreditationApplicant", fields: [submittedById], references: [id], onDelete: SetNull)
+  submittedAt                    DateTime?
+  accessAccreditationAssessmentId String?
+  accessAccreditationAssessment  AccessAccreditationAssessment?       @relation(fields: [accessAccreditationAssessmentId], references: [id], onDelete: SetNull)
+  expiresAt                      DateTime?
+  renewalDueAt                   DateTime?
+  suspendedAt                    DateTime?
+  createdAt                      DateTime                             @default(now())
+  updatedAt                      DateTime                             @updatedAt
+
+  evidence        ProviderAccreditationApplicationEvidence[]
+  assessments     ProviderAccreditationAssessment[]
+  clarifications  ProviderAccreditationClarification[]
+  decisions       ProviderAccreditationDecision[]
+  appeals         ProviderAccreditationAppealRecord[]
+  events          ProviderAccreditationApplicationEvent[]
+
+  @@index([organisationId, status])
+  @@index([frameworkId])
+  @@index([accessAccreditationAssessmentId])
+  @@map("provider_accreditation_applications")
+}
+
+model ProviderAccreditationApplicationEvent {
+  id            String                           @id @default(cuid())
+  applicationId String
+  application   ProviderAccreditationApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  actorId       String?
+  action        String
+  metadata      Json?
+  createdAt     DateTime                         @default(now())
+
+  @@index([applicationId, createdAt])
+  @@map("provider_accreditation_application_events")
+}
+
+model ProviderAccreditationApplicationEvidence {
+  id            String                           @id @default(cuid())
+  applicationId String
+  application   ProviderAccreditationApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  requirementId String?
+  requirement   EvidenceRequirement?             @relation(fields: [requirementId], references: [id], onDelete: SetNull)
+  storagePath   String?
+  caption       String?
+  sourceRef     String?
+  createdAt     DateTime                         @default(now())
+
+  @@index([applicationId])
+  @@map("provider_accreditation_application_evidence")
+}
+
+model ProviderAccreditationAssessment {
+  id            String                           @id @default(cuid())
+  applicationId String
+  application   ProviderAccreditationApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  assessorId    String
+  assessor      User                             @relation("ProviderAccreditationAssessor", fields: [assessorId], references: [id])
+  status        String                           @default("draft")
+  evidenceIndex Json                             @default("[]")
+  notes         String?
+  preparedAt    DateTime?
+  createdAt     DateTime                         @default(now())
+
+  @@index([applicationId])
+  @@index([assessorId])
+  @@map("provider_accreditation_assessments")
+}
+
+model ProviderAccreditationClarification {
+  id            String                                   @id @default(cuid())
+  applicationId String
+  application   ProviderAccreditationApplication       @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  requestedById String
+  requestedBy   User                                     @relation("ProviderAccreditationClarificationRequester", fields: [requestedById], references: [id])
+  question      String
+  response      String?
+  status        ProviderAccreditationClarificationStatus @default(open)
+  createdAt     DateTime                                 @default(now())
+  respondedAt   DateTime?
+
+  @@index([applicationId])
+  @@map("provider_accreditation_clarifications")
+}
+
+model ProviderAccreditationDecision {
+  id            String                               @id @default(cuid())
+  applicationId String
+  application   ProviderAccreditationApplication   @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  deciderId     String
+  decider       User                                 @relation("ProviderAccreditationDecider", fields: [deciderId], references: [id])
+  outcome       ProviderAccreditationDecisionOutcome
+  conditions    String?
+  effectiveAt   DateTime?
+  expiresAt     DateTime?
+  notes         String?
+  decidedAt     DateTime                             @default(now())
+
+  @@index([applicationId])
+  @@index([deciderId])
+  @@map("provider_accreditation_decisions")
+}
+
+model ProviderCapabilityEvidence {
+  id                  String       @id @default(cuid())
+  organisationId      String
+  organisation        Organisation @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+  serviceType         String
+  geography           String?
+  capability          String
+  communicationSupport String[]   @default([])
+  mobilityFeatures    String[]    @default([])
+  assistanceAnimalSupported Boolean @default(false)
+  source              String
+  verificationStatus  String
+  permittedPurposes   String[]    @default([])
+  effectiveAt         DateTime    @default(now())
+  expiresAt           DateTime?
+  revokedAt           DateTime?
+  disputedAt          DateTime?
+  evidenceSummary     String?
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
+
+  @@index([organisationId, serviceType, verificationStatus])
+  @@index([expiresAt, revokedAt])
+  @@map("provider_capability_evidence")
+}
+
+model ProviderEnquiry {
+  id                 String                @id @default(cuid())
+  caseId             String
+  case               CoordinationCase      @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  participantId      String
+  participant        User                  @relation("ProviderEnquiryParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  organisationId     String?
+  organisation       Organisation?         @relation(fields: [organisationId], references: [id], onDelete: SetNull)
+  providerName       String
+  disclosurePreview  String
+  status             ProviderEnquiryStatus @default(draft)
+  responseDeadline   DateTime?
+  responseJson       Json?
+  createdAt          DateTime              @default(now())
+  withdrawnAt        DateTime?
+
+  @@index([caseId])
+  @@index([participantId])
+  @@index([status])
+  @@map("provider_enquiries")
+}
+
+model ProviderServiceOffering {
+  id                    String       @id @default(cuid())
+  organisationId        String
+  organisation          Organisation @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+  serviceType           String
+  registrationGroup     String?
+  title                 String
+  description           String
+  serviceAreas          String[]     @default([])
+  deliveryModes         String[]     @default([])
+  participantAgeGroups  String[]     @default([])
+  accessibilityFeatures String[]     @default([])
+  supportCapabilities   String[]     @default([])
+  communicationCapabilities String[] @default([])
+  highIntensitySupported Boolean     @default(false)
+  status                String       @default("active")
+  evidenceExpiresAt     DateTime?
+  createdAt             DateTime     @default(now())
+  updatedAt             DateTime     @updatedAt
+  deletedAt             DateTime?
+
+  @@index([organisationId, serviceType, status])
+  @@index([evidenceExpiresAt])
+  @@map("provider_service_offerings")
+}
+
+model PublicationRecord {
+  id              String                  @id @default(cuid())
+  projectId       String
+  project         ResearchProject         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  title           String
+  doi             String?
+  status          PublicationRecordStatus @default(draft)
+  publishedAt     DateTime?
+  acknowledgement String?
+  createdAt       DateTime                @default(now())
+  updatedAt       DateTime                @updatedAt
+
+  @@index([projectId])
+  @@map("publication_records")
+}
+
+model QualityAuditFinding {
+  id             String                      @id @default(cuid())
+  auditPlanId    String
+  auditPlan      QualityAuditPlan            @relation(fields: [auditPlanId], references: [id], onDelete: Cascade)
+  organisationId String
+  organisation   Organisation                @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+  indicatorId    String?
+  indicator      StandardIndicator?          @relation(fields: [indicatorId], references: [id], onDelete: SetNull)
+  title          String
+  description    String
+  severity       QualityAuditFindingSeverity @default(minor)
+  status         QualityAuditFindingStatus   @default(open)
+  assignedToId   String?
+  assignedTo     User?                       @relation("QualityAuditFindingAssignee", fields: [assignedToId], references: [id], onDelete: SetNull)
+  createdAt      DateTime                    @default(now())
+  updatedAt      DateTime                    @updatedAt
+
+  correctiveActions CorrectiveAction[]
+  history           QualityAuditFindingHistory[]
+
+  @@index([auditPlanId])
+  @@index([organisationId, status])
+  @@map("quality_audit_findings")
+}
+
+model QualityAuditFindingHistory {
+  id         String                      @id @default(cuid())
+  findingId  String
+  finding    QualityAuditFinding         @relation(fields: [findingId], references: [id], onDelete: Cascade)
+  actorId    String?
+  fromStatus QualityAuditFindingStatus?
+  toStatus   QualityAuditFindingStatus
+  notes      String?
+  createdAt  DateTime                    @default(now())
+
+  @@index([findingId, createdAt])
+  @@map("quality_audit_finding_history")
+}
+
+model QualityAuditPlan {
+  id             String                 @id @default(cuid())
+  organisationId String
+  organisation   Organisation           @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+  title          String
+  scope          String?
+  scheduledAt    DateTime?
+  status         QualityAuditPlanStatus @default(draft)
+  createdById    String
+  createdBy      User                   @relation("QualityAuditPlanCreator", fields: [createdById], references: [id])
+  createdAt      DateTime               @default(now())
+  updatedAt      DateTime               @updatedAt
+
+  findings QualityAuditFinding[]
+
+  @@index([organisationId, status])
+  @@index([createdById])
+  @@map("quality_audit_plans")
+}
+
+model RegionalOrganisation {
+  id                String                     @id @default(cuid())
+  organisationId    String?
+  organisation      Organisation?              @relation(fields: [organisationId], references: [id], onDelete: SetNull)
+  federationTrustId String?
+  federationTrust   FederationTrust?           @relation(fields: [federationTrustId], references: [id], onDelete: SetNull)
+  regionCode        String
+  displayName       String
+  status            RegionalOrganisationStatus @default(draft)
+  directoryRef      String?
+  createdAt         DateTime                   @default(now())
+  updatedAt         DateTime                   @updatedAt
+
+  @@index([regionCode])
+  @@index([organisationId])
+  @@index([federationTrustId])
+  @@map("regional_organisations")
+}
+
+model RehabilitationActivity {
+  id                     String                       @id @default(cuid())
+  planId                 String
+  plan                   RehabilitationPlan           @relation(fields: [planId], references: [id], onDelete: Cascade)
+  title                  String
+  scheduledAt            DateTime?
+  instructionsAccessible String
+  equipmentJson          Json                         @default("[]")
+  status                 RehabilitationActivityStatus @default(scheduled)
+  completionNote         String?
+  participantFeedback    String?
+  completedAt            DateTime?
+  createdAt              DateTime                     @default(now())
+  updatedAt              DateTime                     @updatedAt
+
+  @@index([planId])
+  @@index([status])
+  @@index([scheduledAt])
+  @@map("rehabilitation_activities")
+}
+
+model RehabilitationGoal {
+  id            String                   @id @default(cuid())
+  planId        String
+  plan          RehabilitationPlan       @relation(fields: [planId], references: [id], onDelete: Cascade)
+  participantId String
+  participant   User                     @relation("RehabilitationGoalParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  title         String
+  status        RehabilitationGoalStatus @default(active)
+  createdAt     DateTime                 @default(now())
+
+  @@index([planId])
+  @@index([participantId])
+  @@index([status])
+  @@map("rehabilitation_goals")
+}
+
+model RehabilitationPlan {
+  id                 String                   @id @default(cuid())
+  participantId      String
+  participant        User                     @relation("RehabilitationPlanParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  clinicianAuthorId  String
+  clinicianAuthor    User                     @relation("RehabilitationPlanClinicianAuthor", fields: [clinicianAuthorId], references: [id])
+  status             RehabilitationPlanStatus @default(draft)
+  title              String
+  createdAt          DateTime                 @default(now())
+  updatedAt          DateTime                 @updatedAt
+  versions           RehabilitationPlanVersion[]
+  goals              RehabilitationGoal[]
+  reviews            PlanReview[]
+  activities         RehabilitationActivity[]
+  telehealthSessions TelehealthSessionRecord[]
+
+  @@index([participantId])
+  @@index([clinicianAuthorId])
+  @@index([status])
+  @@map("rehabilitation_plans")
+}
+
+model RehabilitationPlanVersion {
+  id               String             @id @default(cuid())
+  planId           String
+  plan             RehabilitationPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+  version          Int
+  instructionsJson Json               @default("{}")
+  changeSummary    String
+  authoredById     String
+  authoredBy       User               @relation("RehabilitationPlanVersionAuthor", fields: [authoredById], references: [id])
+  approvedAt       DateTime?
+  createdAt        DateTime           @default(now())
+  acknowledgements PlanAcknowledgement[]
+
+  @@unique([planId, version])
+  @@index([planId])
+  @@index([authoredById])
+  @@map("rehabilitation_plan_versions")
+}
+
+model ResearchCohort {
+  id               String          @id @default(cuid())
+  projectId        String
+  project          ResearchProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  name             String
+  criteriaJson     Json?
+  participantCount Int             @default(0)
+  suppressed       Boolean         @default(false)
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+
+  @@index([projectId])
+  @@map("research_cohorts")
+}
+
+model ResearchExport {
+  id                    String               @id @default(cuid())
+  projectId             String
+  project               ResearchProject      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  requestedById         String
+  requestedBy           User                 @relation("ResearchExportRequester", fields: [requestedById], references: [id], onDelete: Cascade)
+  exportLabel           String
+  status                ResearchExportStatus @default(draft)
+  deidentificationLevel String               @default("pseudonymised")
+  ethicsChecked         Boolean              @default(false)
+  approvedById          String?
+  approvedBy            User?                @relation("ResearchExportApprover", fields: [approvedById], references: [id], onDelete: SetNull)
+  approvedAt            DateTime?
+  bundleJson            Json?
+  createdAt             DateTime             @default(now())
+  updatedAt             DateTime             @updatedAt
+
+  @@index([projectId, status])
+  @@map("research_exports")
+}
+
+model ResearchProject {
+  id                    String                @id @default(cuid())
+  title                 String
+  description           String?
+  status                ResearchProjectStatus @default(draft)
+  organisationId        String?
+  organisation          Organisation?         @relation(fields: [organisationId], references: [id], onDelete: SetNull)
+  principalInvestigator String?
+  syntheticDataOnly     Boolean               @default(true)
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
+
+  ethicsApprovals     EthicsApproval[]
+  dataUseAgreements   DataUseAgreement[]
+  consents            ParticipantResearchConsent[]
+  cohorts             ResearchCohort[]
+  exports             ResearchExport[]
+  withdrawals         ResearchWithdrawal[]
+  publications        PublicationRecord[]
+
+  @@index([status])
+  @@index([organisationId])
+  @@map("research_projects")
+}
+
+model ResearchWithdrawal {
+  id            String          @id @default(cuid())
+  projectId     String
+  project       ResearchProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  participantId String
+  participant   User            @relation("ResearchWithdrawalParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  reason        String?
+  effectiveAt   DateTime        @default(now())
+  exportBlocked Boolean         @default(true)
+  dataPurged    Boolean         @default(false)
+  createdAt     DateTime        @default(now())
+
+  @@index([projectId, participantId])
+  @@map("research_withdrawals")
+}
+
+model RestoreDrillRecord {
+  id              String              @id @default(cuid())
+  title           String
+  environment     String              @default("staging")
+  outcome         RestoreDrillOutcome @default(not_run)
+  rpoAchievedMin  Int?
+  rtoAchievedMin  Int?
+  testedAt        DateTime?
+  evidenceJson    Json?
+  notes           String?
+  conductedById   String?
+  conductedBy     User?               @relation("RestoreDrillConductor", fields: [conductedById], references: [id], onDelete: SetNull)
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+
+  @@index([environment, testedAt])
+  @@index([outcome])
+  @@map("restore_drill_records")
+}
+
+model RestraintCapability {
+  id              String        @id @default(cuid())
+  vehicleId       String
+  vehicle         TransportVehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  restraintType   RestraintType
+  quantity        Int           @default(1)
+  evidenceSource  String
+  verifiedAt      DateTime?
+  expiresAt       DateTime?
+  notes           String?
+  metadata        Json?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([vehicleId, restraintType])
+  @@index([expiresAt])
+  @@map("restraint_capabilities")
+}
+
+model SavedPhrase {
+  id         String                @id @default(cuid())
+  passportId String
+  passport   CommunicationPassport @relation(fields: [passportId], references: [id], onDelete: Cascade)
+  label      String
+  text       String
+  category   String?
+  sortOrder  Int                   @default(0)
+  createdAt  DateTime              @default(now())
+  updatedAt  DateTime              @updatedAt
+
+  @@index([passportId])
+  @@map("saved_phrases")
+}
+
+model ServiceAccount {
+  id                          String    @id @default(cuid())
+  apiClientId                 String
+  apiClient                   ApiClient @relation(fields: [apiClientId], references: [id], onDelete: Cascade)
+  name                        String
+  scopes                      ApiScope[]
+  active                      Boolean   @default(true)
+  participantAuthorityBlocked Boolean   @default(true)
+  createdAt                   DateTime  @default(now())
+  updatedAt                   DateTime  @updatedAt
+
+  accessLogs ApiAccessLog[]
+
+  @@index([apiClientId])
+  @@map("service_accounts")
+}
+
+model ShiftOffer {
+  id             String        @id @default(cuid())
+  careShiftId    String
+  careShift      CareShift     @relation(fields: [careShiftId], references: [id], onDelete: Cascade)
+  workerProfileId String
+  workerProfile  WorkerProfile @relation(fields: [workerProfileId], references: [id], onDelete: Cascade)
+  participantId  String
+  participant    User          @relation("ShiftOfferParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  missionId      String?
+  status         String        @default("awaiting_participant")
+  payloadHash    String
+  idempotencyKey String        @unique
+  participantConfirmedAt DateTime?
+  workerRespondedAt DateTime?
+  expiresAt      DateTime
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@index([careShiftId, status])
+  @@index([workerProfileId, status, expiresAt])
+  @@index([participantId, status])
+  @@index([missionId, createdAt])
+  @@map("shift_offers")
+}
+
+model StandardFramework {
+  id          String                  @id @default(cuid())
+  code        String
+  name        String
+  version     String
+  description String?
+  status      StandardFrameworkStatus @default(draft)
+  publishedAt DateTime?
+  sourceRef   String?
+  createdAt   DateTime                @default(now())
+  updatedAt   DateTime                @updatedAt
+
+  outcomes    StandardOutcome[]
+  applications ProviderAccreditationApplication[]
+
+  @@unique([code, version])
+  @@index([status])
+  @@map("standard_frameworks")
+}
+
+model StandardIndicator {
+  id          String          @id @default(cuid())
+  outcomeId   String
+  outcome     StandardOutcome @relation(fields: [outcomeId], references: [id], onDelete: Cascade)
+  code        String
+  title       String
+  description String?
+  sortOrder   Int             @default(0)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  evidenceRequirements EvidenceRequirement[]
+  auditFindings        QualityAuditFinding[]
+
+  @@unique([outcomeId, code])
+  @@index([outcomeId])
+  @@map("standard_indicators")
+}
+
+model StandardOutcome {
+  id          String            @id @default(cuid())
+  frameworkId String
+  framework   StandardFramework @relation(fields: [frameworkId], references: [id], onDelete: Cascade)
+  code        String
+  title       String
+  description String?
+  sortOrder   Int               @default(0)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  indicators  StandardIndicator[]
+
+  @@unique([frameworkId, code])
+  @@index([frameworkId])
+  @@map("standard_outcomes")
+}
+
+model StepUpChallenge {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  purpose     String
+  status      String    @default("pending")
+  expiresAt   DateTime
+  satisfiedAt DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@index([userId, status, expiresAt])
+  @@map("step_up_challenges")
+}
+
+model SupportPlanVersion {
+  id                    String                 @id @default(cuid())
+  supportPlanId         String
+  supportPlan           ParticipantSupportPlan @relation(fields: [supportPlanId], references: [id], onDelete: Cascade)
+  version               Int
+  authorUserId          String
+  authorAuthority       String
+  instructionsJson      Json
+  limitations           String[]               @default([])
+  emergencyEscalation   String?
+  effectiveAt           DateTime
+  reviewAt              DateTime?
+  supersededAt          DateTime?
+  createdAt             DateTime               @default(now())
+
+  @@unique([supportPlanId, version])
+  @@index([supportPlanId, effectiveAt, supersededAt])
+  @@map("support_plan_versions")
+}
+
+model TelehealthSessionRecord {
+  id            String                        @id @default(cuid())
+  planId        String?
+  plan          RehabilitationPlan?           @relation(fields: [planId], references: [id], onDelete: SetNull)
+  participantId String
+  participant   User                          @relation("TelehealthSessionParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  clinicianId   String?
+  clinician     User?                         @relation("TelehealthSessionClinician", fields: [clinicianId], references: [id], onDelete: SetNull)
+  scheduledAt   DateTime
+  joinUrl       String?
+  status        TelehealthSessionRecordStatus @default(scheduled)
+  createdAt     DateTime                      @default(now())
+
+  @@index([planId])
+  @@index([participantId])
+  @@index([clinicianId])
+  @@index([status])
+  @@map("telehealth_session_records")
+}
+
+model TenantAccessDenial {
+  id                String   @id @default(cuid())
+  actorUserId       String
+  attemptedTenantId String
+  resourceType      String
+  resourceId        String?
+  reason            String
+  createdAt         DateTime @default(now())
+
+  @@index([actorUserId, createdAt])
+  @@index([attemptedTenantId, createdAt])
+  @@map("tenant_access_denials")
+}
+
+model ThinMarketContinuitySignal {
+  id                        String   @id @default(cuid())
+  regionKey                 String
+  serviceCategory           String
+  capacityStatus            String
+  notes                     String?
+  observedAt                DateTime @default(now())
+  requiresHumanConfirmation Boolean  @default(true)
+  confirmedAt               DateTime?
+  confirmedByUserId         String?
+  tenantId                  String?
+  createdById               String
+  createdAt                 DateTime @default(now())
+  updatedAt                 DateTime @updatedAt
+
+  @@index([regionKey, serviceCategory])
+  @@index([capacityStatus, observedAt])
+  @@map("thin_market_continuity_signals")
+}
+
+model TrainingCompletionRecord {
+  id            String              @id @default(cuid())
+  requirementId String
+  requirement   TrainingRequirement @relation(fields: [requirementId], references: [id], onDelete: Cascade)
+  userId        String
+  user          User                @relation("TrainingCompletionUser", fields: [userId], references: [id], onDelete: Cascade)
+  completedAt   DateTime            @default(now())
+  expiresAt     DateTime?
+  evidenceRef   String?
+  notes         String?
+
+  @@index([requirementId])
+  @@index([userId])
+  @@map("training_completion_records")
+}
+
+model TrainingRequirement {
+  id             String                    @id @default(cuid())
+  organisationId String
+  organisation   Organisation              @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+  title          String
+  description    String?
+  renewalDays    Int?
+  requiredRoles  String[]                  @default([])
+  status         TrainingRequirementStatus @default(active)
+  createdAt      DateTime                  @default(now())
+  updatedAt      DateTime                  @updatedAt
+
+  completions TrainingCompletionRecord[]
+
+  @@index([organisationId, status])
+  @@map("training_requirements")
+}
+
+model TransportContinuityRecoveryOption {
+  id                String   @id @default(cuid())
+  requestId         String
+  request           TransportContinuityRecoveryRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  optionKey         String
+  label             String
+  description       String
+  vehicleId         String?
+  driverId          String?
+  providerOrganisationId String?
+  isLiveData        Boolean  @default(false)
+  nonLiveAlternative Boolean @default(true)
+  evidenceSummary   String?
+  metadata          Json?
+  sortOrder         Int      @default(0)
+  createdAt         DateTime @default(now())
+
+  @@index([requestId, sortOrder])
+  @@map("transport_continuity_recovery_options")
+}
+
+model TransportContinuityRecoveryRequest {
+  id                  String                          @id @default(cuid())
+  tripId              String
+  trip                TransportTrip                   @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  participantId       String
+  trigger             TransportContinuityTrigger
+  status              TransportContinuityRecoveryStatus @default(options_presented)
+  requiresConfirmation Boolean                        @default(true)
+  confirmedByUserId   String?
+  confirmedAt         DateTime?
+  expiresAt           DateTime?
+  notes               String?
+  metadata            Json?
+  createdAt           DateTime                        @default(now())
+  updatedAt           DateTime                        @updatedAt
+
+  options             TransportContinuityRecoveryOption[]
+
+  @@index([tripId, status])
+  @@index([participantId, status])
+  @@map("transport_continuity_recovery_requests")
+}
+
+model TransportDisruptionEvent {
+  id                String                    @id @default(cuid())
+  tripId            String?
+  trip              TransportTrip?            @relation(fields: [tripId], references: [id], onDelete: SetNull)
+  participantId     String?
+  kind              TransportDisruptionKind
+  status            TransportDisruptionStatus @default(open)
+  source            String
+  sourceFreshnessAt DateTime?
+  title             String
+  description       String?
+  metadata          Json?
+  acknowledgedAt    DateTime?
+  resolvedAt        DateTime?
+  createdAt         DateTime                  @default(now())
+  updatedAt         DateTime                  @updatedAt
+
+  @@index([tripId, status])
+  @@index([participantId, status])
+  @@index([kind, status])
+  @@map("transport_disruption_events")
+}
+
+model TransportReturnTripAssurance {
+  id                String                    @id @default(cuid())
+  outboundTripId    String
+  outboundTrip      TransportTrip             @relation(fields: [outboundTripId], references: [id], onDelete: Cascade)
+  returnTripId      String?
+  status            ReturnTripAssuranceStatus @default(pending)
+  assuredByUserId   String?
+  assuredAt         DateTime?
+  notes             String?
+  metadata          Json?
+  createdAt         DateTime                  @default(now())
+  updatedAt         DateTime                  @updatedAt
+
+  @@index([outboundTripId, status])
+  @@index([returnTripId])
+  @@map("transport_return_trip_assurances")
+}
+
+model TrustedDevice {
+  id                    String    @id @default(cuid())
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deviceLabel           String
+  deviceFingerprintHash String
+  lastSeenAt            DateTime  @default(now())
+  revokedAt             DateTime?
+  createdAt             DateTime  @default(now())
+
+  @@index([userId, revokedAt])
+  @@map("trusted_devices")
+}
+
+model VehicleAccessibilityEvidence {
+  id              String                    @id @default(cuid())
+  vehicleId       String
+  vehicle         TransportVehicle          @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  kind            AccessibilityEvidenceKind
+  source          String
+  measuredValue   String?
+  unit            String?
+  verifiedAt      DateTime?
+  expiresAt       DateTime?
+  evidenceUrl     String?
+  notes           String?
+  metadata        Json?
+  createdAt       DateTime                  @default(now())
+  updatedAt       DateTime                  @updatedAt
+
+  @@index([vehicleId, kind])
+  @@index([expiresAt])
+  @@map("vehicle_accessibility_evidence")
+}
+
+model VehicleInspection {
+  id              String                   @id @default(cuid())
+  vehicleId       String
+  vehicle         TransportVehicle         @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  inspectedAt     DateTime
+  outcome         VehicleInspectionOutcome
+  inspectorName   String?
+  evidenceSource  String
+  expiresAt       DateTime?
+  findings        String?
+  metadata        Json?
+  createdAt       DateTime                 @default(now())
+  updatedAt       DateTime                 @updatedAt
+
+  @@index([vehicleId, inspectedAt])
+  @@index([expiresAt])
+  @@map("vehicle_inspections")
+}
+
+model WebhookDeliveryLog {
+  id             String                @id @default(cuid())
+  subscriptionId String
+  subscription   WebhookSubscription   @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  eventId        String                @unique
+  eventType      String
+  payloadHash    String
+  timestampSent  DateTime
+  status         WebhookDeliveryStatus @default(pending)
+  attemptCount   Int                   @default(0)
+  maxAttempts    Int                   @default(5)
+  nextRetryAt    DateTime?
+  lastError      String?
+  responseStatus Int?
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+
+  @@index([subscriptionId, createdAt])
+  @@index([status, nextRetryAt])
+  @@map("webhook_delivery_logs")
+}
+
+model WebhookSubscription {
+  id                      String    @id @default(cuid())
+  apiClientId             String
+  apiClient               ApiClient @relation(fields: [apiClientId], references: [id], onDelete: Cascade)
+  url                     String
+  eventTypes              String[]
+  secretHash              String
+  secretPrefix            String
+  signingVersion          Int       @default(1)
+  active                  Boolean   @default(true)
+  previousSecretHash      String?
+  previousSecretExpiresAt DateTime?
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+
+  deliveries WebhookDeliveryLog[]
+
+  @@index([apiClientId])
+  @@map("webhook_subscriptions")
+}
+
+model WorkerCompetencyEvidence {
+  id                  String        @id @default(cuid())
+  workerProfileId     String
+  workerProfile       WorkerProfile @relation(fields: [workerProfileId], references: [id], onDelete: Cascade)
+  competencyType      String
+  participantId       String?
+  source              String
+  verificationStatus  String
+  verifiedByUserId    String?
+  effectiveAt         DateTime
+  expiresAt           DateTime?
+  revokedAt           DateTime?
+  limitations         String[]      @default([])
+  createdAt           DateTime      @default(now())
+
+  @@index([workerProfileId, competencyType, verificationStatus])
+  @@index([participantId, competencyType])
+  @@index([expiresAt, revokedAt])
+  @@map("worker_competency_evidence")
+}
+
+model WorkerCredentialEvidence {
+  id                  String        @id @default(cuid())
+  workerProfileId     String
+  workerProfile       WorkerProfile @relation(fields: [workerProfileId], references: [id], onDelete: Cascade)
+  credentialType      String
+  jurisdiction        String        @default("AU")
+  issuer              String?
+  identifierMasked    String?
+  verificationStatus  String
+  issuedAt            DateTime?
+  expiresAt           DateTime?
+  revokedAt           DateTime?
+  renewalRequiredAt   DateTime?
+  source              String
+  evidenceSummary     String?
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+
+  @@index([workerProfileId, credentialType, verificationStatus])
+  @@index([expiresAt, revokedAt])
+  @@map("worker_credential_evidence")
+}
+
+model WorkerEquipmentEvidence {
+  id                  String        @id @default(cuid())
+  workerProfileId     String
+  workerProfile       WorkerProfile @relation(fields: [workerProfileId], references: [id], onDelete: Cascade)
+  equipmentType       String
+  compatibilityTags   String[]      @default([])
+  verificationStatus  String
+  inspectedAt         DateTime?
+  maintenanceDueAt    DateTime?
+  expiresAt           DateTime?
+  revokedAt           DateTime?
+  source              String
+  evidenceSummary     String?
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+
+  @@index([workerProfileId, equipmentType, verificationStatus])
+  @@index([expiresAt, revokedAt])
+  @@map("worker_equipment_evidence")
+}
+
+model WorkplaceAccessibilityEvidence {
+  id                  String                      @id @default(cuid())
+  workplaceLocationId String
+  workplaceLocation   WorkplaceLocation           @relation(fields: [workplaceLocationId], references: [id], onDelete: Cascade)
+  evidenceType        String
+  description         String
+  source              AccessibilityEvidenceSource
+  status              AccessibilityEvidenceStatus @default(pending)
+  verifiedAt          DateTime?
+  expiresAt           DateTime?
+  verifiedById        String?
+  verifiedBy          User?                       @relation("WorkplaceEvidenceVerifiedBy", fields: [verifiedById], references: [id], onDelete: SetNull)
+  createdAt           DateTime                    @default(now())
+  updatedAt           DateTime                    @updatedAt
+
+  @@index([workplaceLocationId])
+  @@index([status])
+  @@map("workplace_accessibility_evidence")
+}
+
+model WorkplaceLocation {
+  id             String       @id @default(cuid())
+  organisationId String
+  organisation   Organisation @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+  name           String
+  address        String?
+  suburb         String?
+  state          String?
+  postcode       String?
+  isPrimary      Boolean      @default(false)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  evidence       WorkplaceAccessibilityEvidence[]
+
+  @@index([organisationId])
+  @@map("workplace_locations")
+}

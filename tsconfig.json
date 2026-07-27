@@ -20,7 +20,12 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./*"],
-      "@server/*": ["server/*"]
+      "@server/*": ["server/*"],
+      "@mapable/contracts": ["packages/contracts/src/index.ts"],
+      "@mapable/intelligence-kernel": ["packages/intelligence-kernel/src/index.ts"],
+      "@mapable/domain-transport": ["packages/domain-transport/src/index.ts"],
+      "@mapable/domain-provider": ["packages/domain-provider/src/index.ts"],
+      "@mapable/domain-workforce": ["packages/domain-workforce/src/index.ts"]
     },
     "target": "ES2021"
   },

@@ -1,4 +1,8 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
+vi.mock("@/lib/api/phase3-scope", () => ({
+  getUserOrganisationIds: vi.fn().mockResolvedValue([]),
+}));
 
 import type { CurrentUser } from "@/lib/auth/current-user";
 import {

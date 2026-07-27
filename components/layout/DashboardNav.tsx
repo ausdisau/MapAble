@@ -8,9 +8,12 @@ import type { UserRole } from "@/types/mapable";
 
 const LINKS = [
   { href: "/dashboard", label: "Control panel", exact: true },
+  { href: "/careos/appointment", label: "CareOS appointment mission", matchPrefix: "/careos/appointment" },
+  { href: "/careos/missions", label: "CareOS missions", matchPrefix: "/careos/missions" },
   { href: "/dashboard/profile", label: "Profile" },
   { href: "/dashboard/accessibility", label: "Accessibility" },
   { href: "/dashboard/consent", label: "Consent" },
+  { href: "/dashboard/careos", label: "My CareOS", matchPrefix: "/dashboard/careos" },
   { href: "/dashboard/bookings", label: "Bookings" },
   { href: "/care", label: "Care", matchPrefix: "/care" },
   { href: "/dashboard/transport", label: "Transport trips", matchPrefix: "/dashboard/transport" },

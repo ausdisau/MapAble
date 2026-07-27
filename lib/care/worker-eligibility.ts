@@ -1,4 +1,5 @@
 import type { WorkerProfile } from "@prisma/client";
+import { evaluateWorkforceEvidence } from "@mapable/domain-workforce";
 
 import { prisma } from "@/lib/prisma";
 
@@ -54,4 +55,31 @@ export async function loadWorkerForEligibility(workerProfileId: string) {
   });
   if (!worker) throw new Error("WORKER_NOT_FOUND");
   return worker;
+}
+
+export async function assertWorkerEvidenceEligible(
+  workerProfileId: string,
+  requiredCredentialTypes: string[]
+): Promise<void> {
+  const evidence = await prisma.workerCredentialEvidence.findMany({
+    where: { workerProfileId },
+  });
+  const result = evaluateWorkforceEvidence({
+    evidence: evidence.map((record) => ({
+      credentialType: record.credentialType,
+      verificationStatus:
+        record.verificationStatus === "verified" ||
+        record.verificationStatus === "pending_review" ||
+        record.verificationStatus === "expired" ||
+        record.verificationStatus === "revoked"
+          ? record.verificationStatus
+          : "unverified",
+      expiresAt: record.expiresAt?.toISOString() ?? null,
+      revokedAt: record.revokedAt?.toISOString() ?? null,
+    })),
+    requiredCredentialTypes,
+  });
+  if (!result.eligible) {
+    throw new Error(result.reasonCodes[0] ?? "WORKER_CREDENTIAL_EVIDENCE_REQUIRED");
+  }
 }

@@ -14,6 +14,11 @@ export default async function SupportCoordinatorHomePage() {
       <nav aria-label="Coordinator sections">
         <ul className="flex flex-col gap-3">
           <li>
+            <Link className="text-primary underline" href="/support-coordinator/caseload">
+              Caseload
+            </Link>
+          </li>
+          <li>
             <Link className="text-primary underline" href="/support-coordinator/participants">
               Participants
             </Link>

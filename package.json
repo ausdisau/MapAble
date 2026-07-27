@@ -40,6 +40,7 @@
     "audit:human-release-evidence": "node scripts/ci/validate-human-release-evidence-readonly.mjs",
     "setup:cloud-agent": "bash scripts/setup-cloud-agent.sh",
     "mcp:av": "tsx mcp/av/server.ts",
+    "mcp:careos": "tsx mcp/careos/server.ts",
     "neon:configure": "python3 scripts/configure-neon-env.py",
     "seed:ndis-service-delivery": "tsx prisma/seed-ndis-service-delivery.ts",
     "import:provider-outlets-supabase": "tsx scripts/import-provider-outlets-supabase.ts",
@@ -57,6 +58,7 @@
     "check:integrations-env": "npx tsx scripts/check-integrations-env.ts",
     "check:convergence-advisory": "npx tsx scripts/convergence-advisory-ci.ts",
     "sync:mapable-adl-kml": "python3 scripts/sync-mapable-adl-kml.py",
+    "check:package-boundaries": "node scripts/check-package-boundaries.mjs",
     "sync:replit-unified": "bash scripts/sync-replit-unified.sh",
     "check:replit-unified": "bash scripts/check-replit-unified-deployment.sh",
     "test:access-intelligence-next": "vitest run tests/access-intelligence-next",
@@ -71,6 +73,7 @@
     ]
   },
   "prisma": {
+    "schema": "prisma",
     "seed": "npx tsx prisma/seed.ts"
   },
   "keywords": [],
@@ -83,6 +86,10 @@
     "@ai-sdk/react": "^3.0.198",
     "@chat-adapter/slack": "^4.30.0",
     "@chat-adapter/state-memory": "^4.30.0",
+    "@mapable/domain-transport": "workspace:*",
+    "@mapable/domain-provider": "workspace:*",
+    "@mapable/domain-workforce": "workspace:*",
+    "@openai/agents": "^0.13.2",
     "@prisma/client": "6.19.2",
     "@pusher/push-notifications-web": "^1.1.0",
     "@radix-ui/react-slot": "^1.2.4",

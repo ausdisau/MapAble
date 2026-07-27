@@ -1,4 +1,9 @@
 import type { TransportVerificationKind } from "@prisma/client";
+import {
+  evaluateDriverEligibility,
+  evaluateVehicleEligibility,
+  transportRequirementsSchema,
+} from "@mapable/domain-transport";
 
 import { prisma } from "@/lib/prisma";
 import { parseMobilityRequirements } from "@/lib/transport/mobility-schema";
@@ -51,8 +56,27 @@ export async function checkDriverEligibility(
   const required = [...DRIVER_REQUIRED];
   if (options?.requireAccessTraining) required.push("training");
 
-  const reasons = checkVerifications(driver.verifications, required);
-  return { eligible: reasons.length === 0, reasons };
+  const requirements = transportRequirementsSchema.parse({
+    requiredCommunicationCapabilities: [],
+  });
+  const result = evaluateDriverEligibility({
+    driver: {
+      id: driver.id,
+      active: driver.active,
+      communicationCapabilities: [],
+      verifications: driver.verifications.map((record) => ({
+        kind: record.kind,
+        status: record.status,
+        expiresAt: record.expiresAt?.toISOString() ?? null,
+      })),
+    },
+    requirements,
+  });
+  const legacyReasons = checkVerifications(driver.verifications, required);
+  return {
+    eligible: result.eligible && legacyReasons.length === 0,
+    reasons: [...legacyReasons, ...result.reasonCodes.map((reason) => reason.replace(/_/g, " ").toLowerCase())],
+  };
 }
 
 export async function checkVehicleEligibility(
@@ -67,9 +91,32 @@ export async function checkVehicleEligibility(
     return { eligible: false, reasons: ["Vehicle not found or inactive"] };
   }
 
-  const reasons = checkVerifications(vehicle.verifications, VEHICLE_REQUIRED);
-
   const reqs = parseMobilityRequirements(mobilityRequirements ?? {});
+  const result = evaluateVehicleEligibility({
+    vehicle: {
+      id: vehicle.id,
+      active: vehicle.active,
+      features: vehicle.features[0]
+        ? {
+            wheelchairAccessible: vehicle.features[0].wheelchairAccessible,
+            rampAvailable: vehicle.features[0].rampAvailable,
+            liftAvailable: vehicle.features[0].liftAvailable,
+            hoistAvailable: vehicle.features[0].hoistAvailable,
+            assistanceAnimalFriendly: vehicle.features[0].assistanceAnimalFriendly,
+          }
+        : null,
+      verifications: vehicle.verifications.map((record) => ({
+        kind: record.kind,
+        status: record.status,
+        expiresAt: record.expiresAt?.toISOString() ?? null,
+      })),
+    },
+    requirements: transportRequirementsSchema.parse(reqs),
+  });
+  const reasons = [
+    ...checkVerifications(vehicle.verifications, VEHICLE_REQUIRED),
+    ...result.reasonCodes.map((reason) => reason.replace(/_/g, " ").toLowerCase()),
+  ];
   const feature = vehicle.features[0];
   if (reqs.requiresWheelchairAccessible && feature && !feature.wheelchairAccessible) {
     reasons.push("Vehicle is not wheelchair accessible");

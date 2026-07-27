@@ -6,8 +6,10 @@ import { MapAbleRoleNav } from "@/components/layout/MapAbleRoleNav";
 
 const LINKS = [
   { href: "/support-coordinator", label: "Overview", exact: true },
+  { href: "/support-coordinator/caseload", label: "Caseload" },
   { href: "/support-coordinator/participants", label: "Participants" },
   { href: "/support-coordinator/tasks", label: "Tasks" },
+  { href: "/support-coordinator/transport", label: "Transport" },
 ];
 
 export function SupportCoordinatorNav() {
