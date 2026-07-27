@@ -160,7 +160,6 @@ run_report() {
   local replit_tree
   cursor_tree="$(mktemp -d)"
   replit_tree="$(mktemp -d)"
-  trap 'rm -rf "${cursor_tree}" "${replit_tree}"' RETURN
 
   git archive "origin/${CURSOR_BRANCH}" | tar -x -C "${cursor_tree}"
   git archive "origin/${REPLIT_BRANCH}" | tar -x -C "${replit_tree}"
@@ -204,6 +203,8 @@ run_report() {
   cat "${summary}"
   echo ""
   echo "Full diff written to ${details}"
+
+  rm -rf "${cursor_tree}" "${replit_tree}"
 
   if [[ "${drift}" -ne 0 ]]; then
     echo "ERROR: path drift detected (${drift} path(s)). Run sync-both to reconcile." >&2
