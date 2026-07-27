@@ -6,7 +6,10 @@ import React, { useEffect, useRef, useState } from "react";
 
 import { AccessibilityPanelTrigger } from "@/components/accessibility/AccessibilityPanelTrigger";
 import { LogoMark } from "@/components/marketing/mapable-care-shared";
-import { MAPABLE_DONATION_URL } from "@/lib/brand/constants";
+import {
+  MAPABLE_BRAND_TAGLINE,
+  MAPABLE_DONATION_URL,
+} from "@/lib/brand/constants";
 import { marketingFeatureRoutes } from "@/lib/marketing/mapable-care-routes";
 import { mapableCareFocusRing } from "@/lib/marketing/mapable-care-tokens";
 
@@ -106,11 +109,14 @@ export function MarketingPrimaryNav() {
     >
       <Link
         href={marketingFeatureRoutes.home}
-        className={`shrink-0 overflow-visible rounded-2xl p-1 transition hover:bg-slate-50 ${mapableCareFocusRing}`}
+        className={`flex min-w-0 shrink items-center gap-3 overflow-visible rounded-2xl p-1 transition hover:bg-slate-50 ${mapableCareFocusRing}`}
         onClick={() => setMobileOpen(false)}
       >
         <span className="sr-only">MapAble home</span>
         <LogoMark />
+        <span className="max-w-[8.5rem] text-[0.65rem] font-black uppercase leading-snug tracking-[0.14em] text-[#0C1833] sm:max-w-[9.5rem] sm:text-[0.7rem] sm:tracking-[0.16em]">
+          {MAPABLE_BRAND_TAGLINE}
+        </span>
       </Link>
 
       <nav aria-label="Primary" className="hidden items-center gap-1 md:flex">

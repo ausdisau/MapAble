@@ -5,11 +5,6 @@ import { TrustStrip } from "@/components/marketing/home/TrustStrip";
 import { ArrowIcon } from "@/components/marketing/mapable-care-icons";
 import { WavyText } from "@/components/marketing/MapAbleCareTypography";
 import {
-  MAPABLE_BRAND_TAGLINE,
-  MAPABLE_LOGO_ALT,
-  MAPABLE_LOGO_SRC,
-} from "@/lib/brand/constants";
-import {
   homepageHeroCopy,
   homepageHeroCtas,
 } from "@/lib/marketing/mapable-care-combined-data";
@@ -31,25 +26,9 @@ export function HeroSection() {
         className="absolute bottom-[-12rem] left-[-8rem] h-[30rem] w-[30rem] animate-[pulse_11s_ease-in-out_infinite] rounded-full bg-[#005B7F]/16 blur-3xl motion-reduce:animate-none motion-reduce:blur-none"
       />
       <div className="relative mx-auto max-w-7xl px-5 py-16 lg:px-8 lg:py-24">
-        <div className="flex flex-wrap items-center gap-4">
-          <img
-            src={MAPABLE_LOGO_SRC}
-            alt={MAPABLE_LOGO_ALT}
-            width={220}
-            height={56}
-            className="h-12 w-auto max-w-[220px] object-contain object-left md:h-14"
-            decoding="async"
-            fetchPriority="high"
-          />
-          <p className="text-sm font-black uppercase tracking-[0.18em]">
-            <span className="rounded-full bg-[#0C1833] px-3 py-1.5 text-[#F8C51C]">
-              {MAPABLE_BRAND_TAGLINE}
-            </span>
-          </p>
-        </div>
         <h1
           aria-label={homepageHeroCopy.headline}
-          className="mt-8 max-w-4xl text-4xl font-black leading-[0.98] tracking-[-0.045em] text-[#0C1833] md:text-6xl lg:text-7xl"
+          className="max-w-4xl text-4xl font-black leading-[0.98] tracking-[-0.045em] text-[#0C1833] md:text-6xl lg:text-7xl"
         >
           <WavyText text={homepageHeroCopy.headline} />
         </h1>

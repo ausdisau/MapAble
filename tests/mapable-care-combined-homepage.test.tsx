@@ -195,7 +195,9 @@ describe("MapAbleCareCombinedHomepage", () => {
         name: homepageHeroCopy.headline,
       }),
     ).toBeTruthy();
-    expect(screen.getByText(/Empowering Independence/i)).toBeTruthy();
+    const homeLink = screen.getByRole("link", { name: /MapAble home/i });
+    expect(homeLink.textContent).toMatch(/Empowering Independence/i);
+    expect(screen.getAllByText(/Empowering Independence/i)).toHaveLength(1);
     expect(
       screen.getByRole("heading", {
         name: /What you can use on the public site today/i,
