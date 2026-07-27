@@ -75,6 +75,11 @@
       "path": "prisma/migrations/20260607000000_case_management/migration.sql",
       "reason": "Replace comment-only stub with Case* enums and cases/case_* tables. support_coordination_os FKs linkedCaseId → cases(id); empty-DB migrate deploy failed with P3018/42P01 relation cases does not exist.",
       "pr": "cursor/replit-supabase-db-pg-a08f"
+    },
+    {
+      "path": "prisma/migrations/20260714170000_canonical_careos_mission/migration.sql",
+      "reason": "ADD COLUMN missionId before CREATE INDEX on careos_action_receipts.missionId. Earlier 20260713110000 creates the table without missionId; CREATE TABLE IF NOT EXISTS is a no-op so the index failed with P3018/42703 column missionId does not exist.",
+      "pr": "cursor/bridge-docs-ownership-a08f"
     }
   ]
 }
