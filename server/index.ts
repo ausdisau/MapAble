@@ -108,9 +108,9 @@ app.use((req, res, next) => {
 
     if (offlinePlaceholder) {
       console.warn(
-        "[seed] Skipping database seed — no real Neon URL set. " +
-          "Set NEON_DATABASE_URL (or DATABASE_URL) to enable seed/data. " +
-          "App still serves on the configured PORT.",
+        "[seed] Skipping database seed — no real Postgres URL set. " +
+          "Set DATABASE_URL (or NEON_DATABASE_URL) to a Neon or Supabase " +
+          "connection string to enable seed/data. App still serves on the configured PORT.",
       );
     } else {
       await seedDatabase();

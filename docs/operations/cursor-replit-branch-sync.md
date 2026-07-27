@@ -44,7 +44,28 @@ override Next Tailwind / Vite / Drizzle config.
 then open a Cursor PR into `app/`/`lib/`. Do not merge Replit UI wholesale into
 Next routes.
 
-## Wire Replit Repl to GitHub
+## Out of Replit credits (Cursor-only workaround)
+
+Replit Agent and Secrets edits are **not required**. Run the Express+Vite overlay
+in Cursor (or any local Node host) and keep syncing via GitHub.
+
+1. Bootstrap once: `npm run bootstrap:replit-deps`
+2. Copy env template (gitignored): `cp .env.replit.example .env.replit`
+3. Choose a mode:
+   - **UI only:** leave `DATABASE_URL` unset — seed skips, server still serves `:5000`
+   - **With data:** set `DATABASE_URL` to the full Supabase (or Neon) Postgres URI in
+     `.env.replit` (or Cursor Cloud environment secrets). Host alone is not enough.
+4. Run:
+   - `npm run dev:replit` → http://127.0.0.1:5000
+   - `npm run test:replit`
+5. Commit/push to `replit-agent` or open a Cursor PR to `main` as usual.
+   When Replit credits return, pull `replit-agent` and paste the same URI into
+   Replit Secrets once — no Agent needed for that.
+
+`scripts/run-replit.sh` loads `.env.replit` then `.env` automatically (process
+env always wins). Do not commit either file.
+
+## Wire Replit Repl to GitHub (optional until credits return)
 
 In the Repl (**Tools → Version control → GitHub**):
 
@@ -57,6 +78,7 @@ In the Repl (**Tools → Version control → GitHub**):
    - `npm run bootstrap:replit-deps`
    - `npm run dev:replit` (Express+Vite on port 5000)
    - `npm run test:replit` (full suite when `DATABASE_URL`/`NEON_DATABASE_URL` is set; otherwise offline smoke + migration-journal)
+   - For seed/data against **Supabase**, set `DATABASE_URL` to the full Postgres URI from Supabase → Project Settings → Database (not just `*.supabase.co`). Neon hosts use the WebSocket driver; Supabase and other Postgres hosts use `pg`. Prefer `.env.replit` in Cursor when Replit Secrets are locked.
 6. Push to `origin/replit-agent` after green tests.
 
 ### Dual package manifests

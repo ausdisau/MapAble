@@ -70,6 +70,11 @@
       "path": "prisma/migrations/20260714062000_home_living_governance/migration.sql",
       "reason": "FK target worker_profiles → WorkerProfile for worker_competency_evidence.workerProfileId.",
       "pr": "cursor/careos-prod-harden-vercel-a08f"
+    },
+    {
+      "path": "prisma/migrations/20260607000000_case_management/migration.sql",
+      "reason": "Replace comment-only stub with Case* enums and cases/case_* tables. support_coordination_os FKs linkedCaseId → cases(id); empty-DB migrate deploy failed with P3018/42P01 relation cases does not exist.",
+      "pr": "cursor/replit-supabase-db-pg-a08f"
     }
   ]
 }

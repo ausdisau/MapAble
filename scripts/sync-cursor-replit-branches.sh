@@ -39,6 +39,8 @@ REPLIT_PATHS=(
   "tsconfig.replit.json"
   "scripts/bootstrap-replit-deps.sh"
   "scripts/run-replit.sh"
+  "scripts/load-env-file.sh"
+  ".env.replit.example"
   "server/agentmail-service.ts"
   "server/auto-debit.ts"
   "server/chat-engine.ts"

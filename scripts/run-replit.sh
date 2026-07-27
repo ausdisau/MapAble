@@ -1,11 +1,19 @@
 #!/usr/bin/env bash
 # Run a Replit overlay command with NODE_PATH pointing at .replit-node_modules.
+# Works fully in Cursor — Replit Secrets / Agent credits are not required.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "${ROOT}"
 
 ACTION="${1:-dev}"
+
+# shellcheck disable=SC1091
+source "${ROOT}/scripts/load-env-file.sh"
+# Cursor-local secrets (preferred when Replit credits are exhausted).
+# Existing process env / CI secrets always win over file values.
+load_env_file "${ROOT}/.env.replit"
+load_env_file "${ROOT}/.env"
 
 if [[ ! -d "${ROOT}/.replit-node_modules/node_modules" ]]; then
   echo "Replit deps missing — running bootstrap..."
