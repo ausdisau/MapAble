@@ -144,12 +144,28 @@ export async function evaluateWorkerOnboarding(
       label: "Worker verification",
       complete: worker.verificationStatus === "verified",
       blocker: true,
+      detail:
+        worker.verificationStatus === "verified"
+          ? undefined
+          : "Complete participant-safe ID verification",
+      href:
+        worker.verificationStatus === "verified"
+          ? undefined
+          : "/worker/verify-id",
     },
     {
       id: "screening",
       label: "Worker screening",
       complete: worker.workerScreeningStatus === "verified",
       blocker: true,
+      detail:
+        worker.workerScreeningStatus === "verified"
+          ? undefined
+          : "Upload your NDIS Worker Screening certificate",
+      href:
+        worker.workerScreeningStatus === "verified"
+          ? undefined
+          : "/worker/verify-id",
     },
     {
       id: "org",

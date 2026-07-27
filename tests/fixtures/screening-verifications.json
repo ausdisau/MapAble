@@ -1,0 +1,21 @@
+
+[
+  {
+    "name": "Sophie T.",
+    "jurisdiction": "NSW",
+    "timestamp": "2026-01-27 14:32",
+    "status": "Pending"
+  },
+  {
+    "name": "Jamal K.",
+    "jurisdiction": "VIC",
+    "timestamp": "2026-01-26 17:10",
+    "status": "Verified"
+  },
+  {
+    "name": "Aisha R.",
+    "jurisdiction": "QLD",
+    "timestamp": "2026-01-25 09:50",
+    "status": "Rejected"
+  }
+]

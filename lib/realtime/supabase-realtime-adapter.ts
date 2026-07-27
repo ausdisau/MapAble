@@ -1,11 +1,7 @@
-export type RealtimeEvent =
-  | { type: "message:new"; conversationId: string; messageId: string }
-  | { type: "message:read"; conversationId: string; messageId: string; userId: string }
-  | { type: "typing:start"; conversationId: string; userId: string }
-  | { type: "typing:stop"; conversationId: string; userId: string }
-  | { type: "presence:update"; userId: string; status: string };
+import { createSocketIoSubscription } from "@/lib/realtime/socketio-realtime-adapter";
+import type { RealtimeEvent, RealtimeProvider } from "@/lib/realtime/types";
 
-export type RealtimeProvider = "polling" | "supabase" | "socketio";
+export type { RealtimeEvent, RealtimeProvider };
 
 export function getRealtimeProvider(): RealtimeProvider {
   const v = process.env.REALTIME_PROVIDER ?? "polling";
@@ -13,15 +9,16 @@ export function getRealtimeProvider(): RealtimeProvider {
   return "polling";
 }
 
-/** MVP: polling adapter — upgrade to Supabase channel or Socket.IO when enabled. */
+/** MVP: polling by default; Socket.IO path when REALTIME_PROVIDER=socketio. */
 export function subscribeToConversation(
-  _conversationId: string,
+  conversationId: string,
   onEvent: (event: RealtimeEvent) => void
 ): () => void {
   const provider = getRealtimeProvider();
-  if (provider === "polling") {
-    return () => undefined;
+  if (provider === "socketio") {
+    return createSocketIoSubscription(conversationId, onEvent);
   }
+  void conversationId;
   void onEvent;
   return () => undefined;
 }
