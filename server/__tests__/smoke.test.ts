@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { startTestServer, type TestServer } from "./helpers";
 import { registry, defaultIntentRouter, chatModules } from "../chat";
 import type { ChatContext } from "../chat";
-import { handoffModule } from "../chat/modules";
+import { handoffModule, profileModule, barriersModule } from "../chat/modules";
 import { toNumericNdisClaim, toNumericNdisClaims, type NdisClaim } from "@shared/schema";
 import { buildSafeguardingSummary } from "../notifications";
 import { classifyUserTurn, applyOutputGuardrails } from "../chat-guardrails";
@@ -348,6 +348,171 @@ describe("MapAble Chat module registry + router parity", () => {
     assert.equal(out.escalated, false, "must not claim escalation succeeded when DB insert failed");
     assert.equal(out.handoffId, null);
     assert.equal(out.status, "error");
+  });
+});
+
+// Task: the chatbot must never write a profile or barrier report unless the
+// user explicitly confirmed (confirmed=true). These tests pin the confirmation
+// gate on every chat write tool by counting actual storage/db calls.
+describe("chat write tools require explicit confirmation", () => {
+  function profileCtx() {
+    const upserts: any[] = [];
+    const ctx = {
+      userId: "u1",
+      profile: { mobilityAids: ["cane"], maxTransferM: 100 },
+      storage: {
+        upsertAccessProfile: async (userId: string, body: any) => {
+          upserts.push({ userId, body });
+          return { ...body, mobilityAids: body.mobilityAids ?? ["cane"] };
+        },
+      },
+    } as unknown as ChatContext;
+    return { ctx, upserts };
+  }
+
+  test("update_user_profile with confirmed missing performs NO write", async () => {
+    const { ctx, upserts } = profileCtx();
+    const out = JSON.parse(
+      await profileModule.handlers.update_user_profile({ stairsAllowed: false }, ctx),
+    );
+    assert.equal(out.success, false);
+    assert.equal(out.needsConfirmation, true);
+    assert.deepEqual(out.proposed, { stairsAllowed: false });
+    assert.equal(upserts.length, 0, "must not write without confirmation");
+  });
+
+  test("update_user_profile with confirmed=false performs NO write", async () => {
+    const { ctx, upserts } = profileCtx();
+    const out = JSON.parse(
+      await profileModule.handlers.update_user_profile(
+        { stairsAllowed: false, confirmed: false },
+        ctx,
+      ),
+    );
+    assert.equal(out.needsConfirmation, true);
+    assert.equal(upserts.length, 0);
+  });
+
+  test("update_user_profile with confirmed=true performs exactly one write", async () => {
+    const { ctx, upserts } = profileCtx();
+    const out = JSON.parse(
+      await profileModule.handlers.update_user_profile(
+        { stairsAllowed: false, confirmed: true },
+        ctx,
+      ),
+    );
+    assert.equal(out.success, true);
+    assert.equal(upserts.length, 1);
+    assert.equal(upserts[0].userId, "u1");
+    assert.equal(upserts[0].body.stairsAllowed, false);
+  });
+
+  function barrierCtx() {
+    const inserts: any[] = [];
+    const updates: any[] = [];
+    const existingReport = {
+      id: "r1",
+      barrierType: "lift_out",
+      severity: "high",
+      locationRef: "Central Station",
+      description: "Lift broken",
+      moderationStatus: "unverified",
+      createdAt: new Date("2026-07-01"),
+    };
+    const ctx = {
+      userId: "u1",
+      db: {
+        insert: () => ({
+          values: (v: any) => ({
+            returning: async () => {
+              inserts.push(v);
+              return [{ id: "new-1", ...v, moderationStatus: "unverified", createdAt: new Date("2026-07-27") }];
+            },
+          }),
+        }),
+      },
+      storage: {
+        getCommunityReportsByReporter: async () => [existingReport],
+        updateCommunityReport: async (id: string, userId: string, changes: any) => {
+          updates.push({ id, userId, changes });
+          return { ...existingReport, ...changes };
+        },
+      },
+    } as unknown as ChatContext;
+    return { ctx, inserts, updates };
+  }
+
+  const submitArgs = {
+    locationRef: "Town Hall",
+    barrierType: "ramp_blocked",
+    severity: "medium",
+    description: "Ramp blocked by bins",
+  };
+
+  test("submit_barrier_report without confirmed returns read-back, NO insert", async () => {
+    const { ctx, inserts } = barrierCtx();
+    const out = JSON.parse(await barriersModule.handlers.submit_barrier_report(submitArgs, ctx));
+    assert.equal(out.success, false);
+    assert.equal(out.needsConfirmation, true);
+    assert.equal(out.proposed.location, "Town Hall");
+    assert.equal(inserts.length, 0, "must not insert without confirmation");
+  });
+
+  test("submit_barrier_report with confirmed=false performs NO insert", async () => {
+    const { ctx, inserts } = barrierCtx();
+    const out = JSON.parse(
+      await barriersModule.handlers.submit_barrier_report({ ...submitArgs, confirmed: false }, ctx),
+    );
+    assert.equal(out.needsConfirmation, true);
+    assert.equal(inserts.length, 0);
+  });
+
+  test("submit_barrier_report with confirmed=true inserts exactly once", async () => {
+    const { ctx, inserts } = barrierCtx();
+    const out = JSON.parse(
+      await barriersModule.handlers.submit_barrier_report({ ...submitArgs, confirmed: true }, ctx),
+    );
+    assert.equal(out.success, true);
+    assert.equal(inserts.length, 1);
+    assert.equal(inserts[0].locationRef, "Town Hall");
+    assert.equal(inserts[0].reporterUserId, "u1");
+  });
+
+  test("update_barrier_report without confirmed returns read-back, NO update", async () => {
+    const { ctx, updates } = barrierCtx();
+    const out = JSON.parse(
+      await barriersModule.handlers.update_barrier_report({ reportId: "r1", severity: "critical" }, ctx),
+    );
+    assert.equal(out.success, false);
+    assert.equal(out.needsConfirmation, true);
+    assert.equal(out.current.reportId, "r1");
+    assert.deepEqual(out.proposed, { severity: "critical" });
+    assert.equal(updates.length, 0, "must not update without confirmation");
+  });
+
+  test("update_barrier_report with confirmed=false performs NO update", async () => {
+    const { ctx, updates } = barrierCtx();
+    const out = JSON.parse(
+      await barriersModule.handlers.update_barrier_report(
+        { reportId: "r1", severity: "critical", confirmed: false },
+        ctx,
+      ),
+    );
+    assert.equal(out.needsConfirmation, true);
+    assert.equal(updates.length, 0);
+  });
+
+  test("update_barrier_report with confirmed=true updates exactly once", async () => {
+    const { ctx, updates } = barrierCtx();
+    const out = JSON.parse(
+      await barriersModule.handlers.update_barrier_report(
+        { reportId: "r1", severity: "critical", confirmed: true },
+        ctx,
+      ),
+    );
+    assert.equal(out.success, true);
+    assert.equal(updates.length, 1);
+    assert.deepEqual(updates[0], { id: "r1", userId: "u1", changes: { severity: "critical" } });
   });
 });
 
