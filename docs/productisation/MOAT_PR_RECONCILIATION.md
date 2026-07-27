@@ -34,6 +34,15 @@ Closed colliding Opportunity tips: **#332**, **#333**, **#334**, **#335** (do no
 | #299 / #267 / #277 | AURA stacks                       | Extract-only                                        |
 | #307 / #311 / #294 | Accountability / governance / QSC | Extract appeals later                               |
 
+## Autonomy Assurance (Prompt 0)
+
+Docs-only reconciliation + freeze waiver **W-AA-1**:
+[`docs/ai-platform/AUTONOMY_ASSURANCE_PROMPT_0_RECONCILIATION.md`](../ai-platform/AUTONOMY_ASSURANCE_PROMPT_0_RECONCILIATION.md).
+
+- Extends Trust Fabric (#328) and in-process AURA harness — **not** a wholesale merge of #299 / #311.
+- Product Train A/B/C each ≤ 3 unmerged PRs; do not attach to breached Geoscape stack.
+- Verdict: narrow freeze waiver required (main tip matched pack baseline `dd5ff9fc`).
+
 ## CareOSMission rule
 
 `Case` remains interim on main. `StartingWorkJourneyProjection` is a **temporary** cross-domain projection. Do not land CareOSMission DDL from AURA/Continuity tips until an explicit SoR PR after rebase.

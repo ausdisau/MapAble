@@ -4,6 +4,8 @@ In-process risk interceptor for MapAble `ToolLoopAgent` product agents (disabili
 
 This is **not** the deferred `lib/aura/` Agent OS stack. Programme proposal boundaries remain in [`lib/programmes/aura/execution-gate.ts`](../../lib/programmes/aura/execution-gate.ts).
 
+Autonomy Assurance Prompt 0 confirmed this harness as the correct deepen path (paper-aligned shadow formula + memory isolation under W-AA-1). Do not resurrect `lib/aura/` from #299. See [AUTONOMY_ASSURANCE_PROMPT_0_RECONCILIATION.md](./AUTONOMY_ASSURANCE_PROMPT_0_RECONCILIATION.md).
+
 ## Flag
 
 | Env | Default | Purpose |

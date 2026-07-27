@@ -44,6 +44,8 @@ AURA Agent OS mega-branches (`lib/aura/`), VisionAccess multimodal, Quality & Sa
 
 The in-process **AURA Agentic Risk Harness** (`lib/aura-harness/`) is separate from deferred Agent OS — see [AURA_HARNESS.md](./AURA_HARNESS.md).
 
+**Registry honesty gap (Prompt 0):** `agent.aura_harness` and `agent.aura_recognise` appear in this table but are **not** yet entries in `lib/ai/platform/capabilities/seed.ts`. Prompt 1 (under freeze waiver W-AA-1) must register ARC-linked capability keys before claiming design-time governance. See [AUTONOMY_ASSURANCE_PROMPT_0_RECONCILIATION.md](./AUTONOMY_ASSURANCE_PROMPT_0_RECONCILIATION.md).
+
 ### CareGPT (design only)
 
 | Capability key | Backend | Maturity | Flag default |

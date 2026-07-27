@@ -35,6 +35,10 @@
 
 `internal_alpha` — not a certified trust network. Feature flags are not production approval.
 
+## Autonomy Assurance extension
+
+Prompt 0 reconciliation and freeze waiver **W-AA-1** authorise deepening this fabric (ARC sidecar on the capability registry, AURA harness shadow math/memory, Decision Passport **projection**, A2H hardening, evidence choreography) without creating a second consent SoT or granting AI decision authority. See [`docs/ai-platform/AUTONOMY_ASSURANCE_PROMPT_0_RECONCILIATION.md`](../ai-platform/AUTONOMY_ASSURANCE_PROMPT_0_RECONCILIATION.md).
+
 ## Rollback
 
 Set both flags to `false`. Receipts remain in the database for audit; UI/API return 503.

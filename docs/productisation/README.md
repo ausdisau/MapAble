@@ -7,6 +7,8 @@
 
 - [PR action ledger](../remediation/PR_ACTION_LEDGER.md)
 - [Leadership train reconciliation](../remediation/LEADERSHIP_TRAIN_RECONCILIATION.md)
+- [AI Autonomy Assurance Prompt 0 reconciliation](../ai-platform/AUTONOMY_ASSURANCE_PROMPT_0_RECONCILIATION.md)
+- [AI Autonomy Assurance Definition of Done](../ai-platform/AUTONOMY_ASSURANCE_DEFINITION_OF_DONE.md)
 - [Productisation merge train](../convergence-os/PRODUCTISATION_MERGE_TRAIN.md)
 - [Public claim registry](../convergence-os/PUBLIC_CLAIM_REGISTRY.md)
 - [Capability registry (human mirror)](./CAPABILITY_REGISTRY.md)
