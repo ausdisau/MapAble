@@ -108,7 +108,7 @@ test.describe("Informational runtime boundary", () => {
         const method = (await form.getAttribute("method")) || "get";
         expect(["get", "post"]).toContain(method.toLowerCase());
         // Contact / PII intake forms require visible privacy/consent context.
-        // Homepage guided search is GET discovery only — labels still required.
+        // Homepage pre-registration is POST intake — labels still required.
         if (route.path === "/contact" || method.toLowerCase() === "post") {
           await expect(
             page

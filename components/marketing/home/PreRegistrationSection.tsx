@@ -212,9 +212,11 @@ export function PreRegistrationSection() {
                 <div className="mt-3 grid gap-2 sm:grid-cols-2">
                   {PRE_REGISTRATION_ROLES.map((option) => {
                     const selected = role === option;
+                    const inputId = `prereg-role-${option}`;
                     return (
                       <label
                         key={option}
+                        htmlFor={inputId}
                         className={`flex min-h-12 cursor-pointer items-center justify-center rounded-2xl border-2 px-4 text-center text-sm font-black transition ${
                           selected
                             ? "border-[#005B7F] bg-[#005B7F] text-white"
@@ -222,6 +224,7 @@ export function PreRegistrationSection() {
                         } ${mapableCareFocusRing}`}
                       >
                         <input
+                          id={inputId}
                           type="radio"
                           name="prereg-role"
                           value={option}

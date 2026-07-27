@@ -72,27 +72,30 @@ CREATE TABLE "programme_source_impact_reviews" (
     CONSTRAINT "programme_source_impact_reviews_pkey" PRIMARY KEY ("id")
 );
 
--- CreateTable
-CREATE TABLE "participant_authority_grants" (
-    "id" TEXT NOT NULL,
-    "participantId" TEXT NOT NULL,
-    "granteeUserId" TEXT,
-    "granteeOrganisationId" TEXT,
-    "purpose" TEXT NOT NULL,
-    "allowedFields" TEXT[] DEFAULT ARRAY[]::TEXT[],
-    "allowedActions" TEXT[] DEFAULT ARRAY[]::TEXT[],
-    "status" "ParticipantAuthorityGrantStatus" NOT NULL DEFAULT 'active',
-    "consentRecordId" TEXT,
-    "expiresAt" TIMESTAMP(3),
-    "createdById" TEXT NOT NULL,
-    "revokedById" TEXT,
-    "revokedAt" TIMESTAMP(3),
-    "correlationId" TEXT NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "participant_authority_grants_pkey" PRIMARY KEY ("id")
-);
+-- participant_authority_grants already created by 20260714050000_authority_document_foundation
+-- (and partially evolved by 20260714070000_identity_authority_foundation). Evolve shape here
+-- instead of CREATE TABLE so empty-DB migrate deploy does not fail with P3018/42P07.
+ALTER TABLE "participant_authority_grants" ADD COLUMN IF NOT EXISTS "granteeUserId" TEXT;
+ALTER TABLE "participant_authority_grants" ADD COLUMN IF NOT EXISTS "granteeOrganisationId" TEXT;
+ALTER TABLE "participant_authority_grants" ADD COLUMN IF NOT EXISTS "purpose" TEXT;
+ALTER TABLE "participant_authority_grants" ADD COLUMN IF NOT EXISTS "allowedFields" TEXT[] DEFAULT ARRAY[]::TEXT[];
+ALTER TABLE "participant_authority_grants" ADD COLUMN IF NOT EXISTS "allowedActions" TEXT[] DEFAULT ARRAY[]::TEXT[];
+ALTER TABLE "participant_authority_grants" ADD COLUMN IF NOT EXISTS "status" "ParticipantAuthorityGrantStatus" NOT NULL DEFAULT 'active';
+ALTER TABLE "participant_authority_grants" ADD COLUMN IF NOT EXISTS "consentRecordId" TEXT;
+ALTER TABLE "participant_authority_grants" ADD COLUMN IF NOT EXISTS "createdById" TEXT;
+ALTER TABLE "participant_authority_grants" ADD COLUMN IF NOT EXISTS "revokedById" TEXT;
+ALTER TABLE "participant_authority_grants" ADD COLUMN IF NOT EXISTS "revokedAt" TIMESTAMP(3);
+ALTER TABLE "participant_authority_grants" ADD COLUMN IF NOT EXISTS "correlationId" TEXT;
+ALTER TABLE "participant_authority_grants" ADD COLUMN IF NOT EXISTS "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE "participant_authority_grants" ADD COLUMN IF NOT EXISTS "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;
+-- Align nullability with programme-foundation / current Prisma model
+ALTER TABLE "participant_authority_grants" ALTER COLUMN "expiresAt" DROP NOT NULL;
+UPDATE "participant_authority_grants" SET "purpose" = COALESCE("purpose", 'general') WHERE "purpose" IS NULL;
+ALTER TABLE "participant_authority_grants" ALTER COLUMN "purpose" SET NOT NULL;
+UPDATE "participant_authority_grants" SET "createdById" = COALESCE("createdById", "participantId") WHERE "createdById" IS NULL;
+ALTER TABLE "participant_authority_grants" ALTER COLUMN "createdById" SET NOT NULL;
+UPDATE "participant_authority_grants" SET "correlationId" = COALESCE("correlationId", "id") WHERE "correlationId" IS NULL;
+ALTER TABLE "participant_authority_grants" ALTER COLUMN "correlationId" SET NOT NULL;
 
 -- CreateTable
 CREATE TABLE "navigator_organisations" (
@@ -334,13 +337,13 @@ CREATE INDEX "programme_source_records_supersedingSourceId_idx" ON "programme_so
 CREATE INDEX "programme_source_impact_reviews_sourceRecordId_status_idx" ON "programme_source_impact_reviews"("sourceRecordId", "status");
 
 -- CreateIndex
-CREATE INDEX "participant_authority_grants_participantId_status_idx" ON "participant_authority_grants"("participantId", "status");
+CREATE INDEX IF NOT EXISTS "participant_authority_grants_participantId_status_idx" ON "participant_authority_grants"("participantId", "status");
 
 -- CreateIndex
-CREATE INDEX "participant_authority_grants_granteeUserId_idx" ON "participant_authority_grants"("granteeUserId");
+CREATE INDEX IF NOT EXISTS "participant_authority_grants_granteeUserId_idx" ON "participant_authority_grants"("granteeUserId");
 
 -- CreateIndex
-CREATE INDEX "participant_authority_grants_expiresAt_idx" ON "participant_authority_grants"("expiresAt");
+CREATE INDEX IF NOT EXISTS "participant_authority_grants_expiresAt_idx" ON "participant_authority_grants"("expiresAt");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "navigator_organisations_organisationId_key" ON "navigator_organisations"("organisationId");
@@ -408,17 +411,22 @@ ALTER TABLE "programme_source_impact_reviews" ADD CONSTRAINT "programme_source_i
 -- AddForeignKey
 ALTER TABLE "programme_source_impact_reviews" ADD CONSTRAINT "programme_source_impact_reviews_reviewOwnerId_fkey" FOREIGN KEY ("reviewOwnerId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
--- AddForeignKey
-ALTER TABLE "participant_authority_grants" ADD CONSTRAINT "participant_authority_grants_participantId_fkey" FOREIGN KEY ("participantId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+-- AddForeignKey (participantId_fkey may already exist from authority_document_foundation)
+DO $$ BEGIN
+  ALTER TABLE "participant_authority_grants" ADD CONSTRAINT "participant_authority_grants_participantId_fkey" FOREIGN KEY ("participantId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
--- AddForeignKey
-ALTER TABLE "participant_authority_grants" ADD CONSTRAINT "participant_authority_grants_granteeUserId_fkey" FOREIGN KEY ("granteeUserId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+DO $$ BEGIN
+  ALTER TABLE "participant_authority_grants" ADD CONSTRAINT "participant_authority_grants_granteeUserId_fkey" FOREIGN KEY ("granteeUserId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
--- AddForeignKey
-ALTER TABLE "participant_authority_grants" ADD CONSTRAINT "participant_authority_grants_createdById_fkey" FOREIGN KEY ("createdById") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+DO $$ BEGIN
+  ALTER TABLE "participant_authority_grants" ADD CONSTRAINT "participant_authority_grants_createdById_fkey" FOREIGN KEY ("createdById") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
--- AddForeignKey
-ALTER TABLE "participant_authority_grants" ADD CONSTRAINT "participant_authority_grants_revokedById_fkey" FOREIGN KEY ("revokedById") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+DO $$ BEGIN
+  ALTER TABLE "participant_authority_grants" ADD CONSTRAINT "participant_authority_grants_revokedById_fkey" FOREIGN KEY ("revokedById") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 -- AddForeignKey
 ALTER TABLE "navigator_organisations" ADD CONSTRAINT "navigator_organisations_organisationId_fkey" FOREIGN KEY ("organisationId") REFERENCES "Organisation"("id") ON DELETE CASCADE ON UPDATE CASCADE;

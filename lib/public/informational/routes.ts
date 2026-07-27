@@ -33,7 +33,7 @@ export const PUBLIC_INFORMATIONAL_ROUTES: readonly InformationalRoute[] = [
     titleIncludes: "MapAble",
     // Marketing hero: "Accessibility you can plan around."
     h1Includes: "Accessibility",
-    // Guided search panel is a GET discovery form (not a contact/PII intake).
+    // Homepage pre-registration form (POST PII intake; privacy banner required).
     formsPermitted: true,
     authenticationProhibited: true,
     kind: "informational",

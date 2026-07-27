@@ -80,6 +80,11 @@
       "path": "prisma/migrations/20260714170000_canonical_careos_mission/migration.sql",
       "reason": "ADD COLUMN missionId before CREATE INDEX on careos_action_receipts.missionId. Earlier 20260713110000 creates the table without missionId; CREATE TABLE IF NOT EXISTS is a no-op so the index failed with P3018/42703 column missionId does not exist.",
       "pr": "cursor/bridge-docs-ownership-a08f"
+    },
+    {
+      "path": "prisma/migrations/20260719120000_shared_programme_foundation/migration.sql",
+      "reason": "participant_authority_grants already created by 20260714050000_authority_document_foundation; replace duplicate CREATE TABLE with ADD COLUMN IF NOT EXISTS + idempotent indexes/FKs so empty-DB migrate deploy does not fail with P3018/42P07.",
+      "pr": "cursor/finish-remaining-ci-ee41"
     }
   ]
 }
