@@ -93,14 +93,20 @@ function SparkIcon() {
   );
 }
 
-export function LogoMark({ compact = false }: { compact?: boolean }) {
+export function LogoMark({
+  compact = false,
+  className,
+}: {
+  compact?: boolean;
+  className?: string;
+}) {
   if (compact) {
     return (
       <img
         src={MAPABLE_LOGO_MARK_SRC}
         alt=""
         aria-hidden
-        className="h-9 w-9 shrink-0 object-contain"
+        className={className ?? "h-9 w-9 shrink-0 object-contain"}
         decoding="async"
       />
     );
@@ -112,7 +118,10 @@ export function LogoMark({ compact = false }: { compact?: boolean }) {
       alt={MAPABLE_LOGO_ALT}
       width={754}
       height={1008}
-      className="block h-14 w-auto max-h-[4.5rem] shrink-0 bg-transparent object-contain object-left sm:h-16"
+      className={
+        className ??
+        "block h-14 w-auto max-h-[4.5rem] shrink-0 bg-transparent object-contain object-left sm:h-16"
+      }
       decoding="async"
       fetchPriority="high"
     />
