@@ -18,7 +18,7 @@ import {
   ShieldCheck,
   CheckCircle2,
 } from "lucide-react";
-import logoImage from "@assets/Accessible_Australia_Logo_Design_1772582762574.png";
+import logoImage from "@assets/mapable-logo.svg";
 import { Link, useLocation } from "wouter";
 
 type Role = "participant" | "provider" | "carer";
@@ -231,8 +231,8 @@ export default function RegisterPage() {
             <div className="flex justify-center">
               <img
                 src={logoImage}
-                alt="MapAble"
-                className="w-16 h-16 rounded-2xl shadow-lg"
+                alt="MapAble — Empowering Independence"
+                className="h-16 w-auto max-w-[160px] object-contain"
                 data-testid="img-register-logo"
               />
             </div>

@@ -53,7 +53,7 @@ afterEach(() => {
 
 describe("mapAbleCareCombinedDesignTests", () => {
   it("exports the full design contract", () => {
-    expect(mapAbleCareCombinedDesignTests).toHaveLength(11);
+    expect(mapAbleCareCombinedDesignTests).toHaveLength(12);
   });
 
   it("search field starts blank", () => {
@@ -120,11 +120,15 @@ describe("mapAbleCareCombinedDesignTests", () => {
         item.name ===
         "design includes clearly labelled sponsored partner placements",
     );
-    expect(spec?.expectedSponsoredPlacements).toEqual([
-      "primary",
-      "search",
-      "footer",
-    ]);
+    expect(spec?.expectedSponsoredPlacements).toEqual(["primary", "search"]);
+  });
+
+  it("footer monetization uses AdSense advertising unit", () => {
+    const spec = mapAbleCareCombinedDesignTests.find(
+      (item) =>
+        item.name === "footer monetization uses AdSense advertising unit",
+    );
+    expect(spec?.expectedFooterMonetization).toBe("adsense.marketing.footer");
   });
 
   it("hero section is extracted to dedicated component", () => {

@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { AlertCircle, LogIn, Loader2, HeartHandshake, Bus, Briefcase, Bot, ShieldCheck, UserPlus } from "lucide-react";
 import { SiGoogle } from "react-icons/si";
 import { Link } from "wouter";
-import logoImage from "@assets/Accessible_Australia_Logo_Design_1772582762574.png";
+import logoImage from "@assets/mapable-logo.svg";
 
 export default function LoginPage() {
   const { login, isLoggingIn, loginError, auth0Enabled } = useAuth();
@@ -35,8 +35,8 @@ export default function LoginPage() {
             <div className="flex justify-center">
               <img
                 src={logoImage}
-                alt="MapAble"
-                className="w-20 h-20 rounded-2xl shadow-lg"
+                alt="MapAble — Empowering Independence"
+                className="h-20 w-auto max-w-[180px] object-contain"
                 data-testid="img-login-logo"
               />
             </div>

@@ -201,8 +201,6 @@ export function PreRegistrationSection() {
               noValidate
               className="space-y-5"
             >
-              <SensitiveDataBanner />
-
               <fieldset>
                 <legend
                   id="prereg-role-legend"
@@ -292,10 +290,16 @@ export function PreRegistrationSection() {
                 </AccessibleFormField>
               ) : null}
 
-              <AccessibleFormField
-                id="prereg-notes"
-                label="What are you hoping to use MapAble for? (optional)"
-              >
+              <div className="space-y-2">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <label
+                    htmlFor="prereg-notes"
+                    className="block text-sm font-medium"
+                  >
+                    What are you hoping to use MapAble for? (optional)
+                  </label>
+                  <SensitiveDataBanner id="prereg-sensitive-tip" />
+                </div>
                 <textarea
                   id="prereg-notes"
                   name="notes"
@@ -303,8 +307,9 @@ export function PreRegistrationSection() {
                   className={formInputClass}
                   value={notes}
                   onChange={(event) => setNotes(event.target.value)}
+                  aria-describedby="prereg-sensitive-tip"
                 />
-              </AccessibleFormField>
+              </div>
 
               {/* Honeypot */}
               <div

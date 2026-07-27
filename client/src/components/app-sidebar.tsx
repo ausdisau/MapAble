@@ -45,7 +45,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import logoImage from "@assets/Accessible_Australia_Logo_Design_1772582762574.png";
+import logoImage from "@assets/mapable-logo.svg";
 
 type NavItem = { title: string; url: string; icon: typeof LayoutDashboard; audioDesc: string };
 
@@ -117,7 +117,12 @@ export function AppSidebar() {
               tabIndex={0}
               aria-label="Open navigation menu"
             >
-              <img src={logoImage} alt="MapAble" className={`rounded-lg object-contain shrink-0 transition-all ${isCollapsed ? "w-8 h-8" : "w-12 h-12"}`} data-testid="img-sidebar-logo" />
+              <img
+                src={logoImage}
+                alt="MapAble — Empowering Independence"
+                className={`object-contain object-left shrink-0 transition-all ${isCollapsed ? "h-8 w-8" : "h-12 w-auto max-w-[140px]"}`}
+                data-testid="img-sidebar-logo"
+              />
               {!isCollapsed && (
                 <div className="flex flex-col overflow-hidden">
                   <div className="flex items-baseline gap-1.5">

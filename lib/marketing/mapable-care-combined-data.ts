@@ -34,7 +34,8 @@ export type SponsoredPlacement = {
   cta: string;
   href: string;
   contextAreas: SupportArea[];
-  placement: "primary" | "search" | "footer";
+  /** First-party labelled partners only — footer monetization uses AdUnit inventory. */
+  placement: "primary" | "search";
 };
 
 export type TrustMetric = {
@@ -519,17 +520,6 @@ export const sponsoredPlacements: SponsoredPlacement[] = [
     contextAreas: ["All", "Transport"],
     placement: "search",
   },
-  {
-    id: "assistive-tech-partner",
-    title: "Assistive technology partner",
-    category: "Community partner",
-    description:
-      "Explore mobility, communication and daily-living products from accessibility-focused providers.",
-    cta: "Explore partner",
-    href: "/provider-finder",
-    contextAreas: ["All", "Care", "Places"],
-    placement: "footer",
-  },
 ];
 
 export const mapAbleCareCombinedDesignTests = [
@@ -566,6 +556,10 @@ export const mapAbleCareCombinedDesignTests = [
     expectedSponsoredPlacements: sponsoredPlacements.map(
       (placement) => placement.placement,
     ),
+  },
+  {
+    name: "footer monetization uses AdSense advertising unit",
+    expectedFooterMonetization: "adsense.marketing.footer",
   },
   {
     name: "hero section is extracted to dedicated component",

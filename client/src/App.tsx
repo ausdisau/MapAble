@@ -15,7 +15,7 @@ import { useState, lazy, Suspense } from "react";
 
 const ChatbotWidget = lazy(() => import("@/components/chatbot-widget"));
 import { useLocation } from "wouter";
-import logoImage from "@assets/Accessible_Australia_Logo_Design_1772582762574.png";
+import logoImage from "@assets/mapable-logo.svg";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -197,7 +197,12 @@ function MobileMenuToggle() {
             data-testid="button-mobile-menu"
             aria-label="Open navigation menu"
           >
-            <img src={logoImage} alt="MapAble" className="h-10 w-auto" data-testid="img-header-logo" />
+            <img
+              src={logoImage}
+              alt="MapAble — Empowering Independence"
+              className="h-10 w-auto max-w-[140px] object-contain object-left"
+              data-testid="img-header-logo"
+            />
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start" className="w-64">

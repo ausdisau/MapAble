@@ -1,18 +1,18 @@
 import Script from "next/script";
 
-/** MapAble Google AdSense publisher ID */
-export const ADSENSE_CLIENT_ID = "ca-pub-4510603272878761";
+import {
+  ADSENSE_CLIENT_ID,
+  isAdSenseEnabled,
+} from "@/lib/ads/adsense-config";
+
+export { ADSENSE_CLIENT_ID };
 
 /**
  * Loads the AdSense script site-wide (required for Auto ads and site verification).
  * Skipped in non-production so localhost does not generate invalid traffic.
  */
 export function GoogleAdSense() {
-  if (process.env.NODE_ENV !== "production") {
-    return null;
-  }
-
-  if (process.env.NEXT_PUBLIC_ADSENSE_ENABLED === "false") {
+  if (!isAdSenseEnabled()) {
     return null;
   }
 

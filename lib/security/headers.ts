@@ -20,6 +20,8 @@ export const CSP_EXTERNAL_ORIGINS = {
     "https://*.tile.openstreetmap.org",
     "https://*.basemaps.cartocdn.com",
     "https://api.maptiler.com",
+    "https://pagead2.googlesyndication.com",
+    "https://*.googlesyndication.com",
     "data:",
     "blob:",
   ],
@@ -30,8 +32,16 @@ export const CSP_EXTERNAL_ORIGINS = {
     "https://*.tile.openstreetmap.org",
     "https://api.maptiler.com",
     "https://vitals.vercel-insights.com",
+    "https://pagead2.googlesyndication.com",
+    "https://*.googlesyndication.com",
   ],
-  frames: ["https://js.stripe.com", "https://hooks.stripe.com"],
+  frames: [
+    "https://js.stripe.com",
+    "https://hooks.stripe.com",
+    "https://googleads.g.doubleclick.net",
+    "https://tpc.googlesyndication.com",
+    "https://www.google.com",
+  ],
   workers: ["blob:"],
 } as const;
 

@@ -4,14 +4,17 @@ import Link from "next/link";
 import React, { type ReactNode } from "react";
 
 import { AccessibilityPanelTrigger } from "@/components/accessibility/AccessibilityPanelTrigger";
-import { SponsoredBadge } from "@/components/marketing/mapable-care-shared";
-import { MAPABLE_SUPPORT_EMAIL } from "@/lib/brand/constants";
+import { AdvertisingUnit } from "@/components/ads/AdvertisingUnit";
+import {
+  MAPABLE_LOGO_ALT,
+  MAPABLE_LOGO_SRC,
+  MAPABLE_SUPPORT_EMAIL,
+} from "@/lib/brand/constants";
 import {
   companyRegistrationDetails,
   footerPlatformLinks,
   footerResourceLinks,
   MAPABLE_CARE_COMBINED_PHONE,
-  sponsoredPlacements,
 } from "@/lib/marketing/mapable-care-combined-data";
 
 function FooterTextLink({
@@ -62,14 +65,14 @@ function SocialLink({
 
 function FooterBrandMark() {
   return (
-    <div className="flex items-center gap-3">
-      <div className="flex h-8 w-8 items-center justify-center rounded-sm bg-[#005B7F] text-white shadow-sm">
-        <div className="h-4 w-4 rounded-b-full rounded-tl-full bg-white" />
-      </div>
-      <span className="text-xl font-black tracking-tight text-[#005B7F]">
-        MapAble
-      </span>
-    </div>
+    <img
+      src={MAPABLE_LOGO_SRC}
+      alt={MAPABLE_LOGO_ALT}
+      width={754}
+      height={1008}
+      className="h-12 w-auto max-w-[180px] bg-transparent object-contain object-left"
+      decoding="async"
+    />
   );
 }
 
@@ -110,47 +113,11 @@ function RegistrationDetails() {
   );
 }
 
-function FooterPartnerStrip() {
-  const footerPlacements = sponsoredPlacements.filter(
-    (placement) => placement.placement === "footer",
-  );
-  if (footerPlacements.length === 0) return null;
-  return (
-    <div className="mb-10 rounded-[1.5rem] border border-slate-200 bg-white p-5">
-      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <div>
-          <SponsoredBadge>Community partners</SponsoredBadge>
-          <p className="mt-2 text-sm leading-6 text-slate-600">
-            Partner placements are separated from support results and labelled
-            for transparency.
-          </p>
-        </div>
-        <div className="grid gap-3 md:min-w-[24rem]">
-          {footerPlacements.map((placement) => (
-            <Link
-              key={placement.id}
-              href={placement.href}
-              className="rounded-2xl border border-slate-200 bg-slate-50 p-4 transition hover:bg-[#F8C51C]/15 focus:outline-none focus:ring-4 focus:ring-[#F8C51C]/40"
-            >
-              <span className="block text-sm font-black text-[#0C1833]">
-                {placement.title}
-              </span>
-              <span className="mt-1 block text-xs leading-5 text-slate-600">
-                {placement.description}
-              </span>
-            </Link>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export function MapAbleCareMarketingFooter() {
   return (
     <footer className="mt-auto border-t border-slate-200 bg-slate-50 text-[#0C1833]">
       <div className="mx-auto max-w-7xl px-5 py-10 lg:px-8 lg:py-14">
-        <FooterPartnerStrip />
+        <AdvertisingUnit unitKey="marketing.footer" />
         <div className="grid gap-10 md:grid-cols-[1.2fr_0.9fr_0.9fr_1fr]">
           <section aria-label="About MapAble">
             <FooterBrandMark />

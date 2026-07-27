@@ -8,16 +8,12 @@
   font-family: "Trebuchet MS", ui-rounded, system-ui, sans-serif;
 }
 
-.mapable-wavy-letter {
-  display: inline-block;
-  transform: translateY(var(--wave-y, 0em)) rotate(var(--wave-r, 0deg));
-  transform-origin: 50% 80%;
-}
-
 .mapable-wavy-word {
   display: inline-block;
   white-space: nowrap;
   margin-right: 0.34em;
+  transform: translateY(var(--wave-y, 0em)) rotate(var(--wave-r, 0deg));
+  transform-origin: 50% 80%;
 }
 
 /* MapAble Transport public landing — atmospheric hero + motion */
