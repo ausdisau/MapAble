@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import {
   IDENTITY_VERIFICATION_STEPS,
   type IdentityVerificationStatusView,
-} from "@/lib/workers/identity-verification-service";
+} from "@/lib/workers/identity-verification-shared";
 
 function statusLabel(status: string): string {
   switch (status) {

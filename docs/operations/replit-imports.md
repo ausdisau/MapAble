@@ -53,3 +53,18 @@ The monorepo already wires the Unified shell and Care module:
 Module registry links in `app/lib/modules.ts` resolve to live routes (`/care`, `/transport`, `/marketplace`, `/dashboard/jobs`, plus coming-soon stubs for Foods/Moves/Kids).
 
 Verify: `pnpm test tests/mapable-core-ui.test.ts tests/module-routes.test.ts tests/marketplace-catalog.test.ts tests/care-mvp.test.ts`
+
+## UI integration map (uploaded Replit assets)
+
+After the MapAble-Unified UI upload that shipped in [PR #439](https://github.com/ausdisau/mapableau-new/pull/439), the asset → monorepo mapping lives at:
+
+[`design/imports/replit-mapable-integration-map.html`](../../design/imports/replit-mapable-integration-map.html)
+
+Open that file in a browser for shipped / stubbed / open / blocked status. Original JSX/HTML uploads remain under `design/imports/`.
+
+Client-safe constants for the verify-id and screening UIs live in:
+
+- `lib/workers/identity-verification-shared.ts`
+- `lib/workers/worker-screening-shared.ts`
+
+Server services (`*-service.ts`) must not be imported from `"use client"` components.

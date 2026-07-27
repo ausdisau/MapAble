@@ -1,27 +1,18 @@
-import type { WorkerCredentialStatus } from "@prisma/client";
-
 import { createAuditEvent } from "@/lib/audit/audit-event-service";
 import { prisma } from "@/lib/prisma";
+import {
+  type IdentityVerificationStatusView,
+  isStripeIdentityConfigured,
+} from "@/lib/workers/identity-verification-shared";
 
-export type IdentityVerificationProvider = "manual_review" | "stripe_identity";
-
-export type IdentityVerificationStatusView = {
-  workerProfileId: string;
-  verificationStatus: WorkerCredentialStatus;
-  workerScreeningStatus: WorkerCredentialStatus;
-  provider: IdentityVerificationProvider;
-  stripeIdentityConfigured: boolean;
-  canStart: boolean;
-};
-
-export function isStripeIdentityConfigured(
-  env: NodeJS.ProcessEnv = process.env,
-): boolean {
-  return (
-    env.STRIPE_IDENTITY_ENABLED === "true" &&
-    Boolean(env.STRIPE_SECRET_KEY?.trim())
-  );
-}
+export type {
+  IdentityVerificationProvider,
+  IdentityVerificationStatusView,
+} from "@/lib/workers/identity-verification-shared";
+export {
+  IDENTITY_VERIFICATION_STEPS,
+  isStripeIdentityConfigured,
+} from "@/lib/workers/identity-verification-shared";
 
 function publicDisplayName(displayName: string): string {
   const parts = displayName.trim().split(/\s+/).filter(Boolean);
@@ -131,14 +122,3 @@ export async function startIdentityVerification(userId: string): Promise<{
     nextStep: "await_admin_review",
   };
 }
-
-export const IDENTITY_VERIFICATION_STEPS = [
-  "Worker initiates ID verification",
-  "Redirect to third-party service (e.g., Stripe Identity, IDVerse)",
-  "Upload ID and selfie for liveness check",
-  "Third-party validates ID and returns result",
-  "Verification result stored in backend",
-  "Worker profile updated (badge shown)",
-  "Optional: Cross-check with NDIS Worker Screening DB",
-  "Audit log saved with timestamp",
-] as const;
