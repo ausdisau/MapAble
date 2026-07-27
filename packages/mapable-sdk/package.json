@@ -15,7 +15,8 @@
     "mapable",
     "sdk",
     "wayfinding",
-    "indoor-routing"
+    "indoor-routing",
+    "billing"
   ],
   "license": "ISC",
   "devDependencies": {

@@ -260,6 +260,10 @@ export const voidInvoiceSchema = z.object({
   reason: z.string().min(1).max(1000),
 });
 
+export const disputeInvoiceSchema = z.object({
+  reason: z.string().min(10).max(2000),
+});
+
 export const createCreditNoteSchema = z.object({
   amountCents: z.number().int().positive(),
   reason: z.string().min(1).max(1000),

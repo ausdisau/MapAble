@@ -3,6 +3,7 @@ import { jsonError } from "@/lib/api/response";
 import {
   BillingAccessError,
 } from "@/lib/billing/access";
+import { isResponse } from "@/lib/billing/api-helpers";
 import { writeFinancialAudit } from "@/lib/billing/audit/financial-audit";
 import {
   renderInvoiceHtml,
@@ -15,7 +16,7 @@ export async function GET(
   { params }: { params: Promise<{ invoiceId: string }> }
 ) {
   const user = await requireApiSession();
-  if (user instanceof Response) return user;
+  if (isResponse(user)) return user;
 
   const { invoiceId } = await params;
   const format = new URL(req.url).searchParams.get("format") ?? "html";

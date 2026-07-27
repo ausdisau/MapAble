@@ -80,3 +80,101 @@ export interface GeoJSONFeatureCollection {
   type: "FeatureCollection";
   features: GeoJSONFeature[];
 }
+
+/** Service types accepted when creating a draft invoice. */
+export type BillingServiceType =
+  | "care"
+  | "transport"
+  | "jobs"
+  | "foods"
+  | "moves"
+  | "academy"
+  | "marketplace"
+  | "subscription"
+  | "other";
+
+/** Approval actor types for invoice review. */
+export type BillingApprovalType =
+  | "participant"
+  | "provider"
+  | "mapable_finance";
+
+/** Approval decision values. */
+export type BillingApprovalDecision =
+  | "approved"
+  | "rejected"
+  | "changes_requested";
+
+/** Line item input for draft invoice creation. */
+export interface CreateInvoiceLineItem {
+  description: string;
+  quantity?: number;
+  unitAmountCents: number;
+  ndisLineItem?: string;
+  gstApplicable?: boolean;
+  metadata?: Record<string, unknown>;
+}
+
+/** POST /api/billing/invoices body. */
+export interface CreateInvoiceRequest {
+  providerId?: string;
+  bookingId?: string;
+  serviceType: BillingServiceType;
+  fundingSourceId?: string;
+  ndisLineItem?: string;
+  ndisClaimable?: boolean;
+  dueAt?: string;
+  lineItems: CreateInvoiceLineItem[];
+  providerSplits?: Array<{
+    recipientType:
+      | "provider"
+      | "worker"
+      | "transport_operator"
+      | "mapable_platform";
+    recipientId?: string;
+    amountCents: number;
+  }>;
+}
+
+/** Opaque invoice record returned by billing APIs (Prisma shape may grow). */
+export interface BillingInvoice {
+  id: string;
+  status: string;
+  [key: string]: unknown;
+}
+
+export interface IssueInvoiceRequest {
+  reason?: string;
+}
+
+export interface SendInvoiceRequest {
+  channel?: string;
+  recipient?: string;
+  reason?: string;
+}
+
+export interface VoidInvoiceRequest {
+  reason: string;
+}
+
+export interface ApproveInvoiceRequest {
+  approvalType: BillingApprovalType;
+  decision?: BillingApprovalDecision;
+  reason?: string;
+}
+
+export interface DisputeInvoiceRequest {
+  reason: string;
+}
+
+export interface RequestApprovalRequest {
+  approvalType: BillingApprovalType;
+  reason?: string;
+}
+
+export interface CreateCreditNoteRequest {
+  amountCents: number;
+  reason: string;
+  lineItemIds?: string[];
+  transitionInvoice?: boolean;
+}
