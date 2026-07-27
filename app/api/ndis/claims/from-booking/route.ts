@@ -1,27 +1,21 @@
-import { z } from "zod";
-
 import { requireApiPermission } from "@/lib/api/auth-handler";
-import { jsonError, jsonOk, zodErrorResponse } from "@/lib/api/response";
+import {
+  isResponse,
+  jsonError,
+  jsonOk,
+  zodErrorResponse,
+} from "@/lib/api/response";
 import {
   assertOrgAccess,
   createClaimLineFromBooking,
 } from "@/lib/ndis/claiming/claim-service";
-
-const bodySchema = z.object({
-  bookingId: z.string().cuid(),
-  providerOrgId: z.string().cuid(),
-  supportItemCode: z.string().optional(),
-  unitPriceCents: z.number().int().nonnegative().optional(),
-  quantity: z.number().positive().optional(),
-  evidenceJson: z.record(z.string(), z.unknown()).optional(),
-  participantConfirmationException: z.string().optional(),
-});
+import { claimFromBookingSchema } from "@/lib/ndis/schemas";
 
 export async function POST(req: Request) {
   const user = await requireApiPermission("provider:ndis:claim");
-  if (user instanceof Response) return user;
+  if (isResponse(user)) return user;
 
-  const parsed = bodySchema.safeParse(await req.json());
+  const parsed = claimFromBookingSchema.safeParse(await req.json());
   if (!parsed.success) return zodErrorResponse(parsed.error);
 
   try {

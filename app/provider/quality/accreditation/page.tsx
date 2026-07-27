@@ -1,9 +1,9 @@
 import Link from "next/link";
 
 import { AccreditationStatusBadge } from "@/components/quality/AccreditationStatusBadge";
+import { listApplicationsForOrganisation } from "@/lib/accreditation/provider-accreditation-service";
 import { requireAuth, requirePermission } from "@/lib/auth/guards";
 import { qualityAccreditationConfig } from "@/lib/config/quality-accreditation";
-import { listApplicationsForOrganisation } from "@/lib/accreditation/provider-accreditation-service";
 import { getProviderOrganisationIds } from "@/lib/engagement/engagement-access";
 
 export const metadata = { title: "Accreditation | Provider" };

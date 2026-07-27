@@ -1,13 +1,13 @@
 import type { Prisma } from "@prisma/client";
 
 import { ensureAnalyticsCloudEnabled } from "@/lib/config/analytics-research";
-import { prisma } from "@/lib/prisma";
 import {
   describeDeidentificationLevel,
   pseudonymiseParticipantId,
   suppressSensitiveFields,
 } from "@/lib/platform/privacy/deidentification";
 import { applySmallCellControls } from "@/lib/platform/privacy/deidentification/small-cell-controls";
+import { prisma } from "@/lib/prisma";
 
 export async function requestAnalyticsExport(params: {
   requestedById: string;

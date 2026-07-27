@@ -2,9 +2,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { AccreditationStatusBadge } from "@/components/quality/AccreditationStatusBadge";
+import { getApplicationDetail } from "@/lib/accreditation/provider-accreditation-service";
 import { requireAdmin } from "@/lib/auth/guards";
 import { qualityAccreditationConfig } from "@/lib/config/quality-accreditation";
-import { getApplicationDetail } from "@/lib/accreditation/provider-accreditation-service";
 
 export default async function AdminAccreditationDetailPage({
   params,

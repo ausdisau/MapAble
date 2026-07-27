@@ -1,14 +1,15 @@
 import type { TransportVerificationKind } from "@prisma/client";
-import {
-  evaluateDriverEligibility,
-  evaluateVehicleEligibility,
-  transportRequirementsSchema,
-} from "@mapable/domain-transport";
+
 
 import { prisma } from "@/lib/prisma";
 import { parseMobilityRequirements } from "@/lib/transport/mobility-schema";
 import { TransportApiError } from "@/lib/transport/transport-api-error";
 import type { EligibilityCheckResult } from "@/types/transport-scheduling";
+import {
+  evaluateDriverEligibility,
+  evaluateVehicleEligibility,
+  transportRequirementsSchema,
+} from "@mapable/domain-transport";
 
 const DRIVER_REQUIRED: TransportVerificationKind[] = [
   "licence",

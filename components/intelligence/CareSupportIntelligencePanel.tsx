@@ -1,5 +1,7 @@
 "use client";
 
+/* eslint-disable jsx-a11y/label-has-associated-control -- checkbox labels nest control + visible title/description text */
+
 import { useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";

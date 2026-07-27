@@ -37,7 +37,7 @@ export function TaskBoard({ tasks }: TaskBoardProps) {
       {openTasks.length === 0 ? (
         <p className="text-sm text-muted-foreground">No open tasks.</p>
       ) : (
-        <ul className="space-y-2" role="list">
+        <ul className="space-y-2">
           {openTasks.map((task) => (
             <li
               key={task.id}

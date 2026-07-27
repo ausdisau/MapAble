@@ -1,5 +1,5 @@
-import { developerPlatformConfig } from "@/lib/config/developer-platform";
 import { hasParticipantAuthority } from "@/lib/authority/participant-authority-service";
+import { developerPlatformConfig } from "@/lib/config/developer-platform";
 
 export async function enforceParticipantAuthority(input: {
   participantId: string;

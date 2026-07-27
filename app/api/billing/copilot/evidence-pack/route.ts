@@ -1,5 +1,5 @@
 import { requireApiPermission } from "@/lib/api/auth-handler";
-import { jsonError, jsonOk } from "@/lib/api/response";
+import { isResponse, jsonError, jsonOk } from "@/lib/api/response";
 import { isBillingCopilotEnabled } from "@/lib/billing/config";
 import {
   buildBillingEvidencePack,
@@ -15,7 +15,7 @@ export async function POST(req: Request) {
   }
 
   const user = await requireApiPermission("invoice:read:org");
-  if (user instanceof Response) return user;
+  if (isResponse(user)) return user;
 
   const body = (await req.json().catch(() => null)) as BillingEvidencePackInput | null;
   if (!body?.invoice?.id) {

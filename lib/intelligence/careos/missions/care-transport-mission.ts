@@ -2,12 +2,14 @@ import { randomUUID } from "crypto";
 
 import { Prisma } from "@prisma/client";
 
+import { prisma } from "@/lib/prisma";
+
 import { auditCareOSEvent } from "../audit/audit-service";
-import type { CareOSContext } from "../context/careos-context";
 import { hasConsentScope } from "../consent/consent-service";
+import type { CareOSContext } from "../context/careos-context";
 import type { CareOSMissionResult } from "../orchestrator/orchestration-result";
 import { createCareOSToolRegistry } from "../tools";
-import { prisma } from "@/lib/prisma";
+
 import { careTransportMissionInputSchema, type CareTransportMissionInput } from "./mission-types";
 
 const STANDARD_PATH = {

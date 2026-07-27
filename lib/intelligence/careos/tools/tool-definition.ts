@@ -1,8 +1,8 @@
 import type { z } from "zod";
 
-import type { CareOSAuthorityLevel } from "../policy/autonomy";
-import type { CareOSContext } from "../context/careos-context";
 import type { CareOSConsentScope } from "../consent/scopes";
+import type { CareOSContext } from "../context/careos-context";
+import type { CareOSAuthorityLevel } from "../policy/autonomy";
 
 export type CareOSToolRisk = "read" | "draft" | "write" | "restricted";
 

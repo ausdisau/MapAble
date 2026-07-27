@@ -26,7 +26,10 @@ function resolveHeapMb() {
     return 5120;
   }
   if (process.env.GITHUB_ACTIONS === "true") {
-    return 7168;
+    // Codebase growth after lib nesting / CareOS waves needs more SSG headroom
+    // than the prior 7168 MB tip (JS heap OOM on CI/Accessibility/CSP).
+    // Override with MAPABLE_BUILD_HEAP_MB; do not raise Vercel above 5120.
+    return 8192;
   }
   return 6144;
 }

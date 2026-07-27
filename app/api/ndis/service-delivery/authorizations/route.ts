@@ -1,38 +1,21 @@
-import {
-  NdisDeliveryAuthorizationType,
-  NdisPaymentRoute,
-  NdisServiceDeliveryMechanism,
-} from "@prisma/client";
-import { z } from "zod";
-
 import { requireApiPermission } from "@/lib/api/auth-handler";
-import { jsonError, jsonOk, zodErrorResponse } from "@/lib/api/response";
+import {
+  isResponse,
+  jsonError,
+  jsonOk,
+  zodErrorResponse,
+} from "@/lib/api/response";
 import { isNdisServiceDeliveryMechanismEnabled } from "@/lib/config/ndis-service-delivery";
 import { assertOrgAccess } from "@/lib/ndis/claiming/claim-service";
+import { createDeliveryAuthorizationSchema } from "@/lib/ndis/schemas";
 import {
   createDeliveryAuthorization,
   listDeliveryAuthorizationsForOrg,
 } from "@/lib/ndis/service-delivery/authorization-service";
 
-const createSchema = z.object({
-  providerOrgId: z.string().cuid(),
-  participantId: z.string().cuid(),
-  paymentRoute: z.nativeEnum(NdisPaymentRoute),
-  deliveryMechanism: z.nativeEnum(NdisServiceDeliveryMechanism),
-  authorizationType: z.nativeEnum(NdisDeliveryAuthorizationType).optional(),
-  supportItemCode: z.string().optional(),
-  supportCategoryCode: z.string().optional(),
-  serviceAgreementId: z.string().cuid().optional(),
-  careBookingId: z.string().cuid().optional(),
-  ndiaBookingReference: z.string().optional(),
-  validFrom: z.string().datetime(),
-  validTo: z.string().datetime().optional(),
-  notes: z.string().optional(),
-});
-
 export async function GET(req: Request) {
   const user = await requireApiPermission("provider:ndis:claim");
-  if (user instanceof Response) return user;
+  if (isResponse(user)) return user;
   if (!isNdisServiceDeliveryMechanismEnabled()) {
     return jsonError("NDIS service delivery mechanism is disabled", 503);
   }
@@ -60,12 +43,12 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   const user = await requireApiPermission("provider:ndis:claim");
-  if (user instanceof Response) return user;
+  if (isResponse(user)) return user;
   if (!isNdisServiceDeliveryMechanismEnabled()) {
     return jsonError("NDIS service delivery mechanism is disabled", 503);
   }
 
-  const parsed = createSchema.safeParse(await req.json());
+  const parsed = createDeliveryAuthorizationSchema.safeParse(await req.json());
   if (!parsed.success) return zodErrorResponse(parsed.error);
 
   try {

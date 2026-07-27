@@ -1,10 +1,10 @@
-import { careosOpportunitiesConfig } from "@/lib/config/careos-opportunities";
 import { appendMissionEvent } from "@/lib/careos/canonical-mission-service";
 import {
   YPIRAC_CAUTION,
   type SchemeKey,
   buildSchemeNavigationBrief,
 } from "@/lib/careos/opportunities/scheme-coordination";
+import { careosOpportunitiesConfig } from "@/lib/config/careos-opportunities";
 import { prisma } from "@/lib/prisma";
 
 function assertLifespanEnabled() {

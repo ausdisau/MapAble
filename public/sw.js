@@ -1,6 +1,7 @@
 /* MapAble offline service worker — Cache API strategy (no Workbox runtime dep).
  * Caches: app shell paths, /api/venues/search, OSM raster tiles.
- * Does not cache authenticated or PII-bearing endpoints.
+ * Does not cache authenticated or PII-bearing endpoints
+ * (e.g. /api/participant/* communication and passport routes).
  */
 /* eslint-disable no-restricted-globals */
 

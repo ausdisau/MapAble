@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -84,9 +85,9 @@ export function SupportedJourneyPanel() {
           </article>
         ))}
       </div>
-      <a className="mt-4 inline-flex min-h-11 items-center underline focus-visible:ring-4 focus-visible:ring-[#F8C51C]/40" href="/dashboard/transport/new">
+      <Link className="mt-4 inline-flex min-h-11 items-center underline focus-visible:ring-4 focus-visible:ring-[#F8C51C]/40" href="/dashboard/transport/new">
         Continue without CareOS
-      </a>
+      </Link>
     </section>
   );
 }

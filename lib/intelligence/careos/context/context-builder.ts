@@ -9,8 +9,9 @@ import {
   careOSActorTypeForUser,
   participantAuthority,
 } from "../authority/participant-authority";
-import { getAuthoritativeCareOSConsentScopes } from "../consent/consent-service";
 import { careOSFeatureFlags } from "../config/feature-flags";
+import { getAuthoritativeCareOSConsentScopes } from "../consent/consent-service";
+
 import type { CareOSContext } from "./careos-context";
 
 const CAREOS_READ_PERMISSIONS: Permission[] = [

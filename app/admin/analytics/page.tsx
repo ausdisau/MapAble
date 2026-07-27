@@ -1,6 +1,6 @@
 import { AnalyticsPrivacyNotice } from "@/components/analytics/AnalyticsPrivacyNotice";
-import { AnalyticsCloudStatus } from "@/components/analytics/MetricSnapshotCard";
 import { EvaluationHarnessPanel } from "@/components/analytics/EvaluationHarnessPanel";
+import { AnalyticsCloudStatus } from "@/components/analytics/MetricSnapshotCard";
 import { ResearchGovernanceNotice } from "@/components/analytics/ResearchGovernanceNotice";
 import { DeidentificationBadge } from "@/components/data-governance/DeidentificationBadge";
 import { isMetabaseEnabled } from "@/lib/analytics/metabase/metabase-client";

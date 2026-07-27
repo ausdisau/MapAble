@@ -1,7 +1,8 @@
 import type { WorkerProfile } from "@prisma/client";
-import { evaluateWorkforceEvidence } from "@mapable/domain-workforce";
 
 import { prisma } from "@/lib/prisma";
+import { evaluateWorkforceEvidence } from "@mapable/domain-workforce";
+
 
 export type CareTaskInput = {
   name?: string;

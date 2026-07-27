@@ -1,8 +1,8 @@
 "use client";
 
+import type { RehabilitationPlanStatus } from "@prisma/client";
 import { useState } from "react";
 
-import type { RehabilitationPlanStatus } from "@prisma/client";
 
 import { PlanStatusBadge } from "@/components/moves/GoalsPanel";
 

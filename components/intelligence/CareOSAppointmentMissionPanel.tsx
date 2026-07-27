@@ -1,12 +1,14 @@
 "use client";
 
+/* eslint-disable jsx-a11y/label-has-associated-control -- checkbox labels nest control + visible title/description text */
+
 import { useState } from "react";
 
 import { CareOSActionWorkbench } from "@/components/intelligence/CareOSActionWorkbench";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { reduceAppointmentMission } from "@/intelligence/kernel/v1/event-reducer";
 import type { AppointmentMissionState } from "@/intelligence/kernel/v1/appointment-types";
+import { reduceAppointmentMission } from "@/intelligence/kernel/v1/event-reducer";
 
 function dependencyClass(
   status: AppointmentMissionState["dependencies"][number]["status"],

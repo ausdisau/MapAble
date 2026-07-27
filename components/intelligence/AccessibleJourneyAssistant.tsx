@@ -3,9 +3,9 @@
 import Link from "next/link";
 import { useState } from "react";
 
-import type { JourneyPlan } from "@/intelligence/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import type { JourneyPlan } from "@/intelligence/types";
 
 export function AccessibleJourneyAssistant() {
   const [message, setMessage] = useState("Help me arrange accessible transport to my next support appointment.");

@@ -1,7 +1,7 @@
 import { createHash } from "crypto";
 
-import { careosOpportunitiesConfig } from "@/lib/config/careos-opportunities";
 import { UNIFIED_PROHIBITED_USES } from "@/lib/careos/policy/unified-prohibited-uses";
+import { careosOpportunitiesConfig } from "@/lib/config/careos-opportunities";
 import {
   runFullEvaluationHarness,
   type EvaluationHarnessReport,

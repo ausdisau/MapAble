@@ -1,8 +1,12 @@
 import { ParticipantProviderRelationshipStatus } from "@prisma/client";
-import { z } from "zod";
 
 import { requireApiPermission, requireApiSession } from "@/lib/api/auth-handler";
-import { jsonError, jsonOk, zodErrorResponse } from "@/lib/api/response";
+import {
+  isResponse,
+  jsonError,
+  jsonOk,
+  zodErrorResponse,
+} from "@/lib/api/response";
 import { isAdminRole } from "@/lib/auth/roles";
 import { assertOrgAccess } from "@/lib/ndis/claiming/claim-service";
 import {
@@ -11,17 +15,11 @@ import {
   ParticipantProviderAccessError,
   upsertParticipantProviderRelationship,
 } from "@/lib/ndis/participant-provider-relationship-service";
-
-const createSchema = z.object({
-  participantId: z.string().cuid(),
-  providerOrgId: z.string().cuid(),
-  status: z.nativeEnum(ParticipantProviderRelationshipStatus).optional(),
-  notes: z.string().optional(),
-});
+import { createParticipantProviderRelationshipSchema } from "@/lib/ndis/schemas";
 
 export async function GET(req: Request) {
   const user = await requireApiSession();
-  if (user instanceof Response) return user;
+  if (isResponse(user)) return user;
 
   const url = new URL(req.url);
   const providerOrgId = url.searchParams.get("providerOrgId") ?? undefined;
@@ -61,9 +59,11 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   const user = await requireApiPermission("provider:ndis:claim");
-  if (user instanceof Response) return user;
+  if (isResponse(user)) return user;
 
-  const parsed = createSchema.safeParse(await req.json());
+  const parsed = createParticipantProviderRelationshipSchema.safeParse(
+    await req.json()
+  );
   if (!parsed.success) return zodErrorResponse(parsed.error);
 
   try {

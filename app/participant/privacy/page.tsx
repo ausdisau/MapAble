@@ -8,8 +8,8 @@ import {
   listPeopleWithAccess,
 } from "@/lib/authority/authority-decision-service";
 import { listWalletCredentials } from "@/lib/careos/opportunities/consent-wallet";
-import { listConsentTimeline } from "@/lib/consent/consent-receipt-service";
 import { careosOpportunitiesConfig } from "@/lib/config/careos-opportunities";
+import { listConsentTimeline } from "@/lib/consent/consent-receipt-service";
 
 export const metadata = { title: "Privacy & access | Participant" };
 

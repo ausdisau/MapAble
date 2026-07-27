@@ -6,8 +6,8 @@ import { buildAppointmentMission } from "@/intelligence/kernel/v1/appointment-ke
 import { persistAppointmentMission } from "@/intelligence/kernel/v1/appointment-persistence";
 import { appointmentMissionRequestSchema } from "@/intelligence/kernel/v1/appointment-types";
 import { requireApiSession } from "@/lib/api/auth-handler";
-import { hasPermission } from "@/lib/auth/permissions";
 import { createAuditEvent } from "@/lib/audit/audit-event-service";
+import { hasPermission } from "@/lib/auth/permissions";
 
 export async function POST(request: Request) {
   const user = await requireApiSession();

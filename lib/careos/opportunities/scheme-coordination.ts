@@ -1,7 +1,7 @@
 import type { Prisma } from "@prisma/client";
 
-import { careosOpportunitiesConfig } from "@/lib/config/careos-opportunities";
 import { appendMissionEvent } from "@/lib/careos/canonical-mission-service";
+import { careosOpportunitiesConfig } from "@/lib/config/careos-opportunities";
 import { prisma } from "@/lib/prisma";
 
 /** Multi-scheme taxonomy for navigation briefs — never eligibility scores (O3). */

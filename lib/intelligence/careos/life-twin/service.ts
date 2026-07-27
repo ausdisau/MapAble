@@ -1,7 +1,9 @@
 import { Prisma } from "@prisma/client";
 
-import { careOSFeatureFlags } from "../config/feature-flags";
 import { prisma } from "@/lib/prisma";
+
+import { careOSFeatureFlags } from "../config/feature-flags";
+
 import {
   lifeTwinDomainRecordSchema,
   lifeTwinPreferencesSchema,

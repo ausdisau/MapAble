@@ -1,8 +1,8 @@
 import type { ApiClient, ApiScope } from "@prisma/client";
 
+import { scopesAllow } from "@/lib/developer-api/api-key-service";
 import { prisma } from "@/lib/prisma";
 import { hashApiKey } from "@/lib/stripe-billing/checkout-service";
-import { scopesAllow } from "@/lib/developer-api/api-key-service";
 
 export type AuthenticatedApiContext = {
   client: ApiClient;

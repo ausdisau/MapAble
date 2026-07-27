@@ -1,22 +1,22 @@
-import { z } from "zod";
-
 import { requireApiPermission } from "@/lib/api/auth-handler";
-import { jsonError, jsonOk, zodErrorResponse } from "@/lib/api/response";
+import {
+  isResponse,
+  jsonError,
+  jsonOk,
+  zodErrorResponse,
+} from "@/lib/api/response";
 import {
   assertOrgAccess,
   validateClaimLineById,
 } from "@/lib/ndis/claiming/claim-service";
+import { validateClaimLineSchema } from "@/lib/ndis/schemas";
 import { prisma } from "@/lib/prisma";
-
-const bodySchema = z.object({
-  claimLineId: z.string().cuid(),
-});
 
 export async function POST(req: Request) {
   const user = await requireApiPermission("provider:ndis:claim");
-  if (user instanceof Response) return user;
+  if (isResponse(user)) return user;
 
-  const parsed = bodySchema.safeParse(await req.json());
+  const parsed = validateClaimLineSchema.safeParse(await req.json());
   if (!parsed.success) return zodErrorResponse(parsed.error);
 
   const line = await prisma.ndisClaimLine.findUnique({

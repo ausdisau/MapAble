@@ -1,9 +1,9 @@
+import { hasParticipantAuthority } from "@/lib/authority/participant-authority-service";
 import {
   assertFederatedIdentityBoundary,
   ensureFederationEnabled,
   nationalPlatformConfig,
 } from "@/lib/config/national-platform";
-import { hasParticipantAuthority } from "@/lib/authority/participant-authority-service";
 import type {
   FederatedIdentityClaims,
   FederationSessionContext,

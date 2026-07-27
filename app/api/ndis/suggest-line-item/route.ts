@@ -1,6 +1,12 @@
 import { requireApiSession } from "@/lib/api/auth-handler";
-import { jsonError, jsonOk } from "@/lib/api/response";
+import {
+  isResponse,
+  jsonError,
+  jsonOk,
+  zodErrorResponse,
+} from "@/lib/api/response";
 import { suggestLineItemForSource } from "@/lib/ndis/ndis-suggestion-service";
+import { suggestLineItemSchema } from "@/lib/ndis/schemas";
 import {
   assertCanAccessSuggestionSource,
   SuggestionSourceAccessError,
@@ -8,17 +14,17 @@ import {
 
 export async function POST(req: Request) {
   const user = await requireApiSession();
-  if (user instanceof Response) return user;
-  const body = await req.json();
-  if (!body.sourceType || !body.sourceId) {
-    return jsonError("sourceType and sourceId required", 400);
-  }
+  if (isResponse(user)) return user;
+  const parsed = suggestLineItemSchema.safeParse(
+    await req.json().catch(() => ({}))
+  );
+  if (!parsed.success) return zodErrorResponse(parsed.error);
 
   try {
     await assertCanAccessSuggestionSource(
       user,
-      body.sourceType,
-      body.sourceId
+      parsed.data.sourceType,
+      parsed.data.sourceId
     );
   } catch (e) {
     if (e instanceof SuggestionSourceAccessError) {
@@ -32,9 +38,9 @@ export async function POST(req: Request) {
   }
 
   const result = await suggestLineItemForSource(
-    body.sourceType,
-    body.sourceId,
-    body.hints
+    parsed.data.sourceType,
+    parsed.data.sourceId,
+    parsed.data.hints
   );
   return jsonOk({
     ...result,

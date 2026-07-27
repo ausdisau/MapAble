@@ -16,7 +16,9 @@
     "sdk",
     "wayfinding",
     "indoor-routing",
-    "billing"
+    "billing",
+    "careos",
+    "ndis"
   ],
   "license": "ISC",
   "devDependencies": {

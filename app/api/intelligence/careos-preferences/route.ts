@@ -10,8 +10,8 @@ import {
   upsertCareOSPreferenceSchema,
 } from "@/intelligence/preferences/preference-service";
 import { requireApiSession } from "@/lib/api/auth-handler";
-import { hasPermission } from "@/lib/auth/permissions";
 import { createAuditEvent } from "@/lib/audit/audit-event-service";
+import { hasPermission } from "@/lib/auth/permissions";
 
 const revokeSchema = z.object({ key: careOSPreferenceKeySchema });
 

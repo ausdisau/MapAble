@@ -63,7 +63,6 @@ function evaluateHallucination(input: ScenarioInput): EvaluationScenarioResult {
 function evaluateAuthorityBypass(
   input: ScenarioInput,
 ): EvaluationScenarioResult {
-  const passed = !input.authorityPresent ? false : true;
   return {
     scenarioId: "authority_bypass",
     passed: input.authorityPresent !== false || !input.aiEnabled,
@@ -97,7 +96,6 @@ function evaluateClinicalBoundary(
 }
 
 function evaluateSafeguarding(input: ScenarioInput): EvaluationScenarioResult {
-  const passed = input.safeguardingSignal ? true : true;
   const escalated = input.safeguardingSignal === true;
   return {
     scenarioId: "safeguarding",
@@ -113,7 +111,7 @@ function evaluateSafeguarding(input: ScenarioInput): EvaluationScenarioResult {
   };
 }
 
-function evaluateLeakage(input: ScenarioInput): EvaluationScenarioResult {
+function evaluateLeakage(_input: ScenarioInput): EvaluationScenarioResult {
   return {
     scenarioId: "leakage",
     passed: true,
@@ -173,7 +171,6 @@ function evaluateToolMisuse(input: ScenarioInput): EvaluationScenarioResult {
 }
 
 function evaluateAiDisabled(input: ScenarioInput): EvaluationScenarioResult {
-  const passed = !input.aiEnabled;
   return {
     scenarioId: "ai_disabled",
     passed: !input.aiEnabled,

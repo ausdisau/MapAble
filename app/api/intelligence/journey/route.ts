@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 
-import { journeyPlanRequestSchema } from "@/intelligence/types";
 import { planAccessibleJourney } from "@/intelligence/journey-plan-service";
+import { journeyPlanRequestSchema } from "@/intelligence/types";
 import { requireApiSession } from "@/lib/api/auth-handler";
 
 export async function POST(request: Request) {

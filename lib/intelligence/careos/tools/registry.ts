@@ -2,10 +2,11 @@ import { z } from "zod";
 
 import { auditCareOSEvent } from "../audit/audit-service";
 import { isCareOSModuleEnabled, type CareOSModule } from "../config/feature-flags";
-import type { CareOSContext } from "../context/careos-context";
 import { getMissingConsentScopes, CareOSConsentError } from "../consent/consent-service";
+import type { CareOSContext } from "../context/careos-context";
 import { isAuthorityLevelAllowed } from "../policy/autonomy";
 import { CareOSPolicyError } from "../policy/prohibited-uses";
+
 import type { CareOSToolDefinition } from "./tool-definition";
 
 export class CareOSToolError extends Error {

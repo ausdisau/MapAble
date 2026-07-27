@@ -1,8 +1,8 @@
-import type { DegradedModePolicy, FailoverProcedure } from "@/lib/platform/resilience/contracts";
 import {
   assertNoUntestedFailoverClaims,
   nationalPlatformConfig,
 } from "@/lib/config/national-platform";
+import type { DegradedModePolicy, FailoverProcedure } from "@/lib/platform/resilience/contracts";
 
 export const DEGRADED_MODE_POLICIES: DegradedModePolicy[] = [
   {

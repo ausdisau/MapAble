@@ -2,13 +2,13 @@ import { ZodError } from "zod";
 
 import { requireApiSession } from "@/lib/api/auth-handler";
 import { jsonError, jsonOk, zodErrorResponse } from "@/lib/api/response";
-import { buildCareOSContext } from "@/lib/intelligence/careos/context/context-builder";
-import { CareOSConsentError } from "@/lib/intelligence/careos/consent/consent-service";
-import { careOSFeatureFlags } from "@/lib/intelligence/careos/config/feature-flags";
 import {
   createConsentProposalToken,
   verifyConsentProposalToken,
 } from "@/lib/intelligence/careos/approvals/proposal-token";
+import { careOSFeatureFlags } from "@/lib/intelligence/careos/config/feature-flags";
+import { CareOSConsentError } from "@/lib/intelligence/careos/consent/consent-service";
+import { buildCareOSContext } from "@/lib/intelligence/careos/context/context-builder";
 import { careTransportMissionInputSchema } from "@/lib/intelligence/careos/missions/mission-types";
 import { runCareOSManager } from "@/lib/intelligence/careos/orchestrator/careos-orchestrator";
 import { CareOSToolError } from "@/lib/intelligence/careos/tools/registry";

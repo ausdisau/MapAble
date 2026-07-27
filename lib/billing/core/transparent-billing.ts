@@ -1,6 +1,7 @@
 import type { BillingAdminApprovalStatus } from "@prisma/client";
 
 import { createAuditEvent } from "@/lib/audit/audit-event-service";
+import { transitionInvoice } from "@/lib/billing/invoicing/issue";
 import { platformPatternsConfig } from "@/lib/config/platform-patterns";
 import { prisma } from "@/lib/prisma";
 
@@ -149,27 +150,45 @@ export async function approveBillingInvoice(
   return invoice;
 }
 
+/**
+ * Participant dispute — transitions via invoicing state machine
+ * (`writeFinancialAudit` + transition row) and sets adminApprovalStatus.
+ * Signature preserved for existing route callers.
+ */
 export async function disputeBillingInvoice(
   invoiceId: string,
   participantUserId: string,
   reason: string
 ) {
-  const invoice = await prisma.billingInvoice.update({
+  const existing = await prisma.billingInvoice.findFirst({
     where: { id: invoiceId, userId: participantUserId },
+  });
+  if (!existing) {
+    throw new Error("Invoice not found");
+  }
+
+  const actor = await prisma.user.findUnique({
+    where: { id: participantUserId },
+    select: { id: true, primaryRole: true },
+  });
+  if (!actor) {
+    throw new Error("Participant not found");
+  }
+
+  await prisma.billingInvoice.update({
+    where: { id: invoiceId },
     data: {
-      adminApprovalStatus: "disputed",
-      disputedAt: new Date(),
-      disputeReason: reason,
-      status: "draft",
+      adminApprovalStatus: "disputed" satisfies BillingAdminApprovalStatus,
     },
   });
 
-  await createAuditEvent({
-    actorUserId: participantUserId,
-    action: "billing.invoice_disputed",
-    entityType: "BillingInvoice",
-    entityId: invoiceId,
-    participantId: participantUserId,
+  const { invoice } = await transitionInvoice({
+    invoiceId,
+    to: "disputed",
+    actorId: participantUserId,
+    actorRole: actor.primaryRole,
+    reason,
+    organisationId: existing.providerId,
   });
 
   return invoice;

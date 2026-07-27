@@ -1,25 +1,21 @@
-import { NdisPaymentRoute } from "@prisma/client";
-import { z } from "zod";
-
 import { requireApiPermission } from "@/lib/api/auth-handler";
-import { jsonError, jsonOk, zodErrorResponse } from "@/lib/api/response";
+import {
+  isResponse,
+  jsonError,
+  jsonOk,
+  zodErrorResponse,
+} from "@/lib/api/response";
 import {
   assertOrgAccess,
   createClaimBatch,
 } from "@/lib/ndis/claiming/claim-service";
-
-const bodySchema = z.object({
-  providerOrgId: z.string().cuid(),
-  paymentRoute: z.nativeEnum(NdisPaymentRoute),
-  claimLineIds: z.array(z.string().cuid()).min(1),
-  batchReference: z.string().optional(),
-});
+import { createNdisClaimBatchSchema } from "@/lib/ndis/schemas";
 
 export async function POST(req: Request) {
   const user = await requireApiPermission("provider:ndis:claim");
-  if (user instanceof Response) return user;
+  if (isResponse(user)) return user;
 
-  const parsed = bodySchema.safeParse(await req.json());
+  const parsed = createNdisClaimBatchSchema.safeParse(await req.json());
   if (!parsed.success) return zodErrorResponse(parsed.error);
 
   try {

@@ -1,7 +1,7 @@
 import { listAccessiblePlaces } from "@/lib/accessibility-map/place-service";
-import { withV1Auth } from "@/lib/platform/api/v1-handler";
 import { apiSuccessResponse } from "@/lib/platform/api/errors";
 import { parseCursorParams, buildCursorPage } from "@/lib/platform/api/pagination";
+import { withV1Auth } from "@/lib/platform/api/v1-handler";
 
 export async function GET(req: Request) {
   return withV1Auth(

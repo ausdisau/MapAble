@@ -1,6 +1,6 @@
+import { syntheticVehicles, syntheticWorkers } from "../fixtures/care-transport-scenarios";
 import type { DeliberationDraft } from "../types/deliberation-draft";
 import type { SyntheticRightsSnapshot } from "../types/mainframe-context";
-import { syntheticVehicles, syntheticWorkers } from "../fixtures/care-transport-scenarios";
 
 export function composeSyntheticCareTransportMission(
   goal: string,

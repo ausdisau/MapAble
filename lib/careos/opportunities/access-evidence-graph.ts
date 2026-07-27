@@ -1,7 +1,7 @@
 import type { AccessConfidenceLevel } from "@prisma/client";
 
-import { careosOpportunitiesConfig } from "@/lib/config/careos-opportunities";
 import { confidenceLabel } from "@/lib/access-map/access-confidence-service";
+import { careosOpportunitiesConfig } from "@/lib/config/careos-opportunities";
 import { prisma } from "@/lib/prisma";
 
 export type EvidenceProvenanceClass =

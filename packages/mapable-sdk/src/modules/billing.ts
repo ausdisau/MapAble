@@ -1,4 +1,5 @@
 import type { MapAbleRequestClient } from "../client";
+import { getJson, postJson } from "../http";
 import type {
   ApproveInvoiceRequest,
   BillingInvoice,
@@ -13,36 +14,26 @@ import type {
 
 /**
  * Billing invoices module — mirrors `/api/billing/invoices*` route cluster.
- * Uses the shared MapAble request client (Bearer + isomorphic fetch).
+ * Composes getJson/postJson on the shared MapAble request client.
  */
 export class BillingModule {
   constructor(private readonly client: MapAbleRequestClient) {}
 
   /** GET /api/billing/invoices */
   listInvoices(): Promise<{ invoices: BillingInvoice[] }> {
-    return this.client.request<{ invoices: BillingInvoice[] }>(
-      "/api/billing/invoices"
-    );
+    return getJson(this.client, "/api/billing/invoices");
   }
 
   /** POST /api/billing/invoices */
   createDraft(
     params: CreateInvoiceRequest
   ): Promise<{ invoice: BillingInvoice }> {
-    return this.client.request<{ invoice: BillingInvoice }>(
-      "/api/billing/invoices",
-      {
-        method: "POST",
-        body: JSON.stringify(params),
-      }
-    );
+    return postJson(this.client, "/api/billing/invoices", params);
   }
 
   /** GET /api/billing/invoices/:invoiceId */
   getInvoice(invoiceId: string): Promise<{ invoice: BillingInvoice }> {
-    return this.client.request<{ invoice: BillingInvoice }>(
-      `/api/billing/invoices/${invoiceId}`
-    );
+    return getJson(this.client, `/api/billing/invoices/${invoiceId}`);
   }
 
   /** POST /api/billing/invoices/:invoiceId/issue */
@@ -50,12 +41,10 @@ export class BillingModule {
     invoiceId: string,
     params: IssueInvoiceRequest = {}
   ): Promise<{ invoice: BillingInvoice }> {
-    return this.client.request<{ invoice: BillingInvoice }>(
+    return postJson(
+      this.client,
       `/api/billing/invoices/${invoiceId}/issue`,
-      {
-        method: "POST",
-        body: JSON.stringify(params),
-      }
+      params
     );
   }
 
@@ -68,12 +57,10 @@ export class BillingModule {
     delivery: unknown;
     transition: unknown;
   }> {
-    return this.client.request(
+    return postJson(
+      this.client,
       `/api/billing/invoices/${invoiceId}/send`,
-      {
-        method: "POST",
-        body: JSON.stringify(params),
-      }
+      params
     );
   }
 
@@ -82,12 +69,10 @@ export class BillingModule {
     invoiceId: string,
     params: VoidInvoiceRequest
   ): Promise<unknown> {
-    return this.client.request(
+    return postJson(
+      this.client,
       `/api/billing/invoices/${invoiceId}/void`,
-      {
-        method: "POST",
-        body: JSON.stringify(params),
-      }
+      params
     );
   }
 
@@ -96,12 +81,10 @@ export class BillingModule {
     invoiceId: string,
     params: ApproveInvoiceRequest
   ): Promise<{ invoice: BillingInvoice }> {
-    return this.client.request<{ invoice: BillingInvoice }>(
+    return postJson(
+      this.client,
       `/api/billing/invoices/${invoiceId}/approve`,
-      {
-        method: "POST",
-        body: JSON.stringify(params),
-      }
+      params
     );
   }
 
@@ -110,12 +93,10 @@ export class BillingModule {
     invoiceId: string,
     params: DisputeInvoiceRequest
   ): Promise<{ invoice: BillingInvoice }> {
-    return this.client.request<{ invoice: BillingInvoice }>(
+    return postJson(
+      this.client,
       `/api/billing/invoices/${invoiceId}/dispute`,
-      {
-        method: "POST",
-        body: JSON.stringify(params),
-      }
+      params
     );
   }
 
@@ -124,12 +105,10 @@ export class BillingModule {
     invoiceId: string,
     params: RequestApprovalRequest
   ): Promise<unknown> {
-    return this.client.request(
+    return postJson(
+      this.client,
       `/api/billing/invoices/${invoiceId}/request-approval`,
-      {
-        method: "POST",
-        body: JSON.stringify(params),
-      }
+      params
     );
   }
 
@@ -138,20 +117,18 @@ export class BillingModule {
     invoiceId: string,
     params: CreateCreditNoteRequest
   ): Promise<{ creditNote: unknown }> {
-    return this.client.request<{ creditNote: unknown }>(
+    return postJson(
+      this.client,
       `/api/billing/invoices/${invoiceId}/credit-notes`,
-      {
-        method: "POST",
-        body: JSON.stringify(params),
-      }
+      params
     );
   }
 
   /** POST /api/billing/invoices/:invoiceId/validate */
   validate(invoiceId: string): Promise<{ validation: unknown }> {
-    return this.client.request<{ validation: unknown }>(
-      `/api/billing/invoices/${invoiceId}/validate`,
-      { method: "POST" }
+    return postJson(
+      this.client,
+      `/api/billing/invoices/${invoiceId}/validate`
     );
   }
 }

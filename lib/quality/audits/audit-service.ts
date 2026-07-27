@@ -7,8 +7,8 @@ import type {
 } from "@prisma/client";
 
 import { ensureQualityQmsEnabled } from "@/lib/config/quality-accreditation";
-import { assertQualityComplianceAllowed } from "@/lib/quality/compliance-boundaries";
 import { prisma } from "@/lib/prisma";
+import { assertQualityComplianceAllowed } from "@/lib/quality/compliance-boundaries";
 
 async function appendFindingHistory(params: {
   findingId: string;

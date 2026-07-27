@@ -9,9 +9,9 @@ import {
   ensureProviderAccreditationEnabled,
   qualityAccreditationConfig,
 } from "@/lib/config/quality-accreditation";
+import { prisma } from "@/lib/prisma";
 import { assertQualityComplianceAllowed } from "@/lib/quality/compliance-boundaries";
 import { listOrganisationEvidence } from "@/lib/quality/standards/standards-service";
-import { prisma } from "@/lib/prisma";
 
 async function recordApplicationEvent(params: {
   applicationId: string;

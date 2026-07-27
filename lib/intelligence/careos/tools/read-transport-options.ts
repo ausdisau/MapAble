@@ -3,6 +3,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 
 import { buildParticipantRightsSnapshot } from "../context/participant-rights";
+
 import type { CareOSToolDefinition } from "./tool-definition";
 
 const inputSchema = z.object({});

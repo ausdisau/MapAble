@@ -1,8 +1,8 @@
 import type { Prisma } from "@prisma/client";
 
 import { ensureResearchGovernanceEnabled } from "@/lib/config/analytics-research";
-import { prisma } from "@/lib/prisma";
 import { describeDeidentificationLevel } from "@/lib/platform/privacy/deidentification";
+import { prisma } from "@/lib/prisma";
 
 async function requireActiveEthics(projectId: string) {
   const approval = await prisma.ethicsApproval.findFirst({

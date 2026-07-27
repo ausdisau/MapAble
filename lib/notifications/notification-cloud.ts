@@ -1,7 +1,7 @@
 import type { NotificationCategory } from "@prisma/client";
 
-import { prisma } from "@/lib/prisma";
 import { notifyUser } from "@/lib/notifications/notification-service";
+import { prisma } from "@/lib/prisma";
 import { sendEmail } from "@/lib/sendGrid";
 
 export type NotificationChannel = "in_app" | "email";

@@ -45,7 +45,7 @@ export function CaseloadDashboard({ cases, enabled }: CaseloadDashboardProps) {
           participant.
         </p>
       ) : (
-        <ul className="grid gap-3" role="list">
+        <ul className="grid gap-3">
           {cases.map((c) => (
             <li
               key={c.id}

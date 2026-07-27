@@ -2,6 +2,7 @@ import { createAuditEvent } from "@/lib/audit/audit-event-service";
 
 import { careOSFeatureFlags } from "../config/feature-flags";
 import type { CareOSContext } from "../context/careos-context";
+
 import { redactCareOSMetadata } from "./redaction";
 
 export type CareOSAuditEvent = {

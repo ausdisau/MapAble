@@ -1,6 +1,14 @@
 export { MapAble } from "./client";
 export type { MapAbleRequestClient } from "./client";
+export {
+  fetchAllCursorPages,
+  getJson,
+  patchJson,
+  postJson,
+} from "./http";
+export type { CursorPage } from "./http";
 export { BillingModule } from "./modules/billing";
+export { CareOsModule } from "./modules/careos";
 export { RoutingModule } from "./modules/routing";
 export { VenuesModule } from "./modules/venues";
 export type {
@@ -26,4 +34,10 @@ export type {
   DisputeInvoiceRequest,
   RequestApprovalRequest,
   CreateCreditNoteRequest,
+  CareOsCursorPage,
+  CareOsListOptions,
+  CareOsParticipantSummary,
+  CareOsCareShift,
+  CareOsAccessPlace,
+  CareOsWebhookSubscription,
 } from "./types";

@@ -9,8 +9,8 @@ import {
 import { createCareOSActionToken } from "@/intelligence/actions/action-token";
 import { getMapAbleIntelligenceConfig } from "@/intelligence/config";
 import { requireApiSession } from "@/lib/api/auth-handler";
-import { hasPermission } from "@/lib/auth/permissions";
 import { createAuditEvent } from "@/lib/audit/audit-event-service";
+import { hasPermission } from "@/lib/auth/permissions";
 
 export async function POST(request: Request) {
   const user = await requireApiSession();

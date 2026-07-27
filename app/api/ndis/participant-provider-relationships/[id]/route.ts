@@ -1,29 +1,29 @@
-import { ParticipantProviderRelationshipStatus } from "@prisma/client";
-import { z } from "zod";
-
 import { requireApiSession } from "@/lib/api/auth-handler";
-import { jsonError, jsonOk, zodErrorResponse } from "@/lib/api/response";
+import {
+  isResponse,
+  jsonError,
+  jsonOk,
+  zodErrorResponse,
+} from "@/lib/api/response";
 import { createAuditEvent } from "@/lib/audit/audit-event-service";
 import { isAdminRole } from "@/lib/auth/roles";
 import {
   assertCanManageParticipantProviderRelationship,
 } from "@/lib/ndis/participant-provider-relationship-service";
+import { patchParticipantProviderRelationshipSchema } from "@/lib/ndis/schemas";
 import { prisma } from "@/lib/prisma";
-
-const patchSchema = z.object({
-  status: z.nativeEnum(ParticipantProviderRelationshipStatus),
-  notes: z.string().optional(),
-});
 
 export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const user = await requireApiSession();
-  if (user instanceof Response) return user;
+  if (isResponse(user)) return user;
 
   const { id } = await params;
-  const parsed = patchSchema.safeParse(await req.json());
+  const parsed = patchParticipantProviderRelationshipSchema.safeParse(
+    await req.json()
+  );
   if (!parsed.success) return zodErrorResponse(parsed.error);
 
   const existing = await prisma.participantProviderRelationship.findUnique({
@@ -55,7 +55,9 @@ export async function PATCH(
         status: parsed.data.status,
         notes: parsed.data.notes ?? existing.notes,
         myProviderVerifiedAt:
-          parsed.data.status === "active" ? new Date() : existing.myProviderVerifiedAt,
+          parsed.data.status === "active"
+            ? new Date()
+            : existing.myProviderVerifiedAt,
       },
     });
 

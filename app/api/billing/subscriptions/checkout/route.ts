@@ -1,11 +1,11 @@
 import { requireApiSession } from "@/lib/api/auth-handler";
-import { jsonError, jsonOk, zodErrorResponse } from "@/lib/api/response";
+import { isResponse, jsonError, jsonOk, zodErrorResponse } from "@/lib/api/response";
 import { subscriptionCheckoutSchema } from "@/lib/billing/core/schemas";
 import { createSubscriptionCheckout } from "@/lib/billing/core/subscription-service";
 
 export async function POST(req: Request) {
   const user = await requireApiSession();
-  if (user instanceof Response) return user;
+  if (isResponse(user)) return user;
   const body = await req.json();
   const parsed = subscriptionCheckoutSchema.safeParse(body);
   if (!parsed.success) return zodErrorResponse(parsed.error);

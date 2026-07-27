@@ -7,7 +7,6 @@ import {
   getParticipantApplication,
   requestInterviewAdjustment,
   submitParticipantApplication,
-  withdrawParticipantApplication,
 } from "@/lib/jobs/applications/participant-application-service";
 
 const correctSchema = z.object({

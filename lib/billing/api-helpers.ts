@@ -2,6 +2,7 @@ import {
   requireApiPermission,
   requireApiSession,
 } from "@/lib/api/auth-handler";
+import { isResponse } from "@/lib/api/response";
 import type { CurrentUser } from "@/lib/auth/current-user";
 import { apiForbidden } from "@/lib/auth/guards";
 import {
@@ -9,9 +10,8 @@ import {
   type Permission,
 } from "@/lib/auth/permissions";
 
-export function isResponse(value: unknown): value is Response {
-  return value instanceof Response;
-}
+/** Re-export shared guard for existing billing import paths. */
+export { isResponse };
 
 /**
  * Thin wrapper around requireApiPermission for billing:* checks.

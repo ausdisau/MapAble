@@ -31,7 +31,8 @@ export const PUBLIC_INFORMATIONAL_ROUTES: readonly InformationalRoute[] = [
     label: "Homepage",
     inSitemap: true,
     titleIncludes: "MapAble",
-    h1Includes: "accessible",
+    // Marketing hero: "Accessibility you can plan around."
+    h1Includes: "Accessibility",
     // Guided search panel is a GET discovery form (not a contact/PII intake).
     formsPermitted: true,
     authenticationProhibited: true,

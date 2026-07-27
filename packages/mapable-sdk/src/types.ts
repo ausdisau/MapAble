@@ -178,3 +178,35 @@ export interface CreateCreditNoteRequest {
   lineItemIds?: string[];
   transitionInvoice?: boolean;
 }
+
+/** CareOS Open API cursor page (openapi-careos-v1 CursorPage). */
+export interface CareOsCursorPage {
+  nextCursor?: string | null;
+  hasMore?: boolean;
+}
+
+export interface CareOsListOptions {
+  limit?: number;
+  cursor?: string;
+}
+
+export interface CareOsParticipantSummary {
+  id: string;
+  authorityDomains?: string[];
+  [key: string]: unknown;
+}
+
+export interface CareOsCareShift {
+  id: string;
+  [key: string]: unknown;
+}
+
+export interface CareOsAccessPlace {
+  id: string;
+  [key: string]: unknown;
+}
+
+export interface CareOsWebhookSubscription {
+  id: string;
+  [key: string]: unknown;
+}

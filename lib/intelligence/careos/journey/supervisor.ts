@@ -2,11 +2,12 @@ import { randomUUID } from "crypto";
 
 import { decideProposedAction } from "@mapable/intelligence-kernel";
 
-import { auditCareOSEvent } from "../audit/audit-service";
-import type { CareOSContext } from "../context/careos-context";
 import {
   createSimulationActionToken,
 } from "../approvals/proposal-token";
+import { auditCareOSEvent } from "../audit/audit-service";
+import type { CareOSContext } from "../context/careos-context";
+
 import {
   planSupportedJourney,
   type JourneyOption,

@@ -2,13 +2,13 @@ import type { ApiScope } from "@prisma/client";
 
 import { checkIpRateLimit, getClientIp } from "@/lib/api/ip-rate-limit";
 import { developerPlatformConfig } from "@/lib/config/developer-platform";
+import { apiErrorResponse } from "@/lib/platform/api/errors";
+import { logApiAccess } from "@/lib/platform/developer-auth/access-log-service";
 import {
   authenticateApiKey,
   type AuthenticatedApiContext,
 } from "@/lib/platform/developer-auth/api-key-auth";
-import { logApiAccess } from "@/lib/platform/developer-auth/access-log-service";
 import { enforceParticipantAuthority } from "@/lib/platform/developer-auth/participant-gate";
-import { apiErrorResponse } from "@/lib/platform/api/errors";
 
 export type V1HandlerContext = AuthenticatedApiContext & {
   participantId?: string;

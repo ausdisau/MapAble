@@ -3,8 +3,8 @@ import Link from "next/link";
 import { DisruptionQueuePanel } from "@/components/transport/DisruptionQueuePanel";
 import { requireAuth } from "@/lib/auth/guards";
 import { transportCommandConfig } from "@/lib/config/transport-command";
-import { listOpenDisruptions } from "@/lib/transport/continuity/recovery-service";
 import { prisma } from "@/lib/prisma";
+import { listOpenDisruptions } from "@/lib/transport/continuity/recovery-service";
 
 export const metadata = { title: "Participant transport | Support coordinator" };
 

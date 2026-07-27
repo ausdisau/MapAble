@@ -2,13 +2,13 @@ import { NdisClaimLineStatus, NdisPaymentRoute } from "@prisma/client";
 
 import { requireApiPermission } from "@/lib/api/auth-handler";
 import { getUserOrganisationIds } from "@/lib/api/organisation-scope";
-import { jsonError, jsonOk } from "@/lib/api/response";
+import { isResponse, jsonError, jsonOk } from "@/lib/api/response";
 import { isAdminRole } from "@/lib/auth/roles";
 import { assertOrgAccess, searchClaimLines } from "@/lib/ndis/claiming/claim-service";
 
 export async function GET(req: Request) {
   const user = await requireApiPermission("provider:ndis:claim");
-  if (user instanceof Response) return user;
+  if (isResponse(user)) return user;
 
   const url = new URL(req.url);
   let providerOrgId = url.searchParams.get("providerOrgId") ?? undefined;

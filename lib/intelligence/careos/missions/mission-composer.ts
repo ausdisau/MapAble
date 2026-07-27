@@ -1,5 +1,6 @@
 import type { CareOSContext } from "../context/careos-context";
 import type { CareOSMissionResult } from "../orchestrator/orchestration-result";
+
 import { composeCareTransportMission } from "./care-transport-mission";
 import type { CareTransportMissionInput } from "./mission-types";
 

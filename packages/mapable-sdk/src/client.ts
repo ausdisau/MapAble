@@ -1,4 +1,5 @@
 import { BillingModule } from "./modules/billing";
+import { CareOsModule } from "./modules/careos";
 import { RoutingModule } from "./modules/routing";
 import { VenuesModule } from "./modules/venues";
 import type { MapAbleConfig } from "./types";
@@ -13,12 +14,13 @@ export interface MapAbleRequestClient {
 /**
  * Official MapAble platform SDK client.
  * Authenticates with a Bearer API key and exposes domain modules
- * (routing, venues, billing).
+ * (routing, venues, billing, careos).
  */
 export class MapAble implements MapAbleRequestClient {
   readonly routing: RoutingModule;
   readonly venues: VenuesModule;
   readonly billing: BillingModule;
+  readonly careos: CareOsModule;
 
   private readonly apiKey: string;
   private readonly baseUrl: string;
@@ -33,6 +35,7 @@ export class MapAble implements MapAbleRequestClient {
     this.routing = new RoutingModule(this);
     this.venues = new VenuesModule(this);
     this.billing = new BillingModule(this);
+    this.careos = new CareOsModule(this);
   }
 
   /**

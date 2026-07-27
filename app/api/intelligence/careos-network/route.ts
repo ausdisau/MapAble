@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 
-import { requireApiSession } from "@/lib/api/auth-handler";
 import { getMapAbleIntelligenceConfig } from "@/intelligence/config";
 import { buildCareOSAgenticNetwork } from "@/intelligence/network/network-service";
 import { careOSNetworkRequestSchema } from "@/intelligence/network/types";
+import { requireApiSession } from "@/lib/api/auth-handler";
 
 export async function POST(request: Request) {
   const user = await requireApiSession();

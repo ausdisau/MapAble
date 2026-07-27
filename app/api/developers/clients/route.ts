@@ -1,3 +1,5 @@
+import type { ApiScope } from "@prisma/client";
+
 import { requireApiSession } from "@/lib/api/auth-handler";
 import { jsonError, jsonOk } from "@/lib/api/response";
 import { developerPlatformConfig } from "@/lib/config/developer-platform";
@@ -9,7 +11,6 @@ import {
 } from "@/lib/platform/developer-auth/api-client-service";
 import { registerOAuthClient } from "@/lib/platform/developer-auth/oauth-client-service";
 import { createServiceAccount } from "@/lib/platform/developer-auth/service-account-service";
-import type { ApiScope } from "@prisma/client";
 
 export async function GET() {
   const user = await requireApiSession();

@@ -1,12 +1,11 @@
 import Link from "next/link";
 
 import { AnalyticsPrivacyNotice } from "@/components/analytics/AnalyticsPrivacyNotice";
-import { AnalyticsCloudStatus } from "@/components/analytics/MetricSnapshotCard";
-import { MetricSnapshotCard } from "@/components/analytics/MetricSnapshotCard";
+import { AnalyticsCloudStatus , MetricSnapshotCard } from "@/components/analytics/MetricSnapshotCard";
 import { ProviderSectionNav } from "@/components/provider/ProviderSectionNav";
 import { requireAuth } from "@/lib/auth/guards";
-import { listPublishedMetrics } from "@/lib/platform/analytics/metric-registry";
 import { PROVIDER_INSIGHTS_LINKS } from "@/lib/core-ui/provider-section-nav";
+import { listPublishedMetrics } from "@/lib/platform/analytics/metric-registry";
 
 export const metadata = { title: "Analytics | MapAble Provider" };
 

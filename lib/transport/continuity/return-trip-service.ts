@@ -1,7 +1,7 @@
 import type { ReturnTripAssuranceStatus } from "@prisma/client";
 
-import { prisma } from "@/lib/prisma";
 import { transportCommandConfig } from "@/lib/config/transport-command";
+import { prisma } from "@/lib/prisma";
 import { TransportApiError } from "@/lib/transport/transport-api-error";
 import { recordTripEvent } from "@/lib/transport/transport-event-service";
 

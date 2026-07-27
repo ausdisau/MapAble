@@ -11,15 +11,20 @@ export const metadata = {
 export default function OfflinePage() {
   return (
     <MapAbleCareMarketingShell>
-      <main className="mx-auto max-w-2xl space-y-4 px-5 py-16">
-        <h1 className="text-3xl font-black tracking-[-0.04em] text-[#0C1833]">
+      <main
+        className="mx-auto max-w-2xl space-y-4 px-5 py-16"
+        aria-labelledby="offline-heading"
+      >
+        <h1
+          id="offline-heading"
+          className="text-3xl font-black tracking-[-0.04em] text-[#0C1833]"
+        >
           You are offline
         </h1>
-        <p className="text-slate-600 leading-7">
+        <p className="text-slate-600 leading-7" role="status">
           MapAble can still show venue accessibility details you searched
           earlier on this device. Reconnect for live map tiles and fresh search
-          results. Participant records and communication passports are not
-          cached.
+          results. Participant records and communication passports are not cached.
         </p>
         <Link
           href="/accessibility-map"

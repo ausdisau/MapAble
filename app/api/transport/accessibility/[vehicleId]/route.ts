@@ -1,13 +1,13 @@
 import { requireApiSession } from "@/lib/api/auth-handler";
 import { jsonOk } from "@/lib/api/response";
+import { transportCommandConfig } from "@/lib/config/transport-command";
 import {
   assessVehicleCompatibility,
   listVehicleEvidence,
 } from "@/lib/transport/accessibility/evidence-service";
 import { parseMobilityRequirements } from "@/lib/transport/mobility-schema";
-import { handleTransportRouteError } from "@/lib/transport/transport-route-handler";
-import { transportCommandConfig } from "@/lib/config/transport-command";
 import { TransportApiError } from "@/lib/transport/transport-api-error";
+import { handleTransportRouteError } from "@/lib/transport/transport-route-handler";
 
 export async function GET(
   req: Request,

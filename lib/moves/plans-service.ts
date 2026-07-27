@@ -1,10 +1,7 @@
 import type { Prisma, RehabilitationPlanStatus } from "@prisma/client";
 
 import { createAuditEvent } from "@/lib/audit/audit-event-service";
-import {
-  ensureMovesRehabilitationEnabled,
-  movesRehabilitationConfig,
-} from "@/lib/config/moves-rehabilitation";
+import { ensureMovesRehabilitationEnabled } from "@/lib/config/moves-rehabilitation";
 import { assertClinicalBoundaryAllowed } from "@/lib/moves/clinical-boundaries";
 import { prisma } from "@/lib/prisma";
 

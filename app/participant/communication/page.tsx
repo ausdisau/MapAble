@@ -5,8 +5,8 @@ import { EmergencyCardPanel } from "@/components/communication/EmergencyCardPane
 import { SavedPhrasesPanel } from "@/components/communication/SavedPhrasesPanel";
 import { VoiceCommandsDemo } from "@/components/communication/VoiceCommandsDemo";
 import { requireAuth } from "@/lib/auth/guards";
-import { mobileCommunicationConfig } from "@/lib/config/mobile-communication";
 import { getOrCreatePassport } from "@/lib/communication/communication-passport-service";
+import { mobileCommunicationConfig } from "@/lib/config/mobile-communication";
 import { computeDegradedModeIndicator } from "@/lib/platform/offline/degraded-mode";
 import { createInitialOfflineShellState } from "@/lib/platform/offline/offline-contracts";
 

@@ -1,7 +1,7 @@
-import { withV1Auth } from "@/lib/platform/api/v1-handler";
 import { apiSuccessResponse } from "@/lib/platform/api/errors";
 import { parseCursorParams, buildCursorPage } from "@/lib/platform/api/pagination";
 import { assertSandboxSafe, syntheticParticipantStub } from "@/lib/platform/api/sandbox-guard";
+import { withV1Auth } from "@/lib/platform/api/v1-handler";
 import { prisma } from "@/lib/prisma";
 
 export async function GET(req: Request) {

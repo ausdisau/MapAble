@@ -3,14 +3,14 @@ import { randomBytes } from "crypto";
 import type { ApiScope } from "@prisma/client";
 
 import { createAuditEvent } from "@/lib/audit/audit-event-service";
-import { phase5Config } from "@/lib/config/phase5";
 import { developerPlatformConfig } from "@/lib/config/developer-platform";
-import { prisma } from "@/lib/prisma";
-import { hashApiKey } from "@/lib/stripe/legacy-checkout-service";
+import { phase5Config } from "@/lib/config/phase5";
 import {
   createApiClient,
   issueApiKey as issuePlatformApiKey,
 } from "@/lib/platform/developer-auth/api-client-service";
+import { prisma } from "@/lib/prisma";
+import { hashApiKey } from "@/lib/stripe/legacy-checkout-service";
 
 export async function createDeveloperApp(
   developerOrganisationId: string,

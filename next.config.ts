@@ -18,7 +18,7 @@ const nextConfig: NextConfig = {
     staticGenerationMaxConcurrency: 1,
     // Fewer workers / larger page batches reduce peak RSS on Vercel preview.
     // Raised from 100 after preview SIGKILL at 6144 MB heap (PR #390).
-    staticGenerationMinPagesPerWorker: 200,
+    staticGenerationMinPagesPerWorker: 400,
   },
   async redirects() {
     return [
@@ -48,16 +48,18 @@ const nextConfig: NextConfig = {
     ];
   },
   eslint: {
-    // Vercel default ~8 GB builders SIGKILL during Next's combined
-    // "Linting and checking validity of types" phase (heap+RSS). CI still
-    // runs `pnpm lint` as a required gate on every PR/main push — do not
-    // weaken that. TypeScript checking remains enforced below.
-    ignoreDuringBuilds: process.env.VERCEL === "1",
+    // Vercel/GHA OOM during Next's combined "Linting and checking validity of
+    // types" phase. CI still runs `pnpm lint` + `pnpm type-check` as required
+    // gates before Production build — do not remove those workflow steps.
+    ignoreDuringBuilds:
+      process.env.VERCEL === "1" || process.env.GITHUB_ACTIONS === "true",
     // tests/ linted via `pnpm lint:tests` (tracked debt; not ignored during builds for app code).
     dirs: ["app", "components", "lib", "schemas", "scripts/ci"],
   },
   typescript: {
-    ignoreBuildErrors: false, // Ensures type safety at build time
+    // CI already ran `pnpm type-check`. Skip duplicate tsc inside `next build`
+    // on GHA only (Vercel still typechecks at build; local builds typecheck).
+    ignoreBuildErrors: process.env.GITHUB_ACTIONS === "true",
   },
 };
 

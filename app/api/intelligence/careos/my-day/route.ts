@@ -1,9 +1,9 @@
 import { requireApiSession } from "@/lib/api/auth-handler";
 import { jsonError, jsonOk } from "@/lib/api/response";
-import { buildCareOSContext } from "@/lib/intelligence/careos/context/context-builder";
 import { careOSFeatureFlags } from "@/lib/intelligence/careos/config/feature-flags";
-import { createCareOSToolRegistry } from "@/lib/intelligence/careos/tools";
 import { CareOSConsentError } from "@/lib/intelligence/careos/consent/consent-service";
+import { buildCareOSContext } from "@/lib/intelligence/careos/context/context-builder";
+import { createCareOSToolRegistry } from "@/lib/intelligence/careos/tools";
 
 export async function GET() {
   const user = await requireApiSession();

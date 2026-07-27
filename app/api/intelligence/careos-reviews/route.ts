@@ -7,9 +7,9 @@ import {
   updateCareOSHumanReview,
 } from "@/intelligence/operations/mission-state-service";
 import { requireApiSession } from "@/lib/api/auth-handler";
+import { createAuditEvent } from "@/lib/audit/audit-event-service";
 import { hasPermission } from "@/lib/auth/permissions";
 import { isAdminRole } from "@/lib/auth/roles";
-import { createAuditEvent } from "@/lib/audit/audit-event-service";
 
 const updateSchema = z.object({
   id: z.string().uuid(),

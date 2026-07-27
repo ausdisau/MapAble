@@ -1,9 +1,7 @@
-import { z } from "zod";
-
 import { requireApiPermission } from "@/lib/api/auth-handler";
-import { jsonError, jsonOk, zodErrorResponse } from "@/lib/api/response";
-import { canProviderAccessOrg } from "@/lib/engagement/engagement-access";
+import { isResponse, jsonError, jsonOk } from "@/lib/api/response";
 import { qualityAccreditationConfig } from "@/lib/config/quality-accreditation";
+import { canProviderAccessOrg } from "@/lib/engagement/engagement-access";
 import { getProviderQualityDashboard } from "@/lib/quality/dashboard-service";
 
 export async function GET(req: Request) {
@@ -12,7 +10,7 @@ export async function GET(req: Request) {
   }
 
   const user = await requireApiPermission("engagement:provider:read");
-  if (user instanceof Response) return user;
+  if (isResponse(user)) return user;
 
   const organisationId = new URL(req.url).searchParams.get("organisationId");
   if (!organisationId) {

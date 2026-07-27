@@ -1,6 +1,7 @@
 import { checkConsent } from "@/lib/consent/consent-service";
 
 import type { CareOSContext } from "../context/careos-context";
+
 import {
   CAREOS_CONSENT_EXPLANATIONS,
   CAREOS_SCOPE_TO_MAPABLE_SCOPE,

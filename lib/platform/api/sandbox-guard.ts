@@ -1,5 +1,6 @@
-import { sandboxDataGuard } from "@/lib/partner-sandbox/sandbox-service";
 import type { ApiClientEnvironment } from "@prisma/client";
+
+import { sandboxDataGuard } from "@/lib/partner-sandbox/sandbox-service";
 
 export function assertSandboxSafe(
   environment: ApiClientEnvironment,

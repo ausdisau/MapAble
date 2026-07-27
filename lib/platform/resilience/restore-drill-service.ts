@@ -5,8 +5,8 @@ import {
   ensureNationalPlatformEnabled,
   nationalPlatformConfig,
 } from "@/lib/config/national-platform";
-import { prisma } from "@/lib/prisma";
 import { getDocumentedTargets } from "@/lib/platform/resilience/procedures";
+import { prisma } from "@/lib/prisma";
 
 export async function recordRestoreDrill(input: {
   title: string;

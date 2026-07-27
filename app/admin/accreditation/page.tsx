@@ -1,9 +1,9 @@
 import Link from "next/link";
 
 import { AccreditationStatusBadge } from "@/components/quality/AccreditationStatusBadge";
+import { listApplicationsForReview } from "@/lib/accreditation/provider-accreditation-service";
 import { requireAdmin } from "@/lib/auth/guards";
 import { qualityAccreditationConfig } from "@/lib/config/quality-accreditation";
-import { listApplicationsForReview } from "@/lib/accreditation/provider-accreditation-service";
 
 export default async function AdminProviderAccreditationPage() {
   await requireAdmin();

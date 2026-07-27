@@ -30,7 +30,8 @@ jobs:
           --health-timeout 5s
           --health-retries 5
     env:
-      NODE_OPTIONS: --max-old-space-size=6144
+      NODE_OPTIONS: --max-old-space-size=8192
+      MAPABLE_BUILD_HEAP_MB: "8192"
       NEXTAUTH_SECRET: ci-nextauth-secret-not-for-production-use-32chars
       NEXTAUTH_URL: http://127.0.0.1:3000
       NEXT_PUBLIC_APP_URL: http://127.0.0.1:3000

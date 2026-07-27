@@ -1,8 +1,8 @@
 import { ensureQualityQmsEnabled } from "@/lib/config/quality-accreditation";
+import { prisma } from "@/lib/prisma";
 import { getOrganisationAuditDashboard } from "@/lib/quality/audits/audit-service";
 import { getPolicyTrainingDashboard } from "@/lib/quality/policies/policy-service";
 import { listOrganisationEvidence } from "@/lib/quality/standards/standards-service";
-import { prisma } from "@/lib/prisma";
 
 export async function getProviderQualityDashboard(organisationId: string) {
   ensureQualityQmsEnabled();

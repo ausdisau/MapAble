@@ -5,8 +5,8 @@ import { z, ZodError } from "zod";
 
 import { appendAppointmentMissionEvent } from "@/intelligence/kernel/v1/appointment-event-service";
 import { requireApiSession } from "@/lib/api/auth-handler";
-import { isAdminRole } from "@/lib/auth/roles";
 import { createAuditEvent } from "@/lib/audit/audit-event-service";
+import { isAdminRole } from "@/lib/auth/roles";
 import { prisma } from "@/lib/prisma";
 
 const bodySchema = z.object({

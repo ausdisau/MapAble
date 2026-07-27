@@ -1,8 +1,8 @@
 import { recordSyntheticAudit } from "../audit/synthetic-audit-log";
 import { assertSyntheticOnly } from "../config/synthetic-guard";
 import { syntheticRights } from "../fixtures/care-transport-scenarios";
-import { parseDeterministicDraft } from "../model/gateway";
 import { composeSyntheticCareTransportMission } from "../missions/care-transport-mission";
+import { parseDeterministicDraft } from "../model/gateway";
 import { evaluateMainframePolicy } from "../policy/gateway";
 import { getPrompt } from "../prompts/registry";
 import type { MainframeOutcome } from "../types/deliberation-draft";

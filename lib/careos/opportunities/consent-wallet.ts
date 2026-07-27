@@ -1,10 +1,10 @@
 import { createAuditEvent } from "@/lib/audit/audit-event-service";
-import { careosOpportunitiesConfig } from "@/lib/config/careos-opportunities";
-import { createConsentReceipt } from "@/lib/consent/consent-receipt-service";
 import {
   grantParticipantAuthority,
   revokeParticipantAuthority,
 } from "@/lib/authority/participant-authority-service";
+import { careosOpportunitiesConfig } from "@/lib/config/careos-opportunities";
+import { createConsentReceipt } from "@/lib/consent/consent-receipt-service";
 import { prisma } from "@/lib/prisma";
 
 function assertWalletEnabled() {

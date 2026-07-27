@@ -1,5 +1,5 @@
 import { requireApiPermission } from "@/lib/api/auth-handler";
-import { jsonError, jsonOk } from "@/lib/api/response";
+import { isResponse, jsonError, jsonOk } from "@/lib/api/response";
 import { assertOrgAccess } from "@/lib/ndis/claiming/claim-service";
 import { prisma } from "@/lib/prisma";
 
@@ -8,7 +8,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const user = await requireApiPermission("provider:ndis:claim");
-  if (user instanceof Response) return user;
+  if (isResponse(user)) return user;
 
   const { id } = await params;
   const batch = await prisma.ndisClaimBatch.findUnique({

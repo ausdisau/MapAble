@@ -4,8 +4,8 @@ import {
   analyticsResearchConfig,
   ensureResearchGovernanceEnabled,
 } from "@/lib/config/analytics-research";
-import { prisma } from "@/lib/prisma";
 import { shouldSuppressCohort } from "@/lib/platform/privacy/deidentification";
+import { prisma } from "@/lib/prisma";
 
 export async function createResearchProject(params: {
   title: string;

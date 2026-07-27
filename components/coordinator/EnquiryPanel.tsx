@@ -46,7 +46,7 @@ export function EnquiryPanel({ enquiries, enabled }: EnquiryPanelProps) {
       {enquiries.length === 0 ? (
         <p className="text-sm text-muted-foreground">No enquiries yet.</p>
       ) : (
-        <ul className="space-y-3" role="list">
+        <ul className="space-y-3">
           {enquiries.map((enquiry) => (
             <li
               key={enquiry.id}

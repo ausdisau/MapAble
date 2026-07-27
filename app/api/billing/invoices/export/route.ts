@@ -1,11 +1,11 @@
 import { requireApiSession } from "@/lib/api/auth-handler";
-import { jsonError, jsonOk, zodErrorResponse } from "@/lib/api/response";
+import { isResponse, jsonError, jsonOk, zodErrorResponse } from "@/lib/api/response";
 import { exportInvoice } from "@/lib/billing/core/export-service";
 import { exportInvoiceSchema } from "@/lib/billing/core/schemas";
 
 export async function POST(req: Request) {
   const user = await requireApiSession();
-  if (user instanceof Response) return user;
+  if (isResponse(user)) return user;
   const body = await req.json();
   const parsed = exportInvoiceSchema.safeParse(body);
   if (!parsed.success) return zodErrorResponse(parsed.error);

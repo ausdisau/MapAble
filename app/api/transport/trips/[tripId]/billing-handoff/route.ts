@@ -1,16 +1,16 @@
 import { requireApiPermission } from "@/lib/api/auth-handler";
-import { jsonError, jsonOk } from "@/lib/api/response";
-import { createBillableItemFromTransportEvidence } from "@/lib/billing/adapters/transport-evidence-adapter";
+import { isResponse, jsonError, jsonOk } from "@/lib/api/response";
+import { handoffTransportTripToBilling } from "@/lib/orchestration/orchestration-service";
 
 export async function POST(
   _req: Request,
   { params }: { params: Promise<{ tripId: string }> },
 ) {
   const user = await requireApiPermission("transport:manage:org");
-  if (user instanceof Response) return user;
+  if (isResponse(user)) return user;
   const { tripId } = await params;
   try {
-    const result = await createBillableItemFromTransportEvidence({
+    const result = await handoffTransportTripToBilling({
       tripId,
       actor: user,
     });

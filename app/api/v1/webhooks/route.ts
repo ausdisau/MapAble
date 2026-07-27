@@ -1,13 +1,13 @@
 import { requireApiSession } from "@/lib/api/auth-handler";
 import { jsonError, jsonOk } from "@/lib/api/response";
 import { developerPlatformConfig } from "@/lib/config/developer-platform";
+import { apiSuccessResponse } from "@/lib/platform/api/errors";
+import { withV1Auth } from "@/lib/platform/api/v1-handler";
 import {
   createWebhookSubscription,
   listPendingDeliveries,
   rotateWebhookSecret,
 } from "@/lib/platform/webhooks/webhook-service";
-import { withV1Auth } from "@/lib/platform/api/v1-handler";
-import { apiSuccessResponse } from "@/lib/platform/api/errors";
 import { prisma } from "@/lib/prisma";
 
 export async function GET(req: Request) {

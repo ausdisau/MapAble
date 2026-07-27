@@ -14,8 +14,8 @@ export type JourneyOrchestrationResult = {
   blockedReason?: string;
 };
 
-const AI_DISABLED: false = false;
-const NO_CHANGE: true = true;
+const AI_DISABLED = false as const;
+const NO_CHANGE = true as const;
 
 export function orchestrateProviderResponseJourney(): JourneyOrchestrationResult {
   return {
