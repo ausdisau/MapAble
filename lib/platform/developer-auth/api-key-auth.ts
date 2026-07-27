@@ -19,7 +19,7 @@ export async function authenticateApiKey(
   if (!key) return null;
 
   const hash = hashApiKey(key);
-  const record = await prisma.apiKey.findFirst({
+  const record = await prisma.platformApiKey.findFirst({
     where: { keyHash: hash, revokedAt: null },
     include: { client: true },
   });
@@ -27,7 +27,7 @@ export async function authenticateApiKey(
     return null;
   }
 
-  await prisma.apiKey.update({
+  await prisma.platformApiKey.update({
     where: { id: record.id },
     data: { lastUsedAt: new Date() },
   });

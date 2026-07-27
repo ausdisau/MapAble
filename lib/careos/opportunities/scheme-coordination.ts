@@ -1,3 +1,5 @@
+import type { Prisma } from "@prisma/client";
+
 import { careosOpportunitiesConfig } from "@/lib/config/careos-opportunities";
 import { appendMissionEvent } from "@/lib/careos/canonical-mission-service";
 import { prisma } from "@/lib/prisma";
@@ -81,9 +83,10 @@ export async function tagMissionSchemes(input: {
     ...prev,
     schemeTags: schemes,
     eligibilityAutomated: false,
-    ypiracCaution:
-      input.includeYpiracCaution === true ? YPIRAC_CAUTION : prev.ypiracCaution,
-  };
+    ypiracCaution: (input.includeYpiracCaution === true
+      ? YPIRAC_CAUTION
+      : prev.ypiracCaution) as Prisma.InputJsonValue,
+  } as Prisma.InputJsonValue;
 
   await prisma.careOSMission.update({
     where: { id: mission.id },

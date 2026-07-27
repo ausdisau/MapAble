@@ -42,6 +42,6 @@ CREATE INDEX "shift_offers_missionId_createdAt_idx" ON "shift_offers"("missionId
 ALTER TABLE "shift_offers" ADD CONSTRAINT "shift_offers_careShiftId_fkey"
   FOREIGN KEY ("careShiftId") REFERENCES "CareShift"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "shift_offers" ADD CONSTRAINT "shift_offers_workerProfileId_fkey"
-  FOREIGN KEY ("workerProfileId") REFERENCES "worker_profiles"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+  FOREIGN KEY ("workerProfileId") REFERENCES "WorkerProfile"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "shift_offers" ADD CONSTRAINT "shift_offers_participantId_fkey"
   FOREIGN KEY ("participantId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;

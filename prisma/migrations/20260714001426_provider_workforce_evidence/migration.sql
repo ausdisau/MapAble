@@ -20,7 +20,7 @@ CREATE TABLE "worker_credential_evidence" (
 );
 CREATE INDEX "worker_credential_evidence_workerProfileId_credentialType_verificationStatus_idx" ON "worker_credential_evidence"("workerProfileId","credentialType","verificationStatus");
 CREATE INDEX "worker_credential_evidence_expiresAt_revokedAt_idx" ON "worker_credential_evidence"("expiresAt","revokedAt");
-ALTER TABLE "worker_credential_evidence" ADD CONSTRAINT "worker_credential_evidence_workerProfileId_fkey" FOREIGN KEY ("workerProfileId") REFERENCES "worker_profiles"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "worker_credential_evidence" ADD CONSTRAINT "worker_credential_evidence_workerProfileId_fkey" FOREIGN KEY ("workerProfileId") REFERENCES "WorkerProfile"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 CREATE TABLE "worker_equipment_evidence" (
   "id" TEXT NOT NULL, "workerProfileId" TEXT NOT NULL, "equipmentType" TEXT NOT NULL,
@@ -31,4 +31,4 @@ CREATE TABLE "worker_equipment_evidence" (
 );
 CREATE INDEX "worker_equipment_evidence_workerProfileId_equipmentType_verificationStatus_idx" ON "worker_equipment_evidence"("workerProfileId","equipmentType","verificationStatus");
 CREATE INDEX "worker_equipment_evidence_expiresAt_revokedAt_idx" ON "worker_equipment_evidence"("expiresAt","revokedAt");
-ALTER TABLE "worker_equipment_evidence" ADD CONSTRAINT "worker_equipment_evidence_workerProfileId_fkey" FOREIGN KEY ("workerProfileId") REFERENCES "worker_profiles"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "worker_equipment_evidence" ADD CONSTRAINT "worker_equipment_evidence_workerProfileId_fkey" FOREIGN KEY ("workerProfileId") REFERENCES "WorkerProfile"("id") ON DELETE CASCADE ON UPDATE CASCADE;

@@ -33,7 +33,7 @@ export async function linkReturnTrip(params: {
         tripDirection: "outbound",
         returnTripId: params.returnTripId,
         returnAssuranceStatus: "pending",
-      },
+      } as any,
     });
     await tx.transportTrip.update({
       where: { id: params.returnTripId },
@@ -41,7 +41,7 @@ export async function linkReturnTrip(params: {
         tripDirection: "return",
         outboundTripId: params.outboundTripId,
         returnAssuranceStatus: "pending",
-      },
+      } as any,
     });
 
     const existing = await tx.transportReturnTripAssurance.findFirst({
@@ -129,7 +129,7 @@ export async function getReturnTripAssurance(outboundTripId: string) {
       orderBy: { createdAt: "desc" },
     }),
     prisma.transportTrip.findFirst({
-      where: { outboundTripId },
+      where: { outboundTripId } as any,
     }),
   ]);
 

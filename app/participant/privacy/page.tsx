@@ -36,7 +36,7 @@ export default async function ParticipantPrivacyPage() {
     consentScopes: grant.consentScopes,
     purpose: grant.purpose,
     recipientRole: grant.recipientRole,
-    expiresAt: grant.expiresAt.toISOString(),
+    expiresAt: grant.expiresAt?.toISOString() ?? "",
     delegate: grant.delegate,
   }));
 
@@ -94,7 +94,7 @@ export default async function ParticipantPrivacyPage() {
                 domain: grant.domain,
                 actions: grant.actions,
                 purpose: grant.purpose,
-                expiresAt: grant.expiresAt.toISOString(),
+                expiresAt: grant.expiresAt?.toISOString() ?? "",
                 delegate: grant.delegate,
               }))}
               documents={wallet.documents.map((doc) => ({

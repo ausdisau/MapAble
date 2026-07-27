@@ -44,7 +44,7 @@ describe("disclosure preview service", () => {
     } as never);
     vi.mocked(prisma.employmentProfile.findUnique).mockResolvedValue(null);
     vi.mocked(prisma.applicationDisclosurePreview.upsert).mockImplementation(
-      async ({ create }) => create as never,
+      (async ({ create }: { create: unknown }) => create) as never,
     );
 
     const preview = await buildDisclosurePreview("app-1", "p1");
@@ -52,8 +52,9 @@ describe("disclosure preview service", () => {
     expect(preview.fieldsToDisclose).toMatchObject({
       reasonableAdjustmentRequest: false,
     });
-    expect(preview.employerVisible.reasonableAdjustmentRequest).toBe(
-      "[Adjustment request on file — not shared with employer]",
-    );
+    expect(
+      (preview.employerVisible as Record<string, unknown>)
+        .reasonableAdjustmentRequest,
+    ).toBe("[Adjustment request on file — not shared with employer]");
   });
 });

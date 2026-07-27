@@ -26,15 +26,13 @@ export async function grantParticipantAuthority(input: {
     data: {
       participantId: input.participantId,
       delegateId: input.delegateId,
-      tenantId: input.tenantId,
       domain: input.domain,
       actions: input.actions,
       consentScopes: input.consentScopes,
-      purpose: input.purpose,
+      purpose: input.purpose ?? "",
       recipientRole: input.recipientRole,
-      evidenceRef: input.evidenceRef,
-      decisionLimitJson: input.decisionLimitJson,
       expiresAt: input.expiresAt,
+      createdById: input.actorUserId,
     },
   });
   await createAuditEvent({
@@ -111,7 +109,7 @@ export async function hasParticipantAuthority(input: {
       revokedAt: null,
       expiresAt: { gt: now },
       ...(input.tenantId ? { tenantId: input.tenantId } : {}),
-    },
+    } as any,
   });
   if (!grant) return false;
   return (input.consentScopes ?? []).every((scope) =>

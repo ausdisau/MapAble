@@ -89,7 +89,7 @@ CREATE INDEX "worker_competency_evidence_participantId_competencyType_idx"
 CREATE INDEX "worker_competency_evidence_expiresAt_revokedAt_idx"
   ON "worker_competency_evidence"("expiresAt","revokedAt");
 ALTER TABLE "worker_competency_evidence" ADD CONSTRAINT "worker_competency_evidence_workerProfileId_fkey"
-  FOREIGN KEY ("workerProfileId") REFERENCES "worker_profiles"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+  FOREIGN KEY ("workerProfileId") REFERENCES "WorkerProfile"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 CREATE TABLE "clinical_review_records" (
   "id" TEXT NOT NULL, "participantId" TEXT NOT NULL, "supportPlanId" TEXT,

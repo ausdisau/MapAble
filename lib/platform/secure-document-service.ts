@@ -61,7 +61,7 @@ export async function createPrivateDocument(input: {
           createdById: input.actorUserId,
         },
       },
-    },
+    } as any,
   });
   await createAuditEvent({
     actorUserId: input.actorUserId,
