@@ -257,6 +257,57 @@ describe("MapAble Chat module registry + router parity", () => {
     assert.ok(selected.length < chatModules.length, "expected narrowing, not full fallback");
   });
 
+  // Mixed-domain coverage: a single turn spanning multiple domains must retain
+  // the tools of EVERY matched domain — a keyword hit on one module must never
+  // narrow away another matched module (router rule 3).
+  test("router retains all matched modules on a mixed-domain turn (billing + shifts)", () => {
+    const selected = defaultIntentRouter.selectModules(
+      "what's my transport budget and can you book a shift?",
+      chatModules,
+      ctx,
+    );
+    const names = selected.map((m) => m.name);
+    assert.ok(names.includes("billing"), "billing must be retained (budget keyword)");
+    assert.ok(names.includes("shifts"), "shifts must be retained (shift/book keywords)");
+    assert.ok(names.includes("transport"), "transport must be retained (transport keyword)");
+    for (const required of ["profile", "safeguarding", "handoff"]) {
+      assert.ok(names.includes(required), `always-on module ${required} dropped`);
+    }
+  });
+
+  test("mixed-domain turn keeps every matched module's tools available", () => {
+    const selected = defaultIntentRouter.selectModules(
+      "do I owe an invoice, and also add groceries to my cart",
+      chatModules,
+      ctx,
+    );
+    const toolNames = selected
+      .flatMap((m) => m.tools)
+      .map((t) => (t.type === "function" ? t.function.name : ""));
+    assert.ok(toolNames.includes("get_pending_invoices"), "billing tool dropped");
+    assert.ok(toolNames.includes("view_grocery_cart"), "grocery tool dropped");
+  });
+
+  // Widening rule (router rule 4): fallback-to-all happens iff ZERO keyword
+  // modules matched. A partial/multi-intent match narrows to the matched set
+  // plus always-on — it must NOT silently widen to everything.
+  test("router widens to all modules only when no keyword module matches", () => {
+    const ambiguous = defaultIntentRouter.selectModules("hello there", chatModules, ctx);
+    assert.equal(ambiguous.length, chatModules.length, "ambiguous turn must widen to all");
+
+    const multiIntent = defaultIntentRouter.selectModules(
+      "pay my invoice and book a shift",
+      chatModules,
+      ctx,
+    );
+    const names = multiIntent.map((m) => m.name);
+    assert.ok(names.includes("billing") && names.includes("shifts"));
+    assert.ok(
+      multiIntent.length < chatModules.length,
+      "multi-intent turn with matches must narrow, not fall back to all",
+    );
+  });
+
   test("escalate_to_human persists a handoff and acknowledges success", async () => {
     const created: any[] = [];
     const fakeCtx = {
