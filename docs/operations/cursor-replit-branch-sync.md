@@ -57,6 +57,7 @@ In the Repl (**Tools → Version control → GitHub**):
    - `npm run bootstrap:replit-deps`
    - `npm run dev:replit` (Express+Vite on port 5000)
    - `npm run test:replit` (full suite when `DATABASE_URL`/`NEON_DATABASE_URL` is set; otherwise offline smoke + migration-journal)
+   - For seed/data against **Supabase**, set `DATABASE_URL` to the full Postgres URI from Supabase → Project Settings → Database (not just `*.supabase.co`). Neon hosts use the WebSocket driver; Supabase and other Postgres hosts use `pg`.
 6. Push to `origin/replit-agent` after green tests.
 
 ### Dual package manifests

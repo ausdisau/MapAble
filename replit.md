@@ -21,7 +21,7 @@ Participant-facing HITL AI features (Concepts B, C, E from `research/hitl-ai-dis
 - **Runtime**: Node.js/TypeScript
 - **Backend**: Express.js (primary API + auth + payments)
 - **Frontend**: React + Vite + Tailwind CSS + shadcn/ui
-- **Database**: Neon PostgreSQL (serverless) via Drizzle ORM
+- **Database**: PostgreSQL via Drizzle ORM (Neon serverless WebSocket, or node-postgres for Supabase / other hosts)
 - **AI**: OpenAI (via Replit AI Integrations)
 - **Payments**: Stripe (Payment Intents with Link + Card methods)
 - **Usage Metering**: Orb (care hours and transport km billing)
@@ -42,7 +42,7 @@ Participant-facing HITL AI features (Concepts B, C, E from `research/hitl-ai-dis
 - **Migration history**: `drizzle-kit push` (schema-diff against the live DB) is the source of truth for schema setup; the numbered SQL files in `migrations/` are an ordered historical ledger and `migrations/meta/_journal.json` is the manifest of that order. Every SQL file has a matching journal entry (idx 0–11) and vice versa — keep them in lockstep. Hand-written migrations (0003 onward) are idempotent (`IF NOT EXISTS`); never edit an already-applied file's SQL, add a new numbered file instead.
 
 ## Environment Variables
-- `NEON_DATABASE_URL` / `DATABASE_URL` — Neon PostgreSQL connection string
+- `NEON_DATABASE_URL` / `DATABASE_URL` — PostgreSQL connection string (Neon `*.neon.tech`, or Supabase `postgresql://…@db.<ref>.supabase.co:5432/postgres?sslmode=require`). Hostname alone is not enough — include user, password, port, and database.
 - `AI_INTEGRATIONS_OPENAI_API_KEY` — OpenAI API key (via Replit integrations)
 - `AI_INTEGRATIONS_OPENAI_BASE_URL` — OpenAI base URL (via Replit integrations)
 - `SESSION_SECRET` — Session secret key
