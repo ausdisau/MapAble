@@ -1,4 +1,5 @@
 import type { ChatModule } from "../types";
+import { notifyChatHandoff } from "../../notifications";
 
 /**
  * Human handoff. Upgraded from a flag-only escalation to a real, persisted
@@ -38,6 +39,16 @@ export const handoffModule: ChatModule = {
           reason,
           channel: ctx.channel,
         });
+        // Alert staff only after the handoff record is persisted (never on the
+        // fail-closed path). Fire-and-forget: notification failures are logged
+        // inside notifyChatHandoff and must not block the chat reply.
+        void notifyChatHandoff({
+          handoffId: handoff.id,
+          sessionId: ctx.sessionId,
+          channel: ctx.channel,
+        }).catch((e) =>
+          console.warn("[handoff] staff notification failed:", e instanceof Error ? e.message : e),
+        );
         return JSON.stringify({
           escalated: true,
           handoffId: handoff.id,

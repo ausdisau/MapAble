@@ -220,6 +220,97 @@ async function resolveSafeguardingRecipients(): Promise<string[]> {
  * summary — never the raw chat content. Never throws: notification failures are
  * logged and must not block the chat response.
  */
+export interface ChatHandoffAlert {
+  handoffId: string;
+  sessionId: string;
+  channel?: string | null;
+}
+
+export interface ChatHandoffAlertResult {
+  attempted: boolean;
+  recipients: number;
+  emailed: number;
+  reason?: string;
+}
+
+function getAppBaseUrl(): string {
+  const domain = process.env.REPLIT_DEV_DOMAIN || process.env.REPLIT_DOMAINS || "";
+  if (domain) return `https://${domain}`;
+  return "http://localhost:5000";
+}
+
+/**
+ * Resolve the staff recipients for human-handoff alerts. Prefers an explicit
+ * distribution list in HANDOFF_ALERT_EMAIL (comma-separated); otherwise falls
+ * back to the email addresses of all admin users (the "Human handoffs" tab is
+ * admin-only).
+ */
+async function resolveHandoffRecipients(): Promise<string[]> {
+  const configured = (process.env.HANDOFF_ALERT_EMAIL || "")
+    .split(",")
+    .map((e) => e.trim())
+    .filter(Boolean);
+  if (configured.length > 0) return Array.from(new Set(configured));
+
+  try {
+    const admins = await storage.getUsersByRole("admin");
+    const emails = admins.map((u) => u.email).filter(Boolean);
+    return Array.from(new Set(emails));
+  } catch (e) {
+    console.warn("[notifications] handoff recipient lookup threw:", e instanceof Error ? e.message : e);
+    return [];
+  }
+}
+
+/**
+ * Notify staff the moment a chat is escalated to a human. Called only after
+ * the handoff record has been successfully persisted (never on the fail-closed
+ * path). Includes a deep link straight to the handoff in the admin page.
+ * Deliberately omits the participant's free-text escalation reason so no
+ * narrative PII reaches the email distribution list. Never throws.
+ */
+export async function notifyChatHandoff(alert: ChatHandoffAlert): Promise<ChatHandoffAlertResult> {
+  try {
+    const recipients = await resolveHandoffRecipients();
+    if (recipients.length === 0) {
+      console.warn(`[notifications] handoff alert (handoff ${alert.handoffId}) has no staff recipients`);
+      return { attempted: false, recipients: 0, emailed: 0, reason: "no_recipients" };
+    }
+
+    const link = `${getAppBaseUrl()}/admin/chat-guardrails?tab=handoffs&handoff=${encodeURIComponent(alert.handoffId)}`;
+    const subject = "[MapAble] A chat participant asked for a human — handoff waiting";
+    const text = [
+      "A MapAble Chat participant has been escalated to human support and is waiting for a team member.",
+      "",
+      `Handoff ID: ${alert.handoffId}`,
+      `Chat session: ${alert.sessionId}`,
+      `Channel: ${alert.channel || "chat"}`,
+      `Status: requested`,
+      "",
+      `Open this handoff: ${link}`,
+      "",
+      "This alert intentionally omits the participant's message content. Review the full record in the Human handoffs tab.",
+      "",
+      "— MapAble Chat",
+    ].join("\n");
+
+    let emailed = 0;
+    for (const to of recipients) {
+      const ok = await sendEmailViaAgentMail(to, subject, text);
+      if (ok) emailed += 1;
+    }
+
+    if (emailed === 0) {
+      console.warn(`[notifications] handoff alert (handoff ${alert.handoffId}) reached 0/${recipients.length} staff (AgentMail unavailable)`);
+      return { attempted: true, recipients: recipients.length, emailed: 0, reason: "agentmail_unavailable" };
+    }
+    return { attempted: true, recipients: recipients.length, emailed };
+  } catch (e) {
+    console.warn("[notifications] handoff alert threw:", e instanceof Error ? e.message : e);
+    return { attempted: true, recipients: 0, emailed: 0, reason: "exception" };
+  }
+}
+
 export async function notifySafeguardingAlert(alert: SafeguardingAlert): Promise<SafeguardingAlertResult> {
   try {
     const recipients = await resolveSafeguardingRecipients();

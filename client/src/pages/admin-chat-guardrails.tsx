@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ShieldAlert, Headphones, ClipboardList, Link2 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
@@ -96,6 +96,19 @@ export default function AdminChatGuardrailsPage() {
   const [savingId, setSavingId] = useState<string | null>(null);
   const [queueFilter, setQueueFilter] = useState<"open" | "all" | "in_review" | "closed">("open");
 
+  // Deep-link support: staff alert emails link to
+  // /admin/chat-guardrails?tab=handoffs&handoff=<id>
+  const [initialTab] = useState<string>(() => {
+    const params = new URLSearchParams(window.location.search);
+    const tab = params.get("tab");
+    return tab === "handoffs" || tab === "audit" || tab === "queue" ? tab : "queue";
+  });
+  const [highlightedHandoffId] = useState<string | null>(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("handoff");
+  });
+  const highlightedHandoffRef = useRef<HTMLElement | null>(null);
+
   const logsQuery = useQuery<GuardrailAuditLog[]>({
     queryKey: ["/api/admin/chat/guardrails/audit"],
     enabled: isAdmin,
@@ -124,6 +137,13 @@ export default function AdminChatGuardrailsPage() {
     meta.setAttribute("content", "Review and action MapAble Chat safeguarding follow-ups, guardrail actions, flags, policy references and audit logs.");
     document.head.appendChild(meta);
   }, []);
+
+  // Scroll the deep-linked handoff into view once it renders.
+  useEffect(() => {
+    if (highlightedHandoffId && highlightedHandoffRef.current) {
+      highlightedHandoffRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }, [highlightedHandoffId, handoffsQuery.data]);
 
   async function updateHandoff(id: string, status: string) {
     try {
@@ -180,7 +200,7 @@ export default function AdminChatGuardrailsPage() {
         </div>
       </div>
 
-      <Tabs defaultValue="queue" className="w-full">
+      <Tabs defaultValue={initialTab} className="w-full">
         <TabsList data-testid="tabs-guardrail">
           <TabsTrigger value="queue" data-testid="tab-queue">
             Safeguarding queue{openQueue.length > 0 ? ` (${openQueue.length})` : ""}
@@ -397,7 +417,12 @@ export default function AdminChatGuardrailsPage() {
                 </div>
               )}
               {handoffs.map((h) => (
-                <article key={h.id} className="border rounded-lg p-3 space-y-2" data-testid={`card-handoff-${h.id}`}>
+                <article
+                  key={h.id}
+                  ref={h.id === highlightedHandoffId ? highlightedHandoffRef : undefined}
+                  className={`border rounded-lg p-3 space-y-2 ${h.id === highlightedHandoffId ? "border-[#1B6EB5] ring-2 ring-[#1B6EB5]/40" : ""}`}
+                  data-testid={`card-handoff-${h.id}`}
+                >
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <span
                       className={`rounded-full px-2 py-1 text-xs font-medium ${HANDOFF_STATUS_STYLES[h.status] || "bg-muted text-foreground"}`}
