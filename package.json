@@ -61,6 +61,8 @@
     "check:package-boundaries": "node scripts/check-package-boundaries.mjs",
     "sync:replit-unified": "bash scripts/sync-replit-unified.sh",
     "check:replit-unified": "bash scripts/check-replit-unified-deployment.sh",
+    "sync:cursor-replit": "bash scripts/sync-cursor-replit-branches.sh",
+    "check:cursor-replit-secrets": "bash scripts/sync-cursor-replit-branches.sh check-secrets",
     "test:access-intelligence-next": "vitest run tests/access-intelligence-next",
     "test:trust-fabric": "vitest run tests/trust-fabric",
     "ai:evals": "tsx scripts/ai-platform/run-evals.ts",
