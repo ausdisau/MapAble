@@ -1,12 +1,31 @@
 import { type Express } from "express";
-import { createServer as createViteServer, createLogger } from "vite";
+import {
+  createServer as createViteServer,
+  createLogger,
+  type UserConfig,
+  type UserConfigExport,
+} from "vite";
 import { type Server } from "http";
-import viteConfig from "../vite.config.replit";
+import viteConfigExport from "../vite.config.replit";
 import fs from "fs";
 import path from "path";
 import { nanoid } from "nanoid";
 
 const viteLogger = createLogger();
+
+async function resolveViteConfig(
+  configExport: UserConfigExport,
+): Promise<UserConfig> {
+  const resolved =
+    typeof configExport === "function"
+      ? await configExport({
+          command: "serve",
+          mode: process.env.NODE_ENV || "development",
+          isSsrBuild: false,
+        })
+      : configExport;
+  return await Promise.resolve(resolved);
+}
 
 export async function setupVite(server: Server, app: Express) {
   const serverOptions = {
@@ -14,6 +33,8 @@ export async function setupVite(server: Server, app: Express) {
     hmr: { server, path: "/vite-hmr" },
     allowedHosts: true as const,
   };
+
+  const viteConfig = await resolveViteConfig(viteConfigExport);
 
   const vite = await createViteServer({
     ...viteConfig,

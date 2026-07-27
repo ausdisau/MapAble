@@ -12,6 +12,14 @@ if [[ ! -d "${ROOT}/.replit-node_modules/node_modules" ]]; then
   bash "${ROOT}/scripts/bootstrap-replit-deps.sh"
 fi
 
+# Vite resolves from client/ upward; point client/node_modules at the isolated
+# Replit install so CSS/UI packages resolve without polluting the pnpm tree.
+if [[ ! -e "${ROOT}/client/node_modules" ]]; then
+  ln -sfn ../.replit-node_modules/node_modules "${ROOT}/client/node_modules"
+elif [[ -L "${ROOT}/client/node_modules" ]]; then
+  ln -sfn ../.replit-node_modules/node_modules "${ROOT}/client/node_modules"
+fi
+
 # shellcheck disable=SC1091
 source "${ROOT}/.replit-node-path.env"
 export TSX_TSCONFIG_PATH="${ROOT}/tsconfig.replit.json"
