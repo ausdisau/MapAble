@@ -82,13 +82,14 @@ CREATE TABLE IF NOT EXISTS "careos_action_receipts" (
     CONSTRAINT "careos_action_receipts_pkey" PRIMARY KEY ("id")
 );
 
+-- If 20260713110000 already created the table without missionId, add it before
+-- indexing (CREATE TABLE IF NOT EXISTS is a no-op against the earlier shape).
+ALTER TABLE "careos_action_receipts" ADD COLUMN IF NOT EXISTS "missionId" TEXT;
+
 CREATE UNIQUE INDEX IF NOT EXISTS "careos_action_receipts_tokenId_key" ON "careos_action_receipts"("tokenId");
 CREATE INDEX IF NOT EXISTS "careos_action_receipts_participantId_claimedAt_idx" ON "careos_action_receipts"("participantId", "claimedAt");
 CREATE INDEX IF NOT EXISTS "careos_action_receipts_requestId_idx" ON "careos_action_receipts"("requestId");
 CREATE INDEX IF NOT EXISTS "careos_action_receipts_missionId_idx" ON "careos_action_receipts"("missionId");
-
--- Extend existing action receipts table if migration 20260713110000 already applied
-ALTER TABLE "careos_action_receipts" ADD COLUMN IF NOT EXISTS "missionId" TEXT;
 
 CREATE TABLE IF NOT EXISTS "careos_participant_preferences" (
     "id" TEXT NOT NULL,
