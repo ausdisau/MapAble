@@ -109,12 +109,15 @@ export function MarketingPrimaryNav() {
     >
       <Link
         href={marketingFeatureRoutes.home}
-        className={`flex min-w-0 shrink items-center gap-2 overflow-visible rounded-2xl p-1 transition hover:bg-slate-50 sm:gap-3 ${mapableCareFocusRing}`}
+        className={`flex min-w-0 shrink flex-col items-start gap-1 overflow-visible rounded-2xl p-1 transition hover:bg-slate-50 ${mapableCareFocusRing}`}
         onClick={() => setMobileOpen(false)}
       >
         <span className="sr-only">MapAble home</span>
-        <LogoMark className="block h-9 w-auto max-w-[140px] shrink-0 bg-transparent object-contain object-left sm:h-10 sm:max-w-[160px]" />
-        <span className="rounded-full bg-[#0C1833] px-2.5 py-1 text-[0.65rem] font-black uppercase tracking-[0.16em] text-[#F8C51C] sm:px-3 sm:py-1.5 sm:text-xs sm:tracking-[0.18em]">
+        {/* 125% of prior h-9/h-10; clip PNG’s baked-in tagline so the pill isn’t duplicated */}
+        <span className="relative block h-[2.8125rem] w-auto max-w-[175px] overflow-hidden sm:h-[3.125rem] sm:max-w-[200px]">
+          <LogoMark className="block h-[118%] w-auto max-w-none shrink-0 bg-transparent object-contain object-left object-top" />
+        </span>
+        <span className="w-full max-w-[175px] rounded-full bg-[#0C1833] px-2 py-1 text-center text-[0.55rem] font-black uppercase leading-none tracking-[0.08em] text-[#F8C51C] sm:max-w-[200px] sm:px-2.5 sm:text-[0.62rem] sm:tracking-[0.1em]">
           {MAPABLE_BRAND_TAGLINE}
         </span>
       </Link>
