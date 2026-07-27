@@ -37,6 +37,21 @@ export {
 } from "@/lib/programmes/source-registry/source-registry-service";
 
 export {
+  assertKnownProgrammeId,
+  expectedProgrammeRegistrySeedIds,
+  getCompileTimeProgrammeRegistry,
+  isKnownProgrammeId,
+  listProgrammeRegistry,
+} from "@/lib/programmes/registry/programme-registry-service";
+export type { ProgrammeRegistryView } from "@/lib/programmes/registry/programme-registry-service";
+
+export {
+  createNavigatorFeedbackInputSchema,
+  navigatorFeedbackRatingSchema,
+} from "@/lib/programmes/navigator/navigator-feedback-schema";
+export type { CreateNavigatorFeedbackInput } from "@/lib/programmes/navigator/navigator-feedback-schema";
+
+export {
   createParticipantAuthorityGrant,
   evaluateParticipantAuthority,
   participantAuthorityPolicy,

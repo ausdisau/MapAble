@@ -1,7 +1,16 @@
 import { ToolLoopAgent, stepCountIs } from "ai";
 
 import { createBookingServicesTools } from "@/lib/agent/booking-services-tools";
+import { assertModelCallAllowed } from "@/lib/ai/platform/policies/kill-switches";
+import {
+  createHarnessSession,
+  isAuraHarnessEnabled,
+  wrapToolsWithAuraHarness,
+  type HarnessSessionAccumulator,
+  type HarnessSessionSummary,
+} from "@/lib/aura-harness";
 import type { CurrentUser } from "@/lib/auth/current-user";
+import { isAiPlatformFoundationEnabled } from "@/lib/config/ai-platform";
 import {
   bookingServicesAgentConfig,
   isBookingServicesAgentConfigured,
@@ -22,7 +31,12 @@ Rules:
 - Be concise, plain-language, and trauma-informed.
 - You cannot accept, cancel, or modify bookings — signpost users to the bookings pages or their provider.`;
 
-export function createBookingServicesAgent(user: CurrentUser) {
+const CAPABILITY_KEY = "agent.booking_services";
+
+export function createBookingServicesAgent(
+  user: CurrentUser,
+  session: HarnessSessionAccumulator = createHarnessSession(),
+) {
   if (!isBookingServicesAgentConfigured()) {
     throw new Error("Booking services agent is not enabled");
   }
@@ -30,10 +44,23 @@ export function createBookingServicesAgent(user: CurrentUser) {
     throw new Error("Search interpreter is not configured");
   }
 
+  if (isAiPlatformFoundationEnabled()) {
+    const gate = assertModelCallAllowed({ capabilityKey: CAPABILITY_KEY });
+    if (!gate.allowed) {
+      throw new Error(`Booking services agent blocked: ${gate.reason}`);
+    }
+  }
+
+  const tools = wrapToolsWithAuraHarness(createBookingServicesTools(user), {
+    agentType: "transport",
+    capabilityKey: CAPABILITY_KEY,
+    session,
+  });
+
   return new ToolLoopAgent({
     model: getInterpreterModel(),
     instructions: SYSTEM_INSTRUCTIONS,
-    tools: createBookingServicesTools(user),
+    tools,
     stopWhen: stepCountIs(bookingServicesAgentConfig.maxSteps),
   });
 }
@@ -48,12 +75,17 @@ export type BookingServicesAgentTurnResult = {
   text: string;
   toolsCalled: string[];
   sessionId: string;
+  aura?: HarnessSessionSummary;
+  auraEnabled: boolean;
+  riskTier: "low" | "medium" | "high" | "critical";
+  humanReviewRequired: boolean;
 };
 
 export async function runBookingServicesAgentTurn(
   input: BookingServicesAgentTurnInput,
 ): Promise<BookingServicesAgentTurnResult> {
-  const agent = createBookingServicesAgent(input.user);
+  const harnessSession = createHarnessSession();
+  const agent = createBookingServicesAgent(input.user, harnessSession);
   const sessionId = input.sessionId?.trim() || `booking-agent-${Date.now()}`;
 
   const result = await agent.generate({
@@ -64,9 +96,16 @@ export async function runBookingServicesAgentTurn(
     step.toolCalls.map((call) => call.toolName),
   );
 
+  const auraEnabled = isAuraHarnessEnabled();
   return {
     text: result.text,
     toolsCalled,
     sessionId,
+    aura: auraEnabled ? harnessSession.summary : undefined,
+    auraEnabled,
+    riskTier: auraEnabled ? harnessSession.toRiskTier() : "low",
+    humanReviewRequired: auraEnabled
+      ? harnessSession.humanReviewRequired()
+      : false,
   };
 }

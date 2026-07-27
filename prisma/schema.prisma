@@ -9079,6 +9079,33 @@ model AgentRun {
   @@map("agent_runs")
 }
 
+enum AuraHarnessMemoryDecision {
+  APPROVED
+  MITIGATED
+  DENIED
+  HITL_APPROVED
+  HITL_REJECTED
+}
+
+/// Fingerprint cache for AURA tool-call risk precedents (no live embeddings).
+model AuraHarnessMemory {
+  id                 String                     @id @default(cuid())
+  fingerprint        String                     @unique
+  toolName           String
+  normalizedGamma    Float
+  concentrationCoeff Float
+  decision           AuraHarnessMemoryDecision
+  mitigationJson     Json?
+  dimensionScores    Json?
+  expiresAt          DateTime
+  createdAt          DateTime                   @default(now())
+  updatedAt          DateTime                   @updatedAt
+
+  @@index([toolName])
+  @@index([expiresAt])
+  @@map("aura_harness_memory")
+}
+
 model ReliabilitySnapshot {
   id                 String   @id @default(cuid())
   workerProfileId    String?
@@ -10885,7 +10912,21 @@ model ProgrammeSourceRecord {
   @@index([jurisdiction, sourceType])
   @@index([authorityStatus])
   @@index([supersedingSourceId])
+  /// GIN created in SQL migration for array-containment queries.
   @@map("programme_source_records")
+}
+
+/// Compile-time PROGRAMME_IDS mirrored as DB source of truth for programme registry.
+model ProgrammeRegistryEntry {
+  id        String   @id
+  label     String
+  enabled   Boolean  @default(true)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([enabled, sortOrder])
+  @@map("programme_registry_entries")
 }
 
 model ProgrammeSourceImpactReview {
@@ -11087,9 +11128,9 @@ model NavigatorAssignment {
   requestId             String
   request               NavigatorRequest          @relation(fields: [requestId], references: [id], onDelete: Cascade)
   participantId         String
-  participant           User                      @relation("NavigatorAssignmentParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  participant           User                      @relation("NavigatorAssignmentParticipant", fields: [participantId], references: [id], onDelete: Restrict)
   navigatorId           String
-  navigator             User                      @relation("NavigatorAssignmentNavigator", fields: [navigatorId], references: [id], onDelete: Cascade)
+  navigator             User                      @relation("NavigatorAssignmentNavigator", fields: [navigatorId], references: [id], onDelete: Restrict)
   navigatorProfileId    String?
   navigatorProfile      NavigatorProfile?         @relation(fields: [navigatorProfileId], references: [id], onDelete: SetNull)
   navigatorOrganisationId String?
@@ -11144,7 +11185,8 @@ model NavigatorFeedback {
   assignmentId   String
   assignment     NavigatorAssignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
   participantId  String
-  participant    User                @relation("NavigatorFeedbackParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  participant    User                @relation("NavigatorFeedbackParticipant", fields: [participantId], references: [id], onDelete: Restrict)
+  /// Bounded 1–5 via DB CHECK (see migration); null allowed when comment-only.
   rating         Int?
   comment        String?
   createdAt      DateTime            @default(now())
@@ -11156,7 +11198,7 @@ model NavigatorFeedback {
 model ServiceRelationshipRecord {
   id                String   @id @default(cuid())
   participantId     String
-  participant       User     @relation("TrustRelationshipParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  participant       User     @relation("TrustRelationshipParticipant", fields: [participantId], references: [id], onDelete: Restrict)
   providerOrganisationId String?
   providerOrganisation Organisation? @relation("TrustRelationshipProvider", fields: [providerOrganisationId], references: [id], onDelete: SetNull)
   platformOrganisationId String?

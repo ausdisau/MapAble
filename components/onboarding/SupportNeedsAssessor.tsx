@@ -355,7 +355,7 @@ export function SupportNeedsAssessor() {
                       onChange={() => setIntensityForCurrent(option.value)}
                       className="mt-1"
                     />
-                    <span>
+                    <span aria-hidden="true">
                       <span className="block font-semibold">{option.label}</span>
                       <span className="block text-xs text-muted-foreground">
                         {option.description}

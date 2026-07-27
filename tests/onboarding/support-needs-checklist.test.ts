@@ -22,7 +22,7 @@ vi.mock("@/lib/prisma", () => ({
   },
 }));
 
-vi.mock("@/lib/provider-verification/verification-case-service", () => ({
+vi.mock("@/lib/provider/verification/verification-case-service", () => ({
   isProviderEligibleForMatching: vi.fn(),
 }));
 

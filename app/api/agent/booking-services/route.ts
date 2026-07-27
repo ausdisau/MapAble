@@ -90,10 +90,12 @@ export async function POST(request: Request) {
       outputSummary: {
         toolsCalled: result.toolsCalled,
         textLength: result.text.length,
+        aura: result.aura ?? null,
       },
       toolsCalled: result.toolsCalled,
-      riskTier: "low",
-      humanReviewRequired: false,
+      guardrailsTriggered: result.aura?.guardrails ?? [],
+      riskTier: result.riskTier,
+      humanReviewRequired: result.humanReviewRequired,
       actorUserId: user.id,
     });
 
@@ -102,6 +104,9 @@ export async function POST(request: Request) {
       text: result.text,
       toolsCalled: result.toolsCalled,
       sessionId: result.sessionId,
+      aura: result.aura,
+      riskTier: result.riskTier,
+      humanReviewRequired: result.humanReviewRequired,
     });
   } catch (err) {
     const message =

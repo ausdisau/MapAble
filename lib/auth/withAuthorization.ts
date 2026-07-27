@@ -75,7 +75,9 @@ type AppRouteContext = {
   params: Promise<Record<string, string | string[] | undefined>>;
 };
 
-export type AuthorizedRouteHandler<TContext extends AppRouteContext = AppRouteContext> = (
+export type AuthorizedRouteHandler<
+  TContext extends AppRouteContext = AppRouteContext,
+> = (
   request: Request,
   context: TContext,
   user: CurrentUser,
@@ -182,11 +184,19 @@ export async function verifyRequestMfa(
  * Returns 401 when unauthenticated, 403 when role/permission/MFA checks fail,
  * before the handler runs.
  */
-export function withAuthorization<TContext extends AppRouteContext = AppRouteContext>(
+export function withAuthorization<
+  TContext extends AppRouteContext = AppRouteContext,
+>(
   options: WithAuthorizationOptions,
   handler: AuthorizedRouteHandler<TContext>,
-): (request: Request, context: TContext) => Promise<Response> {
-  return async (request: Request, context: TContext) => {
+): (
+  request: Request,
+  context: TContext,
+) => Promise<Response> {
+  return async (
+    request: Request,
+    context: TContext = { params: Promise.resolve({}) } as TContext,
+  ) => {
     // Prefer NextAuth/Keycloak session presence, then hydrate CurrentUser from DB.
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {

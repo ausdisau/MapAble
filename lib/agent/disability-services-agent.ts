@@ -1,6 +1,15 @@
 import { ToolLoopAgent, stepCountIs } from "ai";
 
 import { createDisabilityServicesTools } from "@/lib/agent/disability-services-tools";
+import { assertModelCallAllowed } from "@/lib/ai/platform/policies/kill-switches";
+import {
+  createHarnessSession,
+  isAuraHarnessEnabled,
+  wrapToolsWithAuraHarness,
+  type HarnessSessionAccumulator,
+  type HarnessSessionSummary,
+} from "@/lib/aura-harness";
+import { isAiPlatformFoundationEnabled } from "@/lib/config/ai-platform";
 import {
   disabilityServicesAgentConfig,
   isDisabilityServicesAgentConfigured,
@@ -21,7 +30,11 @@ Rules:
 - If results are empty, suggest broader search terms or a nearby suburb.
 - Do not provide medical, legal, or plan-management advice — signpost to qualified professionals.`;
 
-export function createDisabilityServicesAgent() {
+const CAPABILITY_KEY = "agent.disability_services";
+
+export function createDisabilityServicesAgent(
+  session: HarnessSessionAccumulator = createHarnessSession(),
+) {
   if (!isDisabilityServicesAgentConfigured()) {
     throw new Error("Disability services agent is not enabled");
   }
@@ -29,10 +42,23 @@ export function createDisabilityServicesAgent() {
     throw new Error("Search interpreter is not configured");
   }
 
+  if (isAiPlatformFoundationEnabled()) {
+    const gate = assertModelCallAllowed({ capabilityKey: CAPABILITY_KEY });
+    if (!gate.allowed) {
+      throw new Error(`Disability services agent blocked: ${gate.reason}`);
+    }
+  }
+
+  const tools = wrapToolsWithAuraHarness(createDisabilityServicesTools(), {
+    agentType: "matching",
+    capabilityKey: CAPABILITY_KEY,
+    session,
+  });
+
   return new ToolLoopAgent({
     model: getInterpreterModel(),
     instructions: SYSTEM_INSTRUCTIONS,
-    tools: createDisabilityServicesTools(),
+    tools,
     stopWhen: stepCountIs(disabilityServicesAgentConfig.maxSteps),
   });
 }
@@ -46,12 +72,17 @@ export type DisabilityServicesAgentTurnResult = {
   text: string;
   toolsCalled: string[];
   sessionId: string;
+  aura?: HarnessSessionSummary;
+  auraEnabled: boolean;
+  riskTier: "low" | "medium" | "high" | "critical";
+  humanReviewRequired: boolean;
 };
 
 export async function runDisabilityServicesAgentTurn(
   input: DisabilityServicesAgentTurnInput,
 ): Promise<DisabilityServicesAgentTurnResult> {
-  const agent = createDisabilityServicesAgent();
+  const harnessSession = createHarnessSession();
+  const agent = createDisabilityServicesAgent(harnessSession);
   const sessionId = input.sessionId?.trim() || `agent-${Date.now()}`;
 
   const result = await agent.generate({
@@ -62,9 +93,16 @@ export async function runDisabilityServicesAgentTurn(
     step.toolCalls.map((call) => call.toolName),
   );
 
+  const auraEnabled = isAuraHarnessEnabled();
   return {
     text: result.text,
     toolsCalled,
     sessionId,
+    aura: auraEnabled ? harnessSession.summary : undefined,
+    auraEnabled,
+    riskTier: auraEnabled ? harnessSession.toRiskTier() : "low",
+    humanReviewRequired: auraEnabled
+      ? harnessSession.humanReviewRequired()
+      : false,
   };
 }

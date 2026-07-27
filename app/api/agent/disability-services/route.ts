@@ -75,10 +75,15 @@ export async function POST(request: Request) {
       outputSummary: {
         toolsCalled: result.toolsCalled,
         textLength: result.text.length,
+        aura: result.aura ?? null,
       },
       toolsCalled: result.toolsCalled,
-      riskTier: "low",
-      humanReviewRequired: false,
+      guardrailsTriggered: result.aura?.guardrails ?? [],
+      riskTier: result.riskTier,
+      // Capability seed expects human review for this agent; harness elevates further.
+      humanReviewRequired: result.auraEnabled
+        ? result.humanReviewRequired
+        : true,
     });
 
     return disabilityAgentJsonOk(OPERATION, {
@@ -86,6 +91,11 @@ export async function POST(request: Request) {
       toolsCalled: result.toolsCalled,
       sessionId: result.sessionId,
       operationId: OPERATION,
+      aura: result.aura,
+      riskTier: result.riskTier,
+      humanReviewRequired: result.auraEnabled
+        ? result.humanReviewRequired
+        : true,
     });
   } catch (err) {
     console.error("[disability-services-agent]", err);

@@ -15,6 +15,7 @@ Models never become decision-makers. Flags never grant authority or production c
 | ------------------------------ | -------------------------------------------------------------- |
 | Flags                          | `lib/config/programme-flags.ts`                                |
 | Invariants                     | `lib/programmes/safety-invariants.ts`                          |
+| Programme registry             | `lib/programmes/registry/` + `programme_registry_entries`      |
 | Audit (→ AuditEvent)           | `lib/programmes/audit.ts`                                      |
 | Source registry                | `lib/programmes/source-registry/`                              |
 | Authority                      | `lib/programmes/authority/`                                    |
@@ -25,6 +26,13 @@ Models never become decision-makers. Flags never grant authority or production c
 | Passport adapter               | `lib/programmes/adapters/access-passport-adapter.ts`           |
 | Platform Assurance bridge      | `lib/programmes/adapters/platform-assurance-source-adapter.ts` |
 | AURA/AI execution gate         | `lib/programmes/aura/execution-gate.ts`                        |
+
+## Sprint 0 data guard
+
+- `programme_registry_entries` seeds from compile-time `PROGRAMME_IDS` (parity tested).
+- GIN index on `programme_source_records.affectedProgrammes` for array-containment queries.
+- `navigator_feedback.rating` CHECK (1–5 or NULL); Zod mirror in `navigator-feedback-schema.ts`.
+- User-facing FKs on `navigator_assignments` (participant/navigator), `navigator_feedback` (participant), and `service_relationship_records` (participant) use `ON DELETE RESTRICT` so audit/compliance history is not cascade-deleted with a user profile.
 
 ## Feature flags
 

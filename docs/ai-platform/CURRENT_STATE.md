@@ -27,6 +27,8 @@ Positioning: *An evidence-aware, participant-controlled copilot for complete dis
 | mission.semantic_retrieval | deterministic | controlled_pilot | MAPABLE_SEMANTIC_RETRIEVAL off |
 | edge.visit_pack_summary | deterministic | controlled_pilot | MAPABLE_EDGE_AI off |
 | edge.what_changed_explain | deterministic | controlled_pilot | MAPABLE_EDGE_AI off |
+| agent.aura_harness | deterministic | experimental | MAPABLE_AURA_HARNESS off |
+| agent.aura_recognise | deterministic | experimental | rides AURA harness flag |
 
 ## Advanced AI Expansion train (≤ 3)
 
@@ -38,7 +40,9 @@ See [ADVANCED_MERGE_TRAIN.md](./ADVANCED_MERGE_TRAIN.md) and [INTAKE.md](./INTAK
 
 ## Still deferred (follow-on checkpoint)
 
-AURA Agent OS mega-branches, VisionAccess multimodal, Quality & Safeguards Copilot, Continuity Copilot, live OCR, embeddings, computer-use.
+AURA Agent OS mega-branches (`lib/aura/`), VisionAccess multimodal, Quality & Safeguards Copilot, Continuity Copilot, live OCR, embeddings, computer-use.
+
+The in-process **AURA Agentic Risk Harness** (`lib/aura-harness/`) is separate from deferred Agent OS — see [AURA_HARNESS.md](./AURA_HARNESS.md).
 
 ### CareGPT (design only)
 
