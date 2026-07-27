@@ -7,7 +7,7 @@ import {
 import {
   IDENTITY_VERIFICATION_STEPS,
   isStripeIdentityConfigured,
-} from "@/lib/workers/identity-verification-service";
+} from "@/lib/workers/identity-verification-shared";
 import {
   AU_JURISDICTIONS,
 } from "@/lib/workers/worker-screening-service";

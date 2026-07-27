@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import type { ScreeningSubmissionView } from "@/lib/workers/worker-screening-service";
+import type { ScreeningSubmissionView } from "@/lib/workers/worker-screening-shared";
 
 function statusClass(status: ScreeningSubmissionView["status"]): string {
   switch (status) {
