@@ -12,6 +12,15 @@ const STATUS_BY_CODE: Record<TransportErrorCode, number> = {
   TRANSPORT_ROUTE_NOT_FOUND: 404,
   TRANSPORT_OPTIMISATION_FAILED: 422,
   TRANSPORT_VALIDATION_FAILED: 400,
+  TRANSPORT_COMMAND_DISABLED: 503,
+  TRANSPORT_CONTINUITY_DISABLED: 503,
+  TRANSPORT_AUTO_SUBSTITUTION_FORBIDDEN: 403,
+  TRANSPORT_PARTICIPANT_MISMATCH: 409,
+  TRANSPORT_RETURN_ASSURANCE_NOT_FOUND: 404,
+  TRANSPORT_RECOVERY_NOT_FOUND: 404,
+  TRANSPORT_RECOVERY_ALREADY_CONFIRMED: 409,
+  TRANSPORT_RECOVERY_EXPIRED: 410,
+  TRANSPORT_RECOVERY_OPTION_NOT_FOUND: 404,
 };
 
 const PLAIN_MESSAGES: Record<TransportErrorCode, string> = {
@@ -33,6 +42,16 @@ const PLAIN_MESSAGES: Record<TransportErrorCode, string> = {
   TRANSPORT_OPTIMISATION_FAILED:
     "Route optimisation could not be completed. A planner can review manually.",
   TRANSPORT_VALIDATION_FAILED: "Some trip details were invalid. Please check and try again.",
+  TRANSPORT_COMMAND_DISABLED: "Transport command centre is not enabled.",
+  TRANSPORT_CONTINUITY_DISABLED: "Continuity recovery is not enabled.",
+  TRANSPORT_AUTO_SUBSTITUTION_FORBIDDEN:
+    "Automatic vehicle or provider substitution is not permitted.",
+  TRANSPORT_PARTICIPANT_MISMATCH: "Trips must belong to the same participant.",
+  TRANSPORT_RETURN_ASSURANCE_NOT_FOUND: "Return trip assurance record not found.",
+  TRANSPORT_RECOVERY_NOT_FOUND: "Recovery request not found.",
+  TRANSPORT_RECOVERY_ALREADY_CONFIRMED: "This recovery option was already confirmed.",
+  TRANSPORT_RECOVERY_EXPIRED: "Recovery options have expired. New options are required.",
+  TRANSPORT_RECOVERY_OPTION_NOT_FOUND: "Selected recovery option not found.",
 };
 
 export class TransportApiError extends Error {

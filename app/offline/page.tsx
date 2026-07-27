@@ -18,7 +18,8 @@ export default function OfflinePage() {
         <p className="text-slate-600 leading-7">
           MapAble can still show venue accessibility details you searched
           earlier on this device. Reconnect for live map tiles and fresh search
-          results.
+          results. Participant records and communication passports are not
+          cached.
         </p>
         <Link
           href="/accessibility-map"

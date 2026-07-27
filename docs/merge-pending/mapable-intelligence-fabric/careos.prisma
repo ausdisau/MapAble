@@ -1,0 +1,103 @@
+// CareOS operational models. Kept in a separate schema file so generated-client
+// visibility stays aligned with the raw SQL migrations without expanding the
+// already-large core schema file.
+
+model CareOSActionReceipt {
+  id               String   @id
+  tokenId          String   @unique
+  proposalId       String
+  requestId        String
+  participantId    String
+  actionType       String
+  payloadHash      String
+  status           String   @default("claimed")
+  resultEntityType String?
+  resultEntityId   String?
+  errorCode        String?
+  claimedAt        DateTime @default(now())
+  completedAt      DateTime?
+
+  @@index([participantId, claimedAt])
+  @@index([requestId])
+  @@map("careos_action_receipts")
+}
+
+model CareOSMission {
+  id            String   @id
+  requestId     String   @unique
+  participantId String
+  goal          String
+  status        String
+  modules       String[] @default([])
+  graphJson     Json     @default("{}")
+  alertsJson    Json     @default("[]")
+  proposalsJson Json     @default("[]")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  events       CareOSMissionEvent[]
+  humanReviews CareOSHumanReview[]
+
+  @@index([participantId, createdAt])
+  @@map("careos_missions")
+}
+
+model CareOSMissionEvent {
+  id             String        @id
+  missionId      String
+  mission        CareOSMission @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  participantId  String
+  eventType      String
+  sourceModule   String
+  sourceEntityId String?
+  severity       String        @default("information")
+  summary        String
+  payloadJson    Json?
+  createdAt      DateTime      @default(now())
+
+  @@index([missionId, createdAt])
+  @@index([participantId, createdAt])
+  @@map("careos_mission_events")
+}
+
+model CareOSHumanReview {
+  id                         String        @id
+  missionId                  String
+  mission                    CareOSMission @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  requestId                  String
+  participantId              String
+  category                   String
+  priority                   String
+  title                      String
+  summary                    String
+  assignedRole               String
+  status                     String        @default("open")
+  dueAt                      DateTime
+  participantContactRequired Boolean       @default(true)
+  evidenceJson               Json          @default("[]")
+  resolvedAt                 DateTime?
+  createdAt                  DateTime      @default(now())
+  updatedAt                  DateTime      @updatedAt
+
+  @@index([participantId, status])
+  @@index([assignedRole, status])
+  @@index([missionId, createdAt])
+  @@map("careos_human_reviews")
+}
+
+model CareOSParticipantPreference {
+  id            String   @id
+  participantId String
+  preferenceKey String
+  valueJson     Json
+  source        String   @default("participant_confirmed")
+  status        String   @default("active")
+  confirmedAt   DateTime @default(now())
+  expiresAt     DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([participantId, preferenceKey])
+  @@index([participantId, status])
+  @@map("careos_participant_preferences")
+}

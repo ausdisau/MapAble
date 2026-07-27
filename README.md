@@ -73,6 +73,7 @@ The data model lives in a single schema: `prisma/schema.prisma`. Apply reviewed 
 │   ├── transport/              # Trips, dispatch, eligibility
 │   ├── transport-routing/        # OSRM / routing adapters
 │   ├── cases/                  # Case management + AI engine
+│   ├── intelligence/            # CareOS and synthetic Intelligence Mainframe
 │   └── …
 ├── prisma/
 │   ├── schema.prisma         # Unified PostgreSQL schema
@@ -83,9 +84,13 @@ The data model lives in a single schema: `prisma/schema.prisma`. Apply reviewed 
 │   ├── modules/              # Feature guides (care, transport, cases, …)
 │   ├── operations/           # Neon, ops notes
 │   ├── integrations/         # Env var reference
+│   ├── intelligence/           # Intelligence Mainframe synthetic-mode guidance
 │   └── qa/                   # QA checklists
 ├── apps/
 │   └── realtime-server/      # Socket.IO server (pnpm workspace)
+├── packages/
+│   ├── contracts/            # Runtime-validated CSI contracts
+│   └── intelligence-kernel/  # Pure deterministic CSI kernel
 ├── mcp/
 │   └── av/                   # Autonomous-vehicle MCP server
 ├── mobile-contracts/         # Mobile API / screen contracts

@@ -1,6 +1,7 @@
 import { startOfDay, endOfDay } from "date-fns";
 import Link from "next/link";
 
+import { WorkerShiftOffers } from "@/components/care/WorkerShiftOffers";
 import { requirePermission } from "@/lib/auth/guards";
 import { workerProfileForUser } from "@/lib/care/access-control";
 import { prisma } from "@/lib/prisma";
@@ -17,14 +18,32 @@ export default async function WorkerTodayPage() {
   }
 
   const now = new Date();
-  const shifts = await prisma.careShift.findMany({
-    where: {
-      workerProfileId: profile.id,
-      startAt: { gte: startOfDay(now), lte: endOfDay(now) },
-    },
-    orderBy: { startAt: "asc" },
-    include: { careRequest: { select: { title: true } } },
-  });
+  const [shifts, offers] = await Promise.all([
+    prisma.careShift.findMany({
+      where: {
+        workerProfileId: profile.id,
+        startAt: { gte: startOfDay(now), lte: endOfDay(now) },
+      },
+      orderBy: { startAt: "asc" },
+      include: { careRequest: { select: { title: true } } },
+    }),
+    prisma.shiftOffer.findMany({
+      where: {
+        workerProfileId: profile.id,
+        status: "awaiting_worker",
+        expiresAt: { gt: now },
+      },
+      include: {
+        careShift: {
+          select: {
+            startAt: true,
+            careRequest: { select: { title: true } },
+          },
+        },
+      },
+      orderBy: { expiresAt: "asc" },
+    }),
+  ]);
 
   return (
     <div className="space-y-4">
@@ -47,6 +66,14 @@ export default async function WorkerTodayPage() {
           <li className="text-sm text-muted-foreground">No shifts scheduled today.</li>
         ) : null}
       </ul>
+      <WorkerShiftOffers
+        offers={offers.map((offer) => ({
+          id: offer.id,
+          title: offer.careShift.careRequest.title,
+          startsAt: offer.careShift.startAt.toISOString(),
+          expiresAt: offer.expiresAt.toISOString(),
+        }))}
+      />
     </div>
   );
 }
