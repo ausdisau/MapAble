@@ -85,6 +85,11 @@
       "path": "prisma/migrations/20260719120000_shared_programme_foundation/migration.sql",
       "reason": "participant_authority_grants already created by 20260714050000_authority_document_foundation; replace duplicate CREATE TABLE with ADD COLUMN IF NOT EXISTS + idempotent indexes/FKs so empty-DB migrate deploy does not fail with P3018/42P07.",
       "pr": "cursor/finish-remaining-ci-ee41"
+    },
+    {
+      "path": "prisma/migrations/20260726023000_partner_api_keys/migration.sql",
+      "reason": "developer_platform already created platform-shaped api_keys; remap that table to platform_api_keys then create partner api_keys so empty-DB migrate deploy does not fail with P3018/42P07 relation api_keys already exists.",
+      "pr": "cursor/fix-api-keys-migration-collision-59aa"
     }
   ]
 }
