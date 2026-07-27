@@ -1,6 +1,5 @@
 import { z } from "zod";
 
-import { requireApiSession } from "@/lib/api/auth-handler";
 import { featureDisabledResponse, indoorApiError } from "@/lib/access/indoor/api-errors";
 import { isIndoorFeatureEnabled } from "@/lib/access/indoor/feature-flags";
 import {
@@ -13,6 +12,7 @@ import {
   listPendingCorrections,
   moderateCorrectionProposal,
 } from "@/lib/access/indoor/verification/correction-service";
+import { requireApiSession } from "@/lib/api/auth-handler";
 
 const submitSchema = z.object({
   placeId: z.string(),

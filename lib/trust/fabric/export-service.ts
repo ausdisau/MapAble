@@ -1,8 +1,8 @@
 import { createAuditEvent } from "@/lib/audit/audit-event-service";
-import { getCommunicationPassport } from "@/lib/support/communication-passport/service";
 import { isCommunicationPassportEnabled } from "@/lib/config/communication-workforce";
 import { trustFabricConfig } from "@/lib/config/trust-fabric";
 import { prisma } from "@/lib/prisma";
+import { getCommunicationPassport } from "@/lib/support/communication-passport/service";
 import {
   assertTrustFabricEnabled,
   listParticipantAccessHistory,

@@ -1,5 +1,4 @@
 import { requireApiAdminScope } from "@/lib/api/auth-handler";
-import { jsonOk } from "@/lib/api/response";
 import {
   addEcosystemEntry,
   getPartnerConcentrationMetrics,
@@ -8,6 +7,7 @@ import {
   renewEcosystemEntry,
   revokeEcosystemEntry,
 } from "@/lib/api/certified-ecosystem/ecosystem-service";
+import { jsonOk } from "@/lib/api/response";
 
 export async function GET() {
   const user = await requireApiAdminScope("api_certification:manage");

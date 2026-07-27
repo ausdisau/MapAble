@@ -1,15 +1,15 @@
 import { createAgentRun } from "@/lib/ai/agent-ops/agent-run-service";
 import { createAuditEvent } from "@/lib/audit/audit-event-service";
+import type { CurrentUser } from "@/lib/auth/current-user";
+import { isAdminRole } from "@/lib/auth/roles";
 import { classifySupportCategories } from "@/lib/care/support-category-classifier";
 import { applySupportJourneyPatch } from "@/lib/journey/journey-service";
-import { isAdminRole } from "@/lib/auth/roles";
-import type { CurrentUser } from "@/lib/auth/current-user";
-import { transformCareSupport } from "@/server/agents/careSupportTransformer";
 import {
   careSupportTransformInputSchema,
   type CareSupportTransformInput,
   type CareSupportTransformOutput,
 } from "@/server/agents/care/types";
+import { transformCareSupport } from "@/server/agents/careSupportTransformer";
 
 export type TransformCareSupportContext = {
   actorUserId?: string;

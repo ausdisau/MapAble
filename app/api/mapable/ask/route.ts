@@ -11,7 +11,6 @@ import { checkIpRateLimit, getClientIp } from "@/lib/api/ip-rate-limit";
 import { getOptionalApiUser } from "@/lib/api/optional-session";
 import { apiForbidden } from "@/lib/auth/guards";
 import { shouldRouteToBookingAgent } from "@/lib/bookings/rag/copilot-route";
-import { planCareTransportMapActions } from "@/lib/transport/care-map/map-actions";
 import { planCopilotActions } from "@/lib/copilot/actionPlanner";
 import { buildCopilotContext } from "@/lib/copilot/contextBuilder";
 import { applyGuardrails } from "@/lib/copilot/guardrails";
@@ -31,6 +30,7 @@ import {
   serialiseFinderPayload,
   type ProviderFinderSessionFields,
 } from "@/lib/provider/finder/ask-bridge";
+import { planCareTransportMapActions } from "@/lib/transport/care-map/map-actions";
 
 function parseAskContext(raw: unknown): CopilotAskContext {
   if (raw === "provider_finder") return "provider_finder";

@@ -1,11 +1,11 @@
 import { missionCopilotConfig } from "@/lib/config/mission-copilot";
+import type { GoldenJourneyState } from "@/lib/pilot/starting-work/golden-journey";
 import {
   diffMissionProjections,
   getServiceStandardForMission,
   projectStartingWorkMission,
   type SharedMissionProjection,
 } from "@/lib/platform/mission-portfolio";
-import type { GoldenJourneyState } from "@/lib/pilot/starting-work/golden-journey";
 
 import type { MissionCopilotQuestion, MissionCopilotResponse } from "./types";
 

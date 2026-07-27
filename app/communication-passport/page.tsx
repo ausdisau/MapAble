@@ -1,8 +1,8 @@
 import Link from "next/link";
 
 import { requireAuth } from "@/lib/auth/guards";
-import { getCommunicationPassport } from "@/lib/support/communication-passport/service";
 import { isCommunicationPassportEnabled } from "@/lib/config/communication-workforce";
+import { getCommunicationPassport } from "@/lib/support/communication-passport/service";
 
 export const metadata = {
   title: "Communication Passport | MapAble",

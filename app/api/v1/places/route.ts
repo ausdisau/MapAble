@@ -3,8 +3,8 @@ import { createHash } from "crypto";
 import type { ApiScope } from "@prisma/client";
 
 import { listAccessiblePlaces } from "@/lib/access/accessibility-map/place-service";
-import { jsonError, jsonOk } from "@/lib/api/response";
 import { scopesAllow } from "@/lib/api/developer/api-key-service";
+import { jsonError, jsonOk } from "@/lib/api/response";
 import { prisma } from "@/lib/prisma";
 
 

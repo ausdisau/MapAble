@@ -1,14 +1,14 @@
 import { z } from "zod";
 
-import { getUserOrganisationIds } from "@/lib/api/organisation-scope";
-import { jsonError, jsonOk, zodErrorResponse } from "@/lib/api/response";
-import { withAuthorization } from "@/lib/api/with-authorization";
-import { isAdminRole } from "@/lib/auth/roles";
 import { PARTNER_API_KEY_SCOPE_IDS } from "@/lib/api/developer/partner-api-key-scopes";
 import {
   createPartnerApiKey,
   listPartnerApiKeys,
 } from "@/lib/api/developer/partner-api-key-service";
+import { getUserOrganisationIds } from "@/lib/api/organisation-scope";
+import { jsonError, jsonOk, zodErrorResponse } from "@/lib/api/response";
+import { withAuthorization } from "@/lib/api/with-authorization";
+import { isAdminRole } from "@/lib/auth/roles";
 import type { UserRole } from "@/types/mapable";
 
 const createKeySchema = z.object({

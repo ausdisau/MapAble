@@ -7,14 +7,14 @@ import {
 } from "@/lib/api/organisation-scope";
 import { jsonError, jsonOk, zodErrorResponse } from "@/lib/api/response";
 import { isAdminRole } from "@/lib/auth/roles";
+import { isCommunicationPassportEnabled } from "@/lib/config/communication-workforce";
+import { checkConsent } from "@/lib/consent/consent-service";
+import { assertAdminTenantAccess } from "@/lib/security/break-glass";
 import {
   acknowledgeCommunicationPassport,
   CommunicationPassportError,
   getWorkerFacingPassport,
 } from "@/lib/support/communication-passport/service";
-import { isCommunicationPassportEnabled } from "@/lib/config/communication-workforce";
-import { checkConsent } from "@/lib/consent/consent-service";
-import { assertAdminTenantAccess } from "@/lib/security/break-glass";
 
 const acknowledgeSchema = z
   .object({

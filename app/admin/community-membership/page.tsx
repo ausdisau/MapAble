@@ -1,7 +1,7 @@
 import { MembershipAdminForm } from "@/app/admin/community-membership/MembershipAdminForm";
 import { requireAdmin } from "@/lib/auth/guards";
-import { listAllMemberships } from "@/lib/governance/community-membership/membership-service";
 import { isCommunityGovernanceMembershipV2Enabled } from "@/lib/config/y5-rights-infrastructure";
+import { listAllMemberships } from "@/lib/governance/community-membership/membership-service";
 
 export default async function CommunityMembershipPage() {
   await requireAdmin();

@@ -1,6 +1,5 @@
 import { z } from "zod";
 
-import { requireApiSession } from "@/lib/api/auth-handler";
 import { featureDisabledResponse, indoorApiError } from "@/lib/access/indoor/api-errors";
 import { isIndoorFeatureEnabled } from "@/lib/access/indoor/feature-flags";
 import { canManageVisitPlan } from "@/lib/access/indoor/permissions";
@@ -9,6 +8,7 @@ import {
   createVisitPlanShare,
   revokeVisitPlanShare,
 } from "@/lib/access/indoor/sharing/visit-plan-service";
+import { requireApiSession } from "@/lib/api/auth-handler";
 
 const createSchema = z.object({
   placeId: z.string(),

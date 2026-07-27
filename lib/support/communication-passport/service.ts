@@ -1,4 +1,6 @@
 import { createAuditEvent } from "@/lib/audit/audit-event-service";
+import { isCommunicationPassportEnabled } from "@/lib/config/communication-workforce";
+import { prisma } from "@/lib/prisma";
 import {
   communicationPassportFromProfile,
   workerFacingPassportSubset,
@@ -7,8 +9,6 @@ import type {
   CommunicationPassport,
   WorkerPassportAcknowledgement,
 } from "@/lib/support/communication-passport/types";
-import { isCommunicationPassportEnabled } from "@/lib/config/communication-workforce";
-import { prisma } from "@/lib/prisma";
 import { recordDisclosureReceipt } from "@/lib/trust/fabric/receipt-service";
 
 export class CommunicationPassportError extends Error {

@@ -12,11 +12,11 @@ import { ViewFloorPlanButton } from "@/components/accessibility-map/floor-plan/V
 import { VenueAccessDetails } from "@/components/accessibility-map/VenueAccessDetails";
 import { MapAbleCareMarketingShell } from "@/components/marketing/MapAbleCareMarketingShell";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { buildPlaceAccessibilityJsonLd } from "@/lib/access/place-json-ld";
 import { calculateAccessFit } from "@/lib/access/fit/calculate-access-fit";
 import { DEMO_ACCESS_NEEDS } from "@/lib/access/fit/types";
 import { getAccessMapPlaceBySlug } from "@/lib/access/map/access-map-places";
 import { ACCESS_DISCLAIMER } from "@/lib/access/map/copy";
+import { buildPlaceAccessibilityJsonLd } from "@/lib/access/place-json-ld";
 import { getCanonicalPublicOrigin } from "@/lib/config/canonical-url";
 import { mapableInteractiveFocusRing } from "@/lib/marketing/mapable-care-tokens";
 

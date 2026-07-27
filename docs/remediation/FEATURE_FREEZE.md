@@ -49,7 +49,7 @@ Waivers do **not** lift the global freeze. Flags stay default-false. No producti
 
 | Waiver ID | PR / branch                                           | Domain path                                       | Notes                                                                                                        | Status                                         |
 | --------- | ----------------------------------------------------- | ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ | ---------------------------------------------- |
-| W-AT-1    | #382 `cursor/ndis-expansion-wave1-at-continuity-0a20` | `lib/platform/at-continuity/**`                            | Wave 1 AT Continuity scaffold only; additive migration; human-approved notifications                         | Active waiver; PR CI currently `FAILED`        |
+| W-AT-1    | #382 `cursor/ndis-expansion-wave1-at-continuity-0a20` | `lib/platform/at-continuity/**`                   | Wave 1 AT Continuity scaffold only; additive migration; human-approved notifications                         | Active waiver; PR CI currently `FAILED`        |
 | W-GEO-0   | #367 Geoscape Predictive                              | `lib/geoscape-predictive/**`                      | Address autocomplete adapters; flag default false                                                            | Active; stack parent                           |
 | W-GEO-1   | #384–#386 (stacked)                                   | `lib/spatial/**` (+ related)                      | Address intelligence / approach / service areas — **stack depth 4 violates policy**; no further stack growth | Active but **stack-policy breach**             |
 | W-VA-1    | #383 VisionAccess contracts                           | vision-access contracts / synthetic lens          | No camera/inference/migrations                                                                               | Active; review vs freeze each revision         |
@@ -66,7 +66,7 @@ Demo, mock, scaffold, and pilot behaviour must be labelled honestly in UI, API, 
 | Field        | Value                                                                                                                                            |
 | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Domain       | Assistive Technology Continuity only                                                                                                             |
-| Paths        | `lib/platform/at-continuity/**`, `lib/config/at-continuity.ts`                                                                                            |
+| Paths        | `lib/platform/at-continuity/**`, `lib/config/at-continuity.ts`                                                                                   |
 | Schema       | Additive `at_*` tables / enums in `20260720120000_at_continuity_wave1`                                                                           |
 | Flag         | `MAPABLE_AT_CONTINUITY_ENABLED` remains default **false**                                                                                        |
 | Still frozen | New OS layers, payments, second consent/audit, NDIA submit, auto payment approval, other NDIS Expansion product domains without their own waiver |

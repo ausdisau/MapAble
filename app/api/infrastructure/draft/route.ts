@@ -2,14 +2,14 @@ import { generateObject } from "ai";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
-import {
-  draftInfrastructureFromDescription,
-  infrastructureDraftRequestSchema,
-} from "@/lib/transport/care-map/infrastructure-draft";
 import { isAddInfrastructureEnabled } from "@/lib/config/care-transport-map";
 import { isSearchInterpreterConfigured } from "@/lib/config/search-interpreter";
 import { forwardGeocodeAustralia } from "@/lib/map/nominatim-server";
 import { getInterpreterModel } from "@/lib/search/interpreter/get-model";
+import {
+  draftInfrastructureFromDescription,
+  infrastructureDraftRequestSchema,
+} from "@/lib/transport/care-map/infrastructure-draft";
 import { accessPlaceCategorySchema } from "@/types/access-map";
 
 const gptDraftSchema = z.object({

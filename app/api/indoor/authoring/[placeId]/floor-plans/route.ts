@@ -1,6 +1,5 @@
 import { z } from "zod";
 
-import { requireApiSession } from "@/lib/api/auth-handler";
 import { featureDisabledResponse, indoorApiError } from "@/lib/access/indoor/api-errors";
 import {
   createFloorPlanDraft,
@@ -13,6 +12,7 @@ import {
   canReviewFloorPlan,
   canSubmitFloorPlanReview,
 } from "@/lib/access/indoor/permissions";
+import { requireApiSession } from "@/lib/api/auth-handler";
 
 const createDraftSchema = z.object({
   floorCode: z.string().min(1),

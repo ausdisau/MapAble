@@ -2,8 +2,8 @@ import { createHash } from "crypto";
 
 import type { ApiScope } from "@prisma/client";
 
-import { jsonError } from "@/lib/api/response";
 import { scopesAllow } from "@/lib/api/developer/api-key-service";
+import { jsonError } from "@/lib/api/response";
 import type { EmploymentProviderScope } from "@/lib/employment/providers/des-iea";
 import { prisma } from "@/lib/prisma";
 

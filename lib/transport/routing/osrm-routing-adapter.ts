@@ -1,6 +1,6 @@
 import { transportRoutingConfig } from "@/lib/config/transport-routing";
-import { TransportApiError } from "@/lib/transport/transport-api-error";
 import type { RoutingAdapter } from "@/lib/transport/routing/routing-adapter";
+import { TransportApiError } from "@/lib/transport/transport-api-error";
 import type {
   RouteEstimateInput,
   RouteMatrixInput,

@@ -1,6 +1,6 @@
 import { AlgorithmRegisterActions } from "@/app/admin/algorithm-register/AlgorithmRegisterActions";
-import { listAllAlgorithms } from "@/lib/compliance/algorithm-register/register-service";
 import { requireAdmin } from "@/lib/auth/guards";
+import { listAllAlgorithms } from "@/lib/compliance/algorithm-register/register-service";
 import { ALGORITHM_TRANSPARENCY_DISCLAIMER } from "@/lib/config/y4-civic-platform";
 
 export default async function AlgorithmRegisterAdminPage() {

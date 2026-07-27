@@ -14,9 +14,9 @@ import {
 import { MapAccessibleResultsList } from "@/components/map/MapAccessibleResultsList";
 import { MapProvider } from "@/components/map/MapProvider";
 import { Button } from "@/components/ui/button";
-import type { CareTransportMapPayload } from "@/lib/transport/care-map/map-payload";
 import type { CareTransportMapAction } from "@/lib/copilot/types";
 import type { MapFeatureCollection } from "@/lib/map/types";
+import type { CareTransportMapPayload } from "@/lib/transport/care-map/map-payload";
 
 function emptyCollection(): MapFeatureCollection {
   return { type: "FeatureCollection", features: [] };

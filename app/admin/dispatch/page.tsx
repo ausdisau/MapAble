@@ -1,8 +1,8 @@
 import { requireAdmin } from "@/lib/auth/guards";
 import { listOpenBackupRecoveries } from "@/lib/care/backup-shift-recovery-service";
-import { syncOperationalQueues } from "@/lib/transport/dispatch-console/dispatch-service";
 import { awaitParticipantConfirmationState } from "@/lib/matching/matching-service";
 import { prisma } from "@/lib/prisma";
+import { syncOperationalQueues } from "@/lib/transport/dispatch-console/dispatch-service";
 
 export default async function DispatchConsolePage() {
   const user = await requireAdmin();

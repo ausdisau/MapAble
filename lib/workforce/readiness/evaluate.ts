@@ -1,8 +1,8 @@
 import type { WorkerCredentialStatus, WorkerProfile } from "@prisma/client";
 
+import { isWorkforceReadinessEnabled } from "@/lib/config/communication-workforce";
 import { hasWorkerAcknowledgedPassport } from "@/lib/support/communication-passport/service";
 import type { CommunicationPassport } from "@/lib/support/communication-passport/types";
-import { isWorkforceReadinessEnabled } from "@/lib/config/communication-workforce";
 
 export type ReadinessReasonCode =
   | "flag_disabled"

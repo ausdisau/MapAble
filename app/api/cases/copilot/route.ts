@@ -1,6 +1,6 @@
+import { buildCaseCopilotPack } from "@/lib/ai/case-copilot";
 import { requireApiPermission } from "@/lib/api/auth-handler";
 import { jsonError, jsonOk } from "@/lib/api/response";
-import { buildCaseCopilotPack } from "@/lib/ai/case-copilot";
 import type { CaseSnapshot } from "@/lib/cases/ai/types";
 import { caseCopilotConfig } from "@/lib/config/case-copilot";
 

@@ -1,7 +1,7 @@
 import { requireApiAdmin } from "@/lib/api/auth-handler";
 import { jsonOk } from "@/lib/api/response";
-import { getGovernmentPortalSummary } from "@/lib/public/government-portal/portal-service";
 import { prisma } from "@/lib/prisma";
+import { getGovernmentPortalSummary } from "@/lib/public/government-portal/portal-service";
 
 export async function GET(req: Request) {
   const user = await requireApiAdmin();

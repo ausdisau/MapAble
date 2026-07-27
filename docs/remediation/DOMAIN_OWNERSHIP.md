@@ -21,9 +21,9 @@
 | Accessibility evidence      | Existing access modules under `lib/access*` / access map | Access registry                              | No new parallel registry in PR 1                                        |
 | Access place identity       | `lib/access/map/**`                                      | **`AccessPlace`**                            | Sole public place writer                                                |
 | Access Intelligence Next    | `lib/access/intelligence-next/**`                        | Deterministic fit / proof / graph projection | Synthetic contracts only in foundation; must not become AccessPlace SoT |
-| Public accountability       | `lib/governance/national-accountability/**`                         | National accountability publications         | Evolve to governed pipeline (PR 11); no second portal                   |
+| Public accountability       | `lib/governance/national-accountability/**`              | National accountability publications         | Evolve to governed pipeline (PR 11); no second portal                   |
 | Support coordination        | `lib/support/coordinator/**`                             | `SupportCoordinatorRelationship` + tasks     | Outcomes reporting extends this owner — no second SC SoT                |
-| Plan manager workflows      | `lib/support/plan-manager/**`                                    | PM relationships + invoice review            | Wave 10 infrastructure extends; NDIA submit stays off                   |
+| Plan manager workflows      | `lib/support/plan-manager/**`                            | PM relationships + invoice review            | Wave 10 infrastructure extends; NDIA submit stays off                   |
 | Provider quality            | `lib/provider/quality/**`                                | Quality / safeguard review services          | No worker worthiness scores                                             |
 | Workforce readiness         | `lib/workforce/readiness/**`                             | Reason-coded readiness evaluation            | Auto-assign permanently forbidden                                       |
 
@@ -35,7 +35,7 @@ until their wave lands behind default-false flags. See
 
 | Planned domain                    | Planned owner path              | Status                                                                                                      |
 | --------------------------------- | ------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| AT Continuity                     | `lib/platform/at-continuity/**`          | Wave 1 scaffold in #382 — writers flag-gated (`MAPABLE_AT_CONTINUITY_ENABLED=false`); not on main yet       |
+| AT Continuity                     | `lib/platform/at-continuity/**` | Wave 1 scaffold in #382 — writers flag-gated (`MAPABLE_AT_CONTINUITY_ENABLED=false`); not on main yet       |
 | Plan & Evidence Navigator         | `lib/plan-evidence/**`          | planned — **no writers yet**                                                                                |
 | Home & Living Navigator           | `lib/home-living/**`            | planned — **no writers yet**                                                                                |
 | Psychosocial Recovery             | `lib/psychosocial-recovery/**`  | planned — **no writers yet**                                                                                |

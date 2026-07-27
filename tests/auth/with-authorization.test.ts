@@ -1,7 +1,8 @@
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { createTwoFactorToken } from "@/lib/auth/two-factor-token";
 import type { CurrentUser } from "@/lib/auth/current-user";
+import { createTwoFactorToken } from "@/lib/auth/two-factor-token";
+import { withAuthorization } from "@/lib/auth/withAuthorization";
 
 const mockGetServerSession = vi.fn();
 const mockGetCurrentUser = vi.fn();
@@ -27,8 +28,6 @@ vi.mock("@/lib/auth/current-user", async () => {
 vi.mock("@/lib/auth/nextauth-env", () => ({
   resolveNextAuthSecret: () => "test-nextauth-secret-for-unit-tests",
 }));
-
-import { withAuthorization } from "@/lib/auth/withAuthorization";
 
 function adminUser(overrides: Partial<CurrentUser> = {}): CurrentUser {
   return {
@@ -121,7 +120,7 @@ describe("withAuthorization", () => {
       new Request("http://localhost/api/x", {
         headers: { "x-mfa-assertion": assertion },
       }),
-      {},
+      { params: Promise.resolve({}) },
     );
     expect(allowedRes.status).toBe(200);
   });
