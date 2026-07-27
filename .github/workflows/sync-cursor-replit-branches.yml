@@ -18,6 +18,13 @@ on:
         options:
           - report
           - check-secrets
+          - pull-cursor-into-replit
+          - push-replit-into-cursor
+          - sync-both
+          - refresh-from-main
+
+permissions:
+  contents: write
 
 jobs:
   sync:
@@ -26,20 +33,46 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Fetch sync branches
         run: |
           git fetch origin main cursor-main replit-agent || true
           git branch -r | grep -E 'origin/(cursor-main|replit-agent|main)' || true
 
+      - name: Configure git identity
+        if: github.event_name == 'workflow_dispatch' && (inputs.action == 'pull-cursor-into-replit' || inputs.action == 'push-replit-into-cursor' || inputs.action == 'sync-both' || inputs.action == 'refresh-from-main')
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
       - name: Drift report
         if: github.event_name != 'workflow_dispatch' || inputs.action == 'report'
         run: bash scripts/sync-cursor-replit-branches.sh report
-        continue-on-error: true
 
       - name: Secret scan
         if: github.event_name == 'workflow_dispatch' && inputs.action == 'check-secrets'
         run: bash scripts/sync-cursor-replit-branches.sh check-secrets
+
+      - name: Secret scan before merge
+        if: github.event_name == 'workflow_dispatch' && (inputs.action == 'pull-cursor-into-replit' || inputs.action == 'push-replit-into-cursor' || inputs.action == 'sync-both' || inputs.action == 'refresh-from-main')
+        run: bash scripts/sync-cursor-replit-branches.sh check-secrets
+
+      - name: Pull cursor into replit
+        if: github.event_name == 'workflow_dispatch' && inputs.action == 'pull-cursor-into-replit'
+        run: SYNC_PUSH=1 bash scripts/sync-cursor-replit-branches.sh pull-cursor-into-replit
+
+      - name: Push replit into cursor
+        if: github.event_name == 'workflow_dispatch' && inputs.action == 'push-replit-into-cursor'
+        run: SYNC_PUSH=1 bash scripts/sync-cursor-replit-branches.sh push-replit-into-cursor
+
+      - name: Sync both directions
+        if: github.event_name == 'workflow_dispatch' && inputs.action == 'sync-both'
+        run: SYNC_PUSH=1 bash scripts/sync-cursor-replit-branches.sh sync-both
+
+      - name: Refresh sync branches from main
+        if: github.event_name == 'workflow_dispatch' && inputs.action == 'refresh-from-main'
+        run: bash scripts/sync-cursor-replit-branches.sh refresh-from-main
 
       - name: Upload sync report
         if: always()

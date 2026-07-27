@@ -103,36 +103,63 @@ Do **not** overwrite root `package.json` with the Replit manifest. Use
 
 ```bash
 ./scripts/sync-cursor-replit-branches.sh report
-./scripts/sync-cursor-replit-branches.sh pull-cursor-into-replit
-./scripts/sync-cursor-replit-branches.sh push-replit-into-cursor
+./scripts/sync-cursor-replit-branches.sh sync-both
+./scripts/sync-cursor-replit-branches.sh sync-both --push   # or SYNC_PUSH=1
+./scripts/sync-cursor-replit-branches.sh pull-cursor-into-replit [--push]
+./scripts/sync-cursor-replit-branches.sh push-replit-into-cursor [--push]
 ./scripts/sync-cursor-replit-branches.sh check-secrets
 ./scripts/sync-cursor-replit-branches.sh refresh-from-main
 ```
 
-Or via package.json: `pnpm sync:cursor-replit -- report`.
+Or via package.json:
+
+```bash
+pnpm sync:cursor-replit -- report
+pnpm sync:cursor-replit:both
+pnpm sync:cursor-replit:both:push
+```
+
+`sync-both` is the default day-to-day bridge command: secret-scan, merge
+`cursor-main` → `replit-agent`, then `replit-agent` → `cursor-main`, under the
+path-ownership matrix. Equal tips are a no-op. `--push` / `SYNC_PUSH=1` pushes
+both branches after a successful sync. `report` exits non-zero when path drift
+remains.
 
 ## Day-to-day commands
 
-### Replit pulls Cursor work
+### Bidirectional sync (preferred)
 
 ```bash
 git fetch origin
-./scripts/sync-cursor-replit-branches.sh pull-cursor-into-replit
-# or: git merge origin/cursor-main
-npm install
-npx tsx --test server/__tests__/*.test.ts
-git push origin replit-agent
+./scripts/sync-cursor-replit-branches.sh sync-both --push
+# Replit overlay:
+npm run test:replit
+# Cursor / Next surface (when Cursor-owned paths changed):
+pnpm type-check && pnpm test
 ```
 
-### Cursor integrates Replit work
+### Replit ← Cursor only
 
 ```bash
 git fetch origin
-git checkout -b cursor/replit-sync-$(date +%Y%m%d)-a08f origin/main
-git merge origin/replit-agent
-# resolve using path ownership matrix above
+./scripts/sync-cursor-replit-branches.sh pull-cursor-into-replit --push
+npm run test:replit
+```
+
+### Cursor ← Replit only
+
+```bash
+git fetch origin
+./scripts/sync-cursor-replit-branches.sh push-replit-into-cursor --push
 pnpm type-check && pnpm test
-# open PR → main; then refresh sync branches
+```
+
+`cursor-main` is the integration branch for the bridge — **not** Vercel
+production. To ship Replit work to production, promote through
+`ports/mapableau-new/` into a Cursor PR against `main`, then refresh:
+
+```bash
+# after PR merges to main
 ./scripts/sync-cursor-replit-branches.sh refresh-from-main
 ```
 
@@ -145,13 +172,18 @@ pnpm type-check && pnpm test
 This fast-forwards (or merges) `cursor-main` and `replit-agent` to `origin/main`
 and pushes both.
 
-## CI drift advisory
+## CI drift advisory + human-gated sync
 
 Workflow: `.github/workflows/sync-cursor-replit-branches.yml`
 
-- Runs weekly and on pushes to `replit-agent` / `cursor-main`
-- Produces a drift report artifact
-- **Does not auto-merge** — human gate for cross-stack merges
+- **Push / weekly schedule:** runs `report` only (fails the job when path drift > 0;
+  uploads the report artifact). Does **not** auto-merge.
+- **`workflow_dispatch`:** human-gated actions —
+  `report`, `check-secrets`, `pull-cursor-into-replit`, `push-replit-into-cursor`,
+  `sync-both`, `refresh-from-main`. Merge/refresh actions run `check-secrets`
+  first, then `SYNC_PUSH=1`.
+
+Never auto-merge into production `main` from this workflow.
 
 ## Related docs
 

@@ -62,6 +62,8 @@
     "sync:replit-unified": "bash scripts/sync-replit-unified.sh",
     "check:replit-unified": "bash scripts/check-replit-unified-deployment.sh",
     "sync:cursor-replit": "bash scripts/sync-cursor-replit-branches.sh",
+    "sync:cursor-replit:both": "bash scripts/sync-cursor-replit-branches.sh sync-both",
+    "sync:cursor-replit:both:push": "SYNC_PUSH=1 bash scripts/sync-cursor-replit-branches.sh sync-both",
     "check:cursor-replit-secrets": "bash scripts/sync-cursor-replit-branches.sh check-secrets",
     "dev:replit": "bash scripts/run-replit.sh dev",
     "build:replit": "bash scripts/run-replit.sh build",
