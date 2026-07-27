@@ -1,0 +1,186 @@
+import express, { type Request, Response, NextFunction } from "express";
+import session from "express-session";
+import connectPgSimple from "connect-pg-simple";
+import pg from "pg";
+import { registerRoutes } from "./routes";
+import { serveStatic } from "./static";
+import { createServer } from "http";
+import { seedDatabase } from "./seed";
+
+const app = express();
+const httpServer = createServer(app);
+
+declare module "http" {
+  interface IncomingMessage {
+    rawBody: unknown;
+  }
+}
+
+declare module "express-session" {
+  interface SessionData {
+    userId: string;
+    auth0Login?: boolean;
+    auth0State?: string;
+    auth0CodeVerifier?: string;
+    qbOAuthState?: string;
+  }
+}
+
+app.use(
+  express.json({
+    verify: (req, _res, buf) => {
+      req.rawBody = buf;
+    },
+  }),
+);
+
+app.use(express.urlencoded({ extended: false }));
+
+const PgStore = connectPgSimple(session);
+const sessionPool = new pg.Pool({
+  connectionString: process.env.NEON_DATABASE_URL || process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false },
+});
+
+app.use(
+  session({
+    store: new PgStore({
+      pool: sessionPool,
+      createTableIfMissing: true,
+    }),
+    secret: process.env.SESSION_SECRET || "mapable-dev-secret",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+    },
+  }),
+);
+
+export function log(message: string, source = "express") {
+  const formattedTime = new Date().toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true,
+  });
+
+  console.log(`${formattedTime} [${source}] ${message}`);
+}
+
+app.use((req, res, next) => {
+  const start = Date.now();
+  const path = req.path;
+  let capturedJsonResponse: Record<string, any> | undefined = undefined;
+
+  const originalResJson = res.json;
+  res.json = function (bodyJson, ...args) {
+    capturedJsonResponse = bodyJson;
+    return originalResJson.apply(res, [bodyJson, ...args]);
+  };
+
+  res.on("finish", () => {
+    const duration = Date.now() - start;
+    if (path.startsWith("/api")) {
+      let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
+      if (capturedJsonResponse) {
+        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
+      }
+
+      log(logLine);
+    }
+  });
+
+  next();
+});
+
+(async () => {
+  await registerRoutes(httpServer, app);
+
+  try {
+    await seedDatabase();
+  } catch (e) {
+    console.error("Seed error:", e);
+  }
+
+  // Best-effort grocery supplier auto-sync at startup. Disabled by default; opt in
+  // with GROCERY_SUPPLIER_AUTOSYNC=1 (and the existing GROCERY_SUPPLIER_DISABLED guard).
+  if (process.env.GROCERY_SUPPLIER_AUTOSYNC === "1" && process.env.GROCERY_SUPPLIER_DISABLED !== "1") {
+    (async () => {
+      try {
+        const { syncGroceryCatalog, getSupplierProvider } = await import("./grocery-supplier");
+        const { storage } = await import("./storage");
+        const status = await storage.getGroceryCatalogStatus();
+        // bySource has one entry per supplier_source (e.g. "seed", "openfoodfacts").
+        // Only auto-sync when nothing from a non-seed provider has been pulled yet.
+        const provider = getSupplierProvider();
+        const supplierCount = status.bySource[provider] ?? 0;
+        if (supplierCount === 0) {
+          const result = await syncGroceryCatalog();
+          console.log(`[grocery-supplier] autosync: provider=${result.provider} fetched=${result.fetched} upserted=${result.upserted} removedSeed=${result.removedSeed}`);
+        } else {
+          console.log(`[grocery-supplier] autosync skipped: ${supplierCount} ${provider} products already present`);
+        }
+      } catch (e) {
+        console.error("[grocery-supplier] autosync failed:", e);
+      }
+    })();
+  }
+
+  // Auto-debit scheduler — runs every AUTO_DEBIT_INTERVAL_MIN minutes (default 15).
+  // Disable by setting AUTO_DEBIT_DISABLED=1.
+  if (process.env.AUTO_DEBIT_DISABLED !== "1") {
+    const intervalMin = Math.max(1, Number(process.env.AUTO_DEBIT_INTERVAL_MIN || "15"));
+    const tick = async () => {
+      try {
+        const { runAutoDebitTick } = await import("./auto-debit");
+        await runAutoDebitTick();
+      } catch (e) {
+        console.error("[auto-debit] tick failed:", e);
+      }
+    };
+    setTimeout(() => { void tick(); setInterval(() => { void tick(); }, intervalMin * 60_000); }, 30_000);
+  }
+
+  app.use((err: any, _req: Request, res: Response, next: NextFunction) => {
+    const status = err.status || err.statusCode || 500;
+    const message = err.message || "Internal Server Error";
+
+    console.error("Internal Server Error:", err);
+
+    if (res.headersSent) {
+      return next(err);
+    }
+
+    return res.status(status).json({ message });
+  });
+
+  // importantly only setup vite in development and after
+  // setting up all the other routes so the catch-all route
+  // doesn't interfere with the other routes
+  if (process.env.NODE_ENV === "production") {
+    serveStatic(app);
+  } else {
+    const { setupVite } = await import("./vite");
+    await setupVite(httpServer, app);
+  }
+
+  // ALWAYS serve the app on the port specified in the environment variable PORT
+  // Other ports are firewalled. Default to 5000 if not specified.
+  // this serves both the API and the client.
+  // It is the only port that is not firewalled.
+  const port = parseInt(process.env.PORT || "5000", 10);
+  httpServer.listen(
+    {
+      port,
+      host: "0.0.0.0",
+      reusePort: true,
+    },
+    () => {
+      log(`serving on port ${port}`);
+    },
+  );
+})();

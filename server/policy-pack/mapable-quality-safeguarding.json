@@ -1,0 +1,33 @@
+{
+  "version": "mapable-quality-safeguarding-v3+ndis-policies-v2.1",
+  "refs": {
+    "quality": "Quality & Safeguarding Policy v3",
+    "incidents": "SOP — Incident Management & Reportable Incidents; NDIS Policies v2.1 Incident Management",
+    "complaints": "SOP — Feedback & Complaints; NDIS Policies v2.1 Feedback & Complaints",
+    "privacy": "Privacy, Information & Records; NDIS Policies v2.1 Information Privacy & Security",
+    "retention": "Records Retention Schedule"
+  },
+  "principles": [
+    "Rights first — dignity, privacy, choice and control.",
+    "Safety — zero tolerance for abuse, neglect, exploitation or discrimination; act immediately to make people safe.",
+    "Openness — welcome feedback and complaints; respond promptly and fairly.",
+    "Accessibility — multiple ways to contact MapAble; Easy Read and interpreters on request.",
+    "Support the person first, then record, report and learn."
+  ],
+  "contacts": {
+    "emergency": "000",
+    "ndisCommission": "1800 035 544",
+    "lifeline": "13 11 14"
+  },
+  "retentionYears": 7,
+  "sourceFiles": [
+    "attached_assets/MapAble_Quality_Safeguarding_Manual_v3_1776759866243.zip/02_Policy_Quality_and_Safeguarding.md",
+    "attached_assets/MapAble_Quality_Safeguarding_Manual_v3_1776759866243.zip/03_SOP_Complaints.md",
+    "attached_assets/MapAble_Quality_Safeguarding_Manual_v3_1776759866243.zip/04_SOP_Incidents.md",
+    "attached_assets/MapAble_Quality_Safeguarding_Manual_v3_1776759866243.zip/10_Policy_Privacy_and_Records.md",
+    "attached_assets/MapAble_NDIS_Policies_v2_1_1776759866243.zip/01_Policies/Core/Incident_Management_and_Reportable_Incidents.md",
+    "attached_assets/MapAble_NDIS_Policies_v2_1_1776759866243.zip/01_Policies/Core/Feedback_and_Complaints.md",
+    "attached_assets/MapAble_NDIS_Policies_v2_1_1776759866243.zip/01_Policies/Core/Information_Privacy_and_Security.md",
+    "attached_assets/MapAble_NDIS_Policies_v2_1_1776759866243.zip/03_Templates_and_Registers/Records_Retention_Schedule.md"
+  ]
+}

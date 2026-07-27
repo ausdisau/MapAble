@@ -1,0 +1,374 @@
+import { Switch, Route } from "wouter";
+import { queryClient } from "./lib/queryClient";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { Toaster } from "@/components/ui/toaster";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { SidebarProvider, useSidebar } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/app-sidebar";
+import { ThemeProvider, useTheme } from "@/components/theme-provider";
+import { AccessibilityProvider } from "@/components/accessibility-provider";
+import { GroceryCartProvider } from "@/lib/grocery-cart";
+import { useAuth } from "@/hooks/use-auth";
+import { Button } from "@/components/ui/button";
+import { Moon, Sun, Search, Bell, Accessibility, LayoutDashboard, HeartHandshake, Briefcase, Bus, MessageSquare, Settings, PanelLeftClose, PanelLeftOpen, DollarSign, Wallet, FileText, Bot, Loader2, CalendarDays, Building2, ClipboardList, User as UserIconLucide, Mail, ShoppingCart, Map as MapIcon } from "lucide-react";
+import { useState, lazy, Suspense } from "react";
+
+const ChatbotWidget = lazy(() => import("@/components/chatbot-widget"));
+import { useLocation } from "wouter";
+import logoImage from "@assets/Accessible_Australia_Logo_Design_1772582762574.png";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import NotFound from "@/pages/not-found";
+import LoginPage from "@/pages/login";
+import RegisterPage from "@/pages/register";
+import Dashboard from "@/pages/dashboard";
+import CarePage from "@/pages/care";
+import WorkerDetailPage from "@/pages/worker-detail";
+import JobsPage from "@/pages/jobs";
+import JobDetailPage from "@/pages/job-detail";
+import TransportPage from "@/pages/transport";
+import MessagesPage from "@/pages/messages";
+import SettingsPage from "@/pages/settings";
+import PricingPage from "@/pages/pricing";
+import BudgetPage from "@/pages/budget";
+import InvoicesPage from "@/pages/invoices";
+import ChatPage from "@/pages/chat";
+import ShiftsPage from "@/pages/shifts";
+import AbnLookupPage from "@/pages/abn-lookup";
+import WorkerDashboard from "@/pages/worker-dashboard";
+import WorkerProfile from "@/pages/worker-profile";
+import WorkerBookings from "@/pages/worker-bookings";
+import WorkerShifts from "@/pages/worker-shifts";
+import WorkerAvailabilityPage from "@/pages/worker-availability";
+import GroceriesPage from "@/pages/groceries";
+import GroceryCheckoutPage from "@/pages/grocery-checkout";
+import GroceryOrdersPage from "@/pages/grocery-orders";
+import GroceryOrderDetailPage from "@/pages/grocery-order-detail";
+import GroceryPickListPage from "@/pages/grocery-pick-list";
+import PlanReviewPrepPage from "@/pages/plan-review-prep";
+import PaymentMethodsPage from "@/pages/payment-methods";
+import PayoutsPage from "@/pages/payouts";
+import NdisAdminPage from "@/pages/ndis-admin";
+import AdminChatGuardrailsPage from "@/pages/admin-chat-guardrails";
+import AccessibilityMapPage from "@/pages/accessibility-map";
+import GeoAdminPage from "@/pages/geo-admin";
+
+function ThemeToggle() {
+  const { theme, toggleTheme } = useTheme();
+  return (
+    <Button size="icon" variant="ghost" onClick={toggleTheme} data-testid="button-theme-toggle" className="text-white/90">
+      {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+    </Button>
+  );
+}
+
+function HeaderSearchPill() {
+  const [query, setQuery] = useState("");
+  const [, setLocation] = useLocation();
+
+  const handleSearch = () => {
+    if (query.trim()) {
+      setLocation("/care?q=" + encodeURIComponent(query.trim()));
+    }
+  };
+
+  return (
+    <div className="hidden md:flex items-center gap-2 bg-white/15 backdrop-blur-md border border-white/20 rounded-full px-4 py-1.5 min-w-[240px] lg:min-w-[320px]" data-testid="input-header-search-container">
+      <Search className="w-4 h-4 text-white/70 shrink-0" />
+      <input
+        type="search"
+        placeholder="Search workers, jobs, services..."
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        onKeyDown={(e) => { if (e.key === "Enter") handleSearch(); }}
+        className="bg-transparent border-none outline-none text-sm text-white placeholder:text-white/50 w-full"
+        data-testid="input-header-search"
+      />
+    </div>
+  );
+}
+
+function MobileSearchButton() {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const [, setLocation] = useLocation();
+
+  const handleSearch = () => {
+    if (query.trim()) {
+      setLocation("/care?q=" + encodeURIComponent(query.trim()));
+      setOpen(false);
+      setQuery("");
+    }
+  };
+
+  return (
+    <>
+      <Button
+        size="icon"
+        variant="ghost"
+        className="md:hidden text-white/90"
+        onClick={() => setOpen(!open)}
+        data-testid="button-mobile-search"
+      >
+        <Search className="w-4 h-4" />
+      </Button>
+      {open && (
+        <div className="md:hidden absolute top-full left-0 right-0 p-2 z-50 bg-app-header">
+          <div className="flex gap-2">
+            <input
+              type="search"
+              placeholder="Search workers, jobs, services..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter") handleSearch(); }}
+              className="flex-1 bg-white/15 backdrop-blur-md border border-white/20 rounded-md px-3 py-2 text-sm text-white placeholder:text-white/50 outline-none"
+              autoFocus
+              data-testid="input-mobile-search"
+            />
+            <Button size="sm" onClick={handleSearch} data-testid="button-mobile-search-submit">
+              <Search className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+
+
+const participantMobileNavItems = [
+  { title: "Dashboard", url: "/", icon: LayoutDashboard, audioDesc: "View your dashboard overview" },
+  { title: "Book a Carer", url: "/care", icon: HeartHandshake, audioDesc: "Find and book verified NDIS support workers" },
+  { title: "Groceries", url: "/groceries", icon: ShoppingCart, audioDesc: "Order groceries for delivery or book a support worker to shop for you" },
+  { title: "Shifts", url: "/shifts", icon: CalendarDays, audioDesc: "Manage shift schedules and track NDIS goal alignment" },
+  { title: "Find a Job", url: "/jobs", icon: Briefcase, audioDesc: "Browse disability support employment opportunities" },
+  { title: "Get Transport", url: "/transport", icon: Bus, audioDesc: "Arrange wheelchair accessible transport services" },
+  { title: "Accessibility Map", url: "/accessibility-map", icon: MapIcon, audioDesc: "Explore accessible places, parking, lifts and routes on an interactive map" },
+  { title: "MapAble Chat", url: "/chat", icon: Bot, audioDesc: "Chat with your accessibility-aware travel assistant" },
+  { title: "Pricing", url: "/pricing", icon: DollarSign, audioDesc: "View NDIS-aligned pricing for care and transport services" },
+  { title: "Budget", url: "/budget", icon: Wallet, audioDesc: "View your NDIS budget usage and remaining funds" },
+  { title: "Invoices", url: "/invoices", icon: FileText, audioDesc: "View and manage your NDIS invoices and claims" },
+  { title: "ABN Lookup", url: "/abn-lookup", icon: Building2, audioDesc: "Search and verify Australian Business Numbers" },
+  { title: "Messages", url: "/messages", icon: MessageSquare, audioDesc: "View your conversations and messages" },
+  { title: "Settings", url: "/settings", icon: Settings, audioDesc: "Manage your account and accessibility preferences" },
+];
+
+const workerMobileNavItems = [
+  { title: "Dashboard", url: "/worker/dashboard", icon: LayoutDashboard, audioDesc: "View your worker dashboard" },
+  { title: "My Shifts", url: "/worker/shifts", icon: CalendarDays, audioDesc: "View and manage your shifts and earnings" },
+  { title: "My Bookings", url: "/worker/bookings", icon: ClipboardList, audioDesc: "Accept or decline booking requests" },
+  { title: "Availability", url: "/worker/availability", icon: CalendarDays, audioDesc: "Set your weekly availability and blockouts" },
+  { title: "My Profile", url: "/worker/profile", icon: UserIconLucide, audioDesc: "Update your worker profile" },
+  { title: "MapAble Chat", url: "/chat", icon: Bot, audioDesc: "Chat with your accessibility-aware travel assistant" },
+  { title: "Messages", url: "/messages", icon: MessageSquare, audioDesc: "View your conversations and messages" },
+  { title: "Email", url: "/email", icon: Mail, audioDesc: "View and manage your email inbox" },
+  { title: "Settings", url: "/settings", icon: Settings, audioDesc: "Manage your account and accessibility preferences" },
+];
+
+function speakDescription(text: string) {
+  if (typeof window !== "undefined" && window.speechSynthesis) {
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 1;
+    utterance.pitch = 1;
+    window.speechSynthesis.speak(utterance);
+  }
+}
+
+function MobileMenuToggle() {
+  const { toggleSidebar, state } = useSidebar();
+  const [, setLocation] = useLocation();
+  const { user } = useAuth();
+  const isCollapsed = state === "collapsed";
+  const mobileNavItems = user?.role === "carer" ? workerMobileNavItems : participantMobileNavItems;
+
+  return (
+    <div className="md:hidden flex items-center">
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button
+            className="flex items-center"
+            data-testid="button-mobile-menu"
+            aria-label="Open navigation menu"
+          >
+            <img src={logoImage} alt="MapAble" className="h-10 w-auto" data-testid="img-header-logo" />
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start" className="w-64">
+          {mobileNavItems.map((item) => (
+            <DropdownMenuItem
+              key={item.title + item.url}
+              onFocus={() => speakDescription(item.audioDesc)}
+              onSelect={() => setLocation(item.url)}
+              aria-description={item.audioDesc}
+              data-testid={`mobile-dropdown-nav-${item.title.toLowerCase().replace(/\s/g, "-")}`}
+            >
+              <item.icon className="w-4 h-4" />
+              <span>{item.title}</span>
+            </DropdownMenuItem>
+          ))}
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            onFocus={() => speakDescription("Toggle the sidebar open or closed")}
+            onSelect={toggleSidebar}
+            aria-description="Toggle the sidebar open or closed"
+            data-testid="mobile-dropdown-toggle-sidebar"
+          >
+            {isCollapsed ? <PanelLeftOpen className="w-4 h-4" /> : <PanelLeftClose className="w-4 h-4" />}
+            <span>Toggle Sidebar</span>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
+  );
+}
+
+function RoleBasedHome() {
+  const { user } = useAuth();
+  if (user?.role === "carer") {
+    return <WorkerDashboard />;
+  }
+  return <Dashboard />;
+}
+
+function Router() {
+  return (
+    <Switch>
+      <Route path="/" component={RoleBasedHome} />
+      <Route path="/care" component={CarePage} />
+      <Route path="/shifts" component={ShiftsPage} />
+      <Route path="/care/:id" component={WorkerDetailPage} />
+      <Route path="/care/:id/book" component={WorkerDetailPage} />
+      <Route path="/groceries" component={GroceriesPage} />
+      <Route path="/groceries/checkout" component={GroceryCheckoutPage} />
+      <Route path="/groceries/orders" component={GroceryOrdersPage} />
+      <Route path="/groceries/orders/:id" component={GroceryOrderDetailPage} />
+      <Route path="/groceries/pick-list" component={GroceryPickListPage} />
+      <Route path="/plan-review-prep" component={PlanReviewPrepPage} />
+      <Route path="/plan-review-prep/:id" component={PlanReviewPrepPage} />
+      <Route path="/jobs" component={JobsPage} />
+      <Route path="/jobs/:id" component={JobDetailPage} />
+      <Route path="/transport" component={TransportPage} />
+      <Route path="/accessibility-map" component={AccessibilityMapPage} />
+      <Route path="/admin/geo" component={GeoAdminPage} />
+      <Route path="/pricing" component={PricingPage} />
+      <Route path="/budget" component={BudgetPage} />
+      <Route path="/invoices" component={InvoicesPage} />
+      <Route path="/payment-methods" component={PaymentMethodsPage} />
+      <Route path="/payouts" component={PayoutsPage} />
+      <Route path="/ndis-admin" component={NdisAdminPage} />
+      <Route path="/chat" component={ChatPage} />
+      <Route path="/abn-lookup" component={AbnLookupPage} />
+      <Route path="/messages" component={MessagesPage} />
+      <Route path="/settings" component={SettingsPage} />
+      <Route path="/worker/dashboard" component={WorkerDashboard} />
+      <Route path="/worker/profile" component={WorkerProfile} />
+      <Route path="/worker/bookings" component={WorkerBookings} />
+      <Route path="/worker/shifts" component={WorkerShifts} />
+      <Route path="/worker/availability" component={WorkerAvailabilityPage} />
+      <Route path="/admin/chat-guardrails" component={AdminChatGuardrailsPage} />
+      <Route component={NotFound} />
+    </Switch>
+  );
+}
+
+function AppLayout() {
+  const style = {
+    "--sidebar-width": "16rem",
+    "--sidebar-width-icon": "3rem",
+  };
+
+  return (
+    <SidebarProvider style={style as React.CSSProperties}>
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:z-[100] focus:top-2 focus:left-2 focus:bg-primary focus:text-primary-foreground focus:px-4 focus:py-2 focus:rounded-md focus:text-sm focus:font-bold"
+        data-testid="link-skip-to-content"
+      >
+        Skip to main content
+      </a>
+      <div className="flex h-screen w-full">
+        <AppSidebar />
+        <div className="flex flex-col flex-1 min-w-0">
+          <header
+            className="flex items-center justify-between gap-3 px-4 py-2 sticky top-0 z-40 relative bg-app-header"
+            data-testid="header-main"
+          >
+            <div className="flex items-center gap-3 flex-wrap">
+              <MobileMenuToggle />
+              <HeaderSearchPill />
+            </div>
+            <div className="flex items-center gap-1 flex-wrap">
+              <MobileSearchButton />
+              <Button size="icon" variant="ghost" className="text-white/90" data-testid="button-accessibility">
+                <Accessibility className="w-4 h-4" />
+              </Button>
+              <Button size="icon" variant="ghost" className="text-white/90" data-testid="button-notifications">
+                <Bell className="w-4 h-4" />
+              </Button>
+              <ThemeToggle />
+            </div>
+          </header>
+          <div className="flex h-[3px] shrink-0" data-testid="accent-tricolor-strip">
+            <div className="flex-1 bg-brand-teal" />
+            <div className="flex-1 bg-brand-navy" />
+            <div className="flex-1 bg-brand-gold" />
+          </div>
+          <main id="main-content" className="flex-1 overflow-auto" role="main" aria-label="Main content">
+            <Router />
+          </main>
+        </div>
+      </div>
+      <Suspense fallback={null}>
+        <ChatbotWidget />
+      </Suspense>
+    </SidebarProvider>
+  );
+}
+
+function AuthGate() {
+  const { isAuthenticated, isLoading } = useAuth();
+  const [location] = useLocation();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-auth-hero">
+        <Loader2 className="w-8 h-8 animate-spin text-white/60" />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    if (location === "/register") {
+      return <RegisterPage />;
+    }
+    return <LoginPage />;
+  }
+
+  return <AppLayout />;
+}
+
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <ThemeProvider>
+          <AccessibilityProvider>
+            <GroceryCartProvider>
+              <AuthGate />
+              <Toaster />
+            </GroceryCartProvider>
+          </AccessibilityProvider>
+        </ThemeProvider>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+}
+
+export default App;

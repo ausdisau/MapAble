@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>MapAble</name>
+    <description>an interactive map of wheelchair accessible locations in Australia and around the world</description>
+    <NetworkLink>
+      <name>MapAble</name>
+      <Link>
+        <href><![CDATA[https://www.google.com/maps/d/kml?forcekml=1&mid=1sx0iyF2RqJKO8maeZ_Sn_EvWVyybcrOI]]></href>
+      </Link>
+    </NetworkLink>
+  </Document>
+</kml>
