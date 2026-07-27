@@ -264,8 +264,7 @@ run_push_replit_into_cursor() {
 
 run_check_secrets() {
   local failed=0
-  local pattern
-  echo "Scanning staged + tracked attached_assets and common secret patterns..."
+  echo "Scanning for tracked secret files and private-key material..."
 
   if git ls-files | grep -E 'attached_assets/.*\.key$' >/dev/null 2>&1; then
     echo "FAIL: tracked *.key under attached_assets/"
@@ -278,21 +277,48 @@ run_check_secrets() {
     failed=1
   fi
 
-  for pattern in "${SECRET_PATTERNS[@]}"; do
-    if git grep -nI -E "${pattern}" -- ':!docs' ':!*.md' >/dev/null 2>&1; then
-      echo "WARN: pattern matched in tree: ${pattern}"
-      git grep -nI -E "${pattern}" -- ':!docs' ':!*.md' | head -20 || true
-      # Treat private-key / live stripe as hard fail
-      if [[ "${pattern}" == *"PRIVATE KEY"* || "${pattern}" == "sk_live_" ]]; then
-        failed=1
-      fi
-    fi
-  done
+  # Hard-fail only on PEM private key bodies outside docs/tests/scripts allowlist noise.
+  # Exclude scanner source, docs, and fixture/test files that intentionally mention patterns.
+  local pem_hits
+  pem_hits="$(
+    git grep -nI -E 'BEGIN (RSA |OPENSSH |EC )?PRIVATE KEY' -- \
+      ':!.gitignore' \
+      ':!docs/**' \
+      ':!*.md' \
+      ':!scripts/**' \
+      ':!tests/**' \
+      ':!server/__tests__/**' \
+      ':!scripts/server/__tests__/**' \
+      2>/dev/null || true
+  )"
+  if [[ -n "${pem_hits}" ]]; then
+    echo "FAIL: private key material found in tracked files:"
+    echo "${pem_hits}" | head -20
+    failed=1
+  fi
+
+  local live_hits
+  live_hits="$(
+    git grep -nI -E 'sk_live_[A-Za-z0-9]{20,}' -- \
+      ':!.gitignore' \
+      ':!docs/**' \
+      ':!*.md' \
+      ':!scripts/**' \
+      ':!tests/**' \
+      ':!server/__tests__/**' \
+      ':!scripts/server/__tests__/**' \
+      2>/dev/null || true
+  )"
+  if [[ -n "${live_hits}" ]]; then
+    echo "FAIL: live Stripe secret pattern found in tracked files:"
+    echo "${live_hits}" | head -20
+    failed=1
+  fi
 
   if [[ "${failed}" -ne 0 ]]; then
     die "Secret scan failed. Remove secrets and rotate credentials."
   fi
-  echo "OK: secret scan passed (no hard-fail patterns)."
+  echo "OK: secret scan passed (no tracked key files or private-key / sk_live_ material)."
 }
 
 run_refresh_from_main() {

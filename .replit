@@ -1,5 +1,5 @@
 modules = ["nodejs-20", "web", "php-8.4", "postgresql-16"]
-run = "npm run dev"
+run = "npm run dev:replit"
 hidden = [".config", ".git", "generated-icon.png", "node_modules", "dist"]
 
 [nix]
@@ -20,7 +20,7 @@ PORT = "5000"
 [deployment]
 deploymentTarget = "autoscale"
 run = ["node", "./dist/index.cjs"]
-build = ["npm", "run", "build"]
+build = ["npm", "run", "build:replit"]
 publicDir = "dist/public"
 
 [workflows]
@@ -52,7 +52,7 @@ outputType = "webview"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "npm run dev"
+args = "npm run bootstrap:replit-deps && npm run dev:replit"
 waitForPort = 5000
 
 [[workflows.workflow]]
@@ -73,7 +73,7 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "npx tsx --test server/__tests__/*.test.ts"
+args = "REPLIT_TEST_FULL=1 npm run test:replit"
 
 [workflows.workflow.metadata]
 isValidation = true
