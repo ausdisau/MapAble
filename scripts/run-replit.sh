@@ -32,6 +32,9 @@ export SESSION_SECRET="${SESSION_SECRET:-replit-local-session-secret}"
 # server/db.ts requires a URL at import time; offline CI uses a localhost placeholder.
 export DATABASE_URL="${DATABASE_URL:-postgresql://user:password@127.0.0.1:5432/replit_offline}"
 export NEON_DATABASE_URL="${NEON_DATABASE_URL:-$DATABASE_URL}"
+if [[ "${DATABASE_URL}" == *"replit_offline"* || "${DATABASE_URL}" == *"127.0.0.1:5432"* ]]; then
+  export MAPABLE_REPLIT_OFFLINE=1
+fi
 
 case "${ACTION}" in
   dev)

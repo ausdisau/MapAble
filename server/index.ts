@@ -101,9 +101,26 @@ app.use((req, res, next) => {
   await registerRoutes(httpServer, app);
 
   try {
-    await seedDatabase();
+    const dbUrl = process.env.NEON_DATABASE_URL || process.env.DATABASE_URL || "";
+    const offlinePlaceholder =
+      process.env.MAPABLE_REPLIT_OFFLINE === "1" ||
+      /replit_offline|127\.0\.0\.1:5432|localhost:5432/.test(dbUrl);
+
+    if (offlinePlaceholder) {
+      console.warn(
+        "[seed] Skipping database seed — no real Neon URL set. " +
+          "Set NEON_DATABASE_URL (or DATABASE_URL) to enable seed/data. " +
+          "App still serves on the configured PORT.",
+      );
+    } else {
+      await seedDatabase();
+    }
   } catch (e) {
-    console.error("Seed error:", e);
+    const msg = e instanceof Error ? e.message : String(e);
+    console.warn(
+      `[seed] Skipped (non-fatal): ${msg}. ` +
+        "Check NEON_DATABASE_URL / DATABASE_URL. App still serves.",
+    );
   }
 
   // Best-effort grocery supplier auto-sync at startup. Disabled by default; opt in

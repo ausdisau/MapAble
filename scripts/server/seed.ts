@@ -4,6 +4,9 @@ import { sql, eq, isNull } from "drizzle-orm";
 import { seedGeoData } from "./geo/seed";
 
 export async function seedDatabase() {
+  if (process.env.MAPABLE_REPLIT_OFFLINE === "1") {
+    return;
+  }
   const existingUsers = await db.select().from(users);
   if (existingUsers.length > 0) {
     const existingTiers = await db.select().from(pricingTiers);
