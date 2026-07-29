@@ -11,6 +11,7 @@ import {
   ADSENSE_CLIENT_ID,
   GoogleAdSense,
 } from "@/components/ads/GoogleAdSense";
+import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
 import { Providers } from "@/components/providers";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { isFirstPartyAccessibilityPanelEnabled } from "@/lib/accessibility/feature-flags";
@@ -138,6 +139,7 @@ export default async function RootLayout({
         />
         <Providers>{children}</Providers>
         {firstPartyA11yPanel ? null : <AccessiBeWidget />}
+        <GoogleAnalytics />
         <GoogleAdSense />
         {/* Speed Insights only on Vercel; local/CI production servers have no SI endpoint. */}
         {process.env.VERCEL === "1" ? <SpeedInsights /> : null}

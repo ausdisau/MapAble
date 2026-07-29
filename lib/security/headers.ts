@@ -22,6 +22,8 @@ export const CSP_EXTERNAL_ORIGINS = {
     "https://api.maptiler.com",
     "https://pagead2.googlesyndication.com",
     "https://*.googlesyndication.com",
+    "https://www.google-analytics.com",
+    "https://*.google-analytics.com",
     "data:",
     "blob:",
   ],
@@ -34,6 +36,9 @@ export const CSP_EXTERNAL_ORIGINS = {
     "https://vitals.vercel-insights.com",
     "https://pagead2.googlesyndication.com",
     "https://*.googlesyndication.com",
+    "https://www.google-analytics.com",
+    "https://*.google-analytics.com",
+    "https://www.googletagmanager.com",
   ],
   frames: [
     "https://js.stripe.com",
