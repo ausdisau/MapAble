@@ -17,6 +17,7 @@ const resolveSchema = z
   .object({
     decision: z.enum(["approve", "deny"]),
     note: z.string().max(2000).optional(),
+    tenantId: z.string().min(1).optional(),
   })
   .strict();
 
@@ -67,6 +68,7 @@ export async function POST(req: Request, ctx: Ctx) {
       actorUserId: user.id,
       decision: parsed.data.decision,
       note: parsed.data.note,
+      tenantId: parsed.data.tenantId,
     });
     return jsonOk({
       handoff,
@@ -80,6 +82,12 @@ export async function POST(req: Request, ctx: Ctx) {
     const message = err instanceof Error ? err.message : "ACT_HANDOFF_ERROR";
     if (message === "ACT_HANDOFF_NOT_FOUND") {
       return jsonError(message, 404);
+    }
+    if (
+      message === "ACT_HANDOFF_FORBIDDEN" ||
+      message === "ACT_HANDOFF_TENANT_MISMATCH"
+    ) {
+      return jsonError(message, 403);
     }
     return jsonError(message, 400);
   }

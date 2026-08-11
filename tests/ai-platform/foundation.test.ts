@@ -43,6 +43,13 @@ describe("AI platform capability registry", () => {
         "mission.semantic_retrieval",
         "edge.visit_pack_summary",
         "edge.what_changed_explain",
+        "agent.aura_harness",
+        "agent.aura_recognise",
+        "navigator.provider_search.interpret",
+        "navigator.provider_search.reply",
+        "navigator.provider_search.match",
+        "navigator.provider_search.draft_service_request",
+        "navigator.provider_search.escalate",
       ])
     );
   });

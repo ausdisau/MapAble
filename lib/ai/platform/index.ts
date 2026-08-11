@@ -8,6 +8,15 @@ export {
 } from "./capabilities/registry";
 export type { AiCapabilityRegistration } from "./capabilities/types";
 export {
+  getArcAssessment,
+  requireArcAssessment,
+  listArcAssessments,
+  resolveArcTierFromCriticalScores,
+  arcDoesNotGrantRuntimeAuthority,
+  ARC_SIDECAR_VERSION,
+} from "./capabilities/arc-sidecar";
+export type { ArcAssessment, ArcTier } from "./capabilities/arc-sidecar";
+export {
   resolveModelForCapability,
   guardStructuredInput,
 } from "./models/gateway";

@@ -265,6 +265,11 @@ model User {
   // Act layer A2H handoffs (CSNN Sprint 4)
   actHandoffsRequested                    ActHandoff[]                @relation("ActHandoffRequester")
   actHandoffsAssigned                     ActHandoff[]                @relation("ActHandoffAssignee")
+  actHandoffsAsParticipant                ActHandoff[]                @relation("ActHandoffParticipant")
+  governedActionEnvelopesAsParticipant    GovernedActionEnvelope[]    @relation("GovernedEnvelopeParticipant")
+  governedActionEnvelopesInitiated        GovernedActionEnvelope[]    @relation("GovernedEnvelopeInitiator")
+  navigatorDecisionPassports              NavigatorDecisionPassport[] @relation("NavigatorPassportParticipant")
+  navigatorGovernedMemoryItems            NavigatorGovernedMemoryItem[] @relation("NavigatorMemoryParticipant")
 }
 
 model PasskeyCredential {
@@ -11798,6 +11803,11 @@ model ActHandoff {
   requester       User             @relation("ActHandoffRequester", fields: [requesterUserId], references: [id], onDelete: Restrict)
   assigneeUserId  String?
   assignee        User?            @relation("ActHandoffAssignee", fields: [assigneeUserId], references: [id], onDelete: SetNull)
+  /// Tenant scope for IDOR protection (additive; null on legacy rows).
+  tenantId        String?
+  /// Participant the handoff concerns (may differ from requester when delegated).
+  participantId   String?
+  participant     User?            @relation("ActHandoffParticipant", fields: [participantId], references: [id], onDelete: SetNull)
   resolveNote     String?
   createdAt       DateTime         @default(now())
   resolvedAt      DateTime?
@@ -11805,7 +11815,131 @@ model ActHandoff {
   @@index([status, createdAt])
   @@index([fingerprint, status])
   @@index([requesterUserId])
+  @@index([tenantId, status])
+  @@index([participantId, status])
   @@map("act_handoffs")
+}
+
+enum GovernedActionEnvelopeStatus {
+  proposed
+  approved
+  rejected
+  expired
+  executed_draft
+  cancelled
+}
+
+/// Governed Action Envelope v2 — draft-only consequential proposals (Navigator pilot).
+model GovernedActionEnvelope {
+  id                   String                       @id
+  tenantId             String
+  participantId        String
+  participant          User                         @relation("GovernedEnvelopeParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  initiatingUserId     String
+  initiatingUser       User                         @relation("GovernedEnvelopeInitiator", fields: [initiatingUserId], references: [id], onDelete: Restrict)
+  capabilityKey        String
+  action               String
+  payloadJson          Json
+  payloadHash          String
+  evidenceRefs         String[]                     @default([])
+  sourceRefs           String[]                     @default([])
+  modelVersion         String?
+  promptVersion        String?
+  toolVersion          String?
+  consentReceiptId     String
+  requiredApproverRole String
+  nonce                String
+  status               GovernedActionEnvelopeStatus @default(proposed)
+  approvalReason       String?
+  rejectionReason      String?
+  executionResult      Json?
+  expiresAt            DateTime
+  consumedAt           DateTime?
+  auditEventIds        String[]                     @default([])
+  createdAt            DateTime                     @default(now())
+  updatedAt            DateTime                     @updatedAt
+
+  @@unique([id, nonce])
+  @@index([tenantId, participantId, status])
+  @@index([expiresAt])
+  @@index([capabilityKey])
+  @@map("governed_action_envelopes")
+}
+
+enum NavigatorMemoryCategory {
+  explicit_preference
+  communication_requirement
+  accessibility_requirement
+  participant_exclusion
+  consented_workflow_state
+}
+
+enum NavigatorMemoryVerification {
+  participant_stated
+  corrected
+  withdrawn
+  deleted
+}
+
+/// Decision Passport — participant-facing projection of Navigator decision factors (Phase 2).
+model NavigatorDecisionPassport {
+  id                    String   @id @default(cuid())
+  tenantId              String
+  participantId         String
+  participant           User     @relation("NavigatorPassportParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  actorUserId           String
+  sessionId             String
+  goalSummary           String
+  interpretationJson    Json     @default("{}")
+  hardConstraintsJson   Json     @default("[]")
+  rankingWeightsJson    Json     @default("{}")
+  sourcesJson           Json     @default("[]")
+  shortlistJson         Json     @default("[]")
+  uncertaintyNotes      String[] @default([])
+  limitationsNotes      String[] @default([])
+  conflictsOfInterest   String[] @default([])
+  aiInvolved            Boolean  @default(false)
+  modelIndependentRules String[] @default([])
+  nextStep              String?
+  nextStepController    String   @default("participant")
+  consentedPurpose      String
+  consentRecordId       String?
+  aiOptedOut            Boolean  @default(false)
+  status                String   @default("active") // active | corrected | rejected | escalated | closed
+  correlationId         String   @default(cuid())
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@index([tenantId, participantId, createdAt])
+  @@index([sessionId])
+  @@map("navigator_decision_passports")
+}
+
+/// Governed memory — approved categories only; never free-form conversation dumps.
+model NavigatorGovernedMemoryItem {
+  id               String                       @id @default(cuid())
+  tenantId         String
+  participantId    String
+  participant      User                         @relation("NavigatorMemoryParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+  purpose          String
+  category         NavigatorMemoryCategory
+  contentSummary   String
+  provenance       String
+  verification     NavigatorMemoryVerification  @default(participant_stated)
+  creatingActorId  String
+  consentRecordId  String?
+  confidence       String                       @default("stated")
+  expiresAt        DateTime?
+  correctedAt      DateTime?
+  withdrawnAt      DateTime?
+  deletedAt        DateTime?
+  createdAt        DateTime                     @default(now())
+  updatedAt        DateTime                     @updatedAt
+  reviewedAt       DateTime?
+
+  @@index([tenantId, participantId, category])
+  @@index([expiresAt])
+  @@map("navigator_governed_memory_items")
 }
 
 // --- Absorbed from agent/careos-top-ten-implement (models/enums not on main) ---

@@ -30,6 +30,15 @@ Positioning: *An evidence-aware, participant-controlled copilot for complete dis
 | agent.aura_harness | deterministic | experimental | MAPABLE_AURA_HARNESS off |
 | agent.aura_recognise | deterministic | experimental | rides AURA harness flag |
 | understanding.contextual | model_backed | experimental | MAPABLE_UNDERSTANDING off |
+| navigator.provider_search.interpret | hybrid | experimental | MAPABLE_NAVIGATOR_PILOT_ENABLED off |
+| navigator.provider_search.reply | model_backed | experimental | MAPABLE_NAVIGATOR_PILOT_MODEL_ASSISTED off |
+| navigator.provider_search.match | deterministic | experimental | MAPABLE_NAVIGATOR_PILOT_ENABLED (+ MATCHING) off |
+| navigator.provider_search.draft_service_request | deterministic | experimental | MAPABLE_NAVIGATOR_PILOT_ENVELOPES off |
+| navigator.provider_search.escalate | deterministic | experimental | MAPABLE_NAVIGATOR_PILOT_ENABLED off |
+
+Navigator pilot surfaces (Decision Passport, governed memory, matching) also require
+`MAPABLE_NAVIGATOR_PILOT_PASSPORT` / `_MEMORY` / `_MATCHING` (all default false).
+See [NAVIGATOR_ASSURANCE.md](./NAVIGATOR_ASSURANCE.md).
 ## Advanced AI Expansion train (≤ 3)
 
 1. Evidence Intake contracts (`lib/ai/platform/intake/`)
@@ -44,7 +53,7 @@ AURA Agent OS mega-branches (`lib/aura/`), VisionAccess multimodal, Quality & Sa
 
 The in-process **AURA Agentic Risk Harness** (`lib/aura-harness/`) is separate from deferred Agent OS — see [AURA_HARNESS.md](./AURA_HARNESS.md).
 
-**Registry honesty gap (Prompt 0):** `agent.aura_harness` and `agent.aura_recognise` appear in this table but are **not** yet entries in `lib/ai/platform/capabilities/seed.ts`. Prompt 1 (under freeze waiver W-AA-1) must register ARC-linked capability keys before claiming design-time governance. See [AUTONOMY_ASSURANCE_PROMPT_0_RECONCILIATION.md](./AUTONOMY_ASSURANCE_PROMPT_0_RECONCILIATION.md).
+**Registry honesty gap (Prompt 0):** Previously `agent.aura_harness` / `agent.aura_recognise` appeared in this table but were absent from `seed.ts`. Phase 1 of the Navigator governed pilot registers those keys plus `navigator.provider_search.*`, with an ARC sidecar (classification only — no runtime authority). See [NAVIGATOR_GOVERNED_PILOT_PHASE_0.md](./NAVIGATOR_GOVERNED_PILOT_PHASE_0.md).
 
 ### CareGPT (design only)
 

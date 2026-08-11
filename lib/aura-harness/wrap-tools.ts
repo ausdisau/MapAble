@@ -13,6 +13,10 @@ export type AuraHarnessWrapContext = {
   session: HarnessSessionAccumulator;
   /** Session user id for A2H handoff requester attribution. */
   userId?: string;
+  /** Optional tenant scope for A2H IDOR protection. */
+  tenantId?: string;
+  /** Participant the tool call concerns (defaults to userId in handoff service). */
+  participantId?: string;
 };
 
 type AnyTool = {
@@ -69,6 +73,8 @@ export function wrapToolsWithAuraHarness<T extends Record<string, AnyTool>>(
                 payload: input,
                 decision,
                 requesterUserId: ctx.userId,
+                tenantId: ctx.tenantId,
+                participantId: ctx.participantId ?? ctx.userId,
               });
               handoffId = handoff?.id;
             } catch {

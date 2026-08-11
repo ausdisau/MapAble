@@ -11,18 +11,18 @@ The programme is **complete only when** every criterion below is met. Feature fl
 
 | # | Criterion | Owning prompts | Status on `main` @ `dd5ff9fc` |
 |---|-----------|----------------|-------------------------------|
-| 1 | Every agentic or tool-using capability has an ARC assessment | 1 | **Not met** — ARC sidecar absent; `agent.aura_*` not in capability seed |
-| 2 | ARC tiering uses critical-dimension logic and does not grant runtime authority | 1 | **Not met** |
+| 1 | Every agentic or tool-using capability has an ARC assessment | 1 | **Partial on Navigator branch** — ARC sidecar + `agent.aura_*` / `navigator.*` seeded; not yet on `main` |
+| 2 | ARC tiering uses critical-dimension logic and does not grant runtime authority | 1 | **Partial on Navigator branch** — classification only; no runtime authority grant |
 | 3 | AURA v2 is formula-tested, versioned and calibrated in shadow mode | 2 | **Not met** — legacy harness only |
 | 4 | Legacy AURA behaviour remains regression-tested until a separately approved cutover | 2 | **Partial** — legacy tests exist; no versioned cutover policy |
-| 5 | Memory is participant and tenant scoped, versioned, revocable and unable to bypass current authority | 2, 6 | **Not met** — fingerprint-only memory; can short-circuit evaluation |
-| 6 | Mitigations are checked for rights restriction and least-restrictive alternatives | 3 | **Not met** — Dignity of Risk kernel absent |
-| 7 | Decision Passport is participant-controlled and not a consent or capacity system | 4 | **Not met** — projection absent |
-| 8 | Action envelopes are signed, expiring, one-time, hash-bound and revalidated at execution | 5 | **Partial** — v1 CareOS envelope exists; Governed Envelope v2 absent |
-| 9 | Only canonical deterministic services write consequential outcomes | 5 | **Partial** — care/transport allowlist today; v2 gates incomplete |
-| 10 | A2H reviews are role and tenant safe and never auto-execute | 6 | **Partial** — never auto-executes; IDOR/tenant/assignee gaps remain |
-| 11 | Existing receipts, notices, attestations and audits are reused coherently | 7 | **Not met** — choreography absent; AURA/A2H rarely audit |
-| 12 | Participants can understand, challenge, correct and request human help | 7, 8 | **Partial** — access-receipt challenge library exists; Decision Passport / full UI absent |
+| 5 | Memory is participant and tenant scoped, versioned, revocable and unable to bypass current authority | 2, 6 | **Partial on Navigator branch** — governed memory categories; AURA fingerprint memory still separate |
+| 6 | Mitigations are checked for rights restriction and least-restrictive alternatives | 3 | **Partial** — Navigator least-restrictive notes; full Dignity-of-Risk kernel still absent |
+| 7 | Decision Passport is participant-controlled and not a consent or capacity system | 4 | **Partial on Navigator branch** — projection + UI shell; not on `main` |
+| 8 | Action envelopes are signed, expiring, one-time, hash-bound and revalidated at execution | 5 | **Partial on Navigator branch** — Governed Envelope v2 draft-only; CareOS v1 remains |
+| 9 | Only canonical deterministic services write consequential outcomes | 5 | **Partial** — Navigator draft/transfer only; no book/pay |
+| 10 | A2H reviews are role and tenant safe and never auto-execute | 6 | **Partial on Navigator branch** — tenant/participant fields + resolve checks |
+| 11 | Existing receipts, notices, attestations and audits are reused coherently | 7 | **Partial on Navigator branch** — navigator.* audit chain; full choreography still open |
+| 12 | Participants can understand, challenge, correct and request human help | 7, 8 | **Partial on Navigator branch** — Passport panel + opt-out + escalate; lived-experience gate open |
 | 13 | No clinical, legal, safeguarding, payment, claim, service-reduction or worker-discipline decision is delegated to AI | All | **Policy held** in docs/freezes; must remain true through every prompt |
 | 14 | Accessibility and security suites are green | 8 + CI | **Track per PR** — not programme-closed |
 | 15 | Migrate-from-zero is green for any additive schema | 2, 6, 7 as needed | **Track per schema PR** |

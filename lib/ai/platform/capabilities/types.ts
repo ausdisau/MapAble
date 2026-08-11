@@ -9,6 +9,8 @@ export type CapabilityBackend = "deterministic" | "model_backed" | "hybrid";
 
 export type AiCapabilityRegistration = {
   key: string;
+  /** Semver-like capability version string (additive; defaults implied as 1.0.0). */
+  version?: string;
   publicName: string;
   internalOwner: string;
   responsibleDomain: string;
@@ -26,6 +28,10 @@ export type AiCapabilityRegistration = {
   outputSchemaRef: string;
   permittedDataClasses: DataClass[];
   prohibitedDataClasses: DataClass[];
+  /** Purpose-specific consent scopes required before protected use (API dotted form). */
+  requiredConsentScopes?: string[];
+  /** Approval binding lifetime in minutes when participant/human approval is required. */
+  approvalExpiryMinutes?: number;
   authorityCeiling: AuthorityCeiling;
   humanReviewRequired: boolean;
   participantApprovalRequired: boolean;
