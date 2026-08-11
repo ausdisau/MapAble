@@ -1,3 +1,5 @@
+import type { AccessDomain, OntologyDomainV1 } from "@/lib/access/infrastructure/domains";
+
 export type OntologyDataType =
   | "boolean"
   | "number"
@@ -6,13 +8,8 @@ export type OntologyDataType =
   | "dimension"
   | "duration";
 
-export type OntologyDomain =
-  | "physical"
-  | "sensory"
-  | "cognitive_communication"
-  | "service"
-  | "digital"
-  | "transport";
+/** Coarse v1 domains or fine-grained Access Infrastructure domains. */
+export type OntologyDomain = AccessDomain | OntologyDomainV1;
 
 export type PersonalFitBehaviour =
   | "hard_constraint_when_required"
@@ -36,10 +33,15 @@ export type AccessOntologyConcept = {
   deprecationPathway: string | null;
   defaultFreshnessDays: number;
   enumValues?: string[];
+  /** Prefer this Access Infrastructure domain when domain is a v1 coarse value. */
+  accessDomain?: AccessDomain;
+  /** Stable aliases (e.g. v1 id) that resolve to this concept. */
+  aliases?: string[];
 };
 
 export type AccessOntologyVersion = {
   version: string;
   publishedAt: string;
   concepts: AccessOntologyConcept[];
+  framework?: "access_as_infrastructure";
 };

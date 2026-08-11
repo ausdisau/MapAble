@@ -35,6 +35,7 @@ model User {
   roleAssignments        UserRoleAssignment[]
   participantProfile     ParticipantProfile?
   accessibilityProfile   AccessibilityProfile?
+  accessPassport         AccessPassport?
   organisationMemberships OrganisationMember[]
   consentsAsSubject      ConsentRecord[]    @relation("ConsentSubject")
   consentsGranted        ConsentRecord[]    @relation("ConsentGrantedToUser")
@@ -7384,6 +7385,10 @@ model AccessPlace {
   indoorCheckpoints IndoorCheckpoint[]
   evidenceEnvelopes AccessEvidenceEnvelopeRecord[]
   changeReviews    AccessChangeReviewRecord[]
+  accessCapabilities AccessCapabilityRecord[]
+  accessObservations AccessObservationRecord[]
+  accessAdjustments AccessAdjustmentRecord[]
+  accessJourneySegments AccessJourneySegmentRecord[]
 
   @@index([status])
   @@index([suburb, stateOrRegion])
@@ -7451,6 +7456,299 @@ model AccessChangeReviewRecord {
   @@index([subjectNodeId, decision])
   @@index([decision, createdAt])
   @@map("access_change_review_records")
+}
+
+// ---------------------------------------------------------------------------
+// Access as Infrastructure — foundational passport / capability / journey SoT
+// Additive; writers flag-gated. Does not replace AccessPlace (C-011).
+// Docs: docs/access-infrastructure/
+// ---------------------------------------------------------------------------
+
+enum AccessDomain {
+  mobility_movement
+  reach_strength_dexterity
+  seating_stamina
+  vision
+  hearing
+  speech_communication
+  auslan_language
+  cognition_learning
+  executive_memory
+  sensory_regulation
+  psychosocial
+  pain_fatigue_fluctuating
+  self_care_continence
+  equipment_at
+  assistance_animals
+  digital
+  service_staff
+  financial_admin
+  transport
+  emergency
+}
+
+enum AccessCriticality {
+  required
+  strong_preference
+  preference
+}
+
+enum AccessContextScope {
+  always
+  activity_specific
+  journey_specific
+}
+
+enum AccessTiming {
+  permanent
+  temporary
+  fluctuating
+}
+
+enum AccessAssistanceMode {
+  independent
+  optional
+  required
+}
+
+enum AccessProvenanceStatus {
+  verified
+  observed
+  venue_reported
+  community_reported
+  unknown
+  outdated
+  disputed
+}
+
+enum AccessCompatibilityState {
+  compatible
+  compatible_with_adjustment
+  uncertain
+  incompatible
+}
+
+enum AccessEntityType {
+  place
+  footpath
+  transport_stop
+  vehicle
+  support_provider
+  workplace
+  school
+  hospital
+  event
+  park
+  accommodation
+  digital_service
+  path_segment
+  entrance
+  amenity
+  other
+}
+
+enum AccessJourneySegmentKind {
+  preparation
+  origin
+  path_to_transport
+  pickup_or_station
+  boarding
+  vehicle
+  interchange
+  drop_off
+  path_to_destination
+  entrance
+  internal_movement
+  service_or_activity
+  amenities
+  return_journey
+}
+
+enum AccessPassportVisibility {
+  private
+  request_scoped
+  approved_service
+}
+
+/// Participant-owned functional access passport (C-010). Not a clinical dossier.
+model AccessPassport {
+  id                String                   @id @default(cuid())
+  userId            String                   @unique @map("user_id")
+  user              User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  visibilityDefault AccessPassportVisibility @default(private) @map("visibility_default")
+  /// Matching payloads must never treat diagnosis as an input.
+  containsDiagnosis Boolean                  @default(false) @map("contains_diagnosis")
+  createdAt         DateTime                 @default(now()) @map("created_at")
+  updatedAt         DateTime                 @updatedAt @map("updated_at")
+
+  requirements    AccessRequirementRecord[]
+  compatibilities AccessCompatibilityRecord[]
+  journeys        AccessJourneyRecord[]
+
+  @@map("access_passports")
+}
+
+model AccessRequirementRecord {
+  id                    String               @id @default(cuid())
+  passportId            String               @map("passport_id")
+  passport              AccessPassport       @relation(fields: [passportId], references: [id], onDelete: Cascade)
+  ontologyConceptId     String               @map("ontology_concept_id")
+  domain                AccessDomain
+  attribute             String
+  comparator            String?
+  valueJson             Json?                @map("value_json")
+  unit                  String?
+  criticality           AccessCriticality    @default(preference)
+  contextScope          AccessContextScope   @default(always) @map("context_scope")
+  timing                AccessTiming         @default(permanent)
+  assistance            AccessAssistanceMode @default(independent)
+  disclosureScopes      String[]             @default([]) @map("disclosure_scopes")
+  userConfirmed         Boolean              @default(false) @map("user_confirmed")
+  acceptableAdjustmentIds String[]           @default([]) @map("acceptable_adjustment_ids")
+  notes                 String?
+  createdAt             DateTime             @default(now()) @map("created_at")
+  updatedAt             DateTime             @updatedAt @map("updated_at")
+
+  @@index([passportId, domain])
+  @@index([ontologyConceptId])
+  @@map("access_requirement_records")
+}
+
+model AccessObservationRecord {
+  id                   String                 @id @default(cuid())
+  featureKey           String                 @map("feature_key")
+  ontologyConceptId    String                 @map("ontology_concept_id")
+  valueJson            Json                   @map("value_json")
+  unit                 String?
+  sourceType           String                 @map("source_type")
+  observedAt           DateTime               @map("observed_at")
+  evidenceKinds        String[]               @default([]) @map("evidence_kinds")
+  verificationStatus   AccessProvenanceStatus @default(unknown) @map("verification_status")
+  confidence           Float?
+  reviewDue            DateTime?              @map("review_due")
+  disputed             Boolean                @default(false)
+  placeId              String?                @map("place_id")
+  place                AccessPlace?           @relation(fields: [placeId], references: [id], onDelete: SetNull)
+  entityType           AccessEntityType?      @map("entity_type")
+  entityId             String?                @map("entity_id")
+  evidenceEnvelopeId   String?                @map("evidence_envelope_id")
+  observerUserId       String?                @map("observer_user_id")
+  createdAt            DateTime               @default(now()) @map("created_at")
+  updatedAt            DateTime               @updatedAt @map("updated_at")
+
+  capabilities AccessCapabilityRecord[]
+
+  @@index([placeId, ontologyConceptId])
+  @@index([entityType, entityId])
+  @@index([ontologyConceptId, observedAt])
+  @@map("access_observation_records")
+}
+
+model AccessCapabilityRecord {
+  id                    String                 @id @default(cuid())
+  entityType            AccessEntityType       @map("entity_type")
+  entityId              String                 @map("entity_id")
+  placeId               String?                @map("place_id")
+  place                 AccessPlace?           @relation(fields: [placeId], references: [id], onDelete: SetNull)
+  ontologyConceptId     String                 @map("ontology_concept_id")
+  attribute             String
+  valueJson             Json                   @map("value_json")
+  unit                  String?
+  availabilityJson      Json?                  @map("availability_json")
+  evidenceObservationId String                 @map("evidence_observation_id")
+  evidenceObservation   AccessObservationRecord @relation(fields: [evidenceObservationId], references: [id], onDelete: Restrict)
+  status                AccessProvenanceStatus @default(unknown)
+  createdAt             DateTime               @default(now()) @map("created_at")
+  updatedAt             DateTime               @updatedAt @map("updated_at")
+
+  @@index([entityType, entityId])
+  @@index([placeId, ontologyConceptId])
+  @@index([ontologyConceptId, status])
+  @@map("access_capability_records")
+}
+
+model AccessAdjustmentRecord {
+  id                String                 @id @default(cuid())
+  entityType        AccessEntityType       @map("entity_type")
+  entityId          String                 @map("entity_id")
+  placeId           String?                @map("place_id")
+  place             AccessPlace?           @relation(fields: [placeId], references: [id], onDelete: SetNull)
+  ontologyConceptId String?                @map("ontology_concept_id")
+  summary           String
+  description       String?
+  availabilityJson  Json?                  @map("availability_json")
+  status            AccessProvenanceStatus @default(venue_reported)
+  createdAt         DateTime               @default(now()) @map("created_at")
+  updatedAt         DateTime               @updatedAt @map("updated_at")
+
+  @@index([entityType, entityId])
+  @@index([placeId])
+  @@map("access_adjustment_records")
+}
+
+model AccessCompatibilityRecord {
+  id                            String                  @id @default(cuid())
+  passportId                    String                  @map("passport_id")
+  passport                      AccessPassport          @relation(fields: [passportId], references: [id], onDelete: Cascade)
+  entityType                    AccessEntityType        @map("entity_type")
+  entityId                      String                  @map("entity_id")
+  journeyId                     String?                 @map("journey_id")
+  journey                       AccessJourneyRecord?    @relation(fields: [journeyId], references: [id], onDelete: SetNull)
+  state                         AccessCompatibilityState
+  requiredMetConceptIds         String[]                @default([]) @map("required_met_concept_ids")
+  requiredUnmetConceptIds       String[]                @default([]) @map("required_unmet_concept_ids")
+  requiredUncertainConceptIds   String[]                @default([]) @map("required_uncertain_concept_ids")
+  preferenceMetConceptIds       String[]                @default([]) @map("preference_met_concept_ids")
+  preferenceUnmetConceptIds     String[]                @default([]) @map("preference_unmet_concept_ids")
+  preferenceUncertainConceptIds String[]                @default([]) @map("preference_uncertain_concept_ids")
+  adjustmentIds                 String[]                @default([]) @map("adjustment_ids")
+  evidenceRefs                  String[]                @default([]) @map("evidence_refs")
+  limitations                   String[]                @default([])
+  participantDecisionRequired   Boolean                 @default(true) @map("participant_decision_required")
+  evaluatedAt                   DateTime                @default(now()) @map("evaluated_at")
+  createdAt                     DateTime                @default(now()) @map("created_at")
+
+  @@index([passportId, evaluatedAt])
+  @@index([entityType, entityId])
+  @@map("access_compatibility_records")
+}
+
+model AccessJourneyRecord {
+  id            String                   @id @default(cuid())
+  passportId    String                   @map("passport_id")
+  passport      AccessPassport           @relation(fields: [passportId], references: [id], onDelete: Cascade)
+  goal          String
+  activity      String?
+  overallState  AccessCompatibilityState @map("overall_state")
+  limitations   String[]                 @default([])
+  evaluatedAt   DateTime                 @default(now()) @map("evaluated_at")
+  createdAt     DateTime                 @default(now()) @map("created_at")
+  updatedAt     DateTime                 @updatedAt @map("updated_at")
+
+  segments        AccessJourneySegmentRecord[]
+  compatibilities AccessCompatibilityRecord[]
+
+  @@index([passportId, evaluatedAt])
+  @@map("access_journey_records")
+}
+
+model AccessJourneySegmentRecord {
+  id                  String                   @id @default(cuid())
+  journeyId           String                   @map("journey_id")
+  journey             AccessJourneyRecord      @relation(fields: [journeyId], references: [id], onDelete: Cascade)
+  kind                AccessJourneySegmentKind
+  sequence            Int
+  entityType          AccessEntityType?        @map("entity_type")
+  entityId            String?                  @map("entity_id")
+  placeId             String?                  @map("place_id")
+  place               AccessPlace?             @relation(fields: [placeId], references: [id], onDelete: SetNull)
+  compatibilityState  AccessCompatibilityState @map("compatibility_state")
+  notes               String?
+  createdAt           DateTime                 @default(now()) @map("created_at")
+
+  @@unique([journeyId, sequence])
+  @@index([journeyId])
+  @@map("access_journey_segment_records")
 }
 
 model AccessPlaceLocation {

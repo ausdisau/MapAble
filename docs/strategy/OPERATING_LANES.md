@@ -67,7 +67,9 @@ Products for providers, councils, venues, employers, transport operators, equipm
 organisations, plan managers, and software partners.
 
 Includes: Provider Operations; Venue Access Studio; AccessCast widgets; Academy;
-Regional Capacity; Developer Platform; evidence-to-payment tooling; public accountability.
+Regional Capacity; Developer Platform; evidence-to-payment tooling; public accountability;
+**Access as Infrastructure** (ontology, capability registry, compatibility APIs —
+see `docs/access-infrastructure/`).
 
 | Dimension | Rule |
 |-----------|------|

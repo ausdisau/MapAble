@@ -149,6 +149,228 @@ export type DomainEventEnvelope = z.infer<typeof domainEventEnvelopeSchema>;
 export type AuditEvent = z.infer<typeof auditEventSchema>;
 export type EvaluationResult = z.infer<typeof evaluationResultSchema>;
 
+/** Access as Infrastructure — twenty functional domains (not impairment labels). */
+export const accessDomainSchema = z.enum([
+  "mobility_movement",
+  "reach_strength_dexterity",
+  "seating_stamina",
+  "vision",
+  "hearing",
+  "speech_communication",
+  "auslan_language",
+  "cognition_learning",
+  "executive_memory",
+  "sensory_regulation",
+  "psychosocial",
+  "pain_fatigue_fluctuating",
+  "self_care_continence",
+  "equipment_at",
+  "assistance_animals",
+  "digital",
+  "service_staff",
+  "financial_admin",
+  "transport",
+  "emergency",
+]);
+
+export const accessCriticalitySchema = z.enum(["required", "strong_preference", "preference"]);
+export const accessContextScopeSchema = z.enum(["always", "activity_specific", "journey_specific"]);
+export const accessTimingSchema = z.enum(["permanent", "temporary", "fluctuating"]);
+export const accessAssistanceModeSchema = z.enum(["independent", "optional", "required"]);
+export const accessDisclosureScopeSchema = z.enum([
+  "private",
+  "service_provider",
+  "worker",
+  "employer",
+  "venue",
+  "transport_provider",
+  "emergency",
+  "support_coordinator",
+]);
+export const accessProvenanceStatusSchema = z.enum([
+  "verified",
+  "observed",
+  "venue_reported",
+  "community_reported",
+  "unknown",
+  "outdated",
+  "disputed",
+]);
+export const accessCompatibilityStateSchema = z.enum([
+  "compatible",
+  "compatible_with_adjustment",
+  "uncertain",
+  "incompatible",
+]);
+export const accessEntityTypeSchema = z.enum([
+  "place",
+  "footpath",
+  "transport_stop",
+  "vehicle",
+  "support_provider",
+  "workplace",
+  "school",
+  "hospital",
+  "event",
+  "park",
+  "accommodation",
+  "digital_service",
+  "path_segment",
+  "entrance",
+  "amenity",
+  "other",
+]);
+export const accessJourneySegmentKindSchema = z.enum([
+  "preparation",
+  "origin",
+  "path_to_transport",
+  "pickup_or_station",
+  "boarding",
+  "vehicle",
+  "interchange",
+  "drop_off",
+  "path_to_destination",
+  "entrance",
+  "internal_movement",
+  "service_or_activity",
+  "amenities",
+  "return_journey",
+]);
+
+export const accessRequirementSchema = z.object({
+  schemaVersion: contractVersionSchema,
+  id: opaqueIdSchema,
+  passportId: opaqueIdSchema,
+  ontologyConceptId: z.string().min(1),
+  domain: accessDomainSchema,
+  attribute: z.string().min(1),
+  comparator: z.enum(["eq", "neq", "gte", "lte", "gt", "lt", "includes"]).optional(),
+  value: z.union([z.string(), z.number(), z.boolean()]).optional(),
+  unit: z.string().nullable().optional(),
+  criticality: accessCriticalitySchema,
+  contextScope: accessContextScopeSchema,
+  timing: accessTimingSchema,
+  assistance: accessAssistanceModeSchema,
+  disclosureScopes: z.array(accessDisclosureScopeSchema).default([]),
+  userConfirmed: z.boolean(),
+  acceptableAdjustmentIds: z.array(opaqueIdSchema).optional(),
+  notes: z.string().optional(),
+}).strict();
+
+export const accessCapabilitySchema = z.object({
+  schemaVersion: contractVersionSchema,
+  id: opaqueIdSchema,
+  entityType: accessEntityTypeSchema,
+  entityId: opaqueIdSchema,
+  placeId: opaqueIdSchema.nullable().optional(),
+  ontologyConceptId: z.string().min(1),
+  attribute: z.string().min(1),
+  value: z.union([z.string(), z.number(), z.boolean()]),
+  unit: z.string().nullable().optional(),
+  availability: z.unknown().optional(),
+  evidenceObservationId: opaqueIdSchema,
+  status: accessProvenanceStatusSchema,
+}).strict();
+
+export const accessObservationSchema = z.object({
+  schemaVersion: contractVersionSchema,
+  id: opaqueIdSchema,
+  featureKey: z.string().min(1),
+  ontologyConceptId: z.string().min(1),
+  value: z.union([z.string(), z.number(), z.boolean()]),
+  unit: z.string().nullable().optional(),
+  sourceType: z.enum([
+    "trained_assessor",
+    "venue",
+    "community",
+    "operator",
+    "system",
+    "synthetic",
+  ]),
+  observedAt: z.string().datetime(),
+  evidenceKinds: z.array(z.string()).default([]),
+  verificationStatus: accessProvenanceStatusSchema,
+  confidence: z.number().min(0).max(1).nullable().optional(),
+  reviewDue: z.string().datetime().nullable().optional(),
+  disputed: z.boolean(),
+  placeId: opaqueIdSchema.nullable().optional(),
+  entityType: accessEntityTypeSchema.nullable().optional(),
+  entityId: opaqueIdSchema.nullable().optional(),
+  evidenceEnvelopeId: opaqueIdSchema.nullable().optional(),
+  observerUserId: opaqueIdSchema.nullable().optional(),
+}).strict();
+
+export const accessAdjustmentSchema = z.object({
+  schemaVersion: contractVersionSchema,
+  id: opaqueIdSchema,
+  entityType: accessEntityTypeSchema,
+  entityId: opaqueIdSchema,
+  ontologyConceptId: z.string().nullable().optional(),
+  summary: z.string().min(1).max(500),
+  description: z.string().nullable().optional(),
+  availability: z.unknown().optional(),
+  status: accessProvenanceStatusSchema,
+}).strict();
+
+export const accessCompatibilitySchema = z.object({
+  schemaVersion: contractVersionSchema,
+  id: opaqueIdSchema,
+  passportId: opaqueIdSchema,
+  entityType: accessEntityTypeSchema,
+  entityId: opaqueIdSchema,
+  journeyId: opaqueIdSchema.nullable().optional(),
+  state: accessCompatibilityStateSchema,
+  required: z.object({
+    met: z.array(z.string()),
+    unmet: z.array(z.string()),
+    uncertain: z.array(z.string()),
+  }),
+  preferences: z.object({
+    met: z.array(z.string()),
+    unmet: z.array(z.string()),
+    uncertain: z.array(z.string()),
+  }),
+  adjustments: z.array(z.object({
+    id: opaqueIdSchema,
+    summary: z.string(),
+  })).default([]),
+  evidenceRefs: z.array(opaqueIdSchema).default([]),
+  limitations: z.array(z.string()).default([]),
+  participantDecisionRequired: z.boolean(),
+  evaluatedAt: z.string().datetime(),
+}).strict();
+
+export const accessCompatibilityRequestSchema = z.object({
+  schemaVersion: contractVersionSchema,
+  passportId: opaqueIdSchema,
+  entityType: accessEntityTypeSchema,
+  entityId: opaqueIdSchema,
+  context: z.object({
+    activity: z.string().nullable().optional(),
+    journeyId: opaqueIdSchema.nullable().optional(),
+  }).default({}),
+}).strict();
+
+/** Full Access Passport for Access Infrastructure (distinct from programme projection schema). */
+export const accessInfrastructurePassportSchema = z.object({
+  schemaVersion: contractVersionSchema,
+  id: opaqueIdSchema,
+  participantId: opaqueIdSchema,
+  visibilityDefault: z.enum(["private", "request_scoped", "approved_service"]),
+  containsDiagnosis: z.literal(false),
+  requirements: z.array(accessRequirementSchema),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+}).strict();
+
+export type AccessDomain = z.infer<typeof accessDomainSchema>;
+export type AccessRequirementContract = z.infer<typeof accessRequirementSchema>;
+export type AccessCapabilityContract = z.infer<typeof accessCapabilitySchema>;
+export type AccessObservationContract = z.infer<typeof accessObservationSchema>;
+export type AccessAdjustmentContract = z.infer<typeof accessAdjustmentSchema>;
+export type AccessCompatibilityContract = z.infer<typeof accessCompatibilitySchema>;
+export type AccessInfrastructurePassport = z.infer<typeof accessInfrastructurePassportSchema>;
+
 export const commonsContributionPreferenceSchema = z.object({
   schemaVersion: contractVersionSchema,
   participantId: opaqueIdSchema,

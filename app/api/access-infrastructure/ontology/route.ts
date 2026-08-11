@@ -1,23 +1,31 @@
 import { NextResponse } from "next/server";
 
+import { accessInfrastructureFlags } from "@/lib/access/infrastructure";
 import {
   ACCESS_ONTOLOGY_CURRENT,
   ACCESS_ONTOLOGY_V1,
+  ONTOLOGY_CONCEPT_ALIASES_V1_TO_V2,
   accessIntelligenceNextFlags,
 } from "@/lib/access/intelligence-next";
 
 export const dynamic = "force-dynamic";
 
 /**
- * GET ontology seed — flag-gated, synthetic contracts only.
+ * GET Access as Infrastructure ontology (v2) + v1 aliases.
+ * Flag-gated; synthetic / documentation contracts only.
  */
 export async function GET() {
-  if (!accessIntelligenceNextFlags.enabled || !accessIntelligenceNextFlags.ontology) {
+  const enabled =
+    accessInfrastructureFlags.enabled ||
+    (accessIntelligenceNextFlags.enabled && accessIntelligenceNextFlags.ontology);
+
+  if (!enabled) {
     return NextResponse.json(
       {
-        error: "Access Intelligence Next ontology is disabled",
+        error: "Access Infrastructure ontology is disabled",
         flags: {
-          enabled: accessIntelligenceNextFlags.enabled,
+          accessInfrastructure: accessInfrastructureFlags.enabled,
+          accessIntelligenceNext: accessIntelligenceNextFlags.enabled,
           ontology: accessIntelligenceNextFlags.ontology,
         },
       },
@@ -26,17 +34,18 @@ export async function GET() {
   }
 
   return NextResponse.json({
+    framework: "access_as_infrastructure",
     mode: accessIntelligenceNextFlags.mode,
     synthetic: true,
     productionClaim: "none",
-    framework: "access_as_infrastructure",
     ontology: ACCESS_ONTOLOGY_CURRENT,
     legacyOntology: ACCESS_ONTOLOGY_V1,
+    aliases: ONTOLOGY_CONCEPT_ALIASES_V1_TO_V2,
     limitations: [
       "Contract seed only",
       "Not a certification scheme",
       "Not a universal accessibility score",
-      "Prefer /api/access-infrastructure/ontology for Access as Infrastructure v2",
+      "Diagnosis must never be required for matching",
     ],
   });
 }

@@ -23,16 +23,18 @@ Optional durable evidence (still not production truth): see [EVIDENCE_PERSISTENC
 
 | Concept | Owner |
 | --- | --- |
+| Access as Infrastructure doctrine | [`docs/access-infrastructure/`](../access-infrastructure/) |
 | Public place identity | `AccessPlace` (`lib/access/map`) |
 | Floor plans | `AccessFloorPlan` / indoor platform |
 | Participant presentation prefs | `AccessibilityProfile` |
-| Functional requirements (future) | AccessPassport (not yet on `main`) |
+| Functional requirements | `AccessPassport` (Prisma + contracts; C-010) |
 | Mission state | CareOSMission (CareOS tip — not yet on `main`) |
 | Recovery | ContinuityOS tip **#288** |
 | Fit / proof / graph projection | Access Intelligence Next |
 
 ## Related docs
 
+- [Access as Infrastructure](../access-infrastructure/README.md)
 - [REPOSITORY_RECONCILIATION.md](./REPOSITORY_RECONCILIATION.md)
 - [ARCHITECTURE.md](./ARCHITECTURE.md)
 - [NON_GOALS.md](./NON_GOALS.md)
