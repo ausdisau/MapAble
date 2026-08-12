@@ -5,11 +5,8 @@ import { usePathname } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 
 import { AccessibilityPanelTrigger } from "@/components/accessibility/AccessibilityPanelTrigger";
-import { LogoMark } from "@/components/marketing/mapable-care-shared";
-import {
-  MAPABLE_BRAND_TAGLINE,
-  MAPABLE_DONATION_URL,
-} from "@/lib/brand/constants";
+import { MapAbleBrandLockup } from "@/components/brand/MapAbleBrandLockup";
+import { MAPABLE_DONATION_URL } from "@/lib/brand/constants";
 import { marketingFeatureRoutes } from "@/lib/marketing/mapable-care-routes";
 import { mapableCareFocusRing } from "@/lib/marketing/mapable-care-tokens";
 
@@ -107,20 +104,13 @@ export function MarketingPrimaryNav() {
       ref={navRef}
       className="relative flex w-full items-center justify-between gap-4"
     >
-      <Link
+      <MapAbleBrandLockup
         href={marketingFeatureRoutes.home}
-        className={`flex min-w-0 shrink flex-col items-start gap-1 overflow-visible rounded-2xl p-1 transition hover:bg-slate-50 ${mapableCareFocusRing}`}
+        size="header"
+        className={`min-w-0 shrink overflow-visible hover:bg-slate-50 hover:opacity-100 ${mapableCareFocusRing}`}
+        ariaLabel="MapAble home"
         onClick={() => setMobileOpen(false)}
-      >
-        <span className="sr-only">MapAble home</span>
-        {/* 125% of prior h-9/h-10; clip PNG’s baked-in tagline so the pill isn’t duplicated */}
-        <span className="relative block h-[2.8125rem] w-auto max-w-[175px] overflow-hidden sm:h-[3.125rem] sm:max-w-[200px]">
-          <LogoMark className="block h-[118%] w-auto max-w-none shrink-0 bg-transparent object-contain object-left object-top" />
-        </span>
-        <span className="w-full max-w-[175px] rounded-full bg-[#0C1833] px-2 py-1 text-center text-[0.55rem] font-black uppercase leading-none tracking-[0.08em] text-[#F8C51C] sm:max-w-[200px] sm:px-2.5 sm:text-[0.62rem] sm:tracking-[0.1em]">
-          {MAPABLE_BRAND_TAGLINE}
-        </span>
-      </Link>
+      />
 
       <nav aria-label="Primary" className="hidden items-center gap-1 md:flex">
         {primaryLinks.map((link) => (

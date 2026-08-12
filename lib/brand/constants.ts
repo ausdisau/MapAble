@@ -17,10 +17,17 @@ export const MAPABLE_DONATION_URL =
   process.env.NEXT_PUBLIC_DONATION_URL ?? "https://paypal.me/ausdisau";
 
 /**
- * Official MapAble horizontal wordmark — use the exact PNG committed to the repo.
- * Render with a native <img> on a transparent background (marketing headers are light).
+ * Official MapAble vertical lockup (icon + wordmark + baked-in tagline).
+ * Prefer MAPABLE_LOGO_WORDMARK_SRC + the HTML tagline pill for headers so the
+ * pill can be width-matched and centered under the mark.
  */
 export const MAPABLE_LOGO_SRC = "/brand/mapable-logo.png";
+
+/**
+ * Icon + MapAble wordmark only (no baked-in tagline). Use with MapAbleBrandLockup
+ * or a separate Empowering Independence pill.
+ */
+export const MAPABLE_LOGO_WORDMARK_SRC = "/brand/mapable-logo-wordmark.png";
 
 /** Pin + Australia mark for compact headers with separate text. */
 export const MAPABLE_LOGO_MARK_SRC = "/brand/mapable-logo-mark.svg";
