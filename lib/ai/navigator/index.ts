@@ -14,7 +14,12 @@ export {
   approveGovernedActionEnvelope,
   rejectGovernedActionEnvelope,
   getGovernedActionEnvelope,
+  updateGovernedActionEnvelopeDraft,
 } from "@/lib/ai/navigator/envelopes/service";
+export {
+  materialiseFinderTransfer,
+  isTransferFiltersAction,
+} from "@/lib/ai/navigator/finder-transfer";
 export {
   governedEnvelopeActionSchema,
   hashGovernedPayload,

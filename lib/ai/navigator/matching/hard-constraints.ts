@@ -1,8 +1,9 @@
-import type {
-  EliminationCategory,
-  EliminationSummary,
-  HardConstraints,
-  ProviderCandidate,
+import {
+  hardConstraintsSchema,
+  type EliminationCategory,
+  type EliminationSummary,
+  type HardConstraintsInput,
+  type ProviderCandidate,
 } from "@/lib/ai/navigator/matching/types";
 
 export type HardConstraintApplication = {
@@ -48,9 +49,10 @@ function bump(
  */
 export function applyHardConstraints(
   candidates: ProviderCandidate[],
-  constraints: HardConstraints,
+  rawConstraints: HardConstraintsInput,
   now: Date = new Date(),
 ): HardConstraintApplication {
+  const constraints = hardConstraintsSchema.parse(rawConstraints);
   const eligible: ProviderCandidate[] = [];
   const eliminated: HardConstraintApplication["eliminated"] = [];
   const eliminationSummary: EliminationSummary = {};

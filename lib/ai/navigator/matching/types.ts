@@ -4,6 +4,21 @@ import { z } from "zod";
  * Stage-1 hard constraints for Navigator provider matching.
  * Never relaxed by the ranker or model commentary.
  */
+export const hardConstraintKeySchema = z.enum([
+  "serviceType",
+  "state",
+  "postcode",
+  "requiredServices",
+  "exclusions",
+  "communicationRequirements",
+  "accessibilityRequirements",
+  "credentialRequirements",
+  "requireFreshnessDays",
+  "excludeSponsoredOnly",
+]);
+
+export type HardConstraintKey = z.infer<typeof hardConstraintKeySchema>;
+
 export const hardConstraintsSchema = z
   .object({
     serviceType: z.string().min(1).max(200).optional(),
@@ -27,10 +42,18 @@ export const hardConstraintsSchema = z
     requireFreshnessDays: z.number().int().positive().max(3650).optional(),
     /** When true, sponsored listings are eliminated at Stage 1. */
     excludeSponsoredOnly: z.boolean().optional(),
+    /**
+     * Participant-marked non-negotiable keys. Ranking/model may never relax
+     * any hard constraint; these keys additionally cannot be cleared without
+     * an explicit participant correction unlock.
+     */
+    nonNegotiableKeys: z.array(hardConstraintKeySchema).max(20).default([]),
   })
   .strict();
 
 export type HardConstraints = z.infer<typeof hardConstraintsSchema>;
+/** Input shape before Zod defaults (e.g. nonNegotiableKeys) are applied. */
+export type HardConstraintsInput = z.input<typeof hardConstraintsSchema>;
 
 /**
  * Stage-2 ranking weights (0–1 each). Ranker normalises to sum to 1.

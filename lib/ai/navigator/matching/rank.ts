@@ -1,7 +1,7 @@
 import {
   DEFAULT_RANKING_WEIGHTS,
   type EliminationSummary,
-  type HardConstraints,
+  type HardConstraintsInput,
   type MatchResult,
   type ProviderCandidate,
   type RankingWeights,
@@ -9,7 +9,7 @@ import {
 } from "@/lib/ai/navigator/matching/types";
 
 export type RankOptions = {
-  constraints?: HardConstraints;
+  constraints?: HardConstraintsInput;
   weights?: RankingWeights;
   shortlistLimit?: number;
   now?: Date;
@@ -58,12 +58,12 @@ function scoreContinuity(candidate: ProviderCandidate): number {
 
 function scoreParticipantPreference(
   candidate: ProviderCandidate,
-  constraints?: HardConstraints,
+  constraints?: HardConstraintsInput,
 ): number {
   if (!constraints) return 0.5;
   const targets = [
     ...(constraints.serviceType ? [constraints.serviceType] : []),
-    ...constraints.requiredServices,
+    ...(constraints.requiredServices ?? []),
   ];
   if (targets.length === 0) return 0.5;
   const hits = targets.filter((t) =>
@@ -98,7 +98,7 @@ function scoreVerifiedAccessibility(candidate: ProviderCandidate): number {
 
 function scoreTravelBurden(
   candidate: ProviderCandidate,
-  constraints?: HardConstraints,
+  constraints?: HardConstraintsInput,
 ): number {
   if (!constraints) return 0.5;
   if (
@@ -134,7 +134,7 @@ function scoreAvailability(
 
 function scoreCommunicationFit(
   candidate: ProviderCandidate,
-  constraints?: HardConstraints,
+  constraints?: HardConstraintsInput,
 ): number {
   const reqs = constraints?.communicationRequirements ?? [];
   if (reqs.length === 0) return 0.5;
@@ -262,7 +262,7 @@ export function preferenceRank(
 export function buildMatchResult(input: {
   eligible: ProviderCandidate[];
   eliminationSummary: EliminationSummary;
-  constraints?: HardConstraints;
+  constraints?: HardConstraintsInput;
   weights?: RankingWeights;
   shortlistLimit?: number;
   now?: Date;

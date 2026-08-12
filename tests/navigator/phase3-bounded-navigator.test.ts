@@ -139,6 +139,7 @@ describe("Navigator Phase 3 — hard constraints", () => {
         communicationRequirements: [],
         accessibilityRequirements: [],
         credentialRequirements: [],
+        nonNegotiableKeys: [],
       },
     );
     expect(applied.eligible).toHaveLength(0);
@@ -163,6 +164,7 @@ describe("Navigator Phase 3 — hard constraints", () => {
         communicationRequirements: [],
         accessibilityRequirements: [],
         credentialRequirements: [],
+        nonNegotiableKeys: [],
       },
     );
     expect(applied.eligible.map((c) => c.id)).toEqual(["good"]);
@@ -204,6 +206,7 @@ describe("Navigator Phase 3 — ranking", () => {
         communicationRequirements: [],
         accessibilityRequirements: [],
         credentialRequirements: [],
+        nonNegotiableKeys: [],
       },
       weights: {
         continuity: 0,
@@ -227,6 +230,7 @@ describe("Navigator Phase 3 — ranking", () => {
         communicationRequirements: [],
         accessibilityRequirements: [],
         credentialRequirements: [],
+        nonNegotiableKeys: [],
       },
       weights: {
         continuity: 0,
@@ -270,6 +274,7 @@ describe("Navigator Phase 3 — ranking", () => {
         communicationRequirements: [],
         accessibilityRequirements: [],
         credentialRequirements: [],
+        nonNegotiableKeys: [],
         // Sponsored not excluded — remains eligible
       },
     );
@@ -337,6 +342,7 @@ describe("Navigator Phase 3 — orchestrator", () => {
         communicationRequirements: [],
         accessibilityRequirements: [],
         credentialRequirements: [],
+        nonNegotiableKeys: [],
       },
       interpretationConfirmed: false,
       aiOptedOut: true,
@@ -370,6 +376,7 @@ describe("Navigator Phase 3 — orchestrator", () => {
         communicationRequirements: [],
         accessibilityRequirements: [],
         credentialRequirements: [],
+        nonNegotiableKeys: [],
       },
       interpretationConfirmed: true,
       aiOptedOut: true,
@@ -421,6 +428,7 @@ describe("Navigator Phase 3 — orchestrator", () => {
         communicationRequirements: [],
         accessibilityRequirements: [],
         credentialRequirements: [],
+        nonNegotiableKeys: [],
       },
       interpretationConfirmed: true,
       aiOptedOut: true,
@@ -444,6 +452,7 @@ describe("Navigator Phase 3 — orchestrator", () => {
           communicationRequirements: [],
           accessibilityRequirements: [],
           credentialRequirements: [],
+          nonNegotiableKeys: [],
         },
         silent: true,
       }),

@@ -2,7 +2,7 @@ import { assertNavigatorCapability } from "@/lib/ai/navigator/gates";
 import {
   providerCandidateSchema,
   type EvidenceStatus,
-  type HardConstraints,
+  type HardConstraintsInput,
   type ProviderCandidate,
 } from "@/lib/ai/navigator/matching/types";
 import { isNavigatorMatchingEnabled } from "@/lib/config/navigator-pilot";
@@ -70,7 +70,7 @@ export type NdisProviderHardFilterInput = {
   tenantId: string;
   participantId: string;
   actorUserId: string;
-  constraints: HardConstraints;
+  constraints: HardConstraintsInput;
   /** Free-text query minimised into search params. */
   q?: string;
   limit?: number;

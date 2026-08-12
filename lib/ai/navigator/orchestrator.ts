@@ -15,6 +15,7 @@ import {
   hardConstraintsSchema,
   rankingWeightsSchema,
   type HardConstraints,
+  type HardConstraintsInput,
   type MatchResult,
   type RankingWeights,
 } from "@/lib/ai/navigator/matching/types";
@@ -56,13 +57,17 @@ export type NavigatorProviderSearchTurnInput = {
   sessionId?: string;
   goalText?: string;
   structuredFilters?: NavigatorStructuredFilters;
-  hardConstraints: HardConstraints;
+  hardConstraints: HardConstraintsInput;
   rankingWeights?: RankingWeights;
   interpretationConfirmed: boolean;
   aiOptedOut?: boolean;
   consentScope?: ConsentScope;
   consentPurpose?: string;
   consentAction?: string;
+  /** Participant-controlled fields allowed for this purpose (consent gate). */
+  permittedFields?: string[];
+  /** When true, create a transfer_filters_to_finder envelope after match. */
+  transferFilters?: boolean;
   saveDraft?: boolean;
   silent?: boolean;
   now?: Date;
@@ -74,12 +79,16 @@ export type NavigatorProviderSearchTurnResult =
       interpretation: ReviewedInterpretation;
       match: null;
       draftEnvelopeId: null;
+      transferEnvelopeId: null;
+      passportId: null;
     }
   | {
       status: "matched" | "NO_SAFE_MATCH" | "blocked";
       interpretation: ReviewedInterpretation;
       match: MatchResult | null;
       draftEnvelopeId: string | null;
+      transferEnvelopeId: string | null;
+      passportId: string | null;
       reason?: string;
     };
 
@@ -221,6 +230,7 @@ export async function runNavigatorProviderSearchTurn(
     scope: input.consentScope ?? "profile.read",
     purpose: input.consentPurpose ?? NAVIGATOR_CONSENT_PURPOSE,
     action: consentAction,
+    permittedFields: input.permittedFields,
     delegationDomain: "navigator",
     silent: input.silent,
   });
@@ -230,6 +240,8 @@ export async function runNavigatorProviderSearchTurn(
       interpretation: passthroughInterpretation(input),
       match: null,
       draftEnvelopeId: null,
+      transferEnvelopeId: null,
+      passportId: null,
       reason: `consent_${consent.reason}`,
     };
   }
@@ -250,6 +262,8 @@ export async function runNavigatorProviderSearchTurn(
       },
       match: null,
       draftEnvelopeId: null,
+      transferEnvelopeId: null,
+      passportId: null,
     };
   }
 
@@ -260,6 +274,8 @@ export async function runNavigatorProviderSearchTurn(
       interpretation,
       match: null,
       draftEnvelopeId: null,
+      transferEnvelopeId: null,
+      passportId: null,
       reason: "matching_disabled",
     };
   }
@@ -277,6 +293,8 @@ export async function runNavigatorProviderSearchTurn(
       interpretation,
       match: null,
       draftEnvelopeId: null,
+      transferEnvelopeId: null,
+      passportId: null,
       reason: matchGate.reason,
     };
   }
@@ -314,9 +332,10 @@ export async function runNavigatorProviderSearchTurn(
     now: input.now,
   });
 
+  let passportId: string | null = null;
   if (input.sessionId && isNavigatorPassportEnabled()) {
     try {
-      await createDecisionPassport({
+      const passport = await createDecisionPassport({
         tenantId: input.tenantId,
         participantId: input.participantId,
         actorUserId: input.actorUserId,
@@ -338,18 +357,38 @@ export async function runNavigatorProviderSearchTurn(
                 {
                   label: "serviceType",
                   value: effectiveConstraints.serviceType,
+                  nonNegotiable:
+                    effectiveConstraints.nonNegotiableKeys.includes(
+                      "serviceType",
+                    ),
                 },
               ]
             : []),
           ...(effectiveConstraints.state
-            ? [{ label: "state", value: effectiveConstraints.state }]
+            ? [
+                {
+                  label: "state",
+                  value: effectiveConstraints.state,
+                  nonNegotiable:
+                    effectiveConstraints.nonNegotiableKeys.includes("state"),
+                },
+              ]
             : []),
           ...(effectiveConstraints.postcode
-            ? [{ label: "postcode", value: effectiveConstraints.postcode }]
+            ? [
+                {
+                  label: "postcode",
+                  value: effectiveConstraints.postcode,
+                  nonNegotiable:
+                    effectiveConstraints.nonNegotiableKeys.includes("postcode"),
+                },
+              ]
             : []),
           ...effectiveConstraints.exclusions.map((ex) => ({
             label: "exclusion",
             value: ex,
+            nonNegotiable:
+              effectiveConstraints.nonNegotiableKeys.includes("exclusions"),
           })),
         ],
         rankingWeights: {
@@ -386,12 +425,14 @@ export async function runNavigatorProviderSearchTurn(
         consentedPurpose: input.consentPurpose ?? NAVIGATOR_CONSENT_PURPOSE,
         consentRecordId: consent.consentRecordId,
       });
+      passportId = passport.id;
     } catch {
       // Passport failures must not block the match result.
     }
   }
 
   let draftEnvelopeId: string | null = null;
+  let transferEnvelopeId: string | null = null;
   if (input.saveDraft && match.status === "eligible_shortlist") {
     const envelope = await createGovernedActionEnvelope({
       tenantId: input.tenantId,
@@ -422,6 +463,35 @@ export async function runNavigatorProviderSearchTurn(
     draftEnvelopeId = envelope.id;
   }
 
+  if (input.transferFilters) {
+    const transferEnvelope = await createGovernedActionEnvelope({
+      tenantId: input.tenantId,
+      participantId: input.participantId,
+      initiatingUserId: input.actorUserId,
+      capabilityKey: "navigator.provider_search.draft_service_request",
+      action: "transfer_filters_to_finder",
+      payload: {
+        query: interpretation.filters.q || interpretation.sourceQuery,
+        location: interpretation.filters.location,
+        serviceQuery:
+          interpretation.filters.service || effectiveConstraints.serviceType,
+        accessQuery: interpretation.filters.access,
+        providerName: interpretation.filters.provider,
+        appliedFilters: {
+          state: effectiveConstraints.state,
+          postcode: effectiveConstraints.postcode,
+          nonNegotiableKeys: effectiveConstraints.nonNegotiableKeys,
+        },
+      },
+      evidenceRefs: match.shortlist.map((s) => s.provider.id),
+      sourceRefs: ["navigator.provider_search.match"],
+      consentReceiptId: consent.consentReceiptId ?? consent.consentRecordId,
+      requiredApproverRole: "participant",
+    });
+    transferEnvelopeId = transferEnvelope.id;
+    if (!draftEnvelopeId) draftEnvelopeId = transferEnvelope.id;
+  }
+
   return {
     status: match.status === "NO_SAFE_MATCH" ? "NO_SAFE_MATCH" : "matched",
     interpretation: {
@@ -430,5 +500,7 @@ export async function runNavigatorProviderSearchTurn(
     },
     match,
     draftEnvelopeId,
+    transferEnvelopeId,
+    passportId,
   };
 }

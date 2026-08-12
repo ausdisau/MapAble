@@ -109,6 +109,7 @@ describe("Navigator Phase 4 — assurance", () => {
       communicationRequirements: [],
       accessibilityRequirements: [],
       credentialRequirements: [],
+      nonNegotiableKeys: [],
     });
     expect(stage1.eligible).toHaveLength(0);
     const ranked = rankEligibleProviders(stage1.eligible, {});

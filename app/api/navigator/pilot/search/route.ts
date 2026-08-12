@@ -41,13 +41,16 @@ const searchBodySchema = z
   .object({
     tenantId: z.string().min(1),
     participantId: z.string().min(1),
+    sessionId: z.string().min(1).max(120).optional(),
     goalText: z.string().max(2000).optional(),
     structuredFilters: structuredFiltersSchema,
     hardConstraints: hardConstraintsSchema,
     rankingWeights: rankingWeightsSchema.optional(),
     interpretationConfirmed: z.boolean(),
     aiOptedOut: z.boolean().optional(),
+    permittedFields: z.array(z.string().min(1).max(80)).max(40).optional(),
     saveDraft: z.boolean().optional(),
+    transferFilters: z.boolean().optional(),
   })
   .strict();
 
@@ -123,6 +126,9 @@ export async function POST(req: Request) {
       interpretationConfirmed: parsed.data.interpretationConfirmed,
       aiOptedOut: parsed.data.aiOptedOut,
       saveDraft: parsed.data.saveDraft,
+      sessionId: parsed.data.sessionId,
+      permittedFields: parsed.data.permittedFields,
+      transferFilters: parsed.data.transferFilters === true,
     });
     return jsonOk({ result });
   } catch (err) {

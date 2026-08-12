@@ -22,6 +22,8 @@ export const hardConstraintSchema = z
     label: z.string().min(1).max(200),
     value: z.union([z.string().max(200), z.boolean(), z.number()]).optional(),
     source: z.string().max(120).optional(),
+    /** Participant marks this constraint as non-negotiable (cannot be quietly dropped). */
+    nonNegotiable: z.boolean().optional(),
   })
   .strict();
 

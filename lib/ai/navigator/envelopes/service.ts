@@ -15,6 +15,10 @@ import {
   type GovernedEnvelopeAction,
   type GovernedEnvelopeStatus,
 } from "@/lib/ai/navigator/envelopes/schema";
+import {
+  isTransferFiltersAction,
+  materialiseFinderTransfer,
+} from "@/lib/ai/navigator/finder-transfer";
 import { isNavigatorEnvelopesEnabled } from "@/lib/config/navigator-pilot";
 import { prisma } from "@/lib/prisma";
 
@@ -210,6 +214,26 @@ export async function approveGovernedActionEnvelope(input: {
     throw new Error(`NAVIGATOR_GATE_DENIED:${gate.reason}`);
   }
 
+  let executionResult: Record<string, unknown> = {
+    draftOnly: true,
+    action: existing.action,
+    note: "Draft materialised; booking/payment not performed.",
+  };
+
+  if (isTransferFiltersAction(existing.action)) {
+    const transfer = materialiseFinderTransfer({
+      payload: existing.payloadJson,
+    });
+    executionResult = {
+      draftOnly: true,
+      action: existing.action,
+      note: "Filters transferred to Provider Finder; booking not performed.",
+      finderPath: transfer.finderPath,
+      finderSessionId: transfer.sessionId,
+      applied: transfer.applied,
+    };
+  }
+
   // Single-use: consume nonce by transitioning status atomically.
   const updated = await prisma.governedActionEnvelope.updateMany({
     where: {
@@ -223,11 +247,7 @@ export async function approveGovernedActionEnvelope(input: {
       status: "executed_draft",
       approvalReason: input.reason ?? "approved",
       consumedAt: new Date(),
-      executionResult: {
-        draftOnly: true,
-        action: existing.action,
-        note: "Draft materialised; booking/payment not performed.",
-      },
+      executionResult: executionResult as Prisma.InputJsonValue,
     },
   });
 
@@ -245,6 +265,58 @@ export async function approveGovernedActionEnvelope(input: {
   const row = await prisma.governedActionEnvelope.findUniqueOrThrow({
     where: { id: existing.id },
   });
+  return mapRow(row);
+}
+
+/**
+ * Edit a proposed draft envelope payload before approval.
+ * Hash is recomputed; booking/payment never performed.
+ */
+export async function updateGovernedActionEnvelopeDraft(input: {
+  envelopeId: string;
+  tenantId: string;
+  participantId: string;
+  actorUserId: string;
+  payload: Record<string, unknown>;
+}): Promise<GovernedActionEnvelopeRecord> {
+  if (!isNavigatorEnvelopesEnabled()) {
+    throw new Error("NAVIGATOR_ENVELOPES_DISABLED");
+  }
+
+  const existing = await prisma.governedActionEnvelope.findFirst({
+    where: {
+      id: input.envelopeId,
+      tenantId: input.tenantId,
+      participantId: input.participantId,
+      status: "proposed",
+    },
+  });
+  if (!existing) {
+    throw new Error("NAVIGATOR_ENVELOPE_NOT_FOUND");
+  }
+
+  const action = existing.action as GovernedEnvelopeAction;
+  assertNavigatorActionAllowed(action);
+  const payload = validateGovernedEnvelopePayload(action, input.payload);
+  const payloadHash = hashGovernedPayload(payload);
+
+  const row = await prisma.governedActionEnvelope.update({
+    where: { id: existing.id },
+    data: {
+      payloadJson: payload as Prisma.InputJsonValue,
+      payloadHash,
+    },
+  });
+
+  await createAuditEvent({
+    actorUserId: input.actorUserId,
+    participantId: input.participantId,
+    action: "navigator.envelope.draft_edited",
+    entityType: "GovernedActionEnvelope",
+    entityId: row.id,
+    metadata: { tenantId: input.tenantId, payloadHash },
+  });
+
   return mapRow(row);
 }
 

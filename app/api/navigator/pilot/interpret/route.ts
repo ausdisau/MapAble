@@ -41,6 +41,7 @@ const interpretBodySchema = z
       communicationRequirements: [],
       accessibilityRequirements: [],
       credentialRequirements: [],
+      nonNegotiableKeys: [],
     }),
     aiOptedOut: z.boolean().optional(),
   })

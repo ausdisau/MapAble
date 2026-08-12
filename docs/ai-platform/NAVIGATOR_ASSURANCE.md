@@ -9,29 +9,33 @@
 
 ## 1. Delivery status
 
-| Phase | Exit gate | Status |
-|-------|-----------|--------|
-| 0 Inspection | Report reviewed; continue vs supersede #472 decided | **Complete** — continue on `cursor/navigator-governed-pilot-fedd` |
-| 1 Enforcement | Tenant/consent/purpose/tool isolation; flags default off | **Complete** — `tests/navigator/phase1-foundation.test.ts`, A2H hardening |
-| 2 Participant control | Keyboard/SR path for correct, refuse, opt-out, human help | **Complete (code)** — lived-experience review still required |
-| 3 Bounded Navigator | No autonomous booking/sensitive disclosure | **Complete (code)** — deterministic match + draft envelopes only |
-| 4 Assurance | Owners approve synthetic/authorised pilot; flags off | **This document** — checklist below; production enablement **out of scope** |
+| Phase                 | Exit gate                                                   | Status                                                                                                                                           |
+| --------------------- | ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 0 Inspection          | Report reviewed; continue vs supersede #472 decided         | **Complete** — continue on `cursor/navigator-governed-pilot-fedd`                                                                                |
+| 1 Enforcement         | Tenant/consent/purpose/tool isolation; flags default off    | **Complete** — `tests/navigator/phase1-foundation.test.ts`, A2H hardening                                                                        |
+| 2 Participant control | Keyboard/SR path for correct, refuse, opt-out, human help   | **Complete (code)** — lived-experience review still required                                                                                     |
+| 3 Bounded Navigator   | No autonomous booking/sensitive disclosure                  | **Complete (code)** — deterministic match + draft envelopes only                                                                                 |
+| 4 Assurance           | Owners approve synthetic/authorised pilot; flags off        | **This document** — checklist below; production enablement **out of scope**                                                                      |
+| 5 Vertical slice      | Journey UI + Finder transfer + non-negotiables + draft edit | **Complete (code)** — `NavigatorPilotJourney`, `finder-transfer.ts`, `tests/navigator/phase5-vertical-slice.test.ts`; human gates still deferred |
 
 ---
 
 ## 2. Evidence ledger (claim statuses)
 
-| Claim | Status |
-|-------|--------|
-| Capability registry + Navigator keys + ARC sidecar (classification only) | IMPLEMENTED_NOT_PRODUCTION_VERIFIED |
-| Purpose consent gate + draft-only envelopes + A2H tenant fields | IMPLEMENTED_NOT_PRODUCTION_VERIFIED |
-| Decision Passport projection + governed memory + escalation | IMPLEMENTED_NOT_PRODUCTION_VERIFIED |
-| Deterministic hard-constraint match + preference rank + orchestrator | IMPLEMENTED_NOT_PRODUCTION_VERIFIED |
-| Accessible Decision Passport UI shell | IMPLEMENTED_NOT_PRODUCTION_VERIFIED |
-| Lived-experience accessibility acceptance | DOCUMENTED_INTENT — manual matrix still `NOT_RUN` |
-| Dignity-of-Risk kernel (full Autonomy Assurance Prompt 3) | DOCUMENTED_INTENT — least-restrictive notes recorded; kernel not a separate OS |
-| Production Navigator enablement / partner integrations | HISTORICAL / EXPLORATORY — not claimed |
-| VERIFIED_LIVE production Navigator | **Not claimed** |
+| Claim                                                                              | Status                                                                         |
+| ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| Capability registry + Navigator keys + ARC sidecar (classification only)           | IMPLEMENTED_NOT_PRODUCTION_VERIFIED                                            |
+| Purpose consent gate + draft-only envelopes + A2H tenant fields                    | IMPLEMENTED_NOT_PRODUCTION_VERIFIED                                            |
+| Decision Passport projection + governed memory + escalation                        | IMPLEMENTED_NOT_PRODUCTION_VERIFIED                                            |
+| Deterministic hard-constraint match + preference rank + orchestrator               | IMPLEMENTED_NOT_PRODUCTION_VERIFIED                                            |
+| Accessible Decision Passport UI shell                                              | IMPLEMENTED_NOT_PRODUCTION_VERIFIED                                            |
+| Participant journey UI (goal → confirm → constraints → shortlist → draft → Finder) | IMPLEMENTED_NOT_PRODUCTION_VERIFIED                                            |
+| Approved filter transfer to Provider Finder (`executionResult.finderPath`)         | IMPLEMENTED_NOT_PRODUCTION_VERIFIED                                            |
+| Non-negotiable hard-constraint keys on match + passport                            | IMPLEMENTED_NOT_PRODUCTION_VERIFIED                                            |
+| Lived-experience accessibility acceptance                                          | DOCUMENTED_INTENT — manual matrix still `NOT_RUN`                              |
+| Dignity-of-Risk kernel (full Autonomy Assurance Prompt 3)                          | DOCUMENTED_INTENT — least-restrictive notes recorded; kernel not a separate OS |
+| Production Navigator enablement / partner integrations                             | HISTORICAL / EXPLORATORY — not claimed                                         |
+| VERIFIED_LIVE production Navigator                                                 | **Not claimed**                                                                |
 
 ---
 
@@ -53,13 +57,13 @@
 
 ## 4. Accessibility outcomes
 
-| Criterion | Outcome |
-|-----------|---------|
-| WCAG 2.2 AA target | Repository convention retained |
-| Keyboard / focus / live region on Passport panel | Implemented in UI shell |
-| Non-AI equivalent path | Opt-out → `/provider-finder` |
-| Automated a11y | Existing Playwright axe suite; Navigator-specific journey not yet in CI |
-| Lived-experience / switch / AAC | **Required before any flag enablement** — owner action |
+| Criterion                                        | Outcome                                                                 |
+| ------------------------------------------------ | ----------------------------------------------------------------------- |
+| WCAG 2.2 AA target                               | Repository convention retained                                          |
+| Keyboard / focus / live region on Passport panel | Implemented in UI shell                                                 |
+| Non-AI equivalent path                           | Opt-out → `/provider-finder`                                            |
+| Automated a11y                                   | Existing Playwright axe suite; Navigator-specific journey not yet in CI |
+| Lived-experience / switch / AAC                  | **Required before any flag enablement** — owner action                  |
 
 ---
 
@@ -108,18 +112,18 @@ Full Autonomy Assurance Dignity-of-Risk Kernel remains a follow-on under W-AA-1 
 
 ### Incident response
 
-1. Engage global or capability kill switch  
-2. Disable `MAPABLE_NAVIGATOR_PILOT_ENABLED`  
-3. Preserve audit + envelopes (do not purge)  
-4. Follow [`../operations/INCIDENT_RESPONSE.md`](../operations/INCIDENT_RESPONSE.md)  
-5. Do not let models adjudicate reportability  
+1. Engage global or capability kill switch
+2. Disable `MAPABLE_NAVIGATOR_PILOT_ENABLED`
+3. Preserve audit + envelopes (do not purge)
+4. Follow [`../operations/INCIDENT_RESPONSE.md`](../operations/INCIDENT_RESPONSE.md)
+5. Do not let models adjudicate reportability
 
 ### Rollback
 
-1. Keep / set all `MAPABLE_NAVIGATOR_PILOT_*` to unset/false  
-2. Engage kill switches if in-flight model calls  
-3. Additive migrations may remain; reverse only on non-prod if required  
-4. Drafts, consent records, and audit events must remain consistent  
+1. Keep / set all `MAPABLE_NAVIGATOR_PILOT_*` to unset/false
+2. Engage kill switches if in-flight model calls
+3. Additive migrations may remain; reverse only on non-prod if required
+4. Drafts, consent records, and audit events must remain consistent
 
 See also [`ROLLBACK.md`](./ROLLBACK.md).
 
@@ -127,18 +131,18 @@ See also [`ROLLBACK.md`](./ROLLBACK.md).
 
 ## 9. Controlled-pilot checklist (flags stay off until signed)
 
-| # | Check | Owner | Done |
-|---|-------|-------|------|
-| 1 | W-AA-1 still active; no second consent/audit OS | Product + Eng | |
-| 2 | Dual authority writer freeze confirmed | Eng | |
-| 3 | Synthetic-only fixtures; no real participant data | Eng | |
-| 4 | Security tests green for Navigator suites | Eng | |
-| 5 | Manual a11y matrix for Navigator journeys | A11y lead | |
-| 6 | Lived-experience review scheduled/complete | Community | |
-| 7 | Escalation / safeguarding operational owners named | Ops | |
-| 8 | NDIS Commission pages re-verified for policy refs | Compliance | |
-| 9 | Kill switch drill completed | Eng + Ops | |
-| 10 | Production flags remain false unless explicit enablement ticket | Release | |
+| #   | Check                                                           | Owner         | Done |
+| --- | --------------------------------------------------------------- | ------------- | ---- |
+| 1   | W-AA-1 still active; no second consent/audit OS                 | Product + Eng |      |
+| 2   | Dual authority writer freeze confirmed                          | Eng           |      |
+| 3   | Synthetic-only fixtures; no real participant data               | Eng           |      |
+| 4   | Security tests green for Navigator suites                       | Eng           |      |
+| 5   | Manual a11y matrix for Navigator journeys                       | A11y lead     |      |
+| 6   | Lived-experience review scheduled/complete                      | Community     |      |
+| 7   | Escalation / safeguarding operational owners named              | Ops           |      |
+| 8   | NDIS Commission pages re-verified for policy refs               | Compliance    |      |
+| 9   | Kill switch drill completed                                     | Eng + Ops     |      |
+| 10  | Production flags remain false unless explicit enablement ticket | Release       |      |
 
 **Named owners must approve** any synthetic-data or authorised pilot. This change does **not** enable production flags.
 
