@@ -6,8 +6,8 @@ import {
   createActHandoffFromHitl,
   getActHandoffForTenant,
 } from "@/lib/act/handoff/service";
-import { createAuditEvent } from "@/lib/audit/audit-event-service";
 import { NAVIGATOR_AUDIT } from "@/lib/ai/navigator/gates";
+import { createAuditEvent } from "@/lib/audit/audit-event-service";
 import type { HarnessDecision } from "@/lib/aura-harness/types";
 import { isNavigatorPilotEnabled } from "@/lib/config/navigator-pilot";
 import { prisma } from "@/lib/prisma";

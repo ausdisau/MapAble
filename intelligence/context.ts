@@ -1,5 +1,5 @@
-import { listCalendarEvents } from "@/lib/calendar/calendar-service";
 import type { CurrentUser } from "@/lib/auth/current-user";
+import { listCalendarEvents } from "@/lib/calendar/calendar-service";
 import { getMobilityPrefillForUser } from "@/lib/transport/profile-prefill-service";
 
 import type {

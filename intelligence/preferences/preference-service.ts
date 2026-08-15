@@ -1,6 +1,6 @@
+import type { Prisma } from "@prisma/client";
 import { z } from "zod";
 
-import type { Prisma } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
 

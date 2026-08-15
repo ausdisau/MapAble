@@ -1,4 +1,5 @@
 import type { MapAbleModule } from "../types";
+
 import type {
   CareOSAgentActivation,
   CareOSAgentId,

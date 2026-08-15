@@ -1,11 +1,5 @@
 import type { Prisma } from "@prisma/client";
 
-import { createAuditEvent } from "@/lib/audit/audit-event-service";
-import {
-  assertNavigatorActionAllowed,
-  assertNavigatorCapability,
-  NAVIGATOR_AUDIT,
-} from "@/lib/ai/navigator/gates";
 import {
   createEnvelopeNonce,
   createOpaqueEnvelopeId,
@@ -19,6 +13,12 @@ import {
   isTransferFiltersAction,
   materialiseFinderTransfer,
 } from "@/lib/ai/navigator/finder-transfer";
+import {
+  assertNavigatorActionAllowed,
+  assertNavigatorCapability,
+  NAVIGATOR_AUDIT,
+} from "@/lib/ai/navigator/gates";
+import { createAuditEvent } from "@/lib/audit/audit-event-service";
 import { isNavigatorEnvelopesEnabled } from "@/lib/config/navigator-pilot";
 import { prisma } from "@/lib/prisma";
 

@@ -1,3 +1,4 @@
+import { getOntologyConceptV2 } from "./seed-v2";
 import type { AccessOntologyConcept, AccessOntologyVersion } from "./types";
 
 const V = "1.0.0";
@@ -258,8 +259,6 @@ export const ACCESS_ONTOLOGY_V1: AccessOntologyVersion = {
   publishedAt: "2026-07-17T00:00:00.000Z",
   concepts: ONTOLOGY_CONCEPTS_V1,
 };
-
-import { getOntologyConceptV2 } from "./seed-v2";
 
 /** Resolve concept by v2 id, v1 id, or v1→v2 alias. */
 export function getOntologyConcept(id: string): AccessOntologyConcept | undefined {

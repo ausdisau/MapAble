@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-import { mapAbleModuleSchema } from "./types";
 import { INTELLIGENCE_SESSION_CONSENT_SCOPES } from "./consent/session-consent";
+import { mapAbleModuleSchema } from "./types";
 
 export const platformBriefRequestSchema = z.object({
   modules: z.array(mapAbleModuleSchema).min(1).max(8).default([

@@ -7,8 +7,9 @@ import { getMapAbleIntelligenceConfig } from "../config";
 import { buildSessionConsent } from "../consent/session-consent";
 import { persistCareOSMission } from "../operations/mission-state-service";
 import type { MapAbleModule } from "../types";
-import { selectCareOSAgentNetwork } from "./agent-registry";
+
 import { buildCareOSActionProposals } from "./action-proposals";
+import { selectCareOSAgentNetwork } from "./agent-registry";
 import { analyseCareOSContinuity } from "./continuity-radar";
 import { buildCareOSHumanReviewQueue } from "./human-review";
 import { buildCareOSMissionGraph } from "./mission-graph";

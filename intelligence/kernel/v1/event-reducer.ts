@@ -1,11 +1,11 @@
-import type {
-  AppointmentEvent,
-  AppointmentMissionState,
-} from "./appointment-types";
 import {
   reduceAppointmentEvent,
   replayAppointmentMission as replayRawAppointmentMission,
 } from "./appointment-reducer";
+import type {
+  AppointmentEvent,
+  AppointmentMissionState,
+} from "./appointment-types";
 
 export function reduceAppointmentMission(
   state: AppointmentMissionState,

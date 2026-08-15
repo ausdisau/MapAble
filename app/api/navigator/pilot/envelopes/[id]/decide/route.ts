@@ -1,13 +1,13 @@
 import { z } from "zod";
 
 import {
-  approveGovernedActionEnvelope,
-  rejectGovernedActionEnvelope,
-} from "@/lib/ai/navigator/envelopes/service";
-import {
   NAVIGATOR_CONSENT_PURPOSE,
   verifyPurposeConsent,
 } from "@/lib/ai/navigator/consent-gate";
+import {
+  approveGovernedActionEnvelope,
+  rejectGovernedActionEnvelope,
+} from "@/lib/ai/navigator/envelopes/service";
 import { requireApiSession } from "@/lib/api/auth-handler";
 import { checkIpRateLimit, getClientIp } from "@/lib/api/ip-rate-limit";
 import {

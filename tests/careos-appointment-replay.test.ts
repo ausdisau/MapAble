@@ -1,13 +1,13 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  reduceAppointmentMission,
-  replayAppointmentMission,
-} from "@/intelligence/kernel/v1/event-reducer";
 import type {
   AppointmentEvent,
   AppointmentMissionState,
 } from "@/intelligence/kernel/v1/appointment-types";
+import {
+  reduceAppointmentMission,
+  replayAppointmentMission,
+} from "@/intelligence/kernel/v1/event-reducer";
 
 const initial: AppointmentMissionState = {
   missionId: "mission-1",

@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-import { createAuditEvent } from "@/lib/audit/audit-event-service";
 import { NAVIGATOR_AUDIT } from "@/lib/ai/navigator/gates";
+import { createAuditEvent } from "@/lib/audit/audit-event-service";
 import { isNavigatorMemoryEnabled } from "@/lib/config/navigator-pilot";
 import { prisma } from "@/lib/prisma";
 

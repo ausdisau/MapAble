@@ -1,11 +1,11 @@
 import { prisma } from "@/lib/prisma";
 
-import { reduceAppointmentMission } from "./event-reducer";
 import {
   appointmentEventSchema,
   type AppointmentEvent,
   type AppointmentMissionState,
 } from "./appointment-types";
+import { reduceAppointmentMission } from "./event-reducer";
 
 type StoredAppointmentGraph = {
   type: "appointment";

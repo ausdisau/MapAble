@@ -1,6 +1,5 @@
 import type { Prisma } from "@prisma/client";
 
-import { createAuditEvent } from "@/lib/audit/audit-event-service";
 import { NAVIGATOR_AUDIT } from "@/lib/ai/navigator/gates";
 import {
   hardConstraintsSchema,
@@ -14,6 +13,7 @@ import {
   type RankingWeights,
   type ShortlistItem,
 } from "@/lib/ai/navigator/passport/types";
+import { createAuditEvent } from "@/lib/audit/audit-event-service";
 import { isNavigatorPassportEnabled } from "@/lib/config/navigator-pilot";
 import { prisma } from "@/lib/prisma";
 

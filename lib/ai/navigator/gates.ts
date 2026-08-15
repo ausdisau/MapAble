@@ -1,4 +1,3 @@
-import { createAuditEvent } from "@/lib/audit/audit-event-service";
 import { requireAiCapability } from "@/lib/ai/platform/capabilities/registry";
 import type { AiCapabilityRegistration } from "@/lib/ai/platform/capabilities/types";
 import {
@@ -6,6 +5,7 @@ import {
   isCapabilityKilled,
 } from "@/lib/ai/platform/policies/kill-switches";
 import { PROHIBITED_AUTONOMOUS_ACTIONS } from "@/lib/ai/platform/types/authority";
+import { createAuditEvent } from "@/lib/audit/audit-event-service";
 import { navigatorPilotConfig } from "@/lib/config/navigator-pilot";
 
 export const NAVIGATOR_AUDIT = {

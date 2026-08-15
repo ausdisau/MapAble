@@ -8,6 +8,7 @@ import {
   type IntelligenceToolName,
 } from "../tools/registry";
 import type { MapAbleModule } from "../types";
+
 import type { CareOSMissionNode, CareOSModuleReadResult } from "./types";
 
 type ModuleReadSpec = { tool?: IntelligenceToolName; input?: unknown };

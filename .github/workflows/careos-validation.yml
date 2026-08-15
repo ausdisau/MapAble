@@ -35,6 +35,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
+      # Cap below host RAM; pair with sharded/scoped eslint via pnpm lint:careos.
+      NODE_OPTIONS: --max-old-space-size=4096
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mapable_test
       DIRECT_URL: postgresql://postgres:postgres@localhost:5432/mapable_test
       MAPABLE_AI_APPROVAL_SECRET: ci-only-careos-approval-secret-at-least-32-characters
@@ -130,21 +132,7 @@ jobs:
           -t "O6 safety gate"
 
       - name: Lint CareOS implementation
-        run: >-
-          pnpm eslint
-          app/api/intelligence
-          app/careos
-          app/coordinator/careos
-          components/intelligence
-          components/layout/DashboardNav.tsx
-          intelligence
-          tests/careos-action-kernel.test.ts
-          tests/careos-agentic-network.test.ts
-          tests/careos-appointment-replay.test.ts
-          tests/careos-coordinate-confirm.test.ts
-          tests/care-support-intelligence.test.ts
-          tests/careos-kernel-v1.test.ts
-          tests/careos-kernel-v1-appointment.test.ts
+        run: pnpm lint:careos
 
       - name: Production build
         run: pnpm build

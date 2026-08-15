@@ -17,17 +17,6 @@ const MODULE_FLAG_NAMES: Record<MapAbleModule, string> = {
   payments: "MAPABLE_AI_PAYMENTS_ENABLED",
 };
 
-const MODULE_DEFAULTS: Record<MapAbleModule, boolean> = {
-  core: true,
-  care: true,
-  transport: true,
-  jobs: true,
-  access: true,
-  moves: false,
-  foods: false,
-  payments: false,
-};
-
 export type MapAbleIntelligenceRuntimeConfig = {
   enabled: boolean;
   modelReasoningEnabled: boolean;

@@ -32,8 +32,10 @@ jobs:
     env:
       BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
       GITHUB_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
-      NODE_OPTIONS: --max-old-space-size=8192
-      MAPABLE_BUILD_HEAP_MB: "8192"
+      # Lint is sharded in package.json (≤4096 per eslint process). Keep job
+      # headroom for tsc/build without asking Node for more RAM than the runner has.
+      NODE_OPTIONS: --max-old-space-size=6144
+      MAPABLE_BUILD_HEAP_MB: "6144"
       # Build-time placeholders (fail-closed runtime validation is PR 2)
       NEXTAUTH_SECRET: ci-nextauth-secret-not-for-production-use-32chars
       NEXTAUTH_URL: http://localhost:3000

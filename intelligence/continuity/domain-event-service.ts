@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 
 import { getMapAbleIntelligenceConfig } from "../config";
 import { recordCareOSMissionEvent } from "../operations/mission-state-service";
+
 import {
   analyseCareOSOperationalEvent,
   type CareOSOperationalEvent,

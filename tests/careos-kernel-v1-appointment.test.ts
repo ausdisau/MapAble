@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { evaluateAppointmentAuthority } from "@/intelligence/kernel/v1/authority";
 import type {
   AppointmentEvent,
   AppointmentMissionRequest,
   AppointmentMissionState,
 } from "@/intelligence/kernel/v1/appointment-types";
+import { evaluateAppointmentAuthority } from "@/intelligence/kernel/v1/authority";
 import {
   reduceAppointmentMission,
   replayAppointmentMission,

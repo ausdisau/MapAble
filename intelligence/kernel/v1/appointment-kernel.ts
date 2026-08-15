@@ -3,12 +3,13 @@ import { randomUUID } from "node:crypto";
 import type { CurrentUser } from "@/lib/auth/current-user";
 
 import { buildCareSupportIntelligence } from "../../care/support-intelligence-service";
-import { evaluateAppointmentAuthority } from "./authority";
+
 import type {
   AppointmentEvent,
   AppointmentMissionRequest,
   AppointmentMissionState,
 } from "./appointment-types";
+import { evaluateAppointmentAuthority } from "./authority";
 import { reduceAppointmentMission } from "./event-reducer";
 
 function event(params: Omit<AppointmentEvent, "id" | "occurredAt">): AppointmentEvent {

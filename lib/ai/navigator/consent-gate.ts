@@ -1,10 +1,10 @@
+import { NAVIGATOR_AUDIT } from "@/lib/ai/navigator/gates";
 import { createAuditEvent } from "@/lib/audit/audit-event-service";
 import { hasParticipantAuthority } from "@/lib/authority/participant-authority-service";
 import { createConsentReceipt } from "@/lib/consent/consent-receipt-service";
-import { NAVIGATOR_AUDIT } from "@/lib/ai/navigator/gates";
+import { consentScopeToPrisma } from "@/lib/consent/scope-map";
 import { prisma } from "@/lib/prisma";
 import type { ConsentScope } from "@/types/mapable";
-import { consentScopeToPrisma } from "@/lib/consent/scope-map";
 
 export const NAVIGATOR_CONSENT_PURPOSE = "navigator.provider_search" as const;
 
