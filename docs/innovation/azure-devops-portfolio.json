@@ -1,0 +1,1413 @@
+{
+  "version": "1.0.0",
+  "programme": "MapAble Innovation Portfolio",
+  "organisation": "Australian Disability Ltd",
+  "areaPath": "MapAble\\Innovation Portfolio",
+  "iterationPath": "MapAble\\Innovation",
+  "workItemTypeEpic": "Epic",
+  "workItemTypeFeature": "Feature",
+  "epics": [
+    {
+      "key": "mapable-epic-01-access-graph",
+      "title": "MapAble Access Graph",
+      "priority": "P0",
+      "horizon": "Foundation Wave",
+      "dependencies": [],
+      "features": [
+        {
+          "key": "mapable-epic-01-access-graph-gate-g0-problem-evidence",
+          "title": "G0 \u2014 Problem Evidence",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-01-access-graph-gate-g1-co-design",
+          "title": "G1 \u2014 Disability-Led Co-design",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-01-access-graph-gate-g2-rights-review",
+          "title": "G2 \u2014 Rights, Accessibility & Risk Review",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-01-access-graph-gate-g3-technical-proof",
+          "title": "G3 \u2014 Technical Proof",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-01-access-graph-gate-g4-controlled-pilot",
+          "title": "G4 \u2014 Controlled Pilot",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-01-access-graph-gate-g5-evidence-to-scale",
+          "title": "G5 \u2014 Evidence to Scale",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-01-access-graph-gate-g6-continuous-assurance",
+          "title": "G6 \u2014 Continuous Assurance",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-01-access-graph-feat-canonical-accessibility-taxonomy",
+          "title": "Canonical accessibility taxonomy",
+          "type": "product",
+          "classification": "EXTEND"
+        },
+        {
+          "key": "mapable-epic-01-access-graph-feat-place-feature-schema",
+          "title": "Place and feature schema",
+          "type": "product",
+          "classification": "EXTEND"
+        },
+        {
+          "key": "mapable-epic-01-access-graph-feat-evidence-provenance-system",
+          "title": "Evidence provenance system",
+          "type": "product",
+          "classification": "EXTEND"
+        },
+        {
+          "key": "mapable-epic-01-access-graph-feat-observation-workflow",
+          "title": "Observation workflow",
+          "type": "product",
+          "classification": "NEW/EXTEND"
+        },
+        {
+          "key": "mapable-epic-01-access-graph-feat-verification-workflow",
+          "title": "Verification workflow",
+          "type": "product",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-01-access-graph-feat-freshness-expiry-engine",
+          "title": "Freshness and expiry engine",
+          "type": "product",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-01-access-graph-feat-correction-dispute-workflow",
+          "title": "Correction/dispute workflow",
+          "type": "product",
+          "classification": "EXTEND"
+        },
+        {
+          "key": "mapable-epic-01-access-graph-feat-access-graph-read-api",
+          "title": "Access Graph read API (internal)",
+          "type": "product",
+          "classification": "NEW"
+        }
+      ]
+    },
+    {
+      "key": "mapable-epic-02-personal-access-passport",
+      "title": "Personal Access Passport",
+      "priority": "P0",
+      "horizon": "Foundation Wave",
+      "dependencies": [
+        "mapable-epic-01-access-graph"
+      ],
+      "features": [
+        {
+          "key": "mapable-epic-02-personal-access-passport-gate-g0-problem-evidence",
+          "title": "G0 \u2014 Problem Evidence",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-02-personal-access-passport-gate-g1-co-design",
+          "title": "G1 \u2014 Disability-Led Co-design",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-02-personal-access-passport-gate-g2-rights-review",
+          "title": "G2 \u2014 Rights, Accessibility & Risk Review",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-02-personal-access-passport-gate-g3-technical-proof",
+          "title": "G3 \u2014 Technical Proof",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-02-personal-access-passport-gate-g4-controlled-pilot",
+          "title": "G4 \u2014 Controlled Pilot",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-02-personal-access-passport-gate-g5-evidence-to-scale",
+          "title": "G5 \u2014 Evidence to Scale",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-02-personal-access-passport-gate-g6-continuous-assurance",
+          "title": "G6 \u2014 Continuous Assurance",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-02-personal-access-passport-feat-passport-crud-ontology",
+          "title": "Passport CRUD + requirement ontology",
+          "type": "product",
+          "classification": "EXTEND"
+        },
+        {
+          "key": "mapable-epic-02-personal-access-passport-feat-granular-disclosure-scopes",
+          "title": "Granular disclosure scopes",
+          "type": "product",
+          "classification": "EXTEND"
+        },
+        {
+          "key": "mapable-epic-02-personal-access-passport-feat-purpose-bound-consent",
+          "title": "Purpose-bound consent + receipts",
+          "type": "product",
+          "classification": "REUSE/EXTEND"
+        },
+        {
+          "key": "mapable-epic-02-personal-access-passport-feat-sharing-controls-recipient-type",
+          "title": "Sharing controls by recipient type",
+          "type": "product",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-02-personal-access-passport-feat-access-log-participant-review",
+          "title": "Access log + participant review",
+          "type": "product",
+          "classification": "EXTEND"
+        },
+        {
+          "key": "mapable-epic-02-personal-access-passport-feat-passport-compatibility-projection",
+          "title": "Passport compatibility projection",
+          "type": "product",
+          "classification": "EXTEND"
+        },
+        {
+          "key": "mapable-epic-02-personal-access-passport-feat-non-disclosure-guardrails",
+          "title": "Non-disclosure guardrails",
+          "type": "product",
+          "classification": "NEW"
+        }
+      ]
+    },
+    {
+      "key": "mapable-epic-03-navigate",
+      "title": "MapAble Navigate",
+      "priority": "P1",
+      "horizon": "Experience Wave",
+      "dependencies": [
+        "mapable-epic-01-access-graph",
+        "mapable-epic-02-personal-access-passport"
+      ],
+      "features": [
+        {
+          "key": "mapable-epic-03-navigate-gate-g0-problem-evidence",
+          "title": "G0 \u2014 Problem Evidence",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-03-navigate-gate-g1-co-design",
+          "title": "G1 \u2014 Disability-Led Co-design",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-03-navigate-gate-g2-rights-review",
+          "title": "G2 \u2014 Rights, Accessibility & Risk Review",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-03-navigate-gate-g3-technical-proof",
+          "title": "G3 \u2014 Technical Proof",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-03-navigate-gate-g4-controlled-pilot",
+          "title": "G4 \u2014 Controlled Pilot",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-03-navigate-gate-g5-evidence-to-scale",
+          "title": "G5 \u2014 Evidence to Scale",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-03-navigate-gate-g6-continuous-assurance",
+          "title": "G6 \u2014 Continuous Assurance",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-03-navigate-feat-suitability-routing-engine",
+          "title": "Suitability routing engine",
+          "type": "product",
+          "classification": "NEW/EXTEND"
+        },
+        {
+          "key": "mapable-epic-03-navigate-feat-evidence-aware-route-segments",
+          "title": "Evidence-aware route segments",
+          "type": "product",
+          "classification": "EXTEND"
+        },
+        {
+          "key": "mapable-epic-03-navigate-feat-uncertainty-freshness-ui",
+          "title": "Uncertainty + freshness UI",
+          "type": "product",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-03-navigate-feat-rest-toilet-recharge-waypoints",
+          "title": "Rest/toilet/recharge waypoints",
+          "type": "product",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-03-navigate-feat-temporary-barrier-ingestion",
+          "title": "Temporary barrier ingestion",
+          "type": "product",
+          "classification": "NEW/EXTEND"
+        },
+        {
+          "key": "mapable-epic-03-navigate-feat-indoor-outdoor-stitching",
+          "title": "Indoor/outdoor route stitching",
+          "type": "product",
+          "classification": "DEFER"
+        },
+        {
+          "key": "mapable-epic-03-navigate-feat-navigate-participant-ui",
+          "title": "Navigate participant UI",
+          "type": "product",
+          "classification": "NEW"
+        }
+      ]
+    },
+    {
+      "key": "mapable-epic-04-access-intelligence-vision",
+      "title": "Access Intelligence Vision",
+      "priority": "P3",
+      "horizon": "R&D Wave",
+      "dependencies": [
+        "mapable-epic-01-access-graph"
+      ],
+      "features": [
+        {
+          "key": "mapable-epic-04-access-intelligence-vision-gate-g0-problem-evidence",
+          "title": "G0 \u2014 Problem Evidence",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-04-access-intelligence-vision-gate-g1-co-design",
+          "title": "G1 \u2014 Disability-Led Co-design",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-04-access-intelligence-vision-gate-g2-rights-review",
+          "title": "G2 \u2014 Rights, Accessibility & Risk Review",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-04-access-intelligence-vision-gate-g3-technical-proof",
+          "title": "G3 \u2014 Technical Proof",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-04-access-intelligence-vision-gate-g4-controlled-pilot",
+          "title": "G4 \u2014 Controlled Pilot",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-04-access-intelligence-vision-gate-g5-evidence-to-scale",
+          "title": "G5 \u2014 Evidence to Scale",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-04-access-intelligence-vision-gate-g6-continuous-assurance",
+          "title": "G6 \u2014 Continuous Assurance",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-04-access-intelligence-vision-feat-cv-evidence-pipeline",
+          "title": "CV evidence proposal pipeline",
+          "type": "product",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-04-access-intelligence-vision-feat-ai-inferred-unverified-labelling",
+          "title": "AI INFERRED \u2014 UNVERIFIED labelling",
+          "type": "product",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-04-access-intelligence-vision-feat-human-verification-queue",
+          "title": "Human verification queue",
+          "type": "product",
+          "classification": "EXTEND"
+        },
+        {
+          "key": "mapable-epic-04-access-intelligence-vision-feat-community-confirmation",
+          "title": "Community confirmation workflow",
+          "type": "product",
+          "classification": "EXTEND"
+        },
+        {
+          "key": "mapable-epic-04-access-intelligence-vision-feat-organisation-correction",
+          "title": "Organisation correction workflow",
+          "type": "product",
+          "classification": "EXTEND"
+        },
+        {
+          "key": "mapable-epic-04-access-intelligence-vision-feat-assessor-validation",
+          "title": "Assessor validation workflow",
+          "type": "product",
+          "classification": "EXTEND"
+        },
+        {
+          "key": "mapable-epic-04-access-intelligence-vision-feat-vision-eval-harness",
+          "title": "Vision eval harness",
+          "type": "product",
+          "classification": "NEW"
+        }
+      ]
+    },
+    {
+      "key": "mapable-epic-05-accessibility-digital-twins",
+      "title": "Accessibility Digital Twins",
+      "priority": "P3",
+      "horizon": "R&D Wave",
+      "dependencies": [
+        "mapable-epic-01-access-graph"
+      ],
+      "features": [
+        {
+          "key": "mapable-epic-05-accessibility-digital-twins-gate-g0-problem-evidence",
+          "title": "G0 \u2014 Problem Evidence",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-05-accessibility-digital-twins-gate-g1-co-design",
+          "title": "G1 \u2014 Disability-Led Co-design",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-05-accessibility-digital-twins-gate-g2-rights-review",
+          "title": "G2 \u2014 Rights, Accessibility & Risk Review",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-05-accessibility-digital-twins-gate-g3-technical-proof",
+          "title": "G3 \u2014 Technical Proof",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-05-accessibility-digital-twins-gate-g4-controlled-pilot",
+          "title": "G4 \u2014 Controlled Pilot",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-05-accessibility-digital-twins-gate-g5-evidence-to-scale",
+          "title": "G5 \u2014 Evidence to Scale",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-05-accessibility-digital-twins-gate-g6-continuous-assurance",
+          "title": "G6 \u2014 Continuous Assurance",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-05-accessibility-digital-twins-feat-spatial-venue-model-schema",
+          "title": "Spatial venue model schema",
+          "type": "product",
+          "classification": "EXTEND"
+        },
+        {
+          "key": "mapable-epic-05-accessibility-digital-twins-feat-evidence-backed-twin-ingestion",
+          "title": "Evidence-backed twin ingestion",
+          "type": "product",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-05-accessibility-digital-twins-feat-passport-compatibility-preview",
+          "title": "Passport compatibility preview",
+          "type": "product",
+          "classification": "DEFER"
+        },
+        {
+          "key": "mapable-epic-05-accessibility-digital-twins-feat-evacuation-planning-support",
+          "title": "Evacuation planning support",
+          "type": "product",
+          "classification": "PROPOSED"
+        },
+        {
+          "key": "mapable-epic-05-accessibility-digital-twins-feat-ar-vr-preview",
+          "title": "AR/VR preview interface",
+          "type": "product",
+          "classification": "EXPLORATORY"
+        },
+        {
+          "key": "mapable-epic-05-accessibility-digital-twins-feat-twin-publication-workflow",
+          "title": "Twin publication workflow",
+          "type": "product",
+          "classification": "EXTEND"
+        }
+      ]
+    },
+    {
+      "key": "mapable-epic-06-accreditation-os",
+      "title": "MapAble Accreditation OS",
+      "priority": "P0",
+      "horizon": "Foundation Wave",
+      "dependencies": [
+        "mapable-epic-01-access-graph",
+        "mapable-epic-09-trust-credential-network"
+      ],
+      "features": [
+        {
+          "key": "mapable-epic-06-accreditation-os-gate-g0-problem-evidence",
+          "title": "G0 \u2014 Problem Evidence",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-06-accreditation-os-gate-g1-co-design",
+          "title": "G1 \u2014 Disability-Led Co-design",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-06-accreditation-os-gate-g2-rights-review",
+          "title": "G2 \u2014 Rights, Accessibility & Risk Review",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-06-accreditation-os-gate-g3-technical-proof",
+          "title": "G3 \u2014 Technical Proof",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-06-accreditation-os-gate-g4-controlled-pilot",
+          "title": "G4 \u2014 Controlled Pilot",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-06-accreditation-os-gate-g5-evidence-to-scale",
+          "title": "G5 \u2014 Evidence to Scale",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-06-accreditation-os-gate-g6-continuous-assurance",
+          "title": "G6 \u2014 Continuous Assurance",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-06-accreditation-os-feat-assessment-workflow-engine",
+          "title": "Assessment workflow engine",
+          "type": "product",
+          "classification": "EXTEND"
+        },
+        {
+          "key": "mapable-epic-06-accreditation-os-feat-assessor-assignment-identity",
+          "title": "Assessor assignment + identity",
+          "type": "product",
+          "classification": "EXTEND"
+        },
+        {
+          "key": "mapable-epic-06-accreditation-os-feat-measurement-evidence-capture",
+          "title": "Measurement + evidence capture",
+          "type": "product",
+          "classification": "EXTEND"
+        },
+        {
+          "key": "mapable-epic-06-accreditation-os-feat-scoring-human-review",
+          "title": "Scoring + human review",
+          "type": "product",
+          "classification": "EXTEND"
+        },
+        {
+          "key": "mapable-epic-06-accreditation-os-feat-remediation-tracking",
+          "title": "Remediation tracking",
+          "type": "product",
+          "classification": "NEW/EXTEND"
+        },
+        {
+          "key": "mapable-epic-06-accreditation-os-feat-publish-facts-to-graph",
+          "title": "Publish approved facts to graph",
+          "type": "product",
+          "classification": "EXTEND"
+        },
+        {
+          "key": "mapable-epic-06-accreditation-os-feat-expiry-reassessment",
+          "title": "Expiry + reassessment",
+          "type": "product",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-06-accreditation-os-feat-appeals-corrections",
+          "title": "Appeals/corrections",
+          "type": "product",
+          "classification": "EXTEND"
+        }
+      ]
+    },
+    {
+      "key": "mapable-epic-07-participant-orchestration-agent",
+      "title": "Participant Orchestration Agent",
+      "priority": "P2",
+      "horizon": "Controlled Intelligence Wave",
+      "dependencies": [
+        "mapable-epic-02-personal-access-passport",
+        "mapable-epic-03-navigate",
+        "mapable-epic-08-accessible-communications-fabric"
+      ],
+      "features": [
+        {
+          "key": "mapable-epic-07-participant-orchestration-agent-gate-g0-problem-evidence",
+          "title": "G0 \u2014 Problem Evidence",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-07-participant-orchestration-agent-gate-g1-co-design",
+          "title": "G1 \u2014 Disability-Led Co-design",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-07-participant-orchestration-agent-gate-g2-rights-review",
+          "title": "G2 \u2014 Rights, Accessibility & Risk Review",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-07-participant-orchestration-agent-gate-g3-technical-proof",
+          "title": "G3 \u2014 Technical Proof",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-07-participant-orchestration-agent-gate-g4-controlled-pilot",
+          "title": "G4 \u2014 Controlled Pilot",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-07-participant-orchestration-agent-gate-g5-evidence-to-scale",
+          "title": "G5 \u2014 Evidence to Scale",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-07-participant-orchestration-agent-gate-g6-continuous-assurance",
+          "title": "G6 \u2014 Continuous Assurance",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-07-participant-orchestration-agent-feat-orchestrator-agent-shell",
+          "title": "Single orchestrating agent shell",
+          "type": "product",
+          "classification": "EXTEND"
+        },
+        {
+          "key": "mapable-epic-07-participant-orchestration-agent-feat-typed-tools-schemas",
+          "title": "Typed tools + constrained schemas",
+          "type": "product",
+          "classification": "EXTEND"
+        },
+        {
+          "key": "mapable-epic-07-participant-orchestration-agent-feat-propose-validate-approve-execute",
+          "title": "Propose \u2192 validate \u2192 approve \u2192 execute",
+          "type": "product",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-07-participant-orchestration-agent-feat-cross-module-read-aggregation",
+          "title": "Cross-module read aggregation",
+          "type": "product",
+          "classification": "EXTEND"
+        },
+        {
+          "key": "mapable-epic-07-participant-orchestration-agent-feat-approval-gates-audit",
+          "title": "Approval gates + audit events",
+          "type": "product",
+          "classification": "REUSE"
+        },
+        {
+          "key": "mapable-epic-07-participant-orchestration-agent-feat-non-ai-fallback-planner",
+          "title": "Non-AI fallback planner",
+          "type": "product",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-07-participant-orchestration-agent-feat-orchestration-eval-suite",
+          "title": "Orchestration eval suite",
+          "type": "product",
+          "classification": "EXTEND"
+        }
+      ]
+    },
+    {
+      "key": "mapable-epic-08-accessible-communications-fabric",
+      "title": "Accessible Communications Fabric",
+      "priority": "P1",
+      "horizon": "Experience Wave",
+      "dependencies": [],
+      "features": [
+        {
+          "key": "mapable-epic-08-accessible-communications-fabric-gate-g0-problem-evidence",
+          "title": "G0 \u2014 Problem Evidence",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-08-accessible-communications-fabric-gate-g1-co-design",
+          "title": "G1 \u2014 Disability-Led Co-design",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-08-accessible-communications-fabric-gate-g2-rights-review",
+          "title": "G2 \u2014 Rights, Accessibility & Risk Review",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-08-accessible-communications-fabric-gate-g3-technical-proof",
+          "title": "G3 \u2014 Technical Proof",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-08-accessible-communications-fabric-gate-g4-controlled-pilot",
+          "title": "G4 \u2014 Controlled Pilot",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-08-accessible-communications-fabric-gate-g5-evidence-to-scale",
+          "title": "G5 \u2014 Evidence to Scale",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-08-accessible-communications-fabric-gate-g6-continuous-assurance",
+          "title": "G6 \u2014 Continuous Assurance",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-08-accessible-communications-fabric-feat-communication-preference-sot",
+          "title": "Communication preference SoT",
+          "type": "product",
+          "classification": "EXTEND"
+        },
+        {
+          "key": "mapable-epic-08-accessible-communications-fabric-feat-multi-channel-adapter",
+          "title": "Multi-channel adapter layer",
+          "type": "product",
+          "classification": "NEW/EXTEND"
+        },
+        {
+          "key": "mapable-epic-08-accessible-communications-fabric-feat-aac-plain-language",
+          "title": "AAC-friendly + plain-language interfaces",
+          "type": "product",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-08-accessible-communications-fabric-feat-no-voice-escalation",
+          "title": "No-voice-required escalation",
+          "type": "product",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-08-accessible-communications-fabric-feat-service-status-explain",
+          "title": "Service-status explain + next steps",
+          "type": "product",
+          "classification": "EXTEND"
+        },
+        {
+          "key": "mapable-epic-08-accessible-communications-fabric-feat-emergency-escalation-boundaries",
+          "title": "Emergency escalation boundaries",
+          "type": "product",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-08-accessible-communications-fabric-feat-clinical-payment-isolation",
+          "title": "Clinical/payment data isolation",
+          "type": "product",
+          "classification": "REUSE"
+        }
+      ]
+    },
+    {
+      "key": "mapable-epic-09-trust-credential-network",
+      "title": "Trust & Credential Network",
+      "priority": "P0",
+      "horizon": "Foundation Wave",
+      "dependencies": [],
+      "features": [
+        {
+          "key": "mapable-epic-09-trust-credential-network-gate-g0-problem-evidence",
+          "title": "G0 \u2014 Problem Evidence",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-09-trust-credential-network-gate-g1-co-design",
+          "title": "G1 \u2014 Disability-Led Co-design",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-09-trust-credential-network-gate-g2-rights-review",
+          "title": "G2 \u2014 Rights, Accessibility & Risk Review",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-09-trust-credential-network-gate-g3-technical-proof",
+          "title": "G3 \u2014 Technical Proof",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-09-trust-credential-network-gate-g4-controlled-pilot",
+          "title": "G4 \u2014 Controlled Pilot",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-09-trust-credential-network-gate-g5-evidence-to-scale",
+          "title": "G5 \u2014 Evidence to Scale",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-09-trust-credential-network-gate-g6-continuous-assurance",
+          "title": "G6 \u2014 Continuous Assurance",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-09-trust-credential-network-feat-credential-registry-lifecycle",
+          "title": "Credential registry + lifecycle",
+          "type": "product",
+          "classification": "EXTEND"
+        },
+        {
+          "key": "mapable-epic-09-trust-credential-network-feat-expiry-suspension-fail-closed",
+          "title": "Expiry + suspension (never silent approve)",
+          "type": "product",
+          "classification": "NEW/EXTEND"
+        },
+        {
+          "key": "mapable-epic-09-trust-credential-network-feat-issuer-verification-evidence",
+          "title": "Issuer verification + evidence",
+          "type": "product",
+          "classification": "EXTEND"
+        },
+        {
+          "key": "mapable-epic-09-trust-credential-network-feat-renewal-reminders-exceptions",
+          "title": "Renewal reminders + exception workflow",
+          "type": "product",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-09-trust-credential-network-feat-vehicle-driver-assessor-types",
+          "title": "Vehicle/driver/assessor credential types",
+          "type": "product",
+          "classification": "EXTEND"
+        },
+        {
+          "key": "mapable-epic-09-trust-credential-network-feat-credential-api-verticals",
+          "title": "Credential API for verticals",
+          "type": "product",
+          "classification": "EXTEND"
+        }
+      ]
+    },
+    {
+      "key": "mapable-epic-10-funding-payment-integrity",
+      "title": "Funding & Payment Integrity Engine",
+      "priority": "P2",
+      "horizon": "Controlled Intelligence Wave",
+      "dependencies": [],
+      "features": [
+        {
+          "key": "mapable-epic-10-funding-payment-integrity-gate-g0-problem-evidence",
+          "title": "G0 \u2014 Problem Evidence",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-10-funding-payment-integrity-gate-g1-co-design",
+          "title": "G1 \u2014 Disability-Led Co-design",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-10-funding-payment-integrity-gate-g2-rights-review",
+          "title": "G2 \u2014 Rights, Accessibility & Risk Review",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-10-funding-payment-integrity-gate-g3-technical-proof",
+          "title": "G3 \u2014 Technical Proof",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-10-funding-payment-integrity-gate-g4-controlled-pilot",
+          "title": "G4 \u2014 Controlled Pilot",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-10-funding-payment-integrity-gate-g5-evidence-to-scale",
+          "title": "G5 \u2014 Evidence to Scale",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-10-funding-payment-integrity-gate-g6-continuous-assurance",
+          "title": "G6 \u2014 Continuous Assurance",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-10-funding-payment-integrity-feat-pricing-explanation",
+          "title": "Pricing explanation layer",
+          "type": "product",
+          "classification": "EXTEND"
+        },
+        {
+          "key": "mapable-epic-10-funding-payment-integrity-feat-quote-comparison",
+          "title": "Quote comparison",
+          "type": "product",
+          "classification": "EXTEND"
+        },
+        {
+          "key": "mapable-epic-10-funding-payment-integrity-feat-invoice-anomaly-duplicate",
+          "title": "Invoice anomaly + duplicate detection",
+          "type": "product",
+          "classification": "EXTEND"
+        },
+        {
+          "key": "mapable-epic-10-funding-payment-integrity-feat-advisory-funding-language",
+          "title": "Advisory funding pathway language",
+          "type": "product",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-10-funding-payment-integrity-feat-participant-review-draft-questions",
+          "title": "Participant review + draft questions",
+          "type": "product",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-10-funding-payment-integrity-feat-reconciliation-assistance",
+          "title": "Reconciliation assistance",
+          "type": "product",
+          "classification": "EXTEND"
+        },
+        {
+          "key": "mapable-epic-10-funding-payment-integrity-feat-funding-integrity-evals",
+          "title": "Funding integrity evals",
+          "type": "product",
+          "classification": "NEW"
+        }
+      ]
+    },
+    {
+      "key": "mapable-epic-11-employment-accessibility-graph",
+      "title": "Employment Accessibility Graph",
+      "priority": "P2",
+      "horizon": "Participation Wave",
+      "dependencies": [
+        "mapable-epic-01-access-graph",
+        "mapable-epic-02-personal-access-passport",
+        "mapable-epic-03-navigate"
+      ],
+      "features": [
+        {
+          "key": "mapable-epic-11-employment-accessibility-graph-gate-g0-problem-evidence",
+          "title": "G0 \u2014 Problem Evidence",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-11-employment-accessibility-graph-gate-g1-co-design",
+          "title": "G1 \u2014 Disability-Led Co-design",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-11-employment-accessibility-graph-gate-g2-rights-review",
+          "title": "G2 \u2014 Rights, Accessibility & Risk Review",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-11-employment-accessibility-graph-gate-g3-technical-proof",
+          "title": "G3 \u2014 Technical Proof",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-11-employment-accessibility-graph-gate-g4-controlled-pilot",
+          "title": "G4 \u2014 Controlled Pilot",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-11-employment-accessibility-graph-gate-g5-evidence-to-scale",
+          "title": "G5 \u2014 Evidence to Scale",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-11-employment-accessibility-graph-gate-g6-continuous-assurance",
+          "title": "G6 \u2014 Continuous Assurance",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-11-employment-accessibility-graph-feat-workplace-accessibility-profiles",
+          "title": "Workplace accessibility profiles",
+          "type": "product",
+          "classification": "EXTEND"
+        },
+        {
+          "key": "mapable-epic-11-employment-accessibility-graph-feat-candidate-disclosure-gates",
+          "title": "Candidate-controlled disclosure gates",
+          "type": "product",
+          "classification": "EXTEND"
+        },
+        {
+          "key": "mapable-epic-11-employment-accessibility-graph-feat-job-access-transport-compatibility",
+          "title": "Job \u2194 access \u2194 transport compatibility",
+          "type": "product",
+          "classification": "NEW/EXTEND"
+        },
+        {
+          "key": "mapable-epic-11-employment-accessibility-graph-feat-adjustment-request-workflow",
+          "title": "Adjustment request workflow",
+          "type": "product",
+          "classification": "EXTEND"
+        },
+        {
+          "key": "mapable-epic-11-employment-accessibility-graph-feat-interview-accessibility-planning",
+          "title": "Interview accessibility planning",
+          "type": "product",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-11-employment-accessibility-graph-feat-placement-sustainability",
+          "title": "Placement sustainability signals",
+          "type": "product",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-11-employment-accessibility-graph-feat-employer-access-improvement-loop",
+          "title": "Employer access improvement loop",
+          "type": "product",
+          "classification": "NEW"
+        }
+      ]
+    },
+    {
+      "key": "mapable-epic-12-circular-assistive-technology",
+      "title": "Circular Assistive Technology Network",
+      "priority": "P3",
+      "horizon": "R&D Wave",
+      "dependencies": [
+        "mapable-epic-09-trust-credential-network"
+      ],
+      "features": [
+        {
+          "key": "mapable-epic-12-circular-assistive-technology-gate-g0-problem-evidence",
+          "title": "G0 \u2014 Problem Evidence",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-12-circular-assistive-technology-gate-g1-co-design",
+          "title": "G1 \u2014 Disability-Led Co-design",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-12-circular-assistive-technology-gate-g2-rights-review",
+          "title": "G2 \u2014 Rights, Accessibility & Risk Review",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-12-circular-assistive-technology-gate-g3-technical-proof",
+          "title": "G3 \u2014 Technical Proof",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-12-circular-assistive-technology-gate-g4-controlled-pilot",
+          "title": "G4 \u2014 Controlled Pilot",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-12-circular-assistive-technology-gate-g5-evidence-to-scale",
+          "title": "G5 \u2014 Evidence to Scale",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-12-circular-assistive-technology-gate-g6-continuous-assurance",
+          "title": "G6 \u2014 Continuous Assurance",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-12-circular-assistive-technology-feat-equipment-passport-schema",
+          "title": "Equipment Passport schema",
+          "type": "product",
+          "classification": "EXTEND"
+        },
+        {
+          "key": "mapable-epic-12-circular-assistive-technology-feat-trial-rental-reuse-listing",
+          "title": "Trial/rental/reuse listing",
+          "type": "product",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-12-circular-assistive-technology-feat-recall-warranty-tracking",
+          "title": "Recall + warranty tracking",
+          "type": "product",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-12-circular-assistive-technology-feat-compatibility-accessories",
+          "title": "Compatibility + accessories",
+          "type": "product",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-12-circular-assistive-technology-feat-clinical-suitability-guardrails",
+          "title": "Clinical suitability guardrails",
+          "type": "product",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-12-circular-assistive-technology-feat-servicing-collection-logistics",
+          "title": "Servicing + collection logistics",
+          "type": "product",
+          "classification": "DEFER"
+        }
+      ]
+    },
+    {
+      "key": "mapable-epic-13-access-api",
+      "title": "MapAble Access API",
+      "priority": "P2",
+      "horizon": "Platform Commercialisation Wave",
+      "dependencies": [
+        "mapable-epic-01-access-graph",
+        "mapable-epic-06-accreditation-os"
+      ],
+      "features": [
+        {
+          "key": "mapable-epic-13-access-api-gate-g0-problem-evidence",
+          "title": "G0 \u2014 Problem Evidence",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-13-access-api-gate-g1-co-design",
+          "title": "G1 \u2014 Disability-Led Co-design",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-13-access-api-gate-g2-rights-review",
+          "title": "G2 \u2014 Rights, Accessibility & Risk Review",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-13-access-api-gate-g3-technical-proof",
+          "title": "G3 \u2014 Technical Proof",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-13-access-api-gate-g4-controlled-pilot",
+          "title": "G4 \u2014 Controlled Pilot",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-13-access-api-gate-g5-evidence-to-scale",
+          "title": "G5 \u2014 Evidence to Scale",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-13-access-api-gate-g6-continuous-assurance",
+          "title": "G6 \u2014 Continuous Assurance",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-13-access-api-feat-public-api-resource-model",
+          "title": "Public API resource model",
+          "type": "product",
+          "classification": "EXTEND"
+        },
+        {
+          "key": "mapable-epic-13-access-api-feat-provenance-confidence-responses",
+          "title": "Provenance + confidence in responses",
+          "type": "product",
+          "classification": "EXTEND"
+        },
+        {
+          "key": "mapable-epic-13-access-api-feat-rate-limiting-licensing",
+          "title": "Rate limiting + licensing",
+          "type": "product",
+          "classification": "NEW/EXTEND"
+        },
+        {
+          "key": "mapable-epic-13-access-api-feat-privacy-boundaries-no-passport",
+          "title": "Privacy boundaries (no Passport exposure)",
+          "type": "product",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-13-access-api-feat-versioning-change-history",
+          "title": "Versioning + change history",
+          "type": "product",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-13-access-api-feat-partner-onboarding",
+          "title": "Partner onboarding + access controls",
+          "type": "product",
+          "classification": "EXTEND"
+        }
+      ]
+    },
+    {
+      "key": "mapable-epic-14-access-observatory",
+      "title": "MapAble Access Observatory",
+      "priority": "P2",
+      "horizon": "Platform Commercialisation Wave",
+      "dependencies": [
+        "mapable-epic-01-access-graph",
+        "mapable-epic-03-navigate",
+        "mapable-epic-11-employment-accessibility-graph"
+      ],
+      "features": [
+        {
+          "key": "mapable-epic-14-access-observatory-gate-g0-problem-evidence",
+          "title": "G0 \u2014 Problem Evidence",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-14-access-observatory-gate-g1-co-design",
+          "title": "G1 \u2014 Disability-Led Co-design",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-14-access-observatory-gate-g2-rights-review",
+          "title": "G2 \u2014 Rights, Accessibility & Risk Review",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-14-access-observatory-gate-g3-technical-proof",
+          "title": "G3 \u2014 Technical Proof",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-14-access-observatory-gate-g4-controlled-pilot",
+          "title": "G4 \u2014 Controlled Pilot",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-14-access-observatory-gate-g5-evidence-to-scale",
+          "title": "G5 \u2014 Evidence to Scale",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-14-access-observatory-gate-g6-continuous-assurance",
+          "title": "G6 \u2014 Continuous Assurance",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-14-access-observatory-feat-privacy-preserving-aggregation",
+          "title": "Privacy-preserving aggregation layer",
+          "type": "product",
+          "classification": "NEW/EXTEND"
+        },
+        {
+          "key": "mapable-epic-14-access-observatory-feat-gap-analysis-dashboards",
+          "title": "Gap analysis dashboards",
+          "type": "product",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-14-access-observatory-feat-route-barrier-heatmaps",
+          "title": "Route barrier heatmaps",
+          "type": "product",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-14-access-observatory-feat-employment-cluster-analysis",
+          "title": "Employment cluster analysis",
+          "type": "product",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-14-access-observatory-feat-data-coverage-metrics",
+          "title": "Data coverage metrics",
+          "type": "product",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-14-access-observatory-feat-no-identifiable-journeys",
+          "title": "No identifiable journey exposure",
+          "type": "product",
+          "classification": "NEW"
+        }
+      ]
+    },
+    {
+      "key": "mapable-epic-15-academy-capability-passport",
+      "title": "MapAble Academy + Capability Passport",
+      "priority": "P2",
+      "horizon": "Participation Wave",
+      "dependencies": [
+        "mapable-epic-09-trust-credential-network"
+      ],
+      "features": [
+        {
+          "key": "mapable-epic-15-academy-capability-passport-gate-g0-problem-evidence",
+          "title": "G0 \u2014 Problem Evidence",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-15-academy-capability-passport-gate-g1-co-design",
+          "title": "G1 \u2014 Disability-Led Co-design",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-15-academy-capability-passport-gate-g2-rights-review",
+          "title": "G2 \u2014 Rights, Accessibility & Risk Review",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-15-academy-capability-passport-gate-g3-technical-proof",
+          "title": "G3 \u2014 Technical Proof",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-15-academy-capability-passport-gate-g4-controlled-pilot",
+          "title": "G4 \u2014 Controlled Pilot",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-15-academy-capability-passport-gate-g5-evidence-to-scale",
+          "title": "G5 \u2014 Evidence to Scale",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-15-academy-capability-passport-gate-g6-continuous-assurance",
+          "title": "G6 \u2014 Continuous Assurance",
+          "type": "stage-gate",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-15-academy-capability-passport-feat-course-competency-catalogue",
+          "title": "Course + competency catalogue",
+          "type": "product",
+          "classification": "EXTEND"
+        },
+        {
+          "key": "mapable-epic-15-academy-capability-passport-feat-competency-assessment-workflow",
+          "title": "Competency assessment workflow",
+          "type": "product",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-15-academy-capability-passport-feat-capability-passport",
+          "title": "Capability Passport (role requirements)",
+          "type": "product",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-15-academy-capability-passport-feat-expiry-refresher-training",
+          "title": "Expiry + refresher training",
+          "type": "product",
+          "classification": "NEW"
+        },
+        {
+          "key": "mapable-epic-15-academy-capability-passport-feat-evidence-capture-assessments",
+          "title": "Evidence capture for assessments",
+          "type": "product",
+          "classification": "EXTEND"
+        },
+        {
+          "key": "mapable-epic-15-academy-capability-passport-feat-worker-readiness-integration",
+          "title": "Worker readiness integration",
+          "type": "product",
+          "classification": "EXTEND"
+        }
+      ]
+    }
+  ]
+}

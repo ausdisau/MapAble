@@ -40,3 +40,35 @@ export type {
 
 export { isDecisiveCompatibility, mapConclusionToCompatibility } from "./compatibility";
 export { accessInfrastructureFlags } from "./flags";
+export {
+  evaluateObservationFreshness,
+  computeExpiryFromObservedAt,
+  freshnessPolicyForConcept,
+} from "./freshness";
+export type { FreshnessEvaluation, FreshnessState } from "./freshness";
+export {
+  ACCESS_OBSERVATION_SOURCE_TYPES,
+  ACCESS_SOURCE_CLASSES,
+  assertAiCannotBeVerified,
+  buildProvenanceDisplay,
+  resolveCreateVerificationStatus,
+  sourceTypeToSourceClass,
+} from "./provenance";
+export type {
+  AccessObservationSourceType,
+  AccessSourceClass,
+  ProvenanceDisplay,
+} from "./provenance";
+export {
+  AccessGraphError,
+  assertAccessGraphEnabled,
+  createAccessObservation,
+  getAccessObservation,
+  getPlaceAccessGraph,
+  listAccessObservations,
+  serializeObservationRow,
+} from "./observation-service";
+export type {
+  AccessObservationEnvelope,
+  CreateAccessObservationInput,
+} from "./observation-service";
