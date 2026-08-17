@@ -1,190 +1,66 @@
-name: Amalgamate MapAble repositories
+name: Verify MapAble unified repository
 
 on:
   push:
     branches:
-      - integration/amalgamate-mapableau-new-v2
+      - main
     paths:
-      - .github/workflows/amalgamate-repositories.yml
+      - "apps/**"
+      - "docs/repository-amalgamation.md"
+      - "package.json"
+      - ".replit"
+      - "README.md"
+      - ".github/workflows/amalgamate-repositories.yml"
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
-  group: mapable-repository-amalgamation
-  cancel-in-progress: false
+  group: mapable-unified-verification-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  amalgamate:
+  verify-structure:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out destination repository
+      - name: Check out unified repository
         uses: actions/checkout@v4
         with:
-          ref: integration/amalgamate-mapableau-new-v2
           fetch-depth: 0
 
-      - name: Configure Git identity
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-      - name: Move AdaptAble mobile application into apps/mobile
+      - name: Verify canonical monorepo layout
         shell: bash
         run: |
           set -euo pipefail
-          test ! -e apps/web
-          test ! -e apps/mobile
 
-          mkdir -p apps/mobile
-          cp .gitignore apps/mobile/.gitignore
-
-          for path in App.tsx app.json babel.config.js index.js package.json README.md replit.md tsconfig.json .replit; do
-            test -e "$path"
-            git mv "$path" "apps/mobile/$path"
-          done
-          git add apps/mobile/.gitignore
-
-          cat > package.json <<'JSON'
-          {
-            "name": "mapable-unified",
-            "version": "1.0.0",
-            "private": true,
-            "description": "Unified MapAble repository containing the MapAble web platform and AdaptAble/Independence Suite mobile app.",
-            "scripts": {
-              "dev": "pnpm --dir apps/web dev",
-              "dev:web": "pnpm --dir apps/web dev",
-              "build:web": "pnpm --dir apps/web build",
-              "test:web": "pnpm --dir apps/web test",
-              "lint:web": "pnpm --dir apps/web lint",
-              "typecheck:web": "pnpm --dir apps/web type-check",
-              "dev:mobile": "npm --prefix apps/mobile start",
-              "dev:mobile:tunnel": "npm --prefix apps/mobile run start:tunnel",
-              "mobile:web": "npm --prefix apps/mobile run web",
-              "build:mobile-web": "npm --prefix apps/mobile run build:web",
-              "typecheck:mobile": "npm --prefix apps/mobile run typecheck"
-            },
-            "packageManager": "pnpm@10.12.1"
-          }
-          JSON
-
-          cat > .gitignore <<'EOF'
-          node_modules/
-          .DS_Store
-          *.log
-          .env
-          .env.*
-          !.env.example
-          .vercel/
-          coverage/
-          dist/
-          web-build/
-          .expo/
-          EOF
-
-          cat > .replit <<'EOF'
-          modules = ["nodejs-24"]
-          run = "bash -lc 'corepack enable && cd apps/web && pnpm dev:replit'"
-
-          [gitHubImport]
-          requiredFiles = [".replit", "package.json", "apps/web/package.json", "apps/mobile/package.json"]
-          EOF
-
-          cat > README.md <<'EOF'
-          # MapAble Unified
-
-          This is the canonical MapAble repository for Australian Disability Ltd's connected accessibility and independence platform work.
-
-          ## Applications
-
-          - `apps/web` — the existing MapAble web platform imported from `ausdisau/mapableau-new`.
-          - `apps/mobile` — the AdaptAble Home / Independence Suite Expo + React Native application previously at the root of `ausdisau/MapAble`.
-
-          The applications intentionally keep independent dependency roots because the web platform currently uses Next.js/React 18 while the mobile application uses Expo SDK 57/React 19. Combining them into one dependency manifest would create an unnecessary runtime conflict.
-
-          ## Common commands
-
-          ```bash
-          corepack enable
-
-          # Web
-          pnpm --dir apps/web install --frozen-lockfile
-          pnpm dev:web
-
-          # Mobile
-          npm --prefix apps/mobile install
-          npm run dev:mobile
-          ```
-
-          Replit launches the web platform by default. The mobile app can be run separately with the root mobile scripts.
-
-          ## Repository provenance
-
-          The web platform was imported from `ausdisau/mapableau-new` and the mobile application originated in `ausdisau/MapAble`. A pre-amalgamation backup branch was retained before this integration.
-          EOF
-
-          cat > replit.md <<'EOF'
-          # MapAble Unified on Replit
-
-          The repository contains two runnable applications.
-
-          Replit's default Run action starts the MapAble web platform from `apps/web`, using that application's existing Replit-aware scripts and configuration.
-
-          AdaptAble / Independence Suite lives in `apps/mobile` and remains an Expo + React Native application. Run it using the root mobile scripts when working on the native/mobile experience.
-
-          Keep web and mobile dependency installation scoped to their respective application directories. Do not collapse React 18 web dependencies and React 19 mobile dependencies into a single package manifest.
-          EOF
-
-          mkdir -p docs
-          cat > docs/repository-amalgamation.md <<'EOF'
-          # Repository amalgamation
-
-          ## Canonical repository
-
-          `ausdisau/MapAble`
-
-          ## Sources
-
-          - Destination/mobile base: `ausdisau/MapAble` at `0b8e8bc8940b70d6f13924a0a3f5cbd6422eb96f`
-          - Imported web platform: `ausdisau/mapableau-new` at `e0a8b6907b25b23eda82fcbc3b722c088861b704`
-
-          ## Layout
-
-          - `apps/web` preserves the MapAble web application's existing Next.js, Prisma, pnpm workspace, Replit, tests, infrastructure and documentation structure.
-          - `apps/mobile` preserves the AdaptAble/Independence Suite Expo application.
-          - root files provide repository-level navigation and delegated commands.
-
-          ## Dependency boundary
-
-          The applications remain separate install roots because the web and mobile applications currently target different React/runtime generations. Shared domain contracts should be extracted deliberately into repository-level packages only after compatibility is verified.
-          EOF
-
-          git add package.json .gitignore .replit README.md replit.md docs/repository-amalgamation.md apps/mobile
-          git commit -m "chore: move AdaptAble mobile app into apps/mobile"
-
-      - name: Import mapableau-new under apps/web with Git history
-        shell: bash
-        run: |
-          set -euo pipefail
-          git remote add mapableau-new https://github.com/ausdisau/mapableau-new.git
-          git fetch mapableau-new main
-          git subtree add --prefix=apps/web mapableau-new main
-
-      - name: Validate amalgamated repository shape
-        shell: bash
-        run: |
-          set -euo pipefail
+          test -f package.json
           test -f apps/web/package.json
           test -f apps/web/pnpm-workspace.yaml
           test -f apps/mobile/package.json
           test -f apps/mobile/App.tsx
-          test -f package.json
-          node -e "JSON.parse(require('fs').readFileSync('package.json','utf8')); JSON.parse(require('fs').readFileSync('apps/web/package.json','utf8')); JSON.parse(require('fs').readFileSync('apps/mobile/package.json','utf8'))"
-          git status --short
+          test -f docs/repository-amalgamation.md
 
-      - name: Push amalgamated branch
+          # The mobile application must live under apps/mobile, not at repo root.
+          test ! -f App.tsx
+          test ! -f app.json
+
+          node -e "JSON.parse(require('fs').readFileSync('package.json','utf8')); JSON.parse(require('fs').readFileSync('apps/web/package.json','utf8')); JSON.parse(require('fs').readFileSync('apps/mobile/package.json','utf8'))"
+
+      - name: Verify imported web provenance is retained
         shell: bash
         run: |
           set -euo pipefail
-          git push origin HEAD:integration/amalgamate-mapableau-new-v2
+          imported_commit="e0a8b6907b25b23eda82fcbc3b722c088861b704"
+          git cat-file -e "${imported_commit}^{commit}"
+          git log --all --format='%B' | grep -Fq "git-subtree-split: ${imported_commit}"
+
+      - name: Report unified application roots
+        shell: bash
+        run: |
+          echo "Canonical repository: ausdisau/MapAble"
+          echo "Web application: apps/web"
+          echo "Mobile application: apps/mobile"
