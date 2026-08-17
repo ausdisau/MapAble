@@ -56,7 +56,8 @@ jobs:
           set -euo pipefail
           imported_commit="e0a8b6907b25b23eda82fcbc3b722c088861b704"
           git cat-file -e "${imported_commit}^{commit}"
-          git log --all --format='%B' | grep -Fq "git-subtree-split: ${imported_commit}"
+          provenance_commit="$(git log --all --format='%H' --fixed-strings --grep="git-subtree-split: ${imported_commit}" -n 1)"
+          test -n "${provenance_commit}"
 
       - name: Report unified application roots
         shell: bash
