@@ -1,15 +1,23 @@
 import React, { createContext, useContext, useMemo, useState } from 'react';
 import {
+  ActivityIndicator,
   Pressable,
   ScrollView,
   StyleSheet,
   Switch,
   Text,
+  TextInput,
   View,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { createStaticNavigation } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+
+import {
+  isMapAbleApiConfigured,
+  searchMapAblePlaces,
+  type MapAblePlaceSearchResult,
+} from './src/runtime/mapableApi';
 
 const colours = {
   background: '#F7F7F5',
@@ -22,6 +30,7 @@ const colours = {
   primarySoft: '#EAF0F4',
   accent: '#0B6B67',
   warning: '#8A5A00',
+  danger: '#8B1E1E',
 };
 
 type HomeMode = 'Home' | 'Away' | 'Night' | 'Guest';
@@ -93,20 +102,25 @@ function Button({
   label,
   onPress,
   primary = false,
+  disabled = false,
 }: {
   label: string;
   onPress?: () => void;
   primary?: boolean;
+  disabled?: boolean;
 }) {
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={label}
+      accessibilityState={{ disabled }}
+      disabled={disabled}
       onPress={onPress}
       style={({ pressed }) => [
         styles.button,
         primary && styles.buttonPrimary,
-        pressed && { opacity: 0.75 },
+        disabled && styles.buttonDisabled,
+        pressed && !disabled && { opacity: 0.75 },
       ]}
     >
       <Text style={[styles.buttonText, primary && styles.buttonTextPrimary]}>{label}</Text>
@@ -273,6 +287,104 @@ function IndyScreen() {
   );
 }
 
+function formatLabel(value: string | null | undefined) {
+  if (!value) return 'Not specified';
+  return value.replace(/_/g, ' ');
+}
+
+function MapAbleSearchResult({ result }: { result: MapAblePlaceSearchResult }) {
+  const { place, matchReasons } = result;
+  return (
+    <View style={styles.searchResult} accessible accessibilityLabel={`${place.name}, ${place.suburb ?? 'suburb not specified'}`}>
+      <Text style={styles.cardTitle}>{place.name}</Text>
+      <Text style={styles.body}>{place.suburb ?? 'Suburb not specified'} · {formatLabel(place.category)}</Text>
+      <Text style={styles.muted}>Confidence: {formatLabel(place.confidence)} · Reviews: {place.reviewCount}</Text>
+      {place.accreditationTier ? <Text style={styles.muted}>Accreditation: {formatLabel(place.accreditationTier)}</Text> : null}
+      {matchReasons.length > 0 ? <Text style={styles.muted}>Why it matched: {matchReasons.join(' · ')}</Text> : null}
+    </View>
+  );
+}
+
+function MapAbleSearchCard() {
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState<MapAblePlaceSearchResult[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+  const configured = isMapAbleApiConfigured();
+
+  async function runSearch() {
+    setMessage(null);
+    setResults([]);
+
+    if (!configured) {
+      setMessage('MapAble platform connection is not configured for this build.');
+      return;
+    }
+
+    if (!query.trim()) {
+      setMessage('Enter a place, suburb or category to search.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const nextResults = await searchMapAblePlaces(query);
+      setResults(nextResults);
+      if (nextResults.length === 0) {
+        setMessage('No matching places were returned. Try a broader search.');
+      }
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'MapAble search could not be completed.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <Card>
+      <Text style={styles.cardTitle}>Search accessible places</Text>
+      <Text style={styles.body}>Search the unified MapAble web platform by place, suburb or category.</Text>
+      <Text style={styles.muted}>Only the text you type is sent. This search does not request or share live device location.</Text>
+
+      {!configured ? (
+        <View style={styles.disclosure}>
+          <Text style={styles.disclosureTitle}>Platform connection not configured</Text>
+          <Text style={styles.muted}>Set the mobile MapAble API base URL before expecting live platform results.</Text>
+        </View>
+      ) : null}
+
+      <TextInput
+        accessibilityLabel="Search MapAble places"
+        value={query}
+        onChangeText={setQuery}
+        placeholder="Place, suburb or category"
+        placeholderTextColor={colours.muted}
+        returnKeyType="search"
+        onSubmitEditing={runSearch}
+        style={styles.input}
+      />
+      <Button label={loading ? 'Searching' : 'Search MapAble'} primary onPress={runSearch} disabled={loading} />
+
+      {loading ? (
+        <View style={styles.statusRow} accessibilityLiveRegion="polite">
+          <ActivityIndicator accessibilityLabel="Searching MapAble" />
+          <Text style={styles.muted}>Searching the MapAble platform…</Text>
+        </View>
+      ) : null}
+
+      {message ? <Text accessibilityRole="alert" style={styles.error}>{message}</Text> : null}
+
+      {results.map((result) => (
+        <MapAbleSearchResult key={result.place.id} result={result} />
+      ))}
+
+      {results.length > 0 ? (
+        <Text style={styles.muted}>Accessibility information can change. Review the place details and source confidence before relying on it.</Text>
+      ) : null}
+    </Card>
+  );
+}
+
 function MoreScreen() {
   const suite = useSuite();
   return (
@@ -281,12 +393,7 @@ function MoreScreen() {
       <Text style={styles.subtitle}>Capability packs, access and trust controls.</Text>
 
       <SectionTitle>MapAble</SectionTitle>
-      <Card>
-        <Text style={styles.cardTitle}>Accessible journey planning</Text>
-        <Text style={styles.body}>Step-free · accessible toilet nearby · avoid steep gradients · power-wheelchair suitable.</Text>
-        <Text style={styles.muted}>Route data shown here is prototype content, not verified live routing.</Text>
-        <Button label="Review route preferences" />
-      </Card>
+      <MapAbleSearchCard />
 
       <SectionTitle>AccessiBooks</SectionTitle>
       <Card>
@@ -400,6 +507,7 @@ const styles = StyleSheet.create({
   eyebrow: { fontSize: 12, letterSpacing: 1.2, fontWeight: '800', color: colours.accent },
   button: { minHeight: 48, minWidth: 92, paddingHorizontal: 16, justifyContent: 'center', alignItems: 'center', borderRadius: 9, borderWidth: 1, borderColor: colours.border, backgroundColor: colours.surface },
   buttonPrimary: { backgroundColor: colours.primary, borderColor: colours.primary },
+  buttonDisabled: { opacity: 0.5 },
   buttonText: { fontSize: 16, fontWeight: '800', color: colours.text },
   buttonTextPrimary: { color: '#FFFFFF' },
   timelineItem: { flexDirection: 'row', gap: 14, paddingVertical: 8 },
@@ -413,6 +521,10 @@ const styles = StyleSheet.create({
   disclosure: { padding: 12, gap: 4, borderRadius: 10, backgroundColor: colours.surfaceMuted },
   disclosureTitle: { fontSize: 15, fontWeight: '800', color: colours.text },
   success: { fontSize: 15, lineHeight: 22, fontWeight: '700', color: colours.accent },
+  input: { minHeight: 52, borderWidth: 1, borderColor: colours.border, borderRadius: 9, paddingHorizontal: 14, paddingVertical: 10, backgroundColor: colours.surface, color: colours.text, fontSize: 16 },
+  statusRow: { minHeight: 48, flexDirection: 'row', alignItems: 'center', gap: 10 },
+  searchResult: { gap: 4, paddingTop: 12, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colours.border },
+  error: { fontSize: 15, lineHeight: 22, fontWeight: '700', color: colours.danger },
   settingRow: { minHeight: 72, flexDirection: 'row', alignItems: 'center', gap: 16, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colours.border },
   permissionRow: { minHeight: 52, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colours.border },
   permissionStatus: { fontSize: 14, fontWeight: '800', color: colours.primary },
