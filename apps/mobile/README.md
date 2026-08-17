@@ -1,25 +1,45 @@
-# MapAble - AdaptAble Home / Independence Suite
+# MapAble — AdaptAble Home / Independence Suite
 
-Accessibility-first React Native + Expo implementation of the AdaptAble Home wireframes, hosted in the MapAble repository as an Independence Suite prototype.
+Accessibility-first Expo + React Native application inside the unified `ausdisau/MapAble` repository.
 
 ## What is implemented
 
 Primary navigation:
+
 - Today
 - Home
 - Indy
 - More
 
-Capability screens:
-- MapAble accessible journey planning
-- AccessiBooks reading/player prototype
-- Disability News & Advocacy source-aware briefing
+Current capability areas:
+
+- AdaptAble Home prototype controls and routines
+- Indy bounded proposal and approval flow
+- MapAble accessible-place search connected to the unified web platform when configured
+- AccessiBooks prototype card
+- Disability News & Advocacy prototype card
 - My Access accessibility preferences
-- Permissions and consent overview
-- Activity/audit history
+- Permissions overview
+- Activity/audit example
 - Support and prototype boundaries
 
-The interface is deliberately user-controlled. Indy presents bounded proposals, shows what data an action needs, and requires explicit approval before consequential actions. Product analytics are off by default in the demo state.
+The interface is deliberately user-controlled. Indy requires explicit approval before consequential prototype actions. Product analytics are off by default.
+
+## MapAble platform connection
+
+The mobile app can call the existing web endpoint `GET /api/access/search` through `src/runtime/mapableApi.ts`.
+
+Copy `.env.example` to `.env` and set:
+
+```text
+EXPO_PUBLIC_MAPABLE_API_URL=https://your-mapable-web-host.example
+```
+
+`EXPO_PUBLIC_*` values are public client configuration and must never contain secrets.
+
+The first integrated search slice sends only the search text explicitly entered by the user. It does not request or transmit live device location. If the API URL is not configured, the UI displays a clear not-configured state instead of pretending prototype content is live data.
+
+See `../../docs/mobile-web-integration.md` for the contract and deployment notes.
 
 ## Accessibility baseline
 
@@ -27,9 +47,9 @@ The interface is deliberately user-controlled. Indy presents bounded proposals, 
 - role/name labels for primary controls
 - no colour-only state communication
 - font scaling remains enabled
-- high-contrast, reduced-motion and large-control preferences are represented in shared state
-- safe-area-aware screen content
-- four primary mobile tabs with secondary destinations under More
+- high-contrast and reduced-motion preferences represented in shared state
+- explicit loading and error states for live search
+- confidence/source context kept visible for MapAble results
 
 ## Stack
 
@@ -38,8 +58,6 @@ The interface is deliberately user-controlled. Indy presents bounded proposals, 
 - React Native 0.86
 - React Navigation 7 static API
 - TypeScript
-- React Native Testing Library 14
-- Expo web export for Vercel preview deployment
 
 ## Run locally
 
@@ -55,36 +73,30 @@ npm run ios
 npm run android
 ```
 
-Web:
+Web development:
 
 ```bash
 npm run web
 ```
 
-Production web export:
+Static Expo web export:
 
 ```bash
 npm run build:web
 ```
-
-The static web bundle is written to `dist/` and `vercel.json` points Vercel at that directory.
 
 ## Validation
 
 ```bash
 npm run typecheck
-npm test
-npm run build:web
 ```
 
-CI runs these checks on pushes and pull requests.
+Repository CI installs the mobile dependencies, runs the TypeScript check, and verifies that the mobile MapAble client remains anchored to the existing web search contract.
 
 ## Prototype boundaries
 
-This repository does **not** currently prove live smart-home control, emergency dispatch, live location sharing, a production AccessiBooks catalogue, live disability-news ingestion, or production MapAble routing. Those integrations remain gated behind real service adapters, identity/consent enforcement, privacy review, operational ownership and production verification.
+This application does **not** currently prove live smart-home control, emergency dispatch, automatic support-worker notification, production AccessiBooks catalogue access, live disability-news ingestion, or production journey routing.
 
-The current iOS and Android identifiers are prototype identifiers and should be replaced with organisation-controlled production identifiers before store release.
+The MapAble place-search integration can return live platform data only when a real MapAble API host is configured. Accessibility information can change, so confidence and source context should remain visible and users should be able to review details before relying on them.
 
-## Design reference
-
-The implementation is based on the wireframe in `docs/wireframe-reference.png`. Supporting implementation and QA notes are in `docs/`.
+Authenticated participant, worker, driver and provider-admin workflows remain pending a reviewed native authentication and consent design.
