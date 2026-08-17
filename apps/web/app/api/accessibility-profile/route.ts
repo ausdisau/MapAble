@@ -23,17 +23,23 @@ export async function GET(req: Request) {
   );
   if (user instanceof Response) return user;
 
-  let profile = await prisma.accessibilityProfile.findUnique({
+  const profile = await prisma.accessibilityProfile.findUnique({
     where: { userId: user.id },
   });
 
-  if (!profile) {
-    profile = await prisma.accessibilityProfile.create({
-      data: { userId: user.id, ...defaultProfile },
-    });
+  if (profile) return jsonOk({ profile });
+
+  // A scoped mobile read must stay read-only. Return the default projection
+  // without creating a database row; the first explicit PATCH will upsert it.
+  if (req.headers.has("authorization")) {
+    return jsonOk({ profile: defaultProfile });
   }
 
-  return jsonOk({ profile });
+  // Preserve the established web-session behaviour for existing web clients.
+  const created = await prisma.accessibilityProfile.create({
+    data: { userId: user.id, ...defaultProfile },
+  });
+  return jsonOk({ profile: created });
 }
 
 export async function PATCH(req: Request) {
