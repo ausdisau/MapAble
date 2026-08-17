@@ -61,7 +61,7 @@ jobs:
       - name: Type-check mobile application
         run: npm run typecheck
 
-  mobile-auth-token-tests:
+  mobile-auth-web-verification:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -85,6 +85,11 @@ jobs:
         env:
           MOBILE_AUTH_SECRET: test-mobile-auth-secret-at-least-32-characters
         run: pnpm vitest run tests/mobile-auth-token.test.ts
+
+      - name: Type-check web authentication and API integration
+        env:
+          MOBILE_AUTH_SECRET: test-mobile-auth-secret-at-least-32-characters
+        run: pnpm type-check
 
   contract-boundary:
     runs-on: ubuntu-latest
