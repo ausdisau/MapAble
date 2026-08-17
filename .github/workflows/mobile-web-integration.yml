@@ -7,6 +7,12 @@ on:
     paths:
       - "apps/mobile/**"
       - "apps/web/app/api/access/search/**"
+      - "apps/web/app/api/accessibility-profile/**"
+      - "apps/web/app/api/mobile/auth/**"
+      - "apps/web/lib/api/auth-handler.ts"
+      - "apps/web/lib/auth/current-user.ts"
+      - "apps/web/lib/auth/mobile-token.ts"
+      - "apps/web/tests/mobile-auth-token.test.ts"
       - "apps/web/types/access-map.ts"
       - "docs/mobile-web-integration.md"
       - ".github/workflows/mobile-web-integration.yml"
@@ -16,6 +22,12 @@ on:
     paths:
       - "apps/mobile/**"
       - "apps/web/app/api/access/search/**"
+      - "apps/web/app/api/accessibility-profile/**"
+      - "apps/web/app/api/mobile/auth/**"
+      - "apps/web/lib/api/auth-handler.ts"
+      - "apps/web/lib/auth/current-user.ts"
+      - "apps/web/lib/auth/mobile-token.ts"
+      - "apps/web/tests/mobile-auth-token.test.ts"
       - "apps/web/types/access-map.ts"
       - "docs/mobile-web-integration.md"
       - ".github/workflows/mobile-web-integration.yml"
@@ -49,6 +61,31 @@ jobs:
       - name: Type-check mobile application
         run: npm run typecheck
 
+  mobile-auth-token-tests:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Enable pnpm
+        run: corepack enable
+
+      - name: Install web dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Test mobile token boundary
+        env:
+          MOBILE_AUTH_SECRET: test-mobile-auth-secret-at-least-32-characters
+        run: pnpm vitest run tests/mobile-auth-token.test.ts
+
   contract-boundary:
     runs-on: ubuntu-latest
     steps:
@@ -60,13 +97,23 @@ jobs:
         run: |
           set -euo pipefail
           test -f apps/mobile/src/runtime/mapableApi.ts
+          test -f apps/mobile/src/runtime/mobileAuth.ts
+          test -f apps/mobile/src/runtime/accessibilityApi.ts
+          test -f apps/mobile/src/components/MobileIdentityCard.tsx
           test -f apps/mobile/.env.example
           test -f apps/web/app/api/access/search/route.ts
+          test -f apps/web/app/api/mobile/auth/authorize/route.ts
+          test -f apps/web/app/api/mobile/auth/token/route.ts
+          test -f apps/web/app/api/mobile/auth/me/route.ts
+          test -f apps/web/app/api/accessibility-profile/route.ts
+          test -f apps/web/lib/auth/mobile-token.ts
           test -f apps/web/types/access-map.ts
           test -f docs/mobile-web-integration.md
 
           grep -Fq '/api/access/search' apps/mobile/src/runtime/mapableApi.ts
-          grep -Fq 'EXPO_PUBLIC_MAPABLE_API_URL' apps/mobile/src/runtime/mapableApi.ts
-          grep -Fq 'accessSearchQuerySchema' apps/web/app/api/access/search/route.ts
-          grep -Fq 'lat:' apps/web/types/access-map.ts
+          grep -Fq 'EXPO_PUBLIC_MAPABLE_API_URL' apps/mobile/src/runtime/mobileAuth.ts
+          grep -Fq 'code_challenge_method' apps/mobile/src/runtime/mobileAuth.ts
+          grep -Fq 'MOBILE_AUTH_SECRET' apps/web/lib/auth/mobile-token.ts
+          grep -Fq 'accessibility:write' apps/web/app/api/accessibility-profile/route.ts
+          grep -Fq 'requireApiSessionOrMobileBearer' apps/web/app/api/accessibility-profile/route.ts
           grep -Fq 'does not request or share live device location' apps/mobile/App.tsx
