@@ -15,6 +15,17 @@ The applications intentionally keep independent dependency roots because the web
 
 The standalone `ausdisau/mapableau-new` repository has been marked as migrated. Its final imported application commit was `e0a8b6907b25b23eda82fcbc3b722c088861b704`, and that source tree is preserved under `apps/web` with Git history retained through the subtree import.
 
+## First cross-app integration
+
+The mobile application now has a configuration-gated client for the existing MapAble accessible-place search API:
+
+- web endpoint: `GET /api/access/search`
+- mobile client: `apps/mobile/src/runtime/mapableApi.ts`
+- mobile configuration: `EXPO_PUBLIC_MAPABLE_API_URL`
+- integration notes: `docs/mobile-web-integration.md`
+
+The first slice sends only search text explicitly entered by the user. It does not request or transmit live device location. If the API base URL is absent, the mobile interface shows a clear not-configured state rather than presenting prototype content as live platform results.
+
 ## Common commands
 
 ```bash
@@ -27,6 +38,7 @@ pnpm dev:web
 # Mobile
 npm --prefix apps/mobile install
 npm run dev:mobile
+npm run typecheck:mobile
 ```
 
 Replit launches the web platform by default. The mobile app can be run separately with the root mobile scripts.
@@ -36,6 +48,8 @@ Replit launches the web platform by default. The mobile app can be run separatel
 - Keep web dependencies scoped to `apps/web`.
 - Keep Expo/React Native dependencies scoped to `apps/mobile`.
 - Do not collapse the React 18 and React 19 dependency roots.
+- Do not place secrets or privileged credentials in `EXPO_PUBLIC_*` configuration.
+- Authenticated participant, worker, driver and provider-admin mobile APIs require an explicit native authentication design before integration.
 - Extract shared domain contracts into repository-level packages only when runtime compatibility and ownership are clear.
 - New MapAble work should be committed here rather than to the migrated standalone repository.
 
