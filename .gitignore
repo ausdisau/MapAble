@@ -1,10 +1,11 @@
 node_modules/
-.expo/
-dist/
-web-build/
-coverage/
-*.log
 .DS_Store
+*.log
 .env
 .env.*
 !.env.example
+.vercel/
+coverage/
+dist/
+web-build/
+.expo/

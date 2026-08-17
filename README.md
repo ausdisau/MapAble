@@ -1,90 +1,30 @@
-# MapAble - AdaptAble Home / Independence Suite
+# MapAble Unified
 
-Accessibility-first React Native + Expo implementation of the AdaptAble Home wireframes, hosted in the MapAble repository as an Independence Suite prototype.
+This is the canonical MapAble repository for Australian Disability Ltd's connected accessibility and independence platform work.
 
-## What is implemented
+## Applications
 
-Primary navigation:
-- Today
-- Home
-- Indy
-- More
+- `apps/web` — the existing MapAble web platform imported from `ausdisau/mapableau-new`.
+- `apps/mobile` — the AdaptAble Home / Independence Suite Expo + React Native application previously at the root of `ausdisau/MapAble`.
 
-Capability screens:
-- MapAble accessible journey planning
-- AccessiBooks reading/player prototype
-- Disability News & Advocacy source-aware briefing
-- My Access accessibility preferences
-- Permissions and consent overview
-- Activity/audit history
-- Support and prototype boundaries
+The applications intentionally keep independent dependency roots because the web platform currently uses Next.js/React 18 while the mobile application uses Expo SDK 57/React 19. Combining them into one dependency manifest would create an unnecessary runtime conflict.
 
-The interface is deliberately user-controlled. Indy presents bounded proposals, shows what data an action needs, and requires explicit approval before consequential actions. Product analytics are off by default in the demo state.
-
-## Accessibility baseline
-
-- 48pt minimum custom interaction targets
-- role/name labels for primary controls
-- no colour-only state communication
-- font scaling remains enabled
-- high-contrast, reduced-motion and large-control preferences are represented in shared state
-- safe-area-aware screen content
-- four primary mobile tabs with secondary destinations under More
-
-## Stack
-
-- Expo SDK 57
-- React 19.2
-- React Native 0.86
-- React Navigation 7 static API
-- TypeScript
-- React Native Testing Library 14
-- Expo web export for Vercel preview deployment
-
-## Run locally
+## Common commands
 
 ```bash
-npm install
-npm start
+corepack enable
+
+# Web
+pnpm --dir apps/web install --frozen-lockfile
+pnpm dev:web
+
+# Mobile
+npm --prefix apps/mobile install
+npm run dev:mobile
 ```
 
-Native development:
+Replit launches the web platform by default. The mobile app can be run separately with the root mobile scripts.
 
-```bash
-npm run ios
-npm run android
-```
+## Repository provenance
 
-Web:
-
-```bash
-npm run web
-```
-
-Production web export:
-
-```bash
-npm run build:web
-```
-
-The static web bundle is written to `dist/` and `vercel.json` points Vercel at that directory.
-
-## Validation
-
-```bash
-npm run typecheck
-npm test
-npm run build:web
-```
-
-CI runs these checks on pushes and pull requests.
-
-## Prototype boundaries
-
-This repository does **not** currently prove live smart-home control, emergency dispatch, live location sharing, a production AccessiBooks catalogue, live disability-news ingestion, or production MapAble routing. Those integrations remain gated behind real service adapters, identity/consent enforcement, privacy review, operational ownership and production verification.
-
-The current iOS and Android identifiers are prototype identifiers and should be replaced with organisation-controlled production identifiers before store release.
-
-## Design reference
-
-The implementation is based on the wireframe in `docs/wireframe-reference.png`. Supporting implementation and QA notes are in `docs/`.
+The web platform was imported from `ausdisau/mapableau-new` and the mobile application originated in `ausdisau/MapAble`. A pre-amalgamation backup branch was retained before this integration.
