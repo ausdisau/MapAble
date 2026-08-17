@@ -49,7 +49,11 @@ function signingSecret(): string {
   }
 
   if (process.env.NODE_ENV !== "production") {
-    return resolveNextAuthSecret();
+    const fallback = resolveNextAuthSecret();
+    if (fallback) return fallback;
+    throw new Error(
+      "NEXTAUTH_SECRET is required as the non-production mobile authentication fallback",
+    );
   }
 
   throw new Error("MOBILE_AUTH_SECRET is required for mobile authentication");
