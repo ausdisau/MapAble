@@ -27,6 +27,15 @@ type MapAblePlaceSearchResponse = {
   results: MapAblePlaceSearchResult[];
 };
 
+const confidenceValues = new Set<MapAblePlaceConfidence>([
+  'unknown',
+  'user_reported',
+  'multiple_user_reports',
+  'venue_claimed',
+  'mapable_verified',
+  'mapable_accredited',
+]);
+
 export class MapAbleApiError extends Error {
   constructor(message: string) {
     super(message);
@@ -42,10 +51,48 @@ export function isMapAbleApiConfigured(): boolean {
   return getConfiguredBaseUrl().length > 0;
 }
 
+function isNullableString(value: unknown): value is string | null | undefined {
+  return value === undefined || value === null || typeof value === 'string';
+}
+
+function isNullableNumber(value: unknown): value is number | null | undefined {
+  return value === undefined || value === null || (typeof value === 'number' && Number.isFinite(value));
+}
+
+function isPlace(value: unknown): value is MapAblePlace {
+  if (!value || typeof value !== 'object') return false;
+  const place = value as Record<string, unknown>;
+
+  return (
+    typeof place.id === 'string' &&
+    typeof place.name === 'string' &&
+    typeof place.category === 'string' &&
+    typeof place.confidence === 'string' &&
+    confidenceValues.has(place.confidence as MapAblePlaceConfidence) &&
+    typeof place.reviewCount === 'number' &&
+    Number.isFinite(place.reviewCount) &&
+    isNullableString(place.suburb) &&
+    isNullableNumber(place.latitude) &&
+    isNullableNumber(place.longitude) &&
+    isNullableString(place.accreditationTier)
+  );
+}
+
+function isSearchResult(value: unknown): value is MapAblePlaceSearchResult {
+  if (!value || typeof value !== 'object') return false;
+  const result = value as Record<string, unknown>;
+
+  return (
+    isPlace(result.place) &&
+    Array.isArray(result.matchReasons) &&
+    result.matchReasons.every((reason) => typeof reason === 'string')
+  );
+}
+
 function isSearchResponse(value: unknown): value is MapAblePlaceSearchResponse {
   if (!value || typeof value !== 'object') return false;
   const candidate = value as { results?: unknown };
-  return Array.isArray(candidate.results);
+  return Array.isArray(candidate.results) && candidate.results.every(isSearchResult);
 }
 
 export async function searchMapAblePlaces(query: string): Promise<MapAblePlaceSearchResult[]> {
