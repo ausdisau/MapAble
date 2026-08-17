@@ -1,6 +1,6 @@
 import { ZodError } from "zod";
 
-import { requireApiSession } from "@/lib/api/auth-handler";
+import { requireApiSessionOrMobileBearer } from "@/lib/api/auth-handler";
 import { jsonError, jsonOk, zodErrorResponse } from "@/lib/api/response";
 import { createAuditEvent } from "@/lib/audit/audit-event-service";
 import { prisma } from "@/lib/prisma";
@@ -16,8 +16,11 @@ const defaultProfile = {
   shareWithProviders: {},
 };
 
-export async function GET() {
-  const user = await requireApiSession();
+export async function GET(req: Request) {
+  const user = await requireApiSessionOrMobileBearer(
+    req,
+    "accessibility:read",
+  );
   if (user instanceof Response) return user;
 
   let profile = await prisma.accessibilityProfile.findUnique({
@@ -34,7 +37,10 @@ export async function GET() {
 }
 
 export async function PATCH(req: Request) {
-  const user = await requireApiSession();
+  const user = await requireApiSessionOrMobileBearer(
+    req,
+    "accessibility:write",
+  );
   if (user instanceof Response) return user;
 
   try {
