@@ -5,7 +5,7 @@ import {
   mergeUiIntoDigitalPreferences,
   parseAccessibilityUiPreferences,
 } from "@/lib/accessibility/ui-preferences";
-import { requireApiSession } from "@/lib/api/auth-handler";
+import { requireApiSessionOrMobileBearer } from "@/lib/api/auth-handler";
 import { jsonError, jsonOk, zodErrorResponse } from "@/lib/api/response";
 import { createAuditEvent } from "@/lib/audit/audit-event-service";
 import { prisma } from "@/lib/prisma";
@@ -23,8 +23,11 @@ function toJsonValue(
   return value as unknown as Prisma.InputJsonValue;
 }
 
-export async function GET() {
-  const user = await requireApiSession();
+export async function GET(req: Request) {
+  const user = await requireApiSessionOrMobileBearer(
+    req,
+    "accessibility:read",
+  );
   if (user instanceof Response) return user;
 
   const profile = await prisma.accessibilityProfile.findUnique({
@@ -38,7 +41,10 @@ export async function GET() {
 }
 
 export async function PATCH(req: Request) {
-  const user = await requireApiSession();
+  const user = await requireApiSessionOrMobileBearer(
+    req,
+    "accessibility:write",
+  );
   if (user instanceof Response) return user;
 
   try {
@@ -58,7 +64,6 @@ export async function PATCH(req: Request) {
       nextDigital = mergeUiIntoDigitalPreferences(currentDigital, parsedUi);
     }
 
-    // Merge only explicitly provided legacy flags — never wipe unrelated keys.
     const legacyKeys = [
       "largeText",
       "highContrast",
@@ -100,7 +105,6 @@ export async function PATCH(req: Request) {
       entityType: "AccessibilityProfile",
       entityId: updated.id,
       participantId: user.id,
-      // Do not log preference values.
     });
 
     return jsonOk({
