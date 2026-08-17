@@ -2,6 +2,7 @@
   "expo": {
     "name": "MapAble + AdaptAble Home",
     "slug": "mapable-adaptable-home",
+    "scheme": "mapable",
     "version": "0.2.0",
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
