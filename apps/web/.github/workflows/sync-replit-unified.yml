@@ -1,0 +1,47 @@
+name: Sync MapAble-Unified (Replit)
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "Sync step to run"
+        required: true
+        default: report
+        type: choice
+        options:
+          - all
+          - import
+          - report
+          - check
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Import from Replit
+        if: inputs.action == 'all' || inputs.action == 'import'
+        env:
+          REPLIT_GIT_URL: ${{ secrets.REPLIT_UNIFIED_GIT_URL }}
+          REPLIT_ZIP_PATH: ${{ secrets.REPLIT_UNIFIED_ZIP_PATH }}
+        run: bash scripts/sync-replit-unified.sh import
+        continue-on-error: true
+
+      - name: Diff report
+        if: inputs.action == 'all' || inputs.action == 'report'
+        run: bash scripts/sync-replit-unified.sh report
+        continue-on-error: true
+
+      - name: Deployment probe
+        if: inputs.action == 'all' || inputs.action == 'check'
+        run: bash scripts/sync-replit-unified.sh check
+        continue-on-error: true
+
+      - name: Upload sync report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mapable-unified-sync-report
+          path: /tmp/mapable-unified-sync-report/
+          if-no-files-found: ignore

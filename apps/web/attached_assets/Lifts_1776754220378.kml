@@ -1,0 +1,839 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+<Document id="root_doc">
+<Schema name="Lifts" id="Lifts">
+	<SimpleField name="OBJECTID" type="int"></SimpleField>
+	<SimpleField name="ID" type="string"></SimpleField>
+	<SimpleField name="Address" type="string"></SimpleField>
+	<SimpleField name="Suburb" type="string"></SimpleField>
+	<SimpleField name="DoorWidth" type="float"></SimpleField>
+	<SimpleField name="ContinuousPath" type="string"></SimpleField>
+	<SimpleField name="Image" type="string"></SimpleField>
+</Schema>
+<Folder><name>Lifts</name>
+  <Placemark>
+	<name>Circular Quay Lift to Platform 1 West</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">1</SimpleData>
+		<SimpleData name="ID">LF-1</SimpleData>
+		<SimpleData name="Address">Circular Quay </SimpleData>
+		<SimpleData name="Suburb">Sydney</SimpleData>
+		<SimpleData name="ContinuousPath">No</SimpleData>
+		<SimpleData name="Image">LF-1-1.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.210510549914,-33.8614086987446</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Circular Quay Escalator Platform 1 West</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">2</SimpleData>
+		<SimpleData name="ID">ES-560</SimpleData>
+		<SimpleData name="Address">Circular Quay </SimpleData>
+		<SimpleData name="Suburb">Sydney</SimpleData>
+		<SimpleData name="ContinuousPath">No</SimpleData>
+		<SimpleData name="Image">ES-560-1.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.210475399414,-33.8613893986182</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Circular Quay Lift to Platform 2 West</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">3</SimpleData>
+		<SimpleData name="ID">LF-2</SimpleData>
+		<SimpleData name="Address">Circular Quay </SimpleData>
+		<SimpleData name="Suburb">Sydney</SimpleData>
+		<SimpleData name="ContinuousPath">No</SimpleData>
+		<SimpleData name="Image">LF-2-1.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.210533149728,-33.8612622996275</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Circular Quay Escalator Platform 1 East</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">4</SimpleData>
+		<SimpleData name="ID">ES-561</SimpleData>
+		<SimpleData name="Address">Circular Quay </SimpleData>
+		<SimpleData name="Suburb">Sydney</SimpleData>
+		<SimpleData name="ContinuousPath">No</SimpleData>
+		<SimpleData name="Image">ES-561-1.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.210826149811,-33.8614223487043</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Circular Quay Escalator Platform 2 East</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">5</SimpleData>
+		<SimpleData name="ID">ES-562</SimpleData>
+		<SimpleData name="Address">Circular Quay </SimpleData>
+		<SimpleData name="Suburb">Sydney</SimpleData>
+		<SimpleData name="ContinuousPath">No</SimpleData>
+		<SimpleData name="Image">ES-562-1.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.210844600295,-33.8613070490487</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Circular Quay Escalator Platform 2 West</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">6</SimpleData>
+		<SimpleData name="ID">ES-563</SimpleData>
+		<SimpleData name="Address">Circular Quay </SimpleData>
+		<SimpleData name="Suburb">Sydney</SimpleData>
+		<SimpleData name="ContinuousPath">No</SimpleData>
+		<SimpleData name="Image">ES-563-1.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.210493700102,-33.8612740995527</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Circular Quay Lift to Platform 1 East</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">7</SimpleData>
+		<SimpleData name="ID">LF-3</SimpleData>
+		<SimpleData name="Address">Circular Quay </SimpleData>
+		<SimpleData name="Suburb">Sydney</SimpleData>
+		<SimpleData name="ContinuousPath">No</SimpleData>
+		<SimpleData name="Image">LF-3-1.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.210787399682,-33.8614343987435</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Circular Quay Lift to Platform 2 East</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">8</SimpleData>
+		<SimpleData name="ID">LF-4</SimpleData>
+		<SimpleData name="Address">Circular Quay </SimpleData>
+		<SimpleData name="Suburb">Sydney</SimpleData>
+		<SimpleData name="ContinuousPath">No</SimpleData>
+		<SimpleData name="Image">LF-4-1.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.21081019961,-33.8612873487088</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Pyrmont Bridge Escalator</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">9</SimpleData>
+		<SimpleData name="ID">LF-5</SimpleData>
+		<SimpleData name="Address">Sussex Street</SimpleData>
+		<SimpleData name="Suburb">Sydney</SimpleData>
+		<SimpleData name="ContinuousPath">Yes</SimpleData>
+		<SimpleData name="Image">LF-5-4.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.20237185947,-33.8708426672476</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Museum Station Lift</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">10</SimpleData>
+		<SimpleData name="ID">LF-6</SimpleData>
+		<SimpleData name="Address">Corner of Elizabeth Street and Liverpool Street</SimpleData>
+		<SimpleData name="Suburb">Sydney</SimpleData>
+		<SimpleData name="DoorWidth">1</SimpleData>
+		<SimpleData name="ContinuousPath">Yes</SimpleData>
+		<SimpleData name="Image">LF-6-1.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.209806919008,-33.8766323753266</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Overseas Passenger Terminal</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">11</SimpleData>
+		<SimpleData name="ID">LF-7</SimpleData>
+		<SimpleData name="Address">Circular Quay West</SimpleData>
+		<SimpleData name="Suburb">The Rocks</SimpleData>
+		<SimpleData name="DoorWidth">2</SimpleData>
+		<SimpleData name="ContinuousPath">Yes</SimpleData>
+		<SimpleData name="Image">LF-7-1.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.20973234968,-33.8587316979571</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Cahill Walk Lift</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">12</SimpleData>
+		<SimpleData name="ID">LF-8</SimpleData>
+		<SimpleData name="Address">Cahill Express Way</SimpleData>
+		<SimpleData name="Suburb">Sydney</SimpleData>
+		<SimpleData name="ContinuousPath">Yes</SimpleData>
+		<SimpleData name="Image">LF-8-1.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.212478499441,-33.8614404990906</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Darling Harbour-Harris Street Lift</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">13</SimpleData>
+		<SimpleData name="ID">LF-9</SimpleData>
+		<SimpleData name="Address">Darling Harbour</SimpleData>
+		<SimpleData name="Suburb">Sydney</SimpleData>
+		<SimpleData name="DoorWidth">1.29999995</SimpleData>
+		<SimpleData name="ContinuousPath">No</SimpleData>
+		<SimpleData name="Image">LF-9-2.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.200055999476,-33.8745295987746</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Pyrmont Bridge Lift</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">14</SimpleData>
+		<SimpleData name="ID">LF-10</SimpleData>
+		<SimpleData name="Address">Darling Harbour</SimpleData>
+		<SimpleData name="Suburb">Sydney</SimpleData>
+		<SimpleData name="DoorWidth">1.29999995</SimpleData>
+		<SimpleData name="ContinuousPath">Yes</SimpleData>
+		<SimpleData name="Image">LF-10-1.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.202588140669,-33.8710778606685</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Lime Street Lift</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">15</SimpleData>
+		<SimpleData name="ID">LF-11</SimpleData>
+		<SimpleData name="Address">lime Street</SimpleData>
+		<SimpleData name="Suburb">Sydney</SimpleData>
+		<SimpleData name="ContinuousPath">Yes</SimpleData>
+		<SimpleData name="Image">LF-11-1.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.202576399948,-33.8688652986972</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Darling Quarter Theatre lift</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">16</SimpleData>
+		<SimpleData name="ID">LF-12</SimpleData>
+		<SimpleData name="Address">Darling Harbour</SimpleData>
+		<SimpleData name="Suburb">Sydney</SimpleData>
+		<SimpleData name="ContinuousPath">Yes</SimpleData>
+		<SimpleData name="Image">LF-12-1.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.201613999569,-33.8743581986831</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Day Street Lift</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">17</SimpleData>
+		<SimpleData name="ID">LF-13</SimpleData>
+		<SimpleData name="Address">Day Street</SimpleData>
+		<SimpleData name="Suburb">Sydney</SimpleData>
+		<SimpleData name="DoorWidth">0.88999999</SimpleData>
+		<SimpleData name="ContinuousPath">Yes</SimpleData>
+		<SimpleData name="Image">LF-13-2.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.203099599848,-33.8741254991052</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>The Knoll Park Lift</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">18</SimpleData>
+		<SimpleData name="ID">LF-14</SimpleData>
+		<SimpleData name="Address">Distillery Drive</SimpleData>
+		<SimpleData name="Suburb">Pyrmont</SimpleData>
+		<SimpleData name="DoorWidth">0.89999998</SimpleData>
+		<SimpleData name="ContinuousPath">Yes</SimpleData>
+		<SimpleData name="Image">LF-14-2.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.189757000237,-33.8685048995151</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Darling Park Tower lift</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">19</SimpleData>
+		<SimpleData name="ID">LF-15</SimpleData>
+		<SimpleData name="Address">Day Street</SimpleData>
+		<SimpleData name="Suburb">Sydney</SimpleData>
+		<SimpleData name="DoorWidth">0.89999998</SimpleData>
+		<SimpleData name="ContinuousPath">Yes</SimpleData>
+		<SimpleData name="Image">LF-15-1.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.203801700038,-33.8727420988413</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Napoleon Street Bridge Lift</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">20</SimpleData>
+		<SimpleData name="ID">LF-16</SimpleData>
+		<SimpleData name="Address">Napoleon Street / Sussex Street</SimpleData>
+		<SimpleData name="Suburb">Sydney</SimpleData>
+		<SimpleData name="ContinuousPath">Yes</SimpleData>
+		<SimpleData name="Image">LF-16-2.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.203273900029,-33.8644501993329</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Darling Harbour Car Park Lift</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">21</SimpleData>
+		<SimpleData name="ID">LF-17</SimpleData>
+		<SimpleData name="Address">Darling Drive Darling Harbour</SimpleData>
+		<SimpleData name="Suburb">Sydney</SimpleData>
+		<SimpleData name="DoorWidth">0.89999998</SimpleData>
+		<SimpleData name="ContinuousPath">Yes</SimpleData>
+		<SimpleData name="Image">LF-17-1.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.197901599986,-33.8728138990499</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Redfern Station</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">22</SimpleData>
+		<SimpleData name="ID">LF-18</SimpleData>
+		<SimpleData name="Address">Accessible entrance via Gibbons Street </SimpleData>
+		<SimpleData name="Suburb">Eveleigh</SimpleData>
+		<SimpleData name="ContinuousPath">Yes</SimpleData>
+		<SimpleData name="Image">LF-18-1.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.199071400505,-33.891719699424</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Ian Thorpe Aquatic Centre</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">23</SimpleData>
+		<SimpleData name="ID">LF-19</SimpleData>
+		<SimpleData name="Address">Pyrmont Street</SimpleData>
+		<SimpleData name="Suburb">Ultimo</SimpleData>
+		<SimpleData name="DoorWidth">0.88999999</SimpleData>
+		<SimpleData name="ContinuousPath">Yes</SimpleData>
+		<SimpleData name="Image">LF-19-1.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.198977500431,-33.8768789996659</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Central train station north entrance </name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">24</SimpleData>
+		<SimpleData name="ID">LF-20</SimpleData>
+		<SimpleData name="Address">Eddy Avenue</SimpleData>
+		<SimpleData name="Suburb">Haymarket</SimpleData>
+		<SimpleData name="DoorWidth">1</SimpleData>
+		<SimpleData name="ContinuousPath">Yes</SimpleData>
+		<SimpleData name="Image">LF-20-1.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.20613733441,-33.8824655502742</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Central train station lift to/from platforms 16/17</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">25</SimpleData>
+		<SimpleData name="ID">LF-21</SimpleData>
+		<SimpleData name="Address">Central train station</SimpleData>
+		<SimpleData name="Suburb">Haymarket</SimpleData>
+		<SimpleData name="DoorWidth">1.09</SimpleData>
+		<SimpleData name="ContinuousPath">Yes</SimpleData>
+		<SimpleData name="Image">LF-21-1.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.207323100325,-33.8835193984567</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Central train station lift to/from Grand Concourse </name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">26</SimpleData>
+		<SimpleData name="ID">LF-22</SimpleData>
+		<SimpleData name="Address">Central train station</SimpleData>
+		<SimpleData name="Suburb">Haymarket</SimpleData>
+		<SimpleData name="DoorWidth">1.09</SimpleData>
+		<SimpleData name="ContinuousPath">Yes</SimpleData>
+		<SimpleData name="Image">LF-22-1.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.206999899558,-33.8835232988934</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Central train station lift to/from platforms 18/19</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">27</SimpleData>
+		<SimpleData name="ID">LF-23</SimpleData>
+		<SimpleData name="Address">Central train station</SimpleData>
+		<SimpleData name="Suburb">Haymarket</SimpleData>
+		<SimpleData name="DoorWidth">1.09</SimpleData>
+		<SimpleData name="ContinuousPath">Yes</SimpleData>
+		<SimpleData name="Image">LF-23-1.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.207414800165,-33.8835686992295</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Central train station lift to/from platforms 18/19</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">28</SimpleData>
+		<SimpleData name="ID">LF-24</SimpleData>
+		<SimpleData name="Address">Central train station</SimpleData>
+		<SimpleData name="Suburb">Haymarket</SimpleData>
+		<SimpleData name="DoorWidth">1.09</SimpleData>
+		<SimpleData name="ContinuousPath">Yes</SimpleData>
+		<SimpleData name="Image">LF-24-1.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.207530399221,-33.883630999127</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Central train station lift to/from platforms 20/21</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">29</SimpleData>
+		<SimpleData name="ID">LF-25</SimpleData>
+		<SimpleData name="Address">Central train station</SimpleData>
+		<SimpleData name="Suburb">Haymarket</SimpleData>
+		<SimpleData name="DoorWidth">1.09</SimpleData>
+		<SimpleData name="ContinuousPath">Yes</SimpleData>
+		<SimpleData name="Image">LF-25-1.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.207678300379,-33.8837105990141</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Lift to South Concourse, Central train station</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">30</SimpleData>
+		<SimpleData name="ID">LF-26</SimpleData>
+		<SimpleData name="Address">Central train station</SimpleData>
+		<SimpleData name="Suburb">Haymarket</SimpleData>
+		<SimpleData name="DoorWidth">1.04999995</SimpleData>
+		<SimpleData name="ContinuousPath">Yes</SimpleData>
+		<SimpleData name="Image">LF-26-1.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.207758300049,-33.883909799705</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Lift to platforms 24/25 Central train station</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">31</SimpleData>
+		<SimpleData name="ID">LF-27</SimpleData>
+		<SimpleData name="Address">Central train station</SimpleData>
+		<SimpleData name="Suburb">Haymarket</SimpleData>
+		<SimpleData name="DoorWidth">1.38999999</SimpleData>
+		<SimpleData name="ContinuousPath">Yes</SimpleData>
+		<SimpleData name="Image">LF-27-1.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.207422299989,-33.8845152988587</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Central Station Lift - Chalmers Street entrance</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">32</SimpleData>
+		<SimpleData name="ID">LF-28</SimpleData>
+		<SimpleData name="Suburb">Haymarket</SimpleData>
+		<SimpleData name="DoorWidth">1.1</SimpleData>
+		<SimpleData name="ContinuousPath">Yes</SimpleData>
+		<SimpleData name="Image">No photo</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.207875400402,-33.8837155993141</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Central Station Lift - Devonshire Street entrance</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">33</SimpleData>
+		<SimpleData name="ID">LF-29</SimpleData>
+		<SimpleData name="Address">Central train station</SimpleData>
+		<SimpleData name="Suburb">Haymarket</SimpleData>
+		<SimpleData name="DoorWidth">1.04999995</SimpleData>
+		<SimpleData name="ContinuousPath">Yes</SimpleData>
+		<SimpleData name="Image">LF-29-1.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.206778599101,-33.8853843990168</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Newtown Train Station </name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">34</SimpleData>
+		<SimpleData name="ID">LF-30</SimpleData>
+		<SimpleData name="Address">Concourse to Newton Train station, accessed from King Street</SimpleData>
+		<SimpleData name="Suburb">Newtown</SimpleData>
+		<SimpleData name="ContinuousPath">Yes</SimpleData>
+		<SimpleData name="Image">LF-30-1.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.179303599326,-33.8981493993054</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Napoleon Street Bridge Lift</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">35</SimpleData>
+		<SimpleData name="ID">LF-31</SimpleData>
+		<SimpleData name="Address">Napoleon Street/ Sussex Street</SimpleData>
+		<SimpleData name="Suburb">Sydney</SimpleData>
+		<SimpleData name="DoorWidth">1.20000005</SimpleData>
+		<SimpleData name="ContinuousPath">Yes</SimpleData>
+		<SimpleData name="Image">LF-31-1.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.203289829988,-33.8645171055619</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Gas Lane Lift</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">36</SimpleData>
+		<SimpleData name="ID">LF-32</SimpleData>
+		<SimpleData name="Address">Gas Lane Lift</SimpleData>
+		<SimpleData name="Suburb">Millers Point</SimpleData>
+		<SimpleData name="DoorWidth">0.9</SimpleData>
+		<SimpleData name="ContinuousPath">Yes</SimpleData>
+		<SimpleData name="Image">LF-32-1.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.203228796558,-33.862434307336</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Kent Street Lift to Underground</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">37</SimpleData>
+		<SimpleData name="ID">LF-33</SimpleData>
+		<SimpleData name="Address">Kent Street </SimpleData>
+		<SimpleData name="Suburb">Sydney</SimpleData>
+		<SimpleData name="DoorWidth">1.20000005</SimpleData>
+		<SimpleData name="ContinuousPath">Yes</SimpleData>
+		<SimpleData name="Image">LF-33-1.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.204144469765,-33.8653447275355</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Sussex Street to City Centre</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">38</SimpleData>
+		<SimpleData name="ID">LF-34</SimpleData>
+		<SimpleData name="Address">Sussex Street</SimpleData>
+		<SimpleData name="Suburb">Sydney</SimpleData>
+		<SimpleData name="DoorWidth">1.20000005</SimpleData>
+		<SimpleData name="ContinuousPath">Yes</SimpleData>
+		<SimpleData name="Image">LF-34-1.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.203072412703,-33.8655372295933</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Cockle Bay Wharf Footbridge</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">39</SimpleData>
+		<SimpleData name="ID">LF-35</SimpleData>
+		<SimpleData name="Suburb">Sydney</SimpleData>
+		<SimpleData name="DoorWidth">0.89999998</SimpleData>
+		<SimpleData name="ContinuousPath">No</SimpleData>
+		<SimpleData name="Image">LF-35-3.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.201907357595,-33.8729948172109</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Darling Quarter Theatre lift</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">40</SimpleData>
+		<SimpleData name="ID">LF-36</SimpleData>
+		<SimpleData name="Suburb">Sydney</SimpleData>
+		<SimpleData name="Image">No photo</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.201188906127,-33.874137178141</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>King Street Wharf Lift</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">41</SimpleData>
+		<SimpleData name="ID">LF-37</SimpleData>
+		<SimpleData name="Address">Lime Street and Cuthbert Street </SimpleData>
+		<SimpleData name="Suburb">Sydney</SimpleData>
+		<SimpleData name="ContinuousPath">Yes</SimpleData>
+		<SimpleData name="Image">LF-37-1.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.201657616363,-33.8680329495872</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Wulugul Walk Lift</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">42</SimpleData>
+		<SimpleData name="ID">LF-38</SimpleData>
+		<SimpleData name="Address">Argyle Street</SimpleData>
+		<SimpleData name="Suburb">Barangaroo</SimpleData>
+		<SimpleData name="DoorWidth">1.20000005</SimpleData>
+		<SimpleData name="ContinuousPath">Yes</SimpleData>
+		<SimpleData name="Image">LF-38-1.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.201275585795,-33.858621150348</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Domain Carpark North Lift</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">43</SimpleData>
+		<SimpleData name="ID">LF-39</SimpleData>
+		<SimpleData name="Address">Domain Carpark, Sir John Young Crescent</SimpleData>
+		<SimpleData name="Suburb">Sydney</SimpleData>
+		<SimpleData name="ContinuousPath">Yes</SimpleData>
+		<SimpleData name="Image">LF-39-1.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.216623215649,-33.8700753721998</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Domain Carpark South Lift</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">44</SimpleData>
+		<SimpleData name="ID">LF-40</SimpleData>
+		<SimpleData name="Address">The Domain, St Mary Road</SimpleData>
+		<SimpleData name="Suburb">Sydney</SimpleData>
+		<SimpleData name="ContinuousPath">Yes</SimpleData>
+		<SimpleData name="Image">LF-40-1.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.21556050488,-33.8708492501623</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Eastern Distributor Lift</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">45</SimpleData>
+		<SimpleData name="ID">LF-41</SimpleData>
+		<SimpleData name="Address">Eastern Distributor walkover on East side</SimpleData>
+		<SimpleData name="Suburb">Woolloomooloo</SimpleData>
+		<SimpleData name="DoorWidth">0.89999998</SimpleData>
+		<SimpleData name="ContinuousPath">Yes</SimpleData>
+		<SimpleData name="Image">LF-41-2.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.218663454223,-33.8700569324023</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>King Street Wharf Footbridge West </name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">46</SimpleData>
+		<SimpleData name="ID">LF-42</SimpleData>
+		<SimpleData name="Address">Sussex St </SimpleData>
+		<SimpleData name="Suburb">Barangaroo</SimpleData>
+		<SimpleData name="ContinuousPath">Yes</SimpleData>
+		<SimpleData name="Image">LF-42-1.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.202508300315,-33.8650687160592</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Darling Harbour Lift</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">47</SimpleData>
+		<SimpleData name="ID">LF-43</SimpleData>
+		<SimpleData name="Address">Darling Harbour</SimpleData>
+		<SimpleData name="Suburb">Sydney</SimpleData>
+		<SimpleData name="DoorWidth">1.29999995</SimpleData>
+		<SimpleData name="ContinuousPath">Yes</SimpleData>
+		<SimpleData name="Image">LF-43-1.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.203505533611,-33.8712091157916</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Finger Wharf Lift</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">48</SimpleData>
+		<SimpleData name="ID">LF-44</SimpleData>
+		<SimpleData name="Address">Corner of Cower Wharf Road and Lincoln Crescent</SimpleData>
+		<SimpleData name="Suburb">Woolloomooloo</SimpleData>
+		<SimpleData name="ContinuousPath">Yes</SimpleData>
+		<SimpleData name="Image">LF-44-1.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.219033850495,-33.8681124144226</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Railway Square Underpass</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">49</SimpleData>
+		<SimpleData name="ID">LF-45</SimpleData>
+		<SimpleData name="Suburb">Haymarket</SimpleData>
+		<SimpleData name="DoorWidth">0.93000001</SimpleData>
+		<SimpleData name="ContinuousPath">Yes</SimpleData>
+		<SimpleData name="Image">LF-45-1.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.203647106947,-33.883559506901</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Darling Harbour-Pier Street Lift</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">50</SimpleData>
+		<SimpleData name="ID">LF-46</SimpleData>
+		<SimpleData name="Suburb">Sydney</SimpleData>
+		<SimpleData name="DoorWidth">1.29999995</SimpleData>
+		<SimpleData name="ContinuousPath">Yes</SimpleData>
+		<SimpleData name="Image">LF-46-1.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.20075241678,-33.8774869860242</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Pyrmont Bridge-Harbourside Lift</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">51</SimpleData>
+		<SimpleData name="ID">LF-47</SimpleData>
+		<SimpleData name="Address">Darling Harbour</SimpleData>
+		<SimpleData name="Suburb">Sydney</SimpleData>
+		<SimpleData name="DoorWidth">0.89999998</SimpleData>
+		<SimpleData name="ContinuousPath">Yes</SimpleData>
+		<SimpleData name="Image">LF-47-1.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.198503200595,-33.8704779164788</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Pyrmont Light Rail Bridge Lift</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">52</SimpleData>
+		<SimpleData name="ID">LF-48</SimpleData>
+		<SimpleData name="Address">Murray Street</SimpleData>
+		<SimpleData name="Suburb">Pyrmont</SimpleData>
+		<SimpleData name="DoorWidth">0.89999998</SimpleData>
+		<SimpleData name="ContinuousPath">Yes</SimpleData>
+		<SimpleData name="Image">LF-48-1.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.197203899346,-33.8689576988151</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>The Star</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">53</SimpleData>
+		<SimpleData name="ID">LF-49</SimpleData>
+		<SimpleData name="Address">Pirrama Road</SimpleData>
+		<SimpleData name="Suburb">Pyrmont</SimpleData>
+		<SimpleData name="ContinuousPath">Yes</SimpleData>
+		<SimpleData name="Image">LF-49-1.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.195812239477,-33.8678202597719</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Jones Bay Wharf Lift</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">54</SimpleData>
+		<SimpleData name="ID">LF-50</SimpleData>
+		<SimpleData name="Address">Jones Bay Road</SimpleData>
+		<SimpleData name="Suburb">Pyrmont</SimpleData>
+		<SimpleData name="DoorWidth">0.75</SimpleData>
+		<SimpleData name="ContinuousPath">No</SimpleData>
+		<SimpleData name="Image">LF-50-2.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.19517123297,-33.8659526339434</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Giba Park to Pirrama Road Lift</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">55</SimpleData>
+		<SimpleData name="ID">LF-51</SimpleData>
+		<SimpleData name="Address">Pirrama Road</SimpleData>
+		<SimpleData name="Suburb">Pyrmont</SimpleData>
+		<SimpleData name="DoorWidth">0.89999998</SimpleData>
+		<SimpleData name="ContinuousPath">Yes</SimpleData>
+		<SimpleData name="Image">LF-51-1.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.193364329816,-33.8644348490792</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Town Hall Arcade to Station</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">56</SimpleData>
+		<SimpleData name="ID">LF-52</SimpleData>
+		<SimpleData name="Address">Corner of George Street and Bathurst Street (west)</SimpleData>
+		<SimpleData name="Suburb">Sydney</SimpleData>
+		<SimpleData name="DoorWidth">1</SimpleData>
+		<SimpleData name="ContinuousPath">Yes</SimpleData>
+		<SimpleData name="Image">LF-52-1.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.206817499743,-33.8739392989921</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Martin Place to Station Platform</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">57</SimpleData>
+		<SimpleData name="ID">LF-53</SimpleData>
+		<SimpleData name="Address">Phillip Street</SimpleData>
+		<SimpleData name="Suburb">Sydney</SimpleData>
+		<SimpleData name="ContinuousPath">Yes</SimpleData>
+		<SimpleData name="Image">LF-53-1.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.211369381852,-33.8677579569827</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Central Park Mall - Lift to Goget Megapod</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">58</SimpleData>
+		<SimpleData name="ID">LF-54</SimpleData>
+		<SimpleData name="Address">28 Broadway</SimpleData>
+		<SimpleData name="Suburb">Chippendale</SimpleData>
+		<SimpleData name="ContinuousPath">Yes</SimpleData>
+		<SimpleData name="Image">LF-54-1.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.200370509505,-33.8848266415568</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Miller Street Civic Space Lift</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">59</SimpleData>
+		<SimpleData name="ID">LF-55</SimpleData>
+		<SimpleData name="Address">Miller lane</SimpleData>
+		<SimpleData name="Suburb">Pyrmont</SimpleData>
+		<SimpleData name="DoorWidth">1</SimpleData>
+		<SimpleData name="ContinuousPath">Yes</SimpleData>
+		<SimpleData name="Image">LF-55-3.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.192339909699,-33.8707256490993</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Pier 2/3 </name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">60</SimpleData>
+		<SimpleData name="ID">LF-56</SimpleData>
+		<SimpleData name="Address">Hickson Road </SimpleData>
+		<SimpleData name="Suburb">Dawes Point</SimpleData>
+		<SimpleData name="DoorWidth">1</SimpleData>
+		<SimpleData name="ContinuousPath">Yes</SimpleData>
+		<SimpleData name="Image">LF-56-1.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.206785997499,-33.8554840232166</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>John Street Square Light Rail Station Lift</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">61</SimpleData>
+		<SimpleData name="ID">LF-57</SimpleData>
+		<SimpleData name="Address">Harris Street</SimpleData>
+		<SimpleData name="Suburb">Pyrmont</SimpleData>
+		<SimpleData name="DoorWidth">1</SimpleData>
+		<SimpleData name="ContinuousPath">Yes</SimpleData>
+		<SimpleData name="Image">LF-57-1.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.192326124165,-33.8672052961282</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Pyrmont Bay Light Rail Station</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">62</SimpleData>
+		<SimpleData name="ID">LF-58</SimpleData>
+		<SimpleData name="Address">Murray Street</SimpleData>
+		<SimpleData name="Suburb">Pyrmont</SimpleData>
+		<SimpleData name="DoorWidth">0.89999998</SimpleData>
+		<SimpleData name="ContinuousPath">Yes</SimpleData>
+		<SimpleData name="Image">LF-58-1.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.197689935909,-33.8695659975476</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Stargazing Lawn lift</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">63</SimpleData>
+		<SimpleData name="ID">LF-59</SimpleData>
+		<SimpleData name="Suburb">Barangaroo</SimpleData>
+		<SimpleData name="DoorWidth">1.20000005</SimpleData>
+		<SimpleData name="ContinuousPath">Yes</SimpleData>
+		<SimpleData name="Image">LF-59-1.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.20147183505,-33.8581440684542</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>George Street-Town Hall Station Lift </name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">64</SimpleData>
+		<SimpleData name="ID">LF-60</SimpleData>
+		<SimpleData name="Address">Corner of George Street and Bathurst Street (east)</SimpleData>
+		<SimpleData name="Suburb">Sydney</SimpleData>
+		<SimpleData name="DoorWidth">1.10000002</SimpleData>
+		<SimpleData name="ContinuousPath">Yes</SimpleData>
+		<SimpleData name="Image">LF-60-1.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.207026503028,-33.8739348654495</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Wattle Street Lift and Stairs</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">65</SimpleData>
+		<SimpleData name="ID">LF-61</SimpleData>
+		<SimpleData name="Address">Wentworth Park to Quarry Street Footbridge</SimpleData>
+		<SimpleData name="Suburb">Ultimo</SimpleData>
+		<SimpleData name="ContinuousPath">Yes</SimpleData>
+		<SimpleData name="Image">LF-61-1.jpg</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.194735083072,-33.8777170677794</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Pyrmont Bridge Lifts</name>
+	<ExtendedData><SchemaData schemaUrl="#Lifts">
+		<SimpleData name="OBJECTID">67</SimpleData>
+		<SimpleData name="ID">ST-416</SimpleData>
+		<SimpleData name="Address">Darling Harbour </SimpleData>
+		<SimpleData name="Suburb">Sydney</SimpleData>
+		<SimpleData name="Image">No photo</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>151.202230782016,-33.8708642839809</coordinates></Point>
+  </Placemark>
+</Folder>
+</Document></kml>

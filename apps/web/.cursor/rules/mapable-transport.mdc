@@ -1,0 +1,98 @@
+---
+description: Non-negotiable rules for MapAble Transport on mapableau-new (Next.js + Prisma)
+globs:
+  - app/**/transport/**
+  - app/api/transport/**
+  - app/api/provider/transport/**
+  - app/api/driver/transport/**
+  - app/api/driver/trips/**
+  - app/driver/**
+  - app/admin/transport/**
+  - app/dashboard/transport/**
+  - app/dashboard/find-transport/**
+  - components/transport/**
+  - components/layout/TransportNav.tsx
+  - lib/transport/**
+  - lib/transport-routing/**
+  - lib/config/transport-routing.ts
+  - lib/config/y2-orchestration.ts
+  - types/transport*.ts
+  - docs/transport/**
+  - tests/**/transport*
+  - prisma/schema.prisma
+alwaysApply: false
+---
+
+# MapAble Transport rules (mapableau-new)
+
+This repository is **Next.js 15 App Router + Prisma + NextAuth + TanStack Query + Vitest**, not the Vite/Express/Drizzle layout described in older prompt packs. Translate pack intent onto these paths. Read `docs/transport/*` before changing transport behaviour.
+
+## Stack and boundaries
+
+- Preserve: Next.js, React, TypeScript, Prisma, Neon/PostgreSQL, NextAuth session model, TanStack Query, Tailwind, existing Radix/shadcn-style components.
+- Do not add a second global client state framework.
+- Do not rewrite unrelated modules (Care, AbilityPay, indoor accessibility, etc.).
+- Put transport business logic in `lib/transport/*` (and focused adapters under `lib/transport-routing/*`). Keep `app/api/**/route.ts` handlers thin: auth, validate, call service, serialize.
+- Use Zod at every API boundary. Share typed DTOs via `types/transport*.ts` and validated schemas under `lib/transport/*` or `schemas/` as established.
+- Do not use `any` in new transport code unless an external SDK forces it; narrow immediately.
+
+## Domain source of truth
+
+- Prefer **`TransportTrip` / `TransportTripRequest` / `TransportTripEvent`** as the operational source of truth for new work.
+- Preserve legacy `TransportBooking`, generic `Booking`, Care bookings, and the bridge in `lib/transport/booking-bridge-service.ts`. Do not make the generic `bookings` table the sole transport domain model.
+- A transport request is not a booking. A route estimate is not a provider quote. A quote is not confirmed until the participant accepts it. Assignment is not valid until driver and vehicle eligibility pass.
+- Never auto-book transport from a care appointment without explicit participant confirmation.
+
+## Honesty and integrations
+
+- Do not hard-code fares, ETAs, distances, NDIS rates, GST treatment, cancellation charges, partner availability, or funding approval.
+- Ban unconditional production claims such as `NDIS Covered`, `Companion Card Accepted`, fixed fares, or guaranteed assistance unless backed by a verified provider response or configuration.
+- All external data must include `source`, `generatedAt`, freshness/`validUntil`, and an advisory or confirmed classification.
+- Use feature flags / env gates for GTFS, GTFS-Realtime, partner booking APIs, routing providers, SMS, push, and payments (see `lib/config/transport-routing.ts` and related env).
+- A missing API key or disabled flag must produce an honest **sandbox** or **unavailable** state — never a fake booking, live ETA, lift alert, driver notification, or funding approval.
+- Sandbox fixtures must remain labelled sandbox and must never appear as live supply on the public site.
+- Do not calculate transport cost from a generic provider hourly rate.
+
+## Privacy and safety
+
+- Exact pickup and drop-off data are restricted: participant, authorised operator staff after acceptance, assigned driver within the permitted window, and audited administrators only.
+- Before assignment / quote acceptance, show masked label or suburb — not exact address.
+- Do not include diagnoses, full access profiles, exact addresses, or unrestricted coordinates in logs, analytics, notifications, webhooks, or error reports.
+- Do not represent MapAble as an emergency service. Direct immediate danger to **000**.
+- Maintain participant choice and control. AI or rule-based suggestions must be editable, explainable, and overridable unless a safety or legal rule blocks the action.
+
+## AuthZ, audit, and idempotency
+
+- Every write endpoint must enforce ownership or role/membership permissions server-side. Never trust client-supplied role, operator, driver, price, or status.
+- Operator and driver access must eventually be based on transport operator membership / `TransportDriver` assignment, not only a global user role string.
+- Every command that can be retried from mobile or a flaky connection must support idempotency.
+- State changes and eligibility decisions used for assignment/dispatch must be auditable (reuse `lib/audit` and transport event ledger patterns).
+- Treat trip events as append-only; correct with compensating events, not silent mutation.
+
+## Accessibility and locale
+
+- Follow WCAG 2.2 AA. Every map interaction needs an equivalent list or form interaction.
+- Use Australian English. Store timestamps in UTC; default display timezone `Australia/Sydney`.
+
+## Public product language
+
+- Public `/transport` and capability labels must match enabled production configuration and release evidence.
+- Labels: Available now | Pilot / sandbox | Coming next | Requires partner integration. Do not mark driver verification, real-time status, live ETA, evidence, or partner dispatch as available until implementation and flags prove it.
+- Production claims for `driver_vehicle_verification`, `trip_status_evidence_review`, and `routing_adapters` must not be promoted without the gates in `docs/transport/IMPLEMENTATION_CHECKLIST.md` (PC-* prompts).
+
+## Verification
+
+After every transport implementation prompt:
+
+1. `pnpm type-check`
+2. `pnpm build`
+
+Do not report success unless both pass, or clearly list the blocking error and cause. Prefer also `pnpm test` for touched transport suites under `tests/**/transport*`.
+
+## Finish each prompt with
+
+Files changed, database changes, API changes, environment variables, test results, unresolved risks, manual verification steps, and public claim status after the work.
+
+## Out of scope for Prompt 0 artefacts
+
+The files under `docs/transport/` and this rule govern later work. Do not start product implementation from documentation alone without the matching checklist prompt.

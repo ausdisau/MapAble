@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "mapable-av": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["tsx", "${workspaceFolder}/mcp/av/server.ts"],
+      "env": {
+        "MAPABLE_BASE_URL": "${env:NEXT_PUBLIC_APP_URL}",
+        "OSRM_BASE_URL": "${env:OSRM_BASE_URL}"
+      },
+      "envFile": "${workspaceFolder}/.env"
+    }
+  }
+}

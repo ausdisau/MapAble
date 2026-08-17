@@ -1,0 +1,49 @@
+name: Quality
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: mapable_quality
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      NODE_OPTIONS: --max-old-space-size=8192
+      MAPABLE_BUILD_HEAP_MB: "8192"
+      NEXTAUTH_SECRET: ci-nextauth-secret-not-for-production-use-32chars
+      NEXTAUTH_URL: http://localhost:3000
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mapable_quality?schema=public
+      DIRECT_URL: postgresql://postgres:postgres@localhost:5432/mapable_quality?schema=public
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.12.1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm prisma generate
+      - run: pnpm check:package-boundaries
+      - run: pnpm type-check
+      # Ephemeral schema for tests/build (same pattern as CI; not a production instruction).
+      - run: pnpm exec prisma db push --accept-data-loss --skip-generate
+      - run: pnpm test
+      - run: pnpm build

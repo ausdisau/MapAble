@@ -1,0 +1,96 @@
+modules = ["nodejs-20", "web", "php-8.4", "postgresql-16"]
+run = "npm run dev:replit"
+hidden = [".config", ".git", "generated-icon.png", "node_modules", "dist"]
+
+[nix]
+channel = "stable-24_05"
+
+[[ports]]
+localPort = 3001
+externalPort = 3001
+exposeLocalhost = true
+
+[[ports]]
+localPort = 5000
+externalPort = 80
+
+[env]
+PORT = "5000"
+
+[deployment]
+deploymentTarget = "autoscale"
+run = ["node", "./dist/index.cjs"]
+build = ["npm", "run", "build:replit"]
+publicDir = "dist/public"
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Start application"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "AgentMail Service"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "test"
+
+[[workflows.workflow]]
+name = "Start application"
+author = "agent"
+
+[workflows.workflow.metadata]
+outputType = "webview"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run bootstrap:replit-deps && npm run dev:replit"
+waitForPort = 5000
+
+[[workflows.workflow]]
+name = "AgentMail Service"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npx tsx server/agentmail-service.ts"
+waitForPort = 3001
+
+[workflows.workflow.metadata]
+outputType = "console"
+
+[[workflows.workflow]]
+name = "test"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "REPLIT_TEST_FULL=1 npm run test:replit"
+
+[workflows.workflow.metadata]
+isValidation = true
+
+[objectStorage]
+defaultBucketID = "replit-objstore-23684864-b650-42b0-b4fb-f420ba4db463"
+
+[agent]
+integrations = ["javascript_object_storage:2.0.0", "javascript_openai_ai_integrations:2.0.0", "agentmail:1.0.0", "github:1.0.0"]
+
+[userenv]
+
+[userenv.shared]
+AUTH0_DOMAIN = "adid.au.auth0.com"
+AUTH0_CLIENT_ID = "ggZYPtlnLhP55XtJQCEQj4780TiAZfOe"
+ACCESSIBE_SITE_KEY = "YOUR_ACCESSIBE_SITE_KEY_HERE"
+
+[postMerge]
+path = "scripts/post-merge.sh"
+timeoutMs = 120000

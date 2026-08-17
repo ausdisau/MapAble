@@ -1,0 +1,68 @@
+{
+  "$schema_comment": "High/critical production audit exceptions. Each entry must include advisoryId, package, path, rationale, owner, compensatingControl, and expiry (ISO date). Expired entries fail CI.",
+  "exceptions": [
+    {
+      "advisoryId": "GHSA-88FW-HQM2-52QC",
+      "package": "hono",
+      "path": ".>@openai/agents>@openai/agents-core>@modelcontextprotocol/sdk>hono",
+      "rationale": "Transitive via @openai/agents MCP SDK; no first-party Hono server surface. Track upstream agents-core bump.",
+      "owner": "platform-security",
+      "compensatingControl": "MCP SDK is not exposed as a public HTTP edge; production CareOS AI paths remain flag-gated fail-closed.",
+      "expiry": "2026-09-11"
+    },
+    {
+      "advisoryId": "GHSA-V2HH-GCRM-F6HX",
+      "package": "fast-uri",
+      "path": ".>@openai/agents>@openai/agents-core>@modelcontextprotocol/sdk>ajv>fast-uri",
+      "rationale": "Transitive ajv/fast-uri via @openai/agents MCP SDK; awaiting upstream patch.",
+      "owner": "platform-security",
+      "compensatingControl": "No direct fast-uri usage; dependency confined to agent SDK internals behind feature flags.",
+      "expiry": "2026-09-11"
+    },
+    {
+      "advisoryId": "GHSA-4C8G-83QW-93J6",
+      "package": "fast-uri",
+      "path": ".>@openai/agents>@openai/agents-core>@modelcontextprotocol/sdk>ajv>fast-uri",
+      "rationale": "Second fast-uri advisory on same transitive path; track with agents-core upgrade.",
+      "owner": "platform-security",
+      "compensatingControl": "No direct fast-uri usage; dependency confined to agent SDK internals behind feature flags.",
+      "expiry": "2026-09-11"
+    },
+    {
+      "advisoryId": "GHSA-7P8R-X3MC-P8W7",
+      "package": "fast-uri",
+      "path": ".>@openai/agents>@openai/agents-core>@modelcontextprotocol/sdk>ajv>fast-uri",
+      "rationale": "Additional fast-uri advisory on the same @openai/agents MCP SDK transitive path; not introduced by Navigator pilot.",
+      "owner": "platform-security",
+      "compensatingControl": "No direct fast-uri usage; Navigator and CareOS AI surfaces remain flag-gated fail-closed.",
+      "expiry": "2026-09-11"
+    },
+    {
+      "advisoryId": "GHSA-MWP4-54F8-5FHR",
+      "package": "ip-address",
+      "path": ".>@openai/agents>@openai/agents-core>@modelcontextprotocol/sdk>express-rate-limit>ip-address",
+      "rationale": "Transitive express-rate-limit/ip-address via @openai/agents MCP SDK; not a first-party rate-limit surface.",
+      "owner": "platform-security",
+      "compensatingControl": "App rate limiting uses lib/api/ip-rate-limit.ts; MCP SDK path not exposed as public edge.",
+      "expiry": "2026-09-11"
+    },
+    {
+      "advisoryId": "GHSA-2M8V-J782-FHVR",
+      "package": "socket.io-parser",
+      "path": "apps__realtime-server>socket.io>socket.io-parser",
+      "rationale": "Transitive in apps/realtime-server socket.io stack; pre-existing vs Navigator pilot; track upstream bump.",
+      "owner": "platform-security",
+      "compensatingControl": "Realtime server is a separate workspace app; Navigator pilot does not enable or expose socket.io paths.",
+      "expiry": "2026-09-11"
+    },
+    {
+      "advisoryId": "GHSA-2V37-7H3G-55P8",
+      "package": "nanoid",
+      "path": ".>next>postcss>nanoid",
+      "rationale": "Transitive via next/postcss build toolchain; no direct nanoid API usage for auth/security tokens in Navigator.",
+      "owner": "platform-security",
+      "compensatingControl": "Await Next/postcss upstream; Navigator IDs use crypto randomUUID/cuid patterns for envelopes.",
+      "expiry": "2026-09-11"
+    }
+  ]
+}

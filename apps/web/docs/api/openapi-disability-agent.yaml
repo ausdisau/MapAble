@@ -1,0 +1,325 @@
+openapi: 3.1.0
+info:
+  title: MapAble Agentic Disability Services API
+  version: 1.0.0
+  description: |
+    Agent-ready endpoints for NDIS provider discovery, natural-language search
+    interpretation, and AI SDK tool-loop assistance. Every response includes
+    `operationId` and an `X-Operation-Id` header for agent self-healing.
+  contact:
+    name: MapAble
+    url: https://mapable.com.au
+  license:
+    name: Proprietary
+servers:
+  - url: https://mapable.com.au
+    description: Production
+  - url: http://localhost:3000
+    description: Local development
+paths:
+  /api/search/interpret:
+    post:
+      operationId: searchInterpretQuery
+      summary: Interpret natural-language provider search text
+      description: See docs/api/openapi-search-interpret.yaml for full schema.
+      responses:
+        "200":
+          description: Interpretation result
+          headers:
+            X-Operation-Id:
+              schema:
+                type: string
+                example: searchInterpretQuery
+  /api/mapable/ask:
+    post:
+      operationId: mapableAskQuery
+      summary: MapAble Co-Pilot and Provider Finder ask
+      description: |
+        Guest provider_finder context works without sign-in. Other contexts require
+        a NextAuth session (Google, Apple, Microsoft, Facebook, or credentials).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MapableAskRequest"
+            examples:
+              providerFinder:
+                value:
+                  query: Wheelchair accessible transport near Parramatta
+                  context: provider_finder
+      responses:
+        "200":
+          description: Copilot or finder response
+          headers:
+            X-Operation-Id:
+              schema:
+                type: string
+                example: mapableAskQuery
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MapableAskResponse"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/AuthRequired"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+        "500":
+          $ref: "#/components/responses/UpstreamError"
+  /api/providers/ndis/search:
+    get:
+      operationId: ndisProviderSearch
+      summary: Search NDIS provider directory export
+      parameters:
+        - name: q
+          in: query
+          schema:
+            type: string
+          description: Keywords or provider name
+        - name: state
+          in: query
+          schema:
+            type: string
+            maxLength: 8
+          example: NSW
+        - name: postcode
+          in: query
+          schema:
+            type: string
+            maxLength: 16
+          example: "2150"
+        - name: service
+          in: query
+          schema:
+            type: string
+            maxLength: 200
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 25
+      responses:
+        "200":
+          description: Provider listings
+          headers:
+            X-Operation-Id:
+              schema:
+                type: string
+                example: ndisProviderSearch
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NdisProviderSearchResponse"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "502":
+          $ref: "#/components/responses/UpstreamError"
+  /api/agent/disability-services:
+    post:
+      operationId: disabilityServicesAgentTurn
+      summary: AI SDK tool-loop agent turn for disability services
+      description: |
+        Requires DISABILITY_SERVICES_AGENT_ENABLED=true and search interpreter keys.
+        The agent may call interpretFinderQuery, searchNdisProviders, geocodeLocation,
+        and explainProvider tools autonomously.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DisabilityAgentTurnRequest"
+      responses:
+        "200":
+          description: Agent answer
+          headers:
+            X-Operation-Id:
+              schema:
+                type: string
+                example: disabilityServicesAgentTurn
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DisabilityAgentTurnResponse"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+        "503":
+          description: Agent not enabled
+          headers:
+            X-Operation-Id:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AgentError"
+        "502":
+          $ref: "#/components/responses/UpstreamError"
+components:
+  responses:
+    ValidationError:
+      description: Invalid request
+      headers:
+        X-Operation-Id:
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/AgentError"
+    AuthRequired:
+      description: Sign-in required
+      headers:
+        X-Operation-Id:
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/AgentError"
+    RateLimited:
+      description: Rate limited
+      headers:
+        X-Operation-Id:
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/AgentError"
+    UpstreamError:
+      description: Server or upstream failure
+      headers:
+        X-Operation-Id:
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/AgentError"
+  schemas:
+    AgentError:
+      type: object
+      required:
+        - error
+        - code
+        - operationId
+      properties:
+        error:
+          type: string
+        code:
+          type: string
+          enum:
+            - VALIDATION_ERROR
+            - RATE_LIMITED
+            - AUTH_REQUIRED
+            - FORBIDDEN
+            - NOT_CONFIGURED
+            - UPSTREAM_ERROR
+        operationId:
+          type: string
+        details:
+          type: object
+        retryable:
+          type: boolean
+    MapableAskRequest:
+      type: object
+      required:
+        - query
+      properties:
+        query:
+          type: string
+          maxLength: 2000
+        context:
+          type: string
+          enum: [default, provider_finder]
+        mode:
+          type: string
+        sessionId:
+          type: string
+        participantId:
+          type: string
+        providerSlug:
+          type: string
+        providerName:
+          type: string
+    MapableAskResponse:
+      type: object
+      properties:
+        operationId:
+          type: string
+          example: mapableAskQuery
+        source:
+          type: string
+        intent:
+          type: string
+        answer:
+          type: string
+        results:
+          type: array
+          items:
+            type: object
+    NdisProviderSearchResponse:
+      type: object
+      properties:
+        operationId:
+          type: string
+          example: ndisProviderSearch
+        count:
+          type: integer
+        filters_applied:
+          type: object
+        providers:
+          type: array
+          items:
+            type: object
+            properties:
+              source_id:
+                type: string
+              provider_name:
+                type: string
+              suburb:
+                type: string
+                nullable: true
+              state:
+                type: string
+                nullable: true
+              postcode:
+                type: string
+                nullable: true
+              latitude:
+                type: number
+                nullable: true
+              longitude:
+                type: number
+                nullable: true
+    DisabilityAgentTurnRequest:
+      type: object
+      required:
+        - query
+      properties:
+        query:
+          type: string
+          minLength: 1
+          maxLength: 2000
+        sessionId:
+          type: string
+    DisabilityAgentTurnResponse:
+      type: object
+      properties:
+        operationId:
+          type: string
+          example: disabilityServicesAgentTurn
+        answer:
+          type: string
+        toolsCalled:
+          type: array
+          items:
+            type: string
+        sessionId:
+          type: string

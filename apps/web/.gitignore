@@ -1,0 +1,107 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+/.pnp
+.pnp.js
+
+# Testing
+/coverage
+
+# Next.js
+/.next/
+/out/
+next-env.d.ts
+
+# Production
+/build
+/dist
+
+# Misc
+.DS_Store
+*.pem
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# NDIS registry snapshot (fetch via pnpm fetch:ndis-list-providers)
+/data/ndis/*.json
+
+# Local env files
+.env
+.env.replit
+.env*.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Vercel
+.vercel
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# IDE / Editor
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+*.sublime-project
+*.sublime-workspace
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Package manager locks (keeping pnpm-lock.yaml, ignoring npm/yarn)
+package-lock.json
+yarn.lock
+
+# Husky (uncomment if you don't want to commit husky hooks)
+# .husky/_/
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Logs
+logs
+*.log
+
+# Playwright
+test-results/
+playwright-report/
+tests/a11y/.auth/
+
+# Local Replit import working tree (must not be a gitlink/submodule)
+/tmp/mapable-unified-replit/
+/tmp/mapable-unified-replit
+
+# Never re-commit Replit-attached secrets (rotated after #444 history purge)
+attached_assets/*.key
+attached_assets/vercelAPI_*.txt
+attached_assets/**/*secret*
+attached_assets/**/*token*
+
+# Isolated Replit npm install tree (see scripts/bootstrap-replit-deps.sh)
+.replit-node_modules/
+.replit-node-path.env
+client/node_modules
+
+# Local open-weight model checkouts (serve via GPT_OSS_BASE_URL)
+/gpt-oss-120b/
+/gpt-oss-20b/

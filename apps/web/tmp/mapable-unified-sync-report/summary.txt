@@ -1,0 +1,95 @@
+﻿MapAble-Unified zip import report
+Generated: 2026-06-21T17:27:54.9381003+10:00
+Source zip: G:\Operations\MapAble\UI\MapAble-Unified.zip
+Extracted: C:\Users\jonat\mapableau-new\tmp\mapable-unified-replit
+
+Replit stack: Express + Vite React + Drizzle ORM + wouter
+Monorepo stack: Next.js App Router + Prisma
+
+Replit top-level:
+  - .agents
+  - .config
+  - .git
+  - .local
+  - attached_assets
+  - client
+  - dist
+  - docs
+  - e2e
+  - migrations
+  - research
+  - scripts
+  - server
+  - shared
+  - test-results
+  - .gitignore
+  - .replit
+  - components.json
+  - drizzle.config.ts
+  - package-lock.json
+  - package.json
+  - playwright.config.ts
+  - postcss.config.js
+  - replit.md
+  - replit.nix
+  - tailwind.config.ts
+  - tsconfig.json
+  - vite.config.ts
+
+Replit client pages:
+  - client/src/pages/abn-lookup.tsx
+  - client/src/pages/accessibility-map.tsx
+  - client/src/pages/admin-chat-guardrails.tsx
+  - client/src/pages/budget.tsx
+  - client/src/pages/care.tsx
+  - client/src/pages/chat.tsx
+  - client/src/pages/dashboard.tsx
+  - client/src/pages/geo-admin.tsx
+  - client/src/pages/groceries.tsx
+  - client/src/pages/grocery-checkout.tsx
+  - client/src/pages/grocery-order-detail.tsx
+  - client/src/pages/grocery-orders.tsx
+  - client/src/pages/grocery-pick-list.tsx
+  - client/src/pages/invoices.tsx
+  - client/src/pages/job-detail.tsx
+  - client/src/pages/jobs.tsx
+  - client/src/pages/login.tsx
+  - client/src/pages/messages.tsx
+  - client/src/pages/ndis-admin.tsx
+  - client/src/pages/not-found.tsx
+  - client/src/pages/payment-methods.tsx
+  - client/src/pages/payouts.tsx
+  - client/src/pages/plan-review-prep.tsx
+  - client/src/pages/pricing.tsx
+  - client/src/pages/register.tsx
+  - client/src/pages/settings.tsx
+  - client/src/pages/shifts.tsx
+  - client/src/pages/transport.tsx
+  - client/src/pages/worker-availability.tsx
+  - client/src/pages/worker-bookings.tsx
+  - client/src/pages/worker-dashboard.tsx
+  - client/src/pages/worker-detail.tsx
+  - client/src/pages/worker-profile.tsx
+  - client/src/pages/worker-shifts.tsx
+
+Replit server routes (sample):
+  - server/chat
+  - server/geo
+  - server/policy-pack
+  - server/replit_integrations
+  - server/routes
+  - server/storage
+  - server/__tests__
+  - server/agentmail-service.ts
+  - server/auto-debit.ts
+  - server/chat-engine.ts
+  - server/chat-guardrails.ts
+  - server/db.ts
+  - server/grocery-supplier.ts
+  - server/index.ts
+  - server/ndis-api.ts
+  - server/notifications.ts
+  - server/orb.ts
+  - server/plan-review-brief.ts
+  - server/quickbooks.ts
+  - server/seed.ts

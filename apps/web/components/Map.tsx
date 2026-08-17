@@ -1,0 +1,263 @@
+"use client";
+
+import { type LatLngExpression, latLngBounds } from "leaflet";
+import { Fragment, useEffect } from "react";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+
+import type { Provider } from "@/app/provider-finder/providers";
+import { mapMarkerIcons } from "@/lib/map/leaflet-markers";
+import "@/lib/map/leaflet-icons";
+
+const defaultMarkerIcon = mapMarkerIcons.provider;
+const redMarkerIcon = mapMarkerIcons.selected;
+const userPositionIcon = mapMarkerIcons.user;
+
+// Approximate coordinates for Australian locations
+// In production, you'd use a geocoding service
+const locationToCoords: Record<string, LatLngExpression> = {
+  "Parramatta NSW": [-33.8148, 151.0033],
+  "Footscray VIC": [-37.8, 144.9],
+  "Morphett Vale SA": [-35.1167, 138.5167],
+  "Bayswater WA": [-31.9167, 115.9167],
+  "Chermside QLD": [-27.3833, 153.0333],
+  "Civic ACT": [-35.2833, 149.1333],
+  "Hobart TAS": [-42.8833, 147.3167],
+  "Darwin City NT": [-12.4634, 130.8456],
+  "Mildura VIC": [-34.1833, 142.15],
+  "Newcastle NSW": [-32.9283, 151.7817],
+  "Geelong VIC": [-38.15, 144.35],
+};
+
+function getProviderCoords(
+  suburb: string,
+  state: string,
+): LatLngExpression | null {
+  if (suburb === "Remote") return null;
+  const key = `${suburb} ${state}`;
+  return locationToCoords[key] || null;
+}
+
+function parseOpeningHours(hours: string): { day: string; hours: string }[] {
+  return hours
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .map((segment) => {
+      const colonIdx = segment.indexOf(": ");
+      const day = colonIdx >= 0 ? segment.slice(0, colonIdx) : segment;
+      const time = colonIdx >= 0 ? segment.slice(colonIdx + 2) : "";
+      return { day, hours: time || "—" };
+    });
+}
+
+type MapProps = {
+  providers?: Provider[];
+  /** When set, show user position and fit bounds to include it */
+  userPosition?: { lat: number; lng: number } | null;
+  /** When set, fly map to this provider's position (uses lat/lng or geocode lookup) */
+  centerOnProvider?: Provider | null;
+};
+
+// Default center: Sydney, Australia
+const initialCenter: LatLngExpression = [-33.8688, 151.2093];
+const initialZoom = 6;
+
+// Component to adjust map bounds when markers change
+function FitBounds({
+  markers,
+  userPosition,
+}: {
+  markers: { provider: Provider; coords: LatLngExpression }[];
+  userPosition: { lat: number; lng: number } | null;
+}) {
+  const map = useMap();
+
+  useEffect(() => {
+    const points: [number, number][] = markers.map((m) => m.coords as [number, number]);
+    if (userPosition) {
+      points.push([userPosition.lat, userPosition.lng]);
+    }
+    if (points.length === 0) {
+      map.setView(initialCenter, initialZoom);
+      return;
+    }
+    if (points.length === 1) {
+      map.setView(points[0], 13);
+      return;
+    }
+    const bounds = latLngBounds(points);
+    map.fitBounds(bounds, {
+      padding: [50, 50],
+      maxZoom: 15,
+    });
+  }, [map, markers, userPosition]);
+
+  return null;
+}
+
+const CENTER_ZOOM = 14;
+
+function getCoords(provider: Provider): [number, number] | null {
+  if (
+    provider.latitude != null &&
+    provider.longitude != null &&
+    (provider.latitude !== 0 || provider.longitude !== 0)
+  ) {
+    return [provider.latitude, provider.longitude];
+  }
+  const coords = getProviderCoords(provider.suburb, provider.state);
+  if (!coords) return null;
+  return coords as [number, number];
+}
+
+// Fly map to a provider when centerOnProvider changes
+function FlyToProvider({
+  centerOnProvider,
+}: {
+  centerOnProvider: Provider | null | undefined;
+}) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (!centerOnProvider) return;
+    const coords = getCoords(centerOnProvider);
+    if (!coords) return;
+    map.flyTo(coords, CENTER_ZOOM, { duration: 0.5 });
+  }, [map, centerOnProvider]);
+
+  return null;
+}
+
+export default function Map({
+  providers = [],
+  userPosition = null,
+  centerOnProvider = null,
+}: MapProps) {
+  const markers = providers
+    .map((provider) => {
+      const coords =
+        provider.latitude != null &&
+        provider.longitude != null &&
+        (provider.latitude !== 0 || provider.longitude !== 0)
+          ? ([provider.latitude, provider.longitude] as LatLngExpression)
+          : getProviderCoords(provider.suburb, provider.state);
+      if (!coords) return null;
+      return { provider, coords };
+    })
+    .filter(
+      (m): m is { provider: Provider; coords: LatLngExpression } => m !== null,
+    );
+
+  return (
+    <MapContainer
+      center={
+        userPosition
+          ? ([userPosition.lat, userPosition.lng] as LatLngExpression)
+          : initialCenter
+      }
+      zoom={initialZoom}
+      style={{ height: "500px", width: "100%" }}
+      scrollWheelZoom={true}
+    >
+      <TileLayer
+        attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+      />
+      <FitBounds markers={markers} userPosition={userPosition ?? null} />
+      <FlyToProvider centerOnProvider={centerOnProvider ?? null} />
+      {userPosition ? (
+        <Marker position={[userPosition.lat, userPosition.lng]} icon={userPositionIcon}>
+          <Popup>You are here</Popup>
+        </Marker>
+      ) : null}
+      {markers.map(({ provider, coords }) => (
+        <Marker
+          key={provider.id}
+          position={coords}
+          icon={
+            centerOnProvider?.id === provider.id ? redMarkerIcon : defaultMarkerIcon
+          }
+        >
+          <Popup>
+            <div className="min-w-[220px] max-w-[280px] text-xs leading-tight">
+              <h3 className="font-semibold text-sm mb-0.5">{provider.name}</h3>
+              <p className="text-muted-foreground mb-1">
+                {provider.suburb === "Remote"
+                  ? "Telehealth (Australia-wide)"
+                  : `${provider.suburb} ${provider.state} ${provider.postcode}`}
+              </p>
+              <div className="flex items-center gap-1.5 mb-1">
+                <span className="font-medium">
+                  ⭐ {provider.rating.toFixed(1)}
+                </span>
+                <span className="text-muted-foreground">
+                  ({provider.reviewCount} reviews)
+                </span>
+              </div>
+              <div className="flex flex-wrap gap-1 mb-1">
+                {provider.categories.slice(0, 2).map((cat) => (
+                  <span
+                    key={cat}
+                    className="px-1.5 py-0.5 rounded bg-primary/10 text-primary"
+                  >
+                    {cat}
+                  </span>
+                ))}
+              </div>
+              {provider.phone ? (
+                <p className="mb-0.5">
+                  <span className="text-muted-foreground">Ph: </span>
+                  <a href={`tel:${provider.phone}`} className="text-primary hover:underline">
+                    {provider.phone}
+                  </a>
+                </p>
+              ) : null}
+              {provider.email ? (
+                <p className="mb-0.5 truncate">
+                  <span className="text-muted-foreground">Email: </span>
+                  <a href={`mailto:${provider.email}`} className="text-primary hover:underline truncate block" title={provider.email}>
+                    {provider.email}
+                  </a>
+                </p>
+              ) : null}
+              {provider.website ? (
+                <p className="mb-0.5 truncate">
+                  <span className="text-muted-foreground">Web: </span>
+                  <a
+                    href={provider.website.startsWith("http") ? provider.website : `https://${provider.website}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary hover:underline"
+                    title={provider.website}
+                  >
+                    {provider.website}
+                  </a>
+                </p>
+              ) : null}
+              {provider.abn ? (
+                <p className="mb-1">
+                  <span className="text-muted-foreground">ABN: </span>
+                  {provider.abn}
+                </p>
+              ) : null}
+              {provider.openingHours ? (
+                <div className="mt-1 pt-1 border-t border-border">
+                  <p className="font-medium text-muted-foreground mb-0.5">Hours</p>
+                  <div className="grid grid-cols-[max-content_1fr] gap-x-2 gap-y-0.5 tabular-nums">
+                    {parseOpeningHours(provider.openingHours).map(({ day, hours }) => (
+                      <Fragment key={day}>
+                        <span className="text-muted-foreground">{day}</span>
+                        <span>{hours}</span>
+                      </Fragment>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+            </div>
+          </Popup>
+        </Marker>
+      ))}
+    </MapContainer>
+  );
+}

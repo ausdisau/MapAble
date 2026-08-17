@@ -1,0 +1,271 @@
+openapi: 3.1.0
+info:
+  title: MapAble Agentic Booking Services API
+  version: 1.0.0
+  description: |
+    Auth-scoped booking retrieval and AI SDK tool-loop assistance for care,
+    transport, and combined bookings. Every response includes `operationId` and
+    an `X-Operation-Id` header for agent self-healing.
+  contact:
+    name: MapAble
+    url: https://mapable.com.au
+  license:
+    name: Proprietary
+servers:
+  - url: https://mapable.com.au
+    description: Production
+  - url: http://localhost:3000
+    description: Local development
+paths:
+  /api/agent/booking-services:
+    post:
+      operationId: bookingServicesAgentTurn
+      summary: AI SDK tool-loop agent turn for booking services
+      description: |
+        Requires BOOKING_SERVICES_AGENT_ENABLED=true, a signed-in session, and
+        search interpreter keys. The agent calls searchBookings, getBookingContext,
+        and explainBookingStatus tools autonomously.
+      security:
+        - sessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BookingAgentTurnRequest"
+            examples:
+              nextVisit:
+                value:
+                  query: When is my next care visit?
+      responses:
+        "200":
+          description: Agent answer
+          headers:
+            X-Operation-Id:
+              schema:
+                type: string
+                example: bookingServicesAgentTurn
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BookingAgentTurnResponse"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/AuthRequired"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+        "503":
+          description: Agent not enabled
+          headers:
+            X-Operation-Id:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AgentError"
+        "500":
+          $ref: "#/components/responses/UpstreamError"
+  /api/bookings/rag/search:
+    post:
+      operationId: searchBookings
+      summary: Auth-scoped hybrid booking search
+      description: |
+        Returns ranked booking chunks with citations. Applies role scoping before
+        text ranking. No LLM — retrieval only.
+      security:
+        - sessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BookingSearchRequest"
+      responses:
+        "200":
+          description: Search hits
+          headers:
+            X-Operation-Id:
+              schema:
+                type: string
+                example: searchBookings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BookingSearchResponse"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/AuthRequired"
+components:
+  securitySchemes:
+    sessionAuth:
+      type: apiKey
+      in: cookie
+      name: next-auth.session-token
+  responses:
+    ValidationError:
+      description: Invalid request
+      headers:
+        X-Operation-Id:
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/AgentError"
+    AuthRequired:
+      description: Sign-in required
+      headers:
+        X-Operation-Id:
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/AgentError"
+    RateLimited:
+      description: Rate limited
+      headers:
+        X-Operation-Id:
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/AgentError"
+    UpstreamError:
+      description: Server or upstream failure
+      headers:
+        X-Operation-Id:
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/AgentError"
+  schemas:
+    AgentError:
+      type: object
+      required:
+        - error
+        - code
+        - operationId
+      properties:
+        error:
+          type: string
+        code:
+          type: string
+          enum:
+            - VALIDATION_ERROR
+            - RATE_LIMITED
+            - AUTH_REQUIRED
+            - FORBIDDEN
+            - NOT_CONFIGURED
+            - UPSTREAM_ERROR
+        operationId:
+          type: string
+        details:
+          type: object
+        retryable:
+          type: boolean
+    BookingAgentTurnRequest:
+      type: object
+      required:
+        - query
+      properties:
+        query:
+          type: string
+          minLength: 1
+          maxLength: 2000
+        sessionId:
+          type: string
+    BookingAgentTurnResponse:
+      type: object
+      properties:
+        operationId:
+          type: string
+          example: bookingServicesAgentTurn
+        text:
+          type: string
+        toolsCalled:
+          type: array
+          items:
+            type: string
+        sessionId:
+          type: string
+    BookingSearchRequest:
+      type: object
+      required:
+        - query
+      properties:
+        query:
+          type: string
+          minLength: 1
+          maxLength: 2000
+        recordType:
+          type: string
+          enum: [care, transport, bundle]
+        status:
+          type: string
+    BookingSearchResponse:
+      type: object
+      properties:
+        operationId:
+          type: string
+          example: searchBookings
+        totalCandidates:
+          type: integer
+        count:
+          type: integer
+        hits:
+          type: array
+          items:
+            $ref: "#/components/schemas/BookingSearchHit"
+    BookingSearchHit:
+      type: object
+      properties:
+        bookingId:
+          type: string
+        recordType:
+          type: string
+          enum: [care, transport, bundle]
+        title:
+          type: string
+        score:
+          type: number
+        matchedTerms:
+          type: array
+          items:
+            type: string
+        chunks:
+          type: array
+          items:
+            $ref: "#/components/schemas/BookingChunk"
+    BookingChunk:
+      type: object
+      properties:
+        chunkId:
+          type: string
+        bookingId:
+          type: string
+        recordType:
+          type: string
+        sourceType:
+          type: string
+        sourceId:
+          type: string
+        title:
+          type: string
+        excerpt:
+          type: string
+        status:
+          type: string
+        scheduledStartAt:
+          type: string
+          format: date-time
+          nullable: true
+        organisationName:
+          type: string
+          nullable: true

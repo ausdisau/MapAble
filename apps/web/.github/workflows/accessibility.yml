@@ -1,0 +1,83 @@
+name: Accessibility
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: a11y-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  accessibility:
+    name: Accessibility
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: mapable_a11y
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      # Bounded heap for post-compile SSG (see AT_CONTINUITY_WAVE1_BUILD_MEMORY.md).
+      # Raised with codebase growth; if SIGKILL appears, escalate runner size (OWNER_ACTION_REQUIRED).
+      NODE_OPTIONS: --max-old-space-size=8192
+      MAPABLE_BUILD_HEAP_MB: "8192"
+      NEXTAUTH_SECRET: ci-nextauth-secret-not-for-production-use-32chars
+      NEXTAUTH_URL: http://127.0.0.1:3000
+      NEXT_PUBLIC_APP_URL: http://127.0.0.1:3000
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mapable_a11y?schema=public
+      DIRECT_URL: postgresql://postgres:postgres@localhost:5432/mapable_a11y?schema=public
+      # Password credentials must work for Playwright seeds
+      TWILIO_2FA_ENABLED: "false"
+      # Auth routes execute with seeded storage-state fixtures
+      A11Y_SKIP_AUTH_ROUTES: "0"
+      # Exercise first-party panel in a11y CI; production default remains off
+      NEXT_PUBLIC_MAPABLE_FIRST_PARTY_A11Y_PANEL: "true"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.12.1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Prisma generate
+        run: pnpm exec prisma generate
+
+      - name: Ephemeral schema for a11y (CI-only db push)
+        run: pnpm exec prisma db push --accept-data-loss --skip-generate
+
+      - name: Seed authenticated a11y pilot users
+        run: pnpm exec tsx prisma/seed-a11y-pilot.ts
+
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Build
+        run: pnpm build
+
+      - name: Axe + authenticated acceptance
+        env:
+          PLAYWRIGHT_WEB_SERVER: pnpm start
+          PLAYWRIGHT_BASE_URL: http://127.0.0.1:3000
+          A11Y_SKIP_AUTH_ROUTES: "0"
+        run: pnpm test:a11y

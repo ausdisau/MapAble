@@ -1,0 +1,153 @@
+name: CareOS validation
+
+on:
+  pull_request:
+    paths:
+      - "app/api/intelligence/**"
+      - "app/careos/**"
+      - "app/coordinator/careos/**"
+      - "components/intelligence/**"
+      - "components/layout/DashboardNav.tsx"
+      - "intelligence/**"
+      - "prisma/**"
+      - "tests/careos-*.test.ts"
+      - "tests/careos/**"
+      - "tests/care-support-intelligence.test.ts"
+      - "lib/careos/**"
+      - "lib/platform/**"
+      - "lib/intelligence/evaluation/**"
+      - "tests/ai-evaluation/**"
+      - "tests/careos/opportunities/**"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - ".github/workflows/careos-validation.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: careos-validation-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      # Cap below host RAM; pair with sharded/scoped eslint via pnpm lint:careos.
+      NODE_OPTIONS: --max-old-space-size=4096
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mapable_test
+      DIRECT_URL: postgresql://postgres:postgres@localhost:5432/mapable_test
+      MAPABLE_AI_APPROVAL_SECRET: ci-only-careos-approval-secret-at-least-32-characters
+      MAPABLE_AI_ENABLED: "true"
+      MAPABLE_CAREOS_NETWORK_ENABLED: "true"
+      MAPABLE_CAREOS_PERSISTENCE_ENABLED: "true"
+      MAPABLE_CAREOS_EVENT_AUTOMATION_ENABLED: "false"
+      MAPABLE_AI_WRITE_ACTIONS: "false"
+      MAPABLE_AI_EVALUATION_HARNESS_ENABLED: "true"
+      MAPABLE_CAREOS_SAFETY_GATE_ENABLED: "true"
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: mapable_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref }}
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies and regenerate lockfile
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Upload regenerated lockfile
+        uses: actions/upload-artifact@v4
+        with:
+          name: careos-pnpm-lock
+          path: pnpm-lock.yaml
+          if-no-files-found: error
+          retention-days: 3
+
+      - name: Validate Prisma schema
+        run: pnpm prisma validate
+
+      - name: Generate Prisma client
+        run: pnpm prisma generate
+
+      - name: Apply current schema to disposable PostgreSQL
+        run: pnpm prisma db push --skip-generate
+
+      - name: Type-check
+        shell: bash
+        run: |
+          set -o pipefail
+          pnpm type-check 2>&1 | tee careos-typecheck.log
+
+      - name: Upload type-check diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: careos-typecheck-diagnostics
+          path: careos-typecheck.log
+          if-no-files-found: warn
+          retention-days: 3
+
+      - name: Run CareOS tests
+        run: >-
+          pnpm vitest run
+          tests/careos-action-kernel.test.ts
+          tests/careos-agentic-network.test.ts
+          tests/careos-appointment-replay.test.ts
+          tests/careos-coordinate-confirm.test.ts
+          tests/care-support-intelligence.test.ts
+          tests/careos-kernel-v1.test.ts
+          tests/careos-kernel-v1-appointment.test.ts
+          tests/careos/canonical-mission.test.ts
+          tests/careos/opportunities/top-ten-opportunities.test.ts
+
+      - name: CareOS AI safety evaluation gate
+        run: >-
+          pnpm vitest run
+          tests/careos/opportunities/top-ten-opportunities.test.ts
+          -t "O6 safety gate"
+
+      - name: Lint CareOS implementation
+        run: pnpm lint:careos
+
+      - name: Production build
+        run: pnpm build
+
+      - name: Commit regenerated lockfile
+        if: >-
+          github.event_name == 'pull_request' &&
+          github.event.pull_request.head.repo.full_name == github.repository
+        run: |
+          if git diff --quiet -- pnpm-lock.yaml; then
+            echo "pnpm-lock.yaml is already current"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add pnpm-lock.yaml
+          git commit -m "Regenerate pnpm lockfile for OpenAI Agents"
+          git push origin HEAD:${{ github.head_ref }}

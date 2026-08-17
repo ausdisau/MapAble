@@ -1,0 +1,95 @@
+{
+  "description": "Historical migration.sql body repairs explicitly approved during remediation. Integrity check allows only these paths relative to BASE_SHA.",
+  "repairs": [
+    {
+      "path": "prisma/migrations/20260521120000_mapable_core_phase_2/migration.sql",
+      "reason": "Create ProviderResponseStatus before ALTER TABLE so migrate-from-zero does not fail (P3018/42704).",
+      "pr": "cursor/remediation-repo-controls-5fc8"
+    },
+    {
+      "path": "prisma/migrations/20260525000000_mapable_access_phase_1/migration.sql",
+      "reason": "Close access_trust_events with ); and reduce dump to AccessPlace-domain DDL so migrate-from-zero does not fail (P3018/42601 then 42P07 User exists). Neon production checksum matched the pre-repair file; owner must update _prisma_migrations.checksum per docs/remediation/MIGRATE_FROM_ZERO_REPAIR.md.",
+      "pr": "cursor/migration-trust-repair-0a20"
+    },
+    {
+      "path": "prisma/migrations/20260525120000_mapable_care_mvp/migration.sql",
+      "reason": "Replace comment-only stub with Incident* enums and IncidentReport table required by transport_scheduling_routing FK on empty-DB migrate deploy.",
+      "pr": "cursor/migration-trust-repair-0a20"
+    },
+    {
+      "path": "prisma/migrations/20260521180000_mapable_core_phase_3/migration.sql",
+      "reason": "Replace comment-only stub with core domain bootstrap DDL (@@map table names, stub enrichment for WorkerProfile/Vehicle/DriverProfile, care_bookings/care_service_* pre-ALTER shapes) so empty-DB migrate deploy can satisfy later FK/ALTER dependencies.",
+      "pr": "cursor/migration-trust-repair-0a20"
+    },
+    {
+      "path": "prisma/migrations/20260611120000_integration_type_search/migration.sql",
+      "reason": "Create IntegrationType enum before ALTER TYPE ADD VALUE search; enum was historically introduced via db push without a CREATE TYPE migration.",
+      "pr": "cursor/migration-trust-repair-0a20"
+    },
+    {
+      "path": "prisma/migrations/20260626120000_payout_ledger/migration.sql",
+      "reason": "Use ADD VALUE IF NOT EXISTS for BillingAccountRole/BillingPaymentMethod/BillingPaymentSplitStatus labels already present when core_phase_3 bootstraps current schema enum shapes on empty DB.",
+      "pr": "cursor/migration-trust-repair-0a20"
+    },
+    {
+      "path": "prisma/migrations/20260527120000_transport_scheduling_routing/migration.sql",
+      "reason": "Use ADD VALUE IF NOT EXISTS so empty-DB deploy succeeds when bootstrap already contains labels.",
+      "pr": "cursor/migration-trust-repair-0a20"
+    },
+    {
+      "path": "prisma/migrations/20260603120000_y1_wedge/migration.sql",
+      "reason": "Use ADD VALUE IF NOT EXISTS so empty-DB deploy succeeds when bootstrap already contains labels.",
+      "pr": "cursor/migration-trust-repair-0a20"
+    },
+    {
+      "path": "prisma/migrations/20260604120000_engagement_platform/migration.sql",
+      "reason": "Use ADD VALUE IF NOT EXISTS so empty-DB deploy succeeds when bootstrap already contains labels.",
+      "pr": "cursor/migration-trust-repair-0a20"
+    },
+    {
+      "path": "prisma/migrations/20260717020000_billing_centre_foundations/migration.sql",
+      "reason": "Use ADD VALUE IF NOT EXISTS so empty-DB deploy succeeds when bootstrap already contains labels.",
+      "pr": "cursor/migration-trust-repair-0a20"
+    },
+    {
+      "path": "prisma/migrations/20260714044000_cloud_platform_foundation/migration.sql",
+      "reason": "Create WorkflowRun base table before ALTER columns; CareOS #442 migration assumed WorkflowRun already existed from db push. Empty-DB migrate deploy failed with P3018/42P01.",
+      "pr": "cursor/careos-prod-harden-vercel-a08f"
+    },
+    {
+      "path": "prisma/migrations/20260714001426_provider_workforce_evidence/migration.sql",
+      "reason": "FK target worker_profiles → WorkerProfile (canonical table from mapable_core_phase_1). Empty-DB migrate deploy failed with undefined relation worker_profiles.",
+      "pr": "cursor/careos-prod-harden-vercel-a08f"
+    },
+    {
+      "path": "prisma/migrations/20260714053000_provider_workforce_operations/migration.sql",
+      "reason": "FK target worker_profiles → WorkerProfile for shift_offers.workerProfileId.",
+      "pr": "cursor/careos-prod-harden-vercel-a08f"
+    },
+    {
+      "path": "prisma/migrations/20260714062000_home_living_governance/migration.sql",
+      "reason": "FK target worker_profiles → WorkerProfile for worker_competency_evidence.workerProfileId.",
+      "pr": "cursor/careos-prod-harden-vercel-a08f"
+    },
+    {
+      "path": "prisma/migrations/20260607000000_case_management/migration.sql",
+      "reason": "Replace comment-only stub with Case* enums and cases/case_* tables. support_coordination_os FKs linkedCaseId → cases(id); empty-DB migrate deploy failed with P3018/42P01 relation cases does not exist.",
+      "pr": "cursor/replit-supabase-db-pg-a08f"
+    },
+    {
+      "path": "prisma/migrations/20260714170000_canonical_careos_mission/migration.sql",
+      "reason": "ADD COLUMN missionId before CREATE INDEX on careos_action_receipts.missionId. Earlier 20260713110000 creates the table without missionId; CREATE TABLE IF NOT EXISTS is a no-op so the index failed with P3018/42703 column missionId does not exist.",
+      "pr": "cursor/bridge-docs-ownership-a08f"
+    },
+    {
+      "path": "prisma/migrations/20260719120000_shared_programme_foundation/migration.sql",
+      "reason": "participant_authority_grants already created by 20260714050000_authority_document_foundation; replace duplicate CREATE TABLE with ADD COLUMN IF NOT EXISTS + idempotent indexes/FKs so empty-DB migrate deploy does not fail with P3018/42P07.",
+      "pr": "cursor/finish-remaining-ci-ee41"
+    },
+    {
+      "path": "prisma/migrations/20260726023000_partner_api_keys/migration.sql",
+      "reason": "developer_platform already created platform-shaped api_keys; remap that table to platform_api_keys then create partner api_keys so empty-DB migrate deploy does not fail with P3018/42P07 relation api_keys already exists.",
+      "pr": "cursor/fix-api-keys-migration-collision-59aa"
+    }
+  ]
+}

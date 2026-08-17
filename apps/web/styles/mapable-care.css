@@ -1,0 +1,91 @@
+.mapable-display {
+  font-family: ui-rounded, "Arial Rounded MT Bold", "Trebuchet MS", system-ui, sans-serif;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+}
+
+.mapable-soft {
+  font-family: "Trebuchet MS", ui-rounded, system-ui, sans-serif;
+}
+
+.mapable-wavy-word {
+  display: inline-block;
+  white-space: nowrap;
+  margin-right: 0.34em;
+  transform: translateY(var(--wave-y, 0em)) rotate(var(--wave-r, 0deg));
+  transform-origin: 50% 80%;
+}
+
+/* MapAble Transport public landing — atmospheric hero + motion */
+.transport-public-hero-visual {
+  background-color: #0c1833;
+  background-image:
+    radial-gradient(ellipse 80% 55% at 70% 20%, rgba(0, 91, 127, 0.55), transparent 55%),
+    radial-gradient(ellipse 60% 40% at 15% 80%, rgba(0, 169, 121, 0.28), transparent 50%),
+    linear-gradient(160deg, #0c1833 0%, #005b7f 48%, #0c1833 100%),
+    repeating-linear-gradient(
+      105deg,
+      transparent 0,
+      transparent 46px,
+      rgba(248, 197, 28, 0.06) 46px,
+      rgba(248, 197, 28, 0.06) 48px
+    );
+  background-size: 100% 100%, 100% 100%, 100% 100%, 120% 120%;
+  animation: transport-public-drift 28s ease-in-out infinite alternate;
+}
+
+@keyframes transport-public-drift {
+  from {
+    background-position: 0 0, 0 0, 0 0, 0 0;
+  }
+  to {
+    background-position: 0 0, 0 0, 0 0, 8% 4%;
+  }
+}
+
+.transport-public-reveal {
+  animation: transport-public-fade-up 0.85s ease-out both;
+}
+
+.transport-public-section {
+  animation: transport-public-fade-up 0.7s ease-out both;
+}
+
+.transport-public-cta-presence {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.transport-public-cta-presence:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(0, 91, 127, 0.28);
+}
+
+.transport-public-cta-presence:focus-visible {
+  transform: translateY(-1px);
+}
+
+@keyframes transport-public-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(1.25rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .transport-public-hero-visual,
+  .transport-public-reveal,
+  .transport-public-section,
+  .transport-public-cta-presence {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .transport-public-cta-presence:hover,
+  .transport-public-cta-presence:focus-visible {
+    transform: none;
+  }
+}

@@ -1,0 +1,22 @@
+[
+  {
+    "ABN": "123",
+    "Prov_N": "Test Provider",
+    "Head_Office": "Sydney NSW 2000",
+    "Outletname": "HQ",
+    "Flag": "H",
+    "Active": 1,
+    "Phone": "",
+    "Website": "",
+    "Email": "",
+    "Address": "1 Test St, Sydney, NSW 2000",
+    "State_cd": "NSW",
+    "Post_cd": 2000,
+    "Latitude": 0,
+    "Longitude": 0,
+    "RegGroup": [1],
+    "Post_cd_p": "",
+    "opnhrs": "",
+    "prfsn": ""
+  }
+]

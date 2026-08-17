@@ -1,0 +1,78 @@
+# MapAble CODEOWNERS — Wave 0 (user-owned repository)
+# See docs/remediation/DOMAIN_OWNERSHIP.md and docs/operations/branch-protection.md
+#
+# Immediate recommendation: assign @ausdisau (repository owner). GitHub teams
+# under @ausdisau/* cannot exist while the owner is a personal User account.
+# Longer-term: migrate to a GitHub Organisation and restore specialist teams
+# (mapable-maintainers, mapable-security, mapable-privacy, mapable-safeguarding,
+# mapable-billing). Until then, specialist second review is a human process
+# recorded on the PR — CODEOWNERS cannot enforce non-existent teams.
+
+# Default
+* @ausdisau
+
+# Auth, sessions, permissions
+/lib/auth/ @ausdisau
+/app/api/auth/ @ausdisau
+/middleware.ts @ausdisau
+
+# Consent
+/lib/consent/ @ausdisau
+/app/api/consent/ @ausdisau
+/app/api/consents/ @ausdisau
+
+# Safeguarding / incidents
+/lib/incidents/ @ausdisau
+/lib/safety/ @ausdisau
+/app/api/incidents/ @ausdisau
+
+# Billing
+/lib/billing/ @ausdisau
+/lib/billing/core/ @ausdisau
+/lib/invoices/ @ausdisau
+/app/api/billing/ @ausdisau
+/app/api/invoices/ @ausdisau
+
+# Payments
+/lib/stripe/ @ausdisau
+/app/api/stripe/ @ausdisau
+/app/api/payments/ @ausdisau
+/app/api/payouts/ @ausdisau
+/app/api/webhooks/ @ausdisau
+
+# Tenancy / organisations
+/app/api/organisations/ @ausdisau
+/lib/provider/enterprise/ @ausdisau
+
+# Encryption / participant identifiers
+/lib/crypto/ @ausdisau
+/app/api/participant-profile/ @ausdisau
+/app/api/data-vault/ @ausdisau
+/lib/documents/ @ausdisau
+
+# Prisma schema and migrations
+/prisma/schema.prisma @ausdisau
+/prisma/migrations/ @ausdisau
+
+# Remediation controls
+/docs/remediation/ @ausdisau
+/CODEOWNERS @ausdisau
+/.github/workflows/ @ausdisau
+/scripts/ci/ @ausdisau
+/security/ @ausdisau
+
+# Access Intelligence Next — Living Access Fabric (contracts / synthetic only)
+/lib/access/intelligence-next/ @ausdisau
+/app/api/access-intelligence-next/ @ausdisau
+/app/access-intelligence/living-graph/ @ausdisau
+/app/access-intelligence/journey-preflight/ @ausdisau
+/docs/access-intelligence-next/ @ausdisau
+/components/access-intelligence-next/ @ausdisau
+/tests/access-intelligence-next/ @ausdisau
+
+# NDIS Expansion — Assistive Technology Continuity (Wave 1)
+/lib/platform/at-continuity/ @ausdisau
+/lib/config/at-continuity.ts @ausdisau
+/docs/programmes/AT_CONTINUITY_WAVE1.md @ausdisau
+/tests/at-continuity/ @ausdisau
+/prisma/migrations/20260720120000_at_continuity_wave1/ @ausdisau

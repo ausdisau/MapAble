@@ -1,0 +1,27 @@
+{
+  "crons": [
+    {
+      "path": "/api/admin/ingest/ndis-providers",
+      "schedule": "15 17 * * *"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "https://mapable.com.au" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET, POST, PUT, DELETE, OPTIONS" },
+        { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization" }
+      ]
+    },
+    {
+      "source": "/api/(.*)",
+      "has": [{ "type": "host", "value": "peer.mapable.com.au" }],
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "https://peer.mapable.com.au" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET, POST, PUT, DELETE, OPTIONS" },
+        { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization" }
+      ]
+    }
+  ]
+}

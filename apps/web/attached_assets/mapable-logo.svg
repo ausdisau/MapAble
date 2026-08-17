@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 200" role="img" aria-label="MapAble  Empowering Independence">
+  <title>MapAble</title>
+  <!-- Map pin -->
+  <path fill="#0B6E99" d="M110 8c-28 0-50 22-50 50 0 38 50 88 50 88s50-50 50-88c0-28-22-50-50-50z"/>
+  <circle cx="110" cy="58" r="28" fill="#fff"/>
+  <!-- Accessibility symbol -->
+  <g fill="#111" transform="translate(110 58)">
+    <circle r="5" cy="-10"/>
+    <path d="M-14 4h8l3 12 6-18h8l-9 26v14h-8V30l-6-18z"/>
+  </g>
+  <!-- Australia map -->
+  <g transform="translate(62 118)">
+    <path fill="#28BD6B" d="M0 28 L36 0 L52 18 L40 42 Z"/>
+    <path fill="#5BC0BE" d="M36 0 L78 8 L72 34 L52 18 Z"/>
+    <path fill="#1B3A5F" d="M78 8 L96 22 L88 48 L72 34 Z"/>
+    <path fill="#E8A317" d="M52 18 L72 34 L88 48 L56 52 Z"/>
+  </g>
+  <!-- Wordmark -->
+  <text x="110" y="168" text-anchor="middle" font-family="system-ui,Segoe UI,sans-serif" font-size="26" font-weight="700" letter-spacing="-0.5">
+    <tspan fill="#0B6E99">Map</tspan><tspan fill="#7A8B99">Able</tspan>
+  </text>
+  <text x="110" y="190" text-anchor="middle" fill="#E8A317" font-family="system-ui,Segoe UI,sans-serif" font-size="11" font-weight="600" letter-spacing="0.2">Empowering Independence</text>
+</svg>

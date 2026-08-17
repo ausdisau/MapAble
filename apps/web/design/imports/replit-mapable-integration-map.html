@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Replit to mapable.com.au integration</title>
+  <style>
+    :root {
+      --bg: #f7f8fa;
+      --surface: #fff;
+      --text: #1a1a1a;
+      --muted: #5c6370;
+      --border: #e3e5e8;
+      --ok: #1f8a65;
+      --info: #3685bf;
+      --warn: #c08532;
+      --bad: #cf2d56;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.45;
+      padding: 28px 20px 48px;
+    }
+    .wrap { max-width: 960px; margin: 0 auto; }
+    h1 { font-size: 28px; margin: 0 0 8px; letter-spacing: -0.03em; }
+    h2 { font-size: 18px; margin: 28px 0 10px; }
+    .sub { color: var(--muted); margin: 0 0 20px; }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+    .stat {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+    }
+    .stat b { display: block; font-size: 28px; line-height: 1.1; }
+    .stat span { color: var(--muted); font-size: 13px; }
+    .ok b { color: var(--ok); }
+    .info b { color: var(--info); }
+    .warn b { color: var(--warn); }
+    .bad b { color: var(--bad); }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    th, td {
+      text-align: left;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+      vertical-align: top;
+    }
+    th { background: #f0f2f5; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
+    tr:last-child td { border-bottom: 0; }
+    .pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      background: #eee;
+    }
+    .pill.shipped { background: #e5f6ef; color: var(--ok); }
+    .pill.stubbed, .pill.mapped { background: #e8f2fa; color: var(--info); }
+    .pill.open { background: #faf0de; color: var(--warn); }
+    .pill.blocked, .pill.skipped { background: #fde8ee; color: var(--bad); }
+    .note {
+      margin-top: 20px;
+      padding: 14px 16px;
+      border: 1px solid #ead7b0;
+      background: #fff8eb;
+      border-radius: 10px;
+      font-size: 14px;
+    }
+    a { color: #0b57a8; }
+    @media (max-width: 720px) {
+      .stats { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Replit to mapable.com.au integration</h1>
+    <p class="sub">
+      Uploaded MapAble-Unified UI assets mapped into the Next.js monorepo.
+      Shipped on <code>main</code> via
+      <a href="https://github.com/ausdisau/mapableau-new/pull/439">PR 439</a>.
+      Source copy: <code>design/imports/replit-mapable-integration-map.html</code>.
+    </p>
+
+    <div class="stats">
+      <div class="stat ok"><b>6</b><span>Shipped</span></div>
+      <div class="stat info"><b>2</b><span>Mapped / stubbed</span></div>
+      <div class="stat warn"><b>2</b><span>Open gaps</span></div>
+      <div class="stat bad"><b>3</b><span>Blocked / skipped</span></div>
+    </div>
+
+    <h2>Asset to monorepo map</h2>
+    <table>
+      <thead>
+        <tr><th>Replit asset</th><th>MapAble target</th><th>Status</th><th>Notes</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>IDVerificationFlow.jsx</td><td>/worker/verify-id</td><td><span class="pill shipped">Shipped</span></td><td>API + onboarding checklist</td></tr>
+        <tr><td>WorkerScreeningForm.jsx</td><td>POST /api/workers/me/screening</td><td><span class="pill shipped">Shipped</span></td><td>Certificate upload</td></tr>
+        <tr><td>verify-worker-check.js</td><td>worker-screening-service</td><td><span class="pill shipped">Shipped</span></td><td>Manual jurisdiction processing</td></tr>
+        <tr><td>AdminScreeningDashboard.jsx</td><td>/admin/ops/screening</td><td><span class="pill shipped">Shipped</span></td><td>Admin review queue</td></tr>
+        <tr><td>MapAbleUI.html landing</td><td>/find-workers</td><td><span class="pill shipped">Shipped</span></td><td>Verified workers directory</td></tr>
+        <tr><td>OrbInvoiceWidget.jsx</td><td>InvoiceToolsOrb on Billing</td><td><span class="pill shipped">Shipped</span></td><td>Invoices / Xero links</td></tr>
+        <tr><td>socket-server/client.js</td><td>apps/realtime-server</td><td><span class="pill stubbed">Stubbed</span></td><td>Polling remains default</td></tr>
+        <tr><td>MessagingInbox.jsx</td><td>/messages</td><td><span class="pill mapped">Mapped</span></td><td>Existing inbox kept</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Still open vs June Unified drift report</h2>
+    <table>
+      <thead>
+        <tr><th>Gap</th><th>Status</th><th>Detail</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Stripe Identity live redirect</td><td><span class="pill blocked">Blocked</span></td><td>Fail-closed until keys + session API</td></tr>
+        <tr><td>Foods / grocery supplier</td><td><span class="pill open">Open</span></td><td>/foods stub only</td></tr>
+        <tr><td>Plan review prep / brief</td><td><span class="pill open">Open</span></td><td>No plan-review-prep surface yet</td></tr>
+        <tr><td>Orb usage metering</td><td><span class="pill skipped">Skipped</span></td><td>Mapped to Stripe billing + Xero</td></tr>
+        <tr><td>Full MapAble-Unified.zip sync</td><td><span class="pill blocked">Blocked</span></td><td>Zip not in cloud env; Replit 404</td></tr>
+      </tbody>
+    </table>
+
+    <div class="note">
+      <strong>Live routes on main:</strong>
+      /worker/verify-id · /admin/ops/screening · /find-workers · InvoiceToolsOrb on /billing
+      <br /><br />
+      Post-merge CI fix: client components must import constants from
+      <code>identity-verification-shared</code> /
+      <code>worker-screening-shared</code> (not the server services that pull in
+      <code>next/headers</code> via audit).
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,32 @@
+{
+  "expo": {
+    "name": "MapAble Companion",
+    "slug": "mapable-companion",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#0B3D2E"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "au.mapable.companion"
+    },
+    "android": {
+      "package": "au.mapable.companion",
+      "adaptiveIcon": {
+        "backgroundColor": "#0B3D2E"
+      }
+    },
+    "plugins": ["expo-secure-store"],
+    "extra": {
+      "eas": {
+        "projectId": "mapable-companion-foundation"
+      },
+      "mapableApiBaseUrl": "http://localhost:3000",
+      "compulsorySmartphone": false,
+      "webviewWrapper": false
+    }
+  }
+}

@@ -1,0 +1,82 @@
+name: CSP enforce preview
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: csp-enforce-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  csp-enforce-preview:
+    name: CSP enforce preview
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: mapable_csp
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      NODE_OPTIONS: --max-old-space-size=8192
+      MAPABLE_BUILD_HEAP_MB: "8192"
+      NEXTAUTH_SECRET: ci-nextauth-secret-not-for-production-use-32chars
+      NEXTAUTH_URL: http://127.0.0.1:3000
+      NEXT_PUBLIC_APP_URL: http://127.0.0.1:3000
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mapable_csp?schema=public
+      DIRECT_URL: postgresql://postgres:postgres@localhost:5432/mapable_csp?schema=public
+      TWILIO_2FA_ENABLED: "false"
+      MAPABLE_CSP_ENFORCE_PREVIEW: "true"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.12.1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Prisma generate
+        run: pnpm exec prisma generate
+
+      - name: Ephemeral schema (CI-only db push)
+        run: pnpm exec prisma db push --accept-data-loss --skip-generate
+
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps chromium
+
+      # Build MUST use the enforce flag so App Router layout stays dynamic and
+      # framework scripts receive per-request nonces. A plain `pnpm build`
+      # followed by flag-on `pnpm start` yields body-hidden Playwright failures.
+      - name: Build with CSP enforce flag
+        run: pnpm build:csp-enforce
+
+      - name: Flag-on CSP Playwright matrix
+        env:
+          PLAYWRIGHT_WEB_SERVER: pnpm start
+          PLAYWRIGHT_BASE_URL: http://127.0.0.1:3000
+          MAPABLE_CSP_ENFORCE_PREVIEW: "true"
+        run: pnpm test:csp-enforce
+
+      - name: Note on Vercel Preview
+        run: |
+          echo "CI flag-on is synthetic VERIFIED for this job only."
+          echo "Vercel Preview MAPABLE_CSP_ENFORCE_PREVIEW remains NOT_RUN until owner sets Preview env."

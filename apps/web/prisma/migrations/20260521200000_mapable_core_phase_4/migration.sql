@@ -1,0 +1,2 @@
+-- MapAble Core Phase 4 — see prisma/schema.prisma
+-- Deploy: npx prisma db push && npx prisma generate

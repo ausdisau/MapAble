@@ -1,0 +1,192 @@
+openapi: 3.1.0
+info:
+  title: MapAble Search Interpret API
+  version: 1.0.0
+  description: |
+    Turns natural-language provider search queries into structured filters and
+    canonical service category slugs. Agent-ready responses include
+    `operationId` and `X-Operation-Id` headers on every response.
+servers:
+  - url: https://mapable.com.au
+    description: Production
+  - url: http://localhost:3000
+    description: Local development
+paths:
+  /api/search/interpret:
+    post:
+      operationId: searchInterpretQuery
+      summary: Interpret a natural-language provider search query
+      description: |
+        Parses NDIS-aware search text into filters (`q`, `location`, `access`,
+        `service`, `provider`) and resolves `serviceCategorySlug` from the
+        Prisma catalog (with optional Elasticsearch replica in phase 2).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SearchInterpretRequest"
+            examples:
+              transport:
+                value:
+                  query: Wheelchair accessible transport near Parramatta
+                  context: provider_finder
+      responses:
+        "200":
+          description: Interpretation result
+          headers:
+            X-Operation-Id:
+              schema:
+                type: string
+                example: searchInterpretQuery
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SearchInterpretation"
+        "400":
+          description: Validation error
+          headers:
+            X-Operation-Id:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SearchInterpretError"
+        "429":
+          description: Rate limited (30 requests per minute per IP)
+          headers:
+            X-Operation-Id:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SearchInterpretError"
+        "502":
+          description: Upstream interpreter failure
+          headers:
+            X-Operation-Id:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SearchInterpretError"
+components:
+  schemas:
+    SearchInterpretRequest:
+      type: object
+      required:
+        - query
+      properties:
+        query:
+          type: string
+          minLength: 1
+          maxLength: 500
+        context:
+          type: string
+          enum:
+            - homepage
+            - provider_finder
+    NaturalLanguageSearchFilters:
+      type: object
+      properties:
+        q:
+          type: string
+        location:
+          type: string
+        access:
+          type: string
+        service:
+          type: string
+        provider:
+          type: string
+    SearchInterpretation:
+      type: object
+      required:
+        - sourceQuery
+        - parsed
+        - configured
+        - filters
+        - serviceCategorySlug
+        - serviceCategoryId
+        - accessNeedIds
+        - confidence
+        - engineId
+      properties:
+        sourceQuery:
+          type: string
+        parsed:
+          type: boolean
+        configured:
+          type: boolean
+          description: True when AI Gateway or Google API key is present
+        filters:
+          $ref: "#/components/schemas/NaturalLanguageSearchFilters"
+        serviceCategorySlug:
+          type: string
+          nullable: true
+        serviceCategoryId:
+          type: string
+          nullable: true
+        accessNeedIds:
+          type: array
+          items:
+            type: string
+        accessNeeds:
+          type: object
+          required:
+            - ids
+            - confidence
+            - source
+          properties:
+            ids:
+              type: array
+              items:
+                type: string
+            confidence:
+              type: number
+              minimum: 0
+              maximum: 1
+            source:
+              type: string
+              enum:
+                - llm_ids
+                - keyword
+                - llm_step
+                - none
+            unmatchedText:
+              type: string
+              description: Original access phrase when no chip id matched
+        confidence:
+          type: number
+          minimum: 0
+          maximum: 0.85
+          description: Capped for UI disclaimers
+        engineId:
+          type: string
+          example: ai-sdk/gateway/google/gemini-3.5-flash
+    SearchInterpretError:
+      type: object
+      required:
+        - error
+        - code
+        - operationId
+      properties:
+        operationId:
+          type: string
+          example: searchInterpretQuery
+        error:
+          type: string
+        code:
+          type: string
+          enum:
+            - SEARCH_INTERPRET_NOT_CONFIGURED
+            - SEARCH_INTERPRET_VALIDATION_ERROR
+            - SEARCH_INTERPRET_UPSTREAM_ERROR
+            - RATE_LIMITED
+        details:
+          type: object
+        retryable:
+          type: boolean
