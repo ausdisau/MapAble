@@ -13,6 +13,7 @@ import { StatusBar } from 'expo-status-bar';
 import { createStaticNavigation } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
+import { MobileIdentityCard } from './src/components/MobileIdentityCard';
 import {
   isMapAbleApiConfigured,
   searchMapAblePlaces,
@@ -27,9 +28,7 @@ const colours = {
   text: '#171A1B',
   muted: '#5D6264',
   primary: '#243B53',
-  primarySoft: '#EAF0F4',
   accent: '#0B6B67',
-  warning: '#8A5A00',
   danger: '#8B1E1E',
 };
 
@@ -120,7 +119,7 @@ function Button({
         styles.button,
         primary && styles.buttonPrimary,
         disabled && styles.buttonDisabled,
-        pressed && !disabled && { opacity: 0.75 },
+        pressed && !disabled && styles.buttonPressed,
       ]}
     >
       <Text style={[styles.buttonText, primary && styles.buttonTextPrimary]}>{label}</Text>
@@ -166,7 +165,7 @@ function TodayScreen() {
 
 function ActionTile({ title, detail }: { title: string; detail: string }) {
   return (
-    <View style={styles.tile} accessible accessibilityRole="button" accessibilityLabel={`${title}: ${detail}`}>
+    <View style={styles.tile} accessible accessibilityLabel={`${title}: ${detail}`}>
       <Text style={styles.tileTitle}>{title}</Text>
       <Text style={styles.muted}>{detail}</Text>
     </View>
@@ -177,7 +176,7 @@ function TimelineItem({ time, title, detail }: { time: string; title: string; de
   return (
     <View style={styles.timelineItem}>
       <Text style={styles.timelineTime}>{time}</Text>
-      <View style={{ flex: 1 }}>
+      <View style={styles.flexFill}>
         <Text style={styles.cardTitle}>{title}</Text>
         <Text style={styles.muted}>{detail}</Text>
       </View>
@@ -187,6 +186,7 @@ function TimelineItem({ time, title, detail }: { time: string; title: string; de
 
 function HomeScreen() {
   const { homeMode, setHomeMode } = useSuite();
+
   return (
     <Screen>
       <Text accessibilityRole="header" style={styles.title}>AdaptAble Home</Text>
@@ -280,7 +280,11 @@ function IndyScreen() {
             <Button label="Not now" onPress={() => setApproved(false)} />
             <Button label="Approve" primary onPress={() => setApproved(true)} />
           </View>
-          {approved && <Text accessibilityRole="alert" style={styles.success}>Approved for this prototype action only.</Text>}
+          {approved ? (
+            <Text accessibilityRole="alert" style={styles.success}>
+              Approved for this prototype action only.
+            </Text>
+          ) : null}
         </Card>
       )}
     </Screen>
@@ -294,13 +298,22 @@ function formatLabel(value: string | null | undefined) {
 
 function MapAbleSearchResult({ result }: { result: MapAblePlaceSearchResult }) {
   const { place, matchReasons } = result;
+
   return (
-    <View style={styles.searchResult} accessible accessibilityLabel={`${place.name}, ${place.suburb ?? 'suburb not specified'}`}>
+    <View
+      style={styles.searchResult}
+      accessible
+      accessibilityLabel={`${place.name}, ${place.suburb ?? 'suburb not specified'}`}
+    >
       <Text style={styles.cardTitle}>{place.name}</Text>
       <Text style={styles.body}>{place.suburb ?? 'Suburb not specified'} · {formatLabel(place.category)}</Text>
       <Text style={styles.muted}>Confidence: {formatLabel(place.confidence)} · Reviews: {place.reviewCount}</Text>
-      {place.accreditationTier ? <Text style={styles.muted}>Accreditation: {formatLabel(place.accreditationTier)}</Text> : null}
-      {matchReasons.length > 0 ? <Text style={styles.muted}>Why it matched: {matchReasons.join(' · ')}</Text> : null}
+      {place.accreditationTier ? (
+        <Text style={styles.muted}>Accreditation: {formatLabel(place.accreditationTier)}</Text>
+      ) : null}
+      {matchReasons.length > 0 ? (
+        <Text style={styles.muted}>Why it matched: {matchReasons.join(' · ')}</Text>
+      ) : null}
     </View>
   );
 }
@@ -320,7 +333,6 @@ function MapAbleSearchCard() {
       setMessage('MapAble platform connection is not configured for this build.');
       return;
     }
-
     if (!query.trim()) {
       setMessage('Enter a place, suburb or category to search.');
       return;
@@ -360,10 +372,15 @@ function MapAbleSearchCard() {
         placeholder="Place, suburb or category"
         placeholderTextColor={colours.muted}
         returnKeyType="search"
-        onSubmitEditing={runSearch}
+        onSubmitEditing={() => void runSearch()}
         style={styles.input}
       />
-      <Button label={loading ? 'Searching' : 'Search MapAble'} primary onPress={runSearch} disabled={loading} />
+      <Button
+        label={loading ? 'Searching' : 'Search MapAble'}
+        primary
+        onPress={() => void runSearch()}
+        disabled={loading}
+      />
 
       {loading ? (
         <View style={styles.statusRow} accessibilityLiveRegion="polite">
@@ -387,10 +404,19 @@ function MapAbleSearchCard() {
 
 function MoreScreen() {
   const suite = useSuite();
+
   return (
     <Screen>
       <Text accessibilityRole="header" style={styles.title}>More</Text>
       <Text style={styles.subtitle}>Capability packs, access and trust controls.</Text>
+
+      <SectionTitle>Account & My Access</SectionTitle>
+      <MobileIdentityCard
+        highContrast={suite.highContrast}
+        setHighContrast={suite.setHighContrast}
+        reduceMotion={suite.reduceMotion}
+        setReduceMotion={suite.setReduceMotion}
+      />
 
       <SectionTitle>MapAble</SectionTitle>
       <MapAbleSearchCard />
@@ -412,12 +438,17 @@ function MoreScreen() {
         <Text style={styles.muted}>Source and confidence should remain visible. No live news feed is connected in this prototype.</Text>
       </Card>
 
-      <SectionTitle>My Access</SectionTitle>
+      <SectionTitle>Local preferences</SectionTitle>
       <Card>
         <Setting label="Indy suggestions" value={suite.indyEnabled} setValue={suite.setIndyEnabled} />
         <Setting label="High contrast" value={suite.highContrast} setValue={suite.setHighContrast} />
         <Setting label="Reduce motion" value={suite.reduceMotion} setValue={suite.setReduceMotion} />
-        <Setting label="Product analytics" value={suite.analytics} setValue={suite.setAnalytics} description="Off by default. No analytics service is connected." />
+        <Setting
+          label="Product analytics"
+          value={suite.analytics}
+          setValue={suite.setAnalytics}
+          description="Off by default. No analytics service is connected."
+        />
       </Card>
 
       <SectionTitle>Permissions</SectionTitle>
@@ -443,10 +474,20 @@ function MoreScreen() {
   );
 }
 
-function Setting({ label, value, setValue, description }: { label: string; value: boolean; setValue: (v: boolean) => void; description?: string }) {
+function Setting({
+  label,
+  value,
+  setValue,
+  description,
+}: {
+  label: string;
+  value: boolean;
+  setValue: (value: boolean) => void;
+  description?: string;
+}) {
   return (
     <View style={styles.settingRow}>
-      <View style={{ flex: 1 }}>
+      <View style={styles.flexFill}>
         <Text style={styles.cardTitle}>{label}</Text>
         {description ? <Text style={styles.muted}>{description}</Text> : null}
       </View>
@@ -498,22 +539,61 @@ const styles = StyleSheet.create({
   subtitle: { fontSize: 17, lineHeight: 24, color: colours.muted },
   sectionTitle: { marginTop: 6, fontSize: 20, lineHeight: 27, fontWeight: '800', color: colours.text },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
-  tile: { minHeight: 112, minWidth: 150, flexGrow: 1, flexBasis: '46%', justifyContent: 'center', gap: 6, padding: 16, backgroundColor: colours.surface, borderWidth: 1, borderColor: colours.border, borderRadius: 14 },
+  tile: {
+    minHeight: 112,
+    minWidth: 150,
+    flexGrow: 1,
+    flexBasis: '46%',
+    justifyContent: 'center',
+    gap: 6,
+    padding: 16,
+    backgroundColor: colours.surface,
+    borderWidth: 1,
+    borderColor: colours.border,
+    borderRadius: 14,
+  },
   tileTitle: { fontSize: 18, fontWeight: '800', color: colours.text },
-  card: { gap: 12, padding: 16, backgroundColor: colours.surface, borderWidth: 1, borderColor: colours.border, borderRadius: 14 },
+  card: {
+    gap: 12,
+    padding: 16,
+    backgroundColor: colours.surface,
+    borderWidth: 1,
+    borderColor: colours.border,
+    borderRadius: 14,
+  },
   cardTitle: { fontSize: 17, lineHeight: 24, fontWeight: '800', color: colours.text },
   body: { fontSize: 16, lineHeight: 23, color: colours.text },
   muted: { fontSize: 14, lineHeight: 20, color: colours.muted },
   eyebrow: { fontSize: 12, letterSpacing: 1.2, fontWeight: '800', color: colours.accent },
-  button: { minHeight: 48, minWidth: 92, paddingHorizontal: 16, justifyContent: 'center', alignItems: 'center', borderRadius: 9, borderWidth: 1, borderColor: colours.border, backgroundColor: colours.surface },
+  button: {
+    minHeight: 48,
+    minWidth: 92,
+    paddingHorizontal: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 9,
+    borderWidth: 1,
+    borderColor: colours.border,
+    backgroundColor: colours.surface,
+  },
   buttonPrimary: { backgroundColor: colours.primary, borderColor: colours.primary },
   buttonDisabled: { opacity: 0.5 },
+  buttonPressed: { opacity: 0.75 },
   buttonText: { fontSize: 16, fontWeight: '800', color: colours.text },
   buttonTextPrimary: { color: '#FFFFFF' },
   timelineItem: { flexDirection: 'row', gap: 14, paddingVertical: 8 },
   timelineTime: { width: 54, fontSize: 14, fontWeight: '800', color: colours.muted },
+  flexFill: { flex: 1 },
   modeRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  modeButton: { minHeight: 48, paddingHorizontal: 16, justifyContent: 'center', borderRadius: 9, borderWidth: 1, borderColor: colours.border, backgroundColor: colours.surface },
+  modeButton: {
+    minHeight: 48,
+    paddingHorizontal: 16,
+    justifyContent: 'center',
+    borderRadius: 9,
+    borderWidth: 1,
+    borderColor: colours.border,
+    backgroundColor: colours.surface,
+  },
   modeButtonSelected: { backgroundColor: colours.primary },
   modeText: { fontSize: 16, fontWeight: '800', color: colours.text },
   modeTextSelected: { color: '#FFFFFF' },
@@ -521,11 +601,41 @@ const styles = StyleSheet.create({
   disclosure: { padding: 12, gap: 4, borderRadius: 10, backgroundColor: colours.surfaceMuted },
   disclosureTitle: { fontSize: 15, fontWeight: '800', color: colours.text },
   success: { fontSize: 15, lineHeight: 22, fontWeight: '700', color: colours.accent },
-  input: { minHeight: 52, borderWidth: 1, borderColor: colours.border, borderRadius: 9, paddingHorizontal: 14, paddingVertical: 10, backgroundColor: colours.surface, color: colours.text, fontSize: 16 },
+  input: {
+    minHeight: 52,
+    borderWidth: 1,
+    borderColor: colours.border,
+    borderRadius: 9,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    backgroundColor: colours.surface,
+    color: colours.text,
+    fontSize: 16,
+  },
   statusRow: { minHeight: 48, flexDirection: 'row', alignItems: 'center', gap: 10 },
-  searchResult: { gap: 4, paddingTop: 12, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colours.border },
+  searchResult: {
+    gap: 4,
+    paddingTop: 12,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: colours.border,
+  },
   error: { fontSize: 15, lineHeight: 22, fontWeight: '700', color: colours.danger },
-  settingRow: { minHeight: 72, flexDirection: 'row', alignItems: 'center', gap: 16, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colours.border },
-  permissionRow: { minHeight: 52, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colours.border },
+  settingRow: {
+    minHeight: 72,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colours.border,
+  },
+  permissionRow: {
+    minHeight: 52,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colours.border,
+  },
   permissionStatus: { fontSize: 14, fontWeight: '800', color: colours.primary },
 });
