@@ -1,0 +1,72 @@
+name: Verify mobile web integration
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "apps/mobile/**"
+      - "apps/web/app/api/access/search/**"
+      - "apps/web/types/access-map.ts"
+      - "docs/mobile-web-integration.md"
+      - ".github/workflows/mobile-web-integration.yml"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "apps/mobile/**"
+      - "apps/web/app/api/access/search/**"
+      - "apps/web/types/access-map.ts"
+      - "docs/mobile-web-integration.md"
+      - ".github/workflows/mobile-web-integration.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mapable-mobile-web-integration-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  mobile-typecheck:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/mobile
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install mobile dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Type-check mobile application
+        run: npm run typecheck
+
+  contract-boundary:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Verify mobile and web contract anchors
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f apps/mobile/src/runtime/mapableApi.ts
+          test -f apps/mobile/.env.example
+          test -f apps/web/app/api/access/search/route.ts
+          test -f apps/web/types/access-map.ts
+          test -f docs/mobile-web-integration.md
+
+          grep -Fq '/api/access/search' apps/mobile/src/runtime/mapableApi.ts
+          grep -Fq 'EXPO_PUBLIC_MAPABLE_API_URL' apps/mobile/src/runtime/mapableApi.ts
+          grep -Fq 'accessSearchQuerySchema' apps/web/app/api/access/search/route.ts
+          grep -Fq 'lat:' apps/web/types/access-map.ts
+          grep -Fq 'does not request or share live device location' apps/mobile/App.tsx
