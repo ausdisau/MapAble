@@ -17,27 +17,12 @@ export interface CurrentUser {
   roles: UserRole[];
 }
 
-export async function getCurrentUser(): Promise<CurrentUser | null> {
-  const session = await getServerSession(authOptions);
-  // #region agent log
-  agentLog("E", "current-user.ts:getCurrentUser:session", "session read", {
-    hasSession: Boolean(session),
-    sessionUserId: session?.user?.id ?? null,
-  });
-  // #endregion
-  if (!session?.user?.id) return null;
-
+export async function getUserById(userId: string): Promise<CurrentUser | null> {
   const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
+    where: { id: userId },
     include: { roleAssignments: true },
   });
 
-  // #region agent log
-  agentLog("E", "current-user.ts:getCurrentUser:db", "db user lookup", {
-    found: Boolean(user),
-    primaryRole: user?.primaryRole ?? null,
-  });
-  // #endregion
   if (!user) return null;
 
   const roles: UserRole[] = [
@@ -56,6 +41,22 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
     primaryRole: user.primaryRole as UserRole,
     roles: uniqueRoles,
   };
+}
+
+export async function getCurrentUser(): Promise<CurrentUser | null> {
+  const session = await getServerSession(authOptions);
+  agentLog("E", "current-user.ts:getCurrentUser:session", "session read", {
+    hasSession: Boolean(session),
+    sessionUserId: session?.user?.id ?? null,
+  });
+  if (!session?.user?.id) return null;
+
+  const user = await getUserById(session.user.id);
+  agentLog("E", "current-user.ts:getCurrentUser:db", "db user lookup", {
+    found: Boolean(user),
+    primaryRole: user?.primaryRole ?? null,
+  });
+  return user;
 }
 
 export async function requireCurrentUser(): Promise<CurrentUser> {
