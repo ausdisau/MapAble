@@ -5,6 +5,7 @@ import { resolveNextAuthSecret } from "@/lib/auth/nextauth-env";
 const MOBILE_TOKEN_VERSION = "m1";
 const AUTHORIZATION_CODE_TTL_SECONDS = 2 * 60;
 const ACCESS_TOKEN_TTL_SECONDS = 15 * 60;
+const MINIMUM_MOBILE_SECRET_BYTES = 32;
 
 export type MobileAccessScope =
   | "identity:read"
@@ -38,7 +39,14 @@ function base64UrlDecode(value: string): string {
 
 function signingSecret(): string {
   const configured = process.env.MOBILE_AUTH_SECRET?.trim();
-  if (configured) return configured;
+  if (configured) {
+    if (Buffer.byteLength(configured, "utf8") < MINIMUM_MOBILE_SECRET_BYTES) {
+      throw new Error(
+        `MOBILE_AUTH_SECRET must contain at least ${MINIMUM_MOBILE_SECRET_BYTES} bytes`,
+      );
+    }
+    return configured;
+  }
 
   if (process.env.NODE_ENV !== "production") {
     return resolveNextAuthSecret();
@@ -68,7 +76,10 @@ function encodeSignedPayload(payload: object): string {
 }
 
 function decodeSignedPayload(token: string): unknown | null {
-  const [version, encodedPayload, signature] = token.split(".");
+  const parts = token.split(".");
+  if (parts.length !== 3) return null;
+
+  const [version, encodedPayload, signature] = parts;
   if (version !== MOBILE_TOKEN_VERSION || !encodedPayload || !signature) {
     return null;
   }
