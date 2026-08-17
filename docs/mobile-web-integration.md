@@ -1,68 +1,135 @@
 # Mobile ↔ web integration
 
-The unified repository now contains a first real cross-application vertical slice between the Expo/React Native app in `apps/mobile` and the MapAble web platform in `apps/web`.
+The unified repository contains cross-application vertical slices between the Expo/React Native app in `apps/mobile` and the MapAble web platform in `apps/web`.
 
-## First integrated capability: accessible-place search
+## 1. Accessible-place search
 
 The mobile app uses the existing web endpoint:
 
 `GET /api/access/search`
 
-The endpoint is implemented by `apps/web/app/api/access/search/route.ts` and accepts the existing `accessSearchQuerySchema` filters from `apps/web/types/access-map.ts`.
+The first native search slice deliberately sends only:
 
-The first native slice deliberately uses only:
+- `q` — text entered by the user;
+- `limit=5`;
+- `sort=relevance`.
 
-- `q` — text entered by the user
-- `limit=5`
-- `sort=relevance`
+It does **not** request device location and does not send latitude or longitude automatically. Location-aware search must remain behind explicit permission and a clear purpose statement.
 
-It does **not** request device location and does not send latitude or longitude automatically. Location-aware search can be added later only behind explicit location permission and a clear purpose statement.
+## 2. Native identity + My Access
 
-## Mobile configuration
+The mobile app now has a server-mediated browser sign-in flow for participant identity and accessibility preferences.
 
-Set the deployed MapAble web platform URL in the Expo mobile environment:
+### Authorization flow
+
+1. The native app creates a cryptographically random PKCE verifier with `expo-crypto`.
+2. It derives an S256 challenge and random `state` value.
+3. The app opens `GET /api/mobile/auth/authorize` in the system browser.
+4. If there is no MapAble web session, the endpoint redirects to the existing `/login` experience. Passwords, passkeys and two-factor codes remain in the web authentication flow and are never collected by the React Native screen.
+5. After web authentication, MapAble issues a short-lived signed authorization code bound to the PKCE challenge and the allowlisted `mapable://auth/callback` redirect.
+6. The native app validates `state` and exchanges the code plus verifier at `POST /api/mobile/auth/token`.
+7. The server returns a 15-minute bearer token limited to:
+   - `identity:read`;
+   - `accessibility:read`;
+   - `accessibility:write`.
+
+The access token is accepted only by explicitly mobile-safe API boundaries. The remainder of the web API continues to require its existing web session and permission checks.
+
+### Identity endpoint
+
+`GET /api/mobile/auth/me`
+
+Requires a mobile bearer token with `identity:read` and returns only the current user's identity/role context needed by the client.
+
+### Accessibility endpoints
+
+The existing endpoints now accept either the existing web cookie session or a correctly scoped mobile bearer token:
+
+- `GET /api/accessibility-profile` — `accessibility:read`;
+- `PATCH /api/accessibility-profile` — `accessibility:write`;
+- `GET /api/accessibility-profile/digital-preferences` — `accessibility:read`;
+- `PATCH /api/accessibility-profile/digital-preferences` — `accessibility:write`.
+
+The existing audit event for accessibility changes remains in place. Preference values are not added to the audit metadata.
+
+### Mobile My Access behaviour
+
+`apps/mobile/src/components/MobileIdentityCard.tsx` provides:
+
+- browser-based sign-in;
+- explicit signed-in identity context;
+- loading/error states;
+- high-contrast, reduced-motion and large-text synchronization;
+- communication preferences for plain language, AAC, Auslan, written-only, support-person, SMS, email and phone;
+- local sign-out.
+
+The general accessibility profile PATCH schema contains defaults, so communication updates use a fetch-and-merge operation before writing. This prevents a narrow communication change from resetting unrelated accessibility data.
+
+## Configuration
+
+### Mobile public configuration
+
+Set the deployed MapAble web platform URL in the Expo environment:
 
 ```text
 EXPO_PUBLIC_MAPABLE_API_URL=https://your-mapable-web-host.example
 ```
 
-Copy `apps/mobile/.env.example` to a local `.env` when developing locally. Do not commit production secrets. `EXPO_PUBLIC_` values are public client configuration and must never contain secrets or privileged credentials.
+`EXPO_PUBLIC_` values are public client configuration. Never put secrets or privileged credentials in them.
 
-When `EXPO_PUBLIC_MAPABLE_API_URL` is absent, the mobile UI displays a clear not-configured state and does not pretend that prototype data is live.
+### Web/server configuration
 
-## Runtime boundary
+Production must set a dedicated secret for signing mobile authorization/access tokens:
 
-The client lives in `apps/mobile/src/runtime/mapableApi.ts`.
+```text
+MOBILE_AUTH_SECRET=<high-entropy server-only secret>
+```
 
-It:
+Allowed native callbacks may be configured as a comma-separated server-only value:
 
-- strips a trailing slash from the configured base URL;
-- requires a non-empty user search query;
-- URL-encodes the text query;
-- requests JSON from the existing MapAble endpoint;
-- rejects non-2xx responses;
-- rejects malformed response envelopes;
-- returns the web platform's place, confidence, review-count and accreditation fields to the mobile UI.
+```text
+MOBILE_AUTH_REDIRECT_URIS=mapable://auth/callback
+```
 
-The mobile UI keeps confidence visible and reminds the user that accessibility information can change.
+When `MOBILE_AUTH_REDIRECT_URIS` is absent, the current implementation defaults to only `mapable://auth/callback`.
 
-## Authentication
+In non-production environments only, mobile token signing can fall back to the existing NextAuth secret so local development can start without an additional secret. Production fails closed when `MOBILE_AUTH_SECRET` is missing.
 
-This first endpoint does not introduce a new native authentication mechanism. The existing mobile architecture notes that authenticated mobile access will require either the current session approach where viable or a future token-exchange flow.
+## Security boundary and current limitations
 
-Do not embed privileged web credentials in the mobile bundle. Authenticated participant, worker, driver and provider-admin APIs should be integrated only after the native authentication and consent boundary is explicitly designed and reviewed.
+This is a controlled integration slice, not a finished production mobile identity system.
 
-## Expo web caveat
+- Native credentials are never posted directly to the mobile app.
+- The authorization flow uses PKCE S256 and `state` checking.
+- Redirect URIs are exact-match allowlisted.
+- Authorization codes expire after two minutes.
+- Access tokens expire after 15 minutes and carry only three mobile scopes.
+- A supplied but invalid Bearer header never falls back to a web cookie session.
+- The native app currently keeps the access token and PKCE transaction **in memory only**. Restarting the app signs the user out.
+- There is not yet a refresh-token, token-revocation or device-session registry.
+- Authorization codes are signed/stateless rather than persisted as one-time database records. PKCE protects code interception, but production hardening should add one-time code/session persistence and revocation before long-lived native sessions are introduced.
+- Expo web does not run the native custom-scheme account-link flow; it shows an explicit native-only state.
 
-Native iOS/Android fetch is not subject to browser CORS in the same way as Expo web. If the Expo web export is hosted on a different origin from the MapAble web application, the web deployment will need an approved same-origin proxy or explicit CORS policy before this live search can work there.
+## Verification
+
+The repository includes `apps/web/tests/mobile-auth-token.test.ts`, covering:
+
+- successful PKCE exchange;
+- rejection of the wrong verifier;
+- redirect-URI binding;
+- access-scope enforcement;
+- tamper rejection.
+
+The mobile/web CI workflow also type-checks the Expo application and verifies the cross-app contract anchors.
 
 ## Next slices
 
-Recommended sequence:
+Recommended sequence after this boundary is stable:
 
-1. accessibility profile read/write with explicit authentication;
-2. consent and communication preferences;
+1. persist/revoke native device sessions securely and add refresh-token rotation;
+2. consent receipts and purpose-specific sharing controls;
 3. saved place/journey preferences;
 4. participant calendar/bookings;
-5. offline-safe drafts for the specific workflows already permitted by the mobile architecture;
-6. Indy proposals that use platform data but retain deterministic permission checks and explicit approval for consequential actions.
+5. transport booking and trip state;
+6. offline-safe drafts for the workflows already permitted by the mobile architecture;
+7. Indy proposals that use platform data while retaining deterministic permission checks and explicit approval for consequential actions.
