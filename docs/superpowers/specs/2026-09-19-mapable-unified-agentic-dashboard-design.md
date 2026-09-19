@@ -1,6 +1,6 @@
 # MapAble Unified Agentic Dashboard — Design Specification
 
-**Status:** Approved architecture; design specification for review  
+**Status:** Approved for implementation planning  
 **Date:** 2026-09-19  
 **Repository:** `ausdisau/MapAble`  
 **Branch:** `design/unified-agentic-dashboard`  
