@@ -944,3 +944,258 @@ MAPABLE_CORE_V1_API_ENABLED=false
 ```
 
 Existing admin/domain routes remain usable. Do not delete `AdminWorkItem` history merely because the new UI is disabled. Canonical domain records remain authoritative throughout.
+
+
+---
+
+## NDIS Registration Alignment Extension
+
+The following tasks implement the NDIS alignment amendment in the companion specification. They extend Tasks 1–11 and must be completed before a registration-readiness claim.
+
+### Task 12: Map Current NDIS Obligations into the Existing QMS
+
+**Files:**
+- Create: `apps/web/lib/platform/core/compliance/ndis-framework-service.ts`
+- Create: `apps/web/lib/platform/core/compliance/ndis-evidence-view.ts`
+- Reuse: `apps/web/lib/quality/standards/standards-service.ts`
+- Reuse: `apps/web/lib/quality/policies/policy-service.ts`
+- Reuse: `apps/web/lib/quality/audits/audit-service.ts`
+- Create: `apps/web/tests/core-ndis-qms-crosswalk.test.ts`
+
+**Interfaces:**
+- Produces `getNdisComplianceView({ organisationId })`.
+- Seeds/configures obligation definitions through existing `StandardFramework` / `EvidenceRequirement` services; it does not add another compliance-table family.
+
+- [ ] **Step 1: Write RED tests**
+
+```ts
+it("keeps official obligations distinct from internal policy evidence", async () => {
+  const view = await getNdisComplianceView({ organisationId: "org-1" });
+  const platform = view.obligations.find((o) => o.code === "NDIS-0137");
+  expect(platform?.authorityClass).toBe("external_requirement");
+  expect(platform?.policyEvidence).toEqual(
+    expect.arrayContaining([expect.objectContaining({ type: "policy_document" })]),
+  );
+});
+
+it("never treats policy publication as proof of registration", async () => {
+  const view = await getNdisComplianceView({ organisationId: "org-1" });
+  expect(view.registration.status).not.toBe("registered");
+});
+```
+
+- [ ] **Step 2: Run RED**
+
+```bash
+pnpm vitest run tests/core-ndis-qms-crosswalk.test.ts
+```
+
+- [ ] **Step 3: Implement the QMS adapter**
+
+Map current obligations to source-attributed QMS framework/outcome/indicator/requirement records. Reuse versioned `ComplianceEvidence`, `EvidenceAssessment`, policy acknowledgements, training records, audit findings, corrective actions and improvement actions.
+
+Do not persist legal conclusions produced by an LLM.
+
+- [ ] **Step 4: Add a read-only internal API**
+
+Create:
+
+```text
+GET /api/v1/admin/compliance/ndis
+GET /api/v1/admin/compliance/ndis/evidence
+```
+
+Require `admin:compliance:read` and organisation scope.
+
+- [ ] **Step 5: Run GREEN and commit**
+
+```bash
+pnpm vitest run tests/core-ndis-qms-crosswalk.test.ts
+pnpm type-check
+git add lib/platform/core/compliance app/api/v1/admin/compliance tests/core-ndis-qms-crosswalk.test.ts
+git commit -m "feat(core): map NDIS obligations to QMS evidence"
+```
+
+### Task 13: Add 0137 Worker Offer-Eligibility and Verification Evidence Boundary
+
+**Files:**
+- Create: `apps/web/lib/platform/core/compliance/worker-offer-eligibility.ts`
+- Create: `apps/web/lib/platform/core/compliance/worker-verification-adapter.ts`
+- Create: `apps/web/lib/platform/core/compliance/provider-registration-adapter.ts`
+- Test: `apps/web/tests/core-0137-worker-eligibility.test.ts`
+- Test: `apps/web/tests/core-provider-registration-boundary.test.ts`
+
+**Interfaces:**
+- `evaluateNdisPlatformWorkerOfferEligibility(input) -> NdisPlatformWorkerOfferEligibility`
+- Provider registration evidence and worker screening evidence remain separate adapters.
+- Authorised live worker-screening verification is an external dependency; no public web search may be substituted for NWSD/state authorised access.
+
+- [ ] **Step 1: Write RED tests for the 1 January 2027 rules**
+
+```ts
+it("blocks an on-application worker from offering supports under the platform condition", () => {
+  const result = evaluateNdisPlatformWorkerOfferEligibility({
+    asOf: new Date("2027-01-01T00:00:00+11:00"),
+    clearance: { status: "application_pending" },
+    banningOrders: verifiedNoBans,
+    credentials: verifiedCredentials,
+  });
+  expect(result.canOfferNdisSupports).toBe(false);
+  expect(result.reasonCodes).toContain("VALID_CLEARANCE_REQUIRED");
+});
+
+it("fails closed when banning-order verification is unavailable", () => {
+  const result = evaluateNdisPlatformWorkerOfferEligibility({
+    asOf: new Date("2027-01-02T00:00:00+11:00"),
+    clearance: validClearance,
+    banningOrders: { ndis: "not_verified", agedCareAct2024: "not_verified", agedCareQualitySafetyAct2018: "not_verified" },
+    credentials: verifiedCredentials,
+  });
+  expect(result.canOfferNdisSupports).toBe(false);
+});
+```
+
+- [ ] **Step 2: Write RED tests for data separation**
+
+Assert:
+- provider registration never produces worker-clearance status;
+- public worker projection excludes clearance/check number, DOB, address and misconduct allegations;
+- expired/stale evidence cannot become `verified_clearance`;
+- model-generated text cannot mutate verification state.
+
+- [ ] **Step 3: Inspect/reuse current worker credential models before adding schema**
+
+The repo already contains worker credential primitives. Do not create `WorkerScreeningRecord` or a second credential source of truth unless a schema/service inspection proves there is no suitable canonical record.
+
+Document the selected existing model/service and any additive fields/migration before implementation.
+
+- [ ] **Step 4: Implement deterministic eligibility**
+
+Eligibility evaluation consumes typed, already-verified source evidence only. No LLM call exists in this service.
+
+- [ ] **Step 5: Integrate the listing/offer publication boundary**
+
+Any path that makes a person available to provide plan-funded support through the 0137 platform must call the eligibility service before publication/activation once the condition is effective.
+
+- [ ] **Step 6: Run GREEN and commit**
+
+```bash
+pnpm vitest run tests/core-0137-worker-eligibility.test.ts tests/core-provider-registration-boundary.test.ts
+pnpm type-check
+git add lib/platform/core/compliance tests/core-0137-worker-eligibility.test.ts tests/core-provider-registration-boundary.test.ts
+git commit -m "feat(core): enforce 0137 worker offer eligibility"
+```
+
+### Task 14: Add Registration-Condition and Audit-Evidence Workflows
+
+**Files:**
+- Create: `apps/web/lib/platform/core/compliance/registration-condition-service.ts`
+- Create: `apps/web/lib/platform/core/compliance/evidence-pack-service.ts`
+- Create: `apps/web/lib/platform/core/admin/adapters/qms.ts`
+- Test: `apps/web/tests/core-registration-conditions.test.ts`
+- Test: `apps/web/tests/core-ndis-evidence-pack.test.ts`
+
+**Interfaces:**
+- Adds work-item reasons for registration-condition gaps, worker-screening review and QMS corrective actions.
+- Evidence packs reference existing QMS/domain records and are read-only.
+
+- [ ] **Step 1: Write RED tests for 0107**
+
+When 0107 is verified as an approved group and a participant/sole-worker situation is identified, assert the compliance view requires references for:
+- risk assessment;
+- written/proposed service agreement;
+- participant role in worker selection;
+- independent satisfaction check;
+- supervision plan/record;
+- participant communication;
+- affected-participant register entry.
+
+Do not infer 0107 scope merely from a Care feature flag.
+
+- [ ] **Step 2: Write RED evidence-pack tests**
+
+```ts
+it("exports references and assessments without generic incident narratives", async () => {
+  const pack = await buildNdisAuditEvidencePack({ organisationId: "org-1", requestedById: "admin-1" });
+  expect(JSON.stringify(pack)).not.toContain("incidentNarrative");
+  expect(pack.auditTrail).toEqual(expect.any(Array));
+});
+```
+
+Also require an audit event containing requester, purpose, scope and correlation ID.
+
+- [ ] **Step 3: Implement QMS work adapter**
+
+QMS findings/corrective actions can create central work items. Closing the Core work item must not silently close the QMS finding.
+
+- [ ] **Step 4: Implement evidence pack**
+
+Use immutable/versioned references. The pack must say `evidence_status`, not "compliant", unless a competent human assessor has recorded that conclusion in the appropriate system.
+
+- [ ] **Step 5: Run GREEN and commit**
+
+```bash
+pnpm vitest run tests/core-registration-conditions.test.ts tests/core-ndis-evidence-pack.test.ts
+pnpm type-check
+git add lib/platform/core/compliance lib/platform/core/admin/adapters/qms.ts tests/core-registration-conditions.test.ts tests/core-ndis-evidence-pack.test.ts
+git commit -m "feat(core): add NDIS condition and audit evidence workflows"
+```
+
+### Task 15: Add Infrastructure Compliance Evidence and Final Registration-Readiness Gate
+
+**Files:**
+- Create: `apps/web/lib/platform/core/compliance/deployment-evidence.ts`
+- Create: `apps/web/tests/core-deployment-evidence.test.ts`
+- Modify: `apps/web/docs/core-control-plane-pilot-evidence.md`
+- Modify: `apps/web/.env.example` only for key names; never secret values.
+
+**Interfaces:**
+- Captures deployment/commit/environment/test evidence without participant data.
+- Vercel remains an infrastructure evidence source, not a registration authority.
+
+- [ ] **Step 1: Write RED tests for log/evidence minimisation**
+
+Reject deployment evidence fields containing:
+- participant/worker screening identifiers;
+- complaint or incident narratives;
+- NDIS numbers;
+- precise participant location;
+- health/support notes;
+- environment-secret values.
+
+- [ ] **Step 2: Add environment separation assertions**
+
+The pilot evidence must identify whether production/preview/development have distinct intended data/config scopes. Tests/config checks fail if a production database URL is intentionally exposed to a preview environment without an approved exception record.
+
+- [ ] **Step 3: Add release-gate checklist**
+
+Before any "NDIS registration ready" or "0137 ready" internal status can be set, evidence must exist for:
+- legal entity and verified registration pathway;
+- registration certificate/scope where required;
+- QMS framework and current policy versions;
+- worker screening/risk-assessed-role controls;
+- 0137 worker/banning-order/credential tests;
+- incident/complaint/continuity/CI evidence;
+- accessibility tests;
+- tenant/privacy tests;
+- deployment/rollback evidence;
+- named human compliance owner.
+
+- [ ] **Step 4: Run final combined gate**
+
+```bash
+pnpm vitest run   tests/core-ndis-qms-crosswalk.test.ts   tests/core-0137-worker-eligibility.test.ts   tests/core-provider-registration-boundary.test.ts   tests/core-registration-conditions.test.ts   tests/core-ndis-evidence-pack.test.ts   tests/core-deployment-evidence.test.ts   tests/core-control-plane-privacy.test.ts   tests/core-control-plane-tenancy.test.ts   tests/authority/authority-threats.test.ts
+pnpm type-check
+pnpm lint
+```
+
+- [ ] **Step 5: Commit**
+
+```bash
+git add lib/platform/core/compliance tests apps/web/docs/core-control-plane-pilot-evidence.md .env.example
+git commit -m "compliance(core): add NDIS registration readiness gate"
+```
+
+## Revised rollout gate
+
+Tasks 12–15 are mandatory before using the control plane to support an NDIS registration-readiness claim. The software still cannot itself determine that the legal entity is compliant or registered; that conclusion requires current external evidence and competent human review.
