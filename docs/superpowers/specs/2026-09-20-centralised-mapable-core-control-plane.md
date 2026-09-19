@@ -1,6 +1,6 @@
 # Centralised MapAble Core Control Plane — Technical Specification
 
-**Status:** Proposed implementation architecture  
+**Status:** Proposed implementation architecture — aligned to current NDIS digital-platform registration requirements and the MapAble draft NDIS Policy & Procedures Manual  
 **Date:** 2026-09-20  
 **Repository:** `ausdisau/MapAble`  
 **Base:** `main` @ `b51cb9b73395769c46c3f64dd6094120bc2cedac`  
@@ -680,3 +680,308 @@ This work does not:
 - create risk/worthiness scores;
 - change production flags;
 - merge or deploy.
+
+
+---
+
+## 25. NDIS registration alignment — 2026 control-plane amendment
+
+### 25.1 Source hierarchy
+
+For this control plane, compliance truth must be resolved in this order:
+
+1. current Commonwealth law, NDIS Commission rules, registration conditions and Practice Standards;
+2. MapAble's current certificate/scope of registration and Initial Scope of Audit, once available;
+3. the approved MapAble NDIS Policy & Procedures Manual and controlled QMS documents;
+4. current repository controls and generated evidence;
+5. planning documents and historical registration proposals.
+
+The MapAble NDIS Policy & Procedures Manual is an internal policy source. It does **not** prove registration or legal compliance. The older NDIS Provider Registration Plan is historical planning material and must not override later regulatory changes.
+
+### 25.2 Registration group 0137 decision gate
+
+From 1 July 2026, an organisation that meets the legal definition of an NDIS digital platform must be registered for **0137 — Providing an NDIS digital platform service**. Registration group 0137 requires a **certification audit** and the NDIS Practice Standards Core Module.
+
+MapAble Core must therefore carry an explicit, human-maintained registration context:
+
+```ts
+export type NdisRegistrationContext = {
+  legalEntityId: string;
+  registrationStatus:
+    | "not_verified"
+    | "application_preparation"
+    | "application_lodged"
+    | "audit_in_progress"
+    | "registered"
+    | "suspended"
+    | "revoked";
+  registrationGroups: string[];
+  certificateEvidenceRef?: string;
+  initialScopeOfAuditRef?: string;
+  registrationExpiry?: string;
+  conditionsVersion?: string;
+  verifiedAt?: string;
+  verifiedByUserId?: string;
+};
+```
+
+The application must **not infer** that MapAble is registered from a feature flag, provider listing, ABN, payment capability or internal policy document.
+
+Before any production NDIS digital-platform path is enabled, a human compliance owner must confirm:
+
+- whether the actual operating/payment model falls within the current statutory definition of an NDIS digital platform;
+- the correct legal entity;
+- the applicable transition/new-provider pathway;
+- the registration groups actually approved;
+- current certificate conditions.
+
+For a new provider entering the market after 1 July 2026, the system must treat NDIS digital-platform operation as unavailable until registration approval evidence is recorded.
+
+### 25.3 Reuse the existing QMS as the compliance evidence spine
+
+Do not add a second compliance framework database.
+
+Reuse the existing Quality, Accreditation and Compliance Cloud:
+
+- `StandardFramework`
+- `StandardOutcome`
+- `StandardIndicator`
+- `EvidenceRequirement`
+- `ComplianceEvidence`
+- `EvidenceAssessment`
+- `QualityAuditPlan`
+- `QualityAuditFinding`
+- `CorrectiveAction`
+- `ImprovementAction`
+- `PolicyDocument`
+- `PolicyAcknowledgement`
+- `TrainingRequirement`
+- `TrainingCompletionRecord`
+
+The current `createFramework(...sourceRef)` and versioned `ComplianceEvidence` service are the first implementation target for mapping Practice Standards and registration conditions to audit evidence.
+
+Create QMS frameworks for:
+
+- NDIS Practice Standards — Core Module;
+- registration group 0137 conditions;
+- any additional registration groups actually approved for the legal entity;
+- MapAble controlled policies and procedures as implementation evidence, not as legal authority.
+
+Each evidence item must be attributable to an obligation, organisation, source/version, owner, review status and supersession history.
+
+### 25.4 MapAble Policy & Procedures Manual crosswalk
+
+Core must generate and maintain evidence for the manual's operational domains:
+
+| Manual domain | Core/QMS control | Canonical source of truth |
+| --- | --- | --- |
+| Governance & operational management | QMS framework, board/management review evidence, delegated authority, conflicts, audit dashboard | Quality/QMS + organisation/auth |
+| Risk management | risk evidence, findings, corrective actions, operational work items | QMS plus domain risk services |
+| Incident management | incident work projection, deadline/escalation evidence, corrective action | `IncidentReport` / `lib/incidents/**` |
+| Feedback & complaints | complaint work projection, procedural-fairness timeline, CI linkage | Engagement/complaints domain |
+| Information & privacy | purpose-bound consent, access audit, minimum-data projections, retention controls | consent/auth/audit/domain records |
+| Human resources & worker screening | risk-assessed-role register, clearance evidence, training/policy acknowledgements | workforce/credential services + QMS |
+| Continuity of supports | disruption/continuity work items and participant-agreed alternatives | Care/Transport/service domains |
+| Provision of supports | service agreements, support plans, participant choice/consent evidence | domain services |
+| Supports environment | WHS/safety/medication/money-property controls where service scope requires them | domain-specific controls |
+
+### 25.5 Worker-screening and risk-assessed-role controls
+
+Registered-provider worker screening and 0137 platform-worker eligibility are related but not identical.
+
+Core must maintain a controlled **risk-assessed role register** with:
+
+- role title;
+- basis for risk-assessed classification;
+- role description;
+- assessment date;
+- assessor;
+- review/update history.
+
+Worker screening records must remain restricted compliance records. They may include the details required by the NDIS Commission for registered-provider records and must be retained according to current legal requirements. Public/provider-facing projections must not expose screening identifiers, date of birth, address, allegations or other restricted fields.
+
+Provider registration verification and worker screening are separate checks:
+
+- Provider Register / Provider Finder evidence may establish provider registration facts.
+- The NDIS Worker Screening Database or authorised state/territory process establishes worker screening status.
+- Public absence of a provider compliance action does not prove worker clearance.
+- A training completion or credential does not equal worker screening clearance.
+
+### 25.6 0137 worker offer-eligibility gate — effective 1 January 2027
+
+For a person who uses the platform to provide NDIS supports under a participant's plan, the public offer/listing path must fail closed unless current evidence establishes the 0137 conditions.
+
+```ts
+export type NdisPlatformWorkerOfferEligibility = {
+  workerId: string;
+  clearance:
+    | "verified_clearance"
+    | "not_verified"
+    | "expired"
+    | "suspended"
+    | "excluded";
+  clearanceVerifiedAt?: string;
+  clearanceExpiresAt?: string;
+
+  banningOrders: {
+    ndis: "none_verified" | "in_force" | "not_verified";
+    agedCareAct2024: "none_verified" | "in_force" | "not_verified";
+    agedCareQualitySafetyAct2018:
+      | "none_verified"
+      | "in_force"
+      | "not_verified";
+    checkedAt?: string;
+  };
+
+  credentials: Array<{
+    name: string;
+    issuer?: string;
+    status: "verified" | "expired" | "not_verified";
+    checkedAt?: string;
+  }>;
+
+  canOfferNdisSupports: boolean;
+  reasonCodes: string[];
+  evaluatedAt: string;
+};
+```
+
+Rules from 1 January 2027:
+
+- a platform worker must have a **valid NDIS worker screening clearance before offering NDIS supports**;
+- "work on application" is not an allowed platform-worker state for offer publication;
+- banning-order checks required by the 0137 condition must be completed and the required information displayed;
+- credential/qualification checking and display must be evidence-backed, with a plain-language explanation of the checking process;
+- unavailable/stale verification must not silently become approval;
+- an LLM cannot change screening, banning-order or credential status.
+
+A human compliance review path handles source outage, identity mismatch, ambiguous records or credential exceptions.
+
+### 25.7 Provider registration projection
+
+MapAble may ingest official Provider Register / Provider Finder evidence for providers, but must keep provenance and freshness.
+
+A provider badge must distinguish:
+
+- registered for the relevant group;
+- registration suspended/revoked where the official register reports it;
+- registration not verified;
+- data stale / refresh required.
+
+Provider registration does not establish worker screening, participant fit, availability, competence or service quality.
+
+### 25.8 0107 living-alone / sole-worker conditions
+
+If the legal entity is approved for 0107 and supports a participant living alone with a sole support worker, Core must surface the additional registration-condition workflow without replacing Care as the source of truth.
+
+Required evidence includes:
+
+- participant-specific risk assessment;
+- written/proposed service agreement;
+- participant role in worker selection;
+- independent participant satisfaction monitoring;
+- worker supervision plan and records;
+- direct communication with the participant;
+- records of affected participants;
+- management/key-personnel review where risk factors are present.
+
+These controls must be participant-facing and communication-accessible; communication disability must never be treated as lack of decision-making authority.
+
+### 25.9 Complaints, incidents, continuity and continuous improvement
+
+The central work queue is an operations projection only.
+
+- Incident reportability and regulatory notification decisions remain human-reviewed in the canonical incident system.
+- Complaint resolution must preserve procedural fairness, accessible complaint pathways, external escalation information and non-retaliation.
+- Incident/complaint outcomes should be able to create QMS findings or improvement actions without creating provider/participant risk scores.
+- Continuity events must record participant-agreed alternatives and human escalation where service interruption could affect health, safety or wellbeing.
+- The QMS must retain internal-audit, corrective-action, improvement, policy acknowledgement and training evidence for audit.
+
+### 25.10 Audit-ready evidence exports
+
+Add a read-only, scoped evidence-pack service that can prepare evidence for internal review and an Approved Quality Auditor.
+
+Evidence packs may reference:
+
+- controlled policy versions and acknowledgements;
+- training requirements/completions;
+- worker-screening register completeness;
+- risk-assessed-role register;
+- incident/complaint registers and procedural timelines;
+- internal audit plans/findings/corrective actions;
+- continuous-improvement actions;
+- registration certificate/scope evidence;
+- relevant 0107 / 0137 condition evidence.
+
+Exports must:
+
+- be organisation-scoped;
+- exclude data not needed for the audit purpose;
+- redact participant/worker-sensitive information unless legitimately required;
+- record who generated/downloaded the pack and why;
+- use immutable/versioned evidence references;
+- never claim "compliant" merely because documents exist.
+
+### 25.11 Deployment and infrastructure evidence
+
+Vercel is infrastructure evidence, not NDIS compliance evidence by itself.
+
+For the MapAble deployment, the release evidence pack should capture:
+
+- deployment ID and commit SHA;
+- environment (preview/production);
+- feature-flag values by environment without secret values;
+- build/test outcome;
+- runtime error summary;
+- security/deployment-protection settings where available;
+- audit-log references where available.
+
+Secrets remain environment-scoped and must never appear in Git, audit metadata, screenshots or evidence exports. Production and preview data connections must be explicitly separated unless an approved exception exists.
+
+Application/runtime logs must not contain incident narratives, complaint narratives, precise participant location, NDIS numbers, worker screening identifiers or clinical/support notes.
+
+### 25.12 External ML/public-data boundary
+
+Hugging Face or other external ML/data hubs must not be treated as registration or worker-screening authorities.
+
+Any future use for model evaluation should prefer synthetic or lawfully de-identified datasets, with explicit licence, provenance, retention and disclosure review. No identifiable participant, worker or incident data should be uploaded to public model/dataset services.
+
+Likewise, foreign healthcare public datasets (for example U.S. CMS datasets) can inform generic data-provenance engineering patterns but are **not evidence of Australian NDIS compliance**.
+
+### 25.13 Agent/API governance
+
+Any agent or MCP layer over Core must expose **typed, least-privilege tools** and preserve the same authority boundary as the web API.
+
+Agents may:
+
+- read an authorised compliance status;
+- prepare an evidence checklist;
+- draft a corrective-action summary;
+- surface stale/missing evidence.
+
+Agents may not:
+
+- declare registration;
+- mark a worker screened without authorised source evidence;
+- override a banning-order result;
+- decide incident reportability;
+- suppress a complaint;
+- issue an accreditation decision;
+- grant themselves participant authority.
+
+All mutating agent actions require the same deterministic service and audit path as human/API actions.
+
+### 25.14 Revised release gate
+
+The Core control plane is **not NDIS-registration ready** until the following are evidenced:
+
+1. the legal entity and applicable registration pathway are verified;
+2. if the operating model meets the digital-platform definition, 0137 registration evidence is present before operation where required;
+3. current registration groups/conditions are represented in the QMS;
+4. worker screening/risk-assessed-role records meet current requirements;
+5. the 1 January 2027 0137 worker/banning-order/credential display gate passes end-to-end tests before that condition becomes effective;
+6. incidents, complaints, continuity and CI generate usable audit evidence;
+7. controlled policy versions and staff acknowledgements/training can be exported;
+8. no cross-tenant or participant-authority leakage is found;
+9. Vercel deployment evidence and environment separation are verified;
+10. an internal compliance owner and, where required, the AQA/legal adviser review unresolved interpretation questions.
