@@ -91,6 +91,8 @@ describe("MapAble Exchange synthetic domain and rights safeguards", () => {
   it("does not grant visibility to uninvited suppliers or coordinators", () => {
     const state = shared(draft(), "supplierBlue");
     expect(getVisibleRequests(state, "supplierBlue", TODAY)).toHaveLength(1);
+    expect(getVisibleRequests(state, "supplierBlue", TODAY)[0].grants).toEqual([]);
+    expect(getVisibleRequests(state, "participant", TODAY)[0].grants).toHaveLength(1);
     expect(getVisibleRequests(state, "supplierGold", TODAY)).toHaveLength(0);
     expect(getVisibleRequests(state, "providerCare", TODAY)).toHaveLength(0);
     expect(getVisibleRequests(state, "coordinator", TODAY)).toHaveLength(0);
