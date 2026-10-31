@@ -62,7 +62,7 @@ describe("MapAble dual-sided exchange UI", () => {
     render(<ExchangeWorkspace />);
     fireEvent.click(screen.getByRole("button", { name: "Service providers" }));
     expect(screen.getByRole("heading", { name: "Example training provider" })).toBeTruthy();
-    expect(screen.getByText(/Example AAC training formats|Example training|Compare accessible AAC training/i)).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "AAC technology training session" })).toBeTruthy();
     expect(screen.queryByRole("button", { name: /approve NDIS|accept purchase/i })).toBeNull();
   });
 
