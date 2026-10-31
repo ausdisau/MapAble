@@ -153,7 +153,7 @@ MarketplaceRequest, MarketplaceGrant, MarketplaceQuote, QuoteVersion, AdvisorEvi
 ### Trust invariants for backend review
 
 1. Request is private by default. Only owner or scoped actors can read a projected view.
-2. Quote cannot exist without a current per-recipient share; a vendor cannot see another vendor's quote.
+2. Quote cannot exist without a current per-recipient share; a vendor cannot see another vendor's quote. Synthetic non-owner request projections also strip the recipient-grant list. A real server must additionally enforce field-level projections before serialisation.
 3. Grant revocation propagates immediately to read, notifications, drafts and export authorisation; audit remains participant-readable.
 4. Advisor notes are separate from seller quotes and clinical records; no supplier can prescribe for a person solely by listing a product.
 5. No automatic participant approval from coordinator, carer, provider, clinician, AI model or role mode switch.
