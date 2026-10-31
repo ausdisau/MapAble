@@ -147,9 +147,9 @@ export class DemoCycleError extends Error {
   }
 }
 
-const deny = (code: string, message: string): never => {
+function deny(code: string, message: string): never {
   throw new DemoCycleError(code, message);
-};
+}
 const hasRole = (actor: DemoActor, role: DemoRole): void => {
   if (actor.role !== role) deny("ROLE_DENIED", "This simulated step requires the " + role + " role.");
 };
