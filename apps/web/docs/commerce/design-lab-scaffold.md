@@ -10,8 +10,9 @@
 - Scaffold branch: feat/commerce-design-lab-20261031
 - Research reference: docs/commerce/PLATFORM_REFERENCE_STANDARD.md and docs/commerce/DELIVERY_SCORECARD.md (draft PR #4).
 - Older Marketplace and PayCore code: independent draft PRs #641–#643 in ausdisau/mapableau-new; **not reconciled** into the canonical repository.
-- Existing default-off guard: apps/web/app/marketplace/(shop)/layout.tsx, enforced by requireAuth and MAPABLE_MARKETPLACE_ENABLED.
-- Route: /marketplace/browse/design-lab, **noindex**, under the existing gated shop layout.
+- Existing transactional Marketplace guard: apps/web/app/marketplace/(shop)/layout.tsx enforces requireAuth and MAPABLE_MARKETPLACE_ENABLED. **Unchanged.**
+- Research preview is independently gated by MAPABLE_COMMERCE_DESIGN_LAB_ENABLED (default OFF) and requireAuth; its route is **/marketplace/design-lab** (noindex).
+- Preview needs no commerce checkout flag, avoiding unsafe legacy cart exposure while usability-testing designs.
 
 ## Deep platform comparison and actionable interface decisions
 
@@ -40,9 +41,11 @@ Vendor documentation describes vendor features, **not verified MapAble functiona
 ## Scaffold file tree
 
     apps/web/
-      app/marketplace/(shop)/browse/design-lab/page.tsx
+      app/marketplace/(design-preview)/design-lab/layout.tsx
+      app/marketplace/(design-preview)/design-lab/page.tsx
       components/marketplace/commerce-design-lab/CommerceDesignLab.tsx
       lib/marketplace/design-lab-model.ts
+      lib/marketplace/design-lab-gate.ts
       tests/commerce-design-lab-model.test.ts
       tests/commerce-design-lab-ui.test.tsx
       docs/commerce/design-lab-scaffold.md
@@ -76,7 +79,7 @@ Target WCAG 2.2 AA, with **independent manual and participant-led verification s
 ## Security, consumer protection, funding, consent and failures
 
 - User cannot click through to a new live payment route from this scaffold. It does not import the existing legacy cart/checkout functions.
-- Shop layout already requires authentication and enforces the default-off MAPABLE_MARKETPLACE_ENABLED guard. Do not enable the flag in production to demo this page.
+- Preview layout enforces authentication and MAPABLE_COMMERCE_DESIGN_LAB_ENABLED default OFF. It is separate from the transactional Marketplace, whose MAPABLE_MARKETPLACE_ENABLED flag must remain OFF. Do not enable either flag in production for this exercise.
 - Restricted hoists excluded from planning. Wheelchair, mounting, rental, shower seating and reuse examples remain specialist-enquiry/planning only.
 - Seller information is purely synthetic and cannot be used to infer a real Australian business, NDIS registration or warranty.
 - Consent and delegate scopes must be enforced by MapAble Core for any future shared real planning/ordering. A dropdown cannot provide legal or operational access.
@@ -91,7 +94,7 @@ From apps/web after installing locked dependencies:
 
     pnpm exec vitest run tests/commerce-design-lab-model.test.ts tests/commerce-design-lab-ui.test.tsx
     pnpm type-check
-    pnpm exec eslint lib/marketplace/design-lab-model.ts components/marketplace/commerce-design-lab/CommerceDesignLab.tsx "app/marketplace/(shop)/browse/design-lab/page.tsx" tests/commerce-design-lab-model.test.ts tests/commerce-design-lab-ui.test.tsx --max-warnings 0
+    pnpm exec eslint lib/marketplace/design-lab-model.ts components/marketplace/commerce-design-lab/CommerceDesignLab.tsx "app/marketplace/(design-preview)/design-lab/page.tsx" tests/commerce-design-lab-model.test.ts tests/commerce-design-lab-ui.test.tsx --max-warnings 0
 
 The dedicated workflow also runs formatting verification. Full repository CI, security review and human accessibility tests still govern release.
 
@@ -99,14 +102,27 @@ The dedicated workflow also runs formatting verification. Full repository CI, se
 
 **Keep:** apps/web/app/marketplace/(shop)/layout.tsx identity and gating, MapAble Core identity/consent, existing catalogue and PayCore source boundaries.
 
-**Add:** model, client UI, route, tests, docs and scoped workflow.
+**Add:** model, independently gated preview layout/page, client UI, tests, docs and scoped workflow.
 
-**Update:** gated shop navigation with an explicit "Commerce design lab" link only.
+**Update:** no existing shop navigation or checkout. Preview header links only to the public Marketplace explainer and MapAble Core.
 
-**Wire together:** model -> client component -> authenticated shop page. No server mutation, checkout, provider API, pricing API or mobile bridge yet.
+**Wire together:** model -> client component -> independent /marketplace/design-lab preview behind its own server-side flag. No server mutation, checkout, provider API, pricing API or mobile bridge yet.
 
 **Next merge order:** first review benchmark PR #4, then this stacked UI draft, then reconcile the newer standalone #641–#643 code and its authorisation/payment security fixes through independent reviewed PRs. Do not merge on the assumption that all source histories are aligned.
 
 ## Release decision
 
 **No-go for production commerce.** The only authorised output of this implementation is an internal, synthetic, feature-gated UI scaffold for designer/developer and participant-led usability testing. Production flags, NDIS claims, seller approvals, deployment and Stripe remain unchanged.
+
+
+## Architecture and domain ownership
+
+MapAble Core owns real identity, consent, organisation and delegate authorisation. Marketplace owns real catalogue, seller and product evidence in future work. PayCore/AbilityPay owns server-authoritative payment routes. This research preview owns **only synthetic in-memory UI state** and is not the system of record for orders, charges or supplier approval.
+
+## Failure modes and recovery
+
+Empty search results provide clear reset controls; restricted equipment is not added to lists; seller form errors are visible and announced; local export failures show a message; reloading clears the prototype. The dedicated flag prevents preview access when OFF without opening the legacy transactional shop.
+
+## Critical risk
+
+The older Marketplace cart may have unreviewed client-priced billing paths. The design-lab flag is separate so testers must **not** set MAPABLE_MARKETPLACE_ENABLED=true just to view the research UI. No payment, invoice or seller route has been modified.

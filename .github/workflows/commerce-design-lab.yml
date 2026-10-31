@@ -5,8 +5,8 @@ on:
     paths:
       - "apps/web/lib/marketplace/design-lab-model.ts"
       - "apps/web/components/marketplace/commerce-design-lab/**"
-      - "apps/web/app/marketplace/(shop)/browse/design-lab/**"
-      - "apps/web/app/marketplace/(shop)/layout.tsx"
+      - "apps/web/app/marketplace/(design-preview)/design-lab/**"
+      - "apps/web/lib/marketplace/design-lab-gate.ts"
       - "apps/web/tests/commerce-design-lab-*"
       - ".github/workflows/commerce-design-lab.yml"
   workflow_dispatch:
@@ -49,6 +49,8 @@ jobs:
           pnpm exec eslint \
             lib/marketplace/design-lab-model.ts \
             components/marketplace/commerce-design-lab/CommerceDesignLab.tsx \
-            "app/marketplace/(shop)/browse/design-lab/page.tsx" \
+            "app/marketplace/(design-preview)/design-lab/page.tsx" \
+            "app/marketplace/(design-preview)/design-lab/layout.tsx" \
+            lib/marketplace/design-lab-gate.ts \
             tests/commerce-design-lab-model.test.ts \
             tests/commerce-design-lab-ui.test.tsx --max-warnings 0

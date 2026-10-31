@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { isCommerceDesignLabEnabled } from "@/lib/marketplace/design-lab-gate";
 
 import {
   COMMERCE_LAB_OFFERS,
@@ -13,6 +14,12 @@ import {
 } from "@/lib/marketplace/design-lab-model";
 
 describe("MapAble commerce design lab: reference-driven domain", () => {
+  it("uses its own default-off gate without enabling commerce checkout", () => {
+    expect(isCommerceDesignLabEnabled({})).toBe(false);
+    expect(isCommerceDesignLabEnabled({ MAPABLE_COMMERCE_DESIGN_LAB_ENABLED: "false" })).toBe(false);
+    expect(isCommerceDesignLabEnabled({ MAPABLE_COMMERCE_DESIGN_LAB_ENABLED: "true" })).toBe(true);
+  });
+
   it("only contains synthetic sellers and unverified evidence", () => {
     expect(COMMERCE_LAB_OFFERS.length).toBeGreaterThanOrEqual(15);
     expect(COMMERCE_LAB_OFFERS.every((offer) => offer.sellerName === "Synthetic seller")).toBe(true);

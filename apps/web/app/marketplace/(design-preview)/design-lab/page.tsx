@@ -7,7 +7,7 @@ export const metadata = {
   robots: { index: false, follow: false },
 };
 
-/** Inherits requireAuth + default-off MAPABLE_MARKETPLACE_ENABLED from shop layout. */
+/** Inherits requireAuth + independently default-off design-preview flag. */
 export default function CommerceDesignLabPage() {
   return <CommerceDesignLab />;
 }

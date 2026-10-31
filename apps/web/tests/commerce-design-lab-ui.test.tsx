@@ -35,7 +35,7 @@ describe("MapAble commerce design lab: participant-facing UI", () => {
     expect(screen.getByRole("heading", { name: "AAC technology training session" })).toBeTruthy();
     fireEvent.change(search, { target: { value: "inexistent phrase abcdef" } });
     expect(screen.getByText(/No matching examples/)).toBeTruthy();
-    fireEvent.click(screen.getByRole("button", { name: "Clear filters" }));
+    fireEvent.click(screen.getAllByRole("button", { name: "Clear filters" })[0]);
     expect(screen.getByText(/17 of 17 synthetic examples shown/)).toBeTruthy();
   });
 
