@@ -1,0 +1,87 @@
+name: Marketplace closed-alpha web and desktop
+
+on:
+  pull_request:
+    paths:
+      - "apps/web/lib/marketplace/alpha/**"
+      - "apps/web/components/marketplace/alpha/**"
+      - "apps/web/app/marketplace/(design-preview)/design-lab/closed-alpha/**"
+      - "apps/web/app/api/marketplace/open-beta/catalogue/**"
+      - "apps/web/tests/marketplace-closed-alpha-*"
+      - "apps/web/docs/commerce/closed-alpha-web-desktop.md"
+      - "apps/marketplace-desktop/**"
+      - ".github/workflows/marketplace-web-desktop-alpha.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  nextjs:
+    name: Next.js TypeScript, alpha tests and lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.12.1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: apps/web/pnpm-lock.yaml
+      - name: Install locked Next.js dependencies
+        working-directory: apps/web
+        run: pnpm install --frozen-lockfile
+      - name: Generate Prisma client
+        working-directory: apps/web
+        run: pnpm exec prisma generate
+      - name: Check Next.js TypeScript
+        working-directory: apps/web
+        run: pnpm type-check
+      - name: Test alpha, source gates and existing exchange
+        working-directory: apps/web
+        run: |
+          pnpm exec vitest run \
+            tests/marketplace-closed-alpha-model.test.ts \
+            tests/marketplace-closed-alpha-ui.test.tsx \
+            tests/marketplace-exchange-model.test.ts \
+            tests/marketplace-exchange-ui.test.tsx
+      - name: Lint closed-alpha implementation
+        working-directory: apps/web
+        env:
+          ESLINT_CI_LIGHT: "1"
+        run: |
+          pnpm exec eslint \
+            lib/marketplace/alpha/web-alpha-model.ts \
+            lib/marketplace/alpha/web-alpha-access.ts \
+            lib/marketplace/alpha/open-beta-source-contract.ts \
+            components/marketplace/alpha/MarketplaceAlphaWeb.tsx \
+            "app/marketplace/(design-preview)/design-lab/closed-alpha/layout.tsx" \
+            "app/marketplace/(design-preview)/design-lab/closed-alpha/page.tsx" \
+            app/api/marketplace/open-beta/catalogue/route.ts \
+            tests/marketplace-closed-alpha-model.test.ts \
+            tests/marketplace-closed-alpha-ui.test.tsx --max-warnings 0
+
+  electron:
+    name: Electron desktop TypeScript and security policy
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Install desktop TypeScript dependencies without native install scripts
+        working-directory: apps/marketplace-desktop
+        run: npm install --ignore-scripts --no-audit --no-fund
+      - name: Check desktop TypeScript
+        working-directory: apps/marketplace-desktop
+        run: npm run typecheck
+      - name: Compile desktop shell
+        working-directory: apps/marketplace-desktop
+        run: npm run build
+      - name: Test navigation and origin restrictions
+        working-directory: apps/marketplace-desktop
+        run: npm run test:policy
