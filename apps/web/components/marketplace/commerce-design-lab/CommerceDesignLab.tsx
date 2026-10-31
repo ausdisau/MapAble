@@ -11,6 +11,7 @@ import {
   MessageSquareText, Package, Search, ShieldAlert, ShoppingBag,
   SlidersHorizontal, Wrench, X,
 } from "lucide-react";
+import Link from "next/link";
 import { useMemo, useState, type FormEvent } from "react";
 
 import {
@@ -534,6 +535,12 @@ export function CommerceDesignLab() {
           Synthetic design preview — not a live shop. No real products, providers, stock,
           sales, bookings, NDIS funding decisions or payments.
         </p>
+        <Link
+          href="/marketplace/design-lab/exchange"
+          className="mt-5 inline-flex min-h-11 items-center rounded-xl border border-white bg-white px-5 py-3 text-sm font-extrabold text-[#073F97] underline-offset-4 hover:bg-[#edf3ff] focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#f9a54a]"
+        >
+          Explore the buyer–seller exchange prototype
+        </Link>
       </div>
       <ShoppingBag aria-hidden="true"
         className="absolute -right-8 top-2 h-52 w-52 rotate-[-16deg] text-white/10"/>

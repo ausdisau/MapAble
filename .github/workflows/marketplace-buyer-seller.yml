@@ -1,0 +1,61 @@
+name: Marketplace buyer-seller exchange research
+
+on:
+  pull_request:
+    paths:
+      - "apps/web/lib/marketplace/dual-sided/**"
+      - "apps/web/components/marketplace/dual-sided/**"
+      - "apps/web/components/marketplace/commerce-design-lab/CommerceDesignLab.tsx"
+      - "apps/web/app/marketplace/(design-preview)/design-lab/exchange/**"
+      - "apps/web/tests/marketplace-exchange-*"
+      - "apps/web/docs/commerce/buyer-seller-exchange.md"
+      - ".github/workflows/marketplace-buyer-seller.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  exchange:
+    name: Two-sided state policy, interaction, type and lint checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.12.1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: apps/web/pnpm-lock.yaml
+      - name: Install web dependencies
+        working-directory: apps/web
+        run: pnpm install --frozen-lockfile
+      - name: Generate Prisma client
+        working-directory: apps/web
+        run: pnpm exec prisma generate
+      - name: Full web TypeScript check
+        working-directory: apps/web
+        run: pnpm type-check
+      - name: Two-sided policy and accessible interaction tests
+        working-directory: apps/web
+        run: |
+          pnpm exec vitest run \
+            tests/marketplace-exchange-model.test.ts \
+            tests/marketplace-exchange-ui.test.tsx \
+            tests/commerce-design-lab-model.test.ts \
+            tests/commerce-design-lab-ui.test.tsx
+      - name: Focused ESLint
+        working-directory: apps/web
+        env:
+          ESLINT_CI_LIGHT: "1"
+        run: |
+          pnpm exec eslint \
+            lib/marketplace/dual-sided/exchange-model.ts \
+            components/marketplace/dual-sided/ExchangeWorkspace.tsx \
+            components/marketplace/commerce-design-lab/CommerceDesignLab.tsx \
+            "app/marketplace/(design-preview)/design-lab/exchange/page.tsx" \
+            tests/marketplace-exchange-model.test.ts \
+            tests/marketplace-exchange-ui.test.tsx --max-warnings 0
