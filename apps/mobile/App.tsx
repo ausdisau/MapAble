@@ -14,6 +14,7 @@ import { createStaticNavigation } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import { MobileIdentityCard } from './src/components/MobileIdentityCard';
+import { MarketplaceAlphaScreen } from './src/components/MarketplaceAlphaScreen';
 import {
   isMapAbleApiConfigured,
   searchMapAblePlaces,
@@ -517,6 +518,7 @@ const Tabs = createBottomTabNavigator({
     Home: HomeScreen,
     Indy: IndyScreen,
     More: MoreScreen,
+    ...(process.env.EXPO_PUBLIC_MAPABLE_MARKETPLACE_ALPHA === 'true' ? { Marketplace: MarketplaceAlphaScreen } : {}),
   },
 });
 
