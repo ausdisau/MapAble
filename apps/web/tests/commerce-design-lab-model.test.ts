@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { isCommerceDesignLabEnabled } from "@/lib/marketplace/design-lab-gate";
 
+import { isCommerceDesignLabEnabled } from "@/lib/marketplace/design-lab-gate";
 import {
   COMMERCE_LAB_OFFERS,
   addPlanningLine,
