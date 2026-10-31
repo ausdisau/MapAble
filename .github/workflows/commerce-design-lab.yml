@@ -1,0 +1,54 @@
+name: Commerce design lab scaffold
+
+on:
+  pull_request:
+    paths:
+      - "apps/web/lib/marketplace/design-lab-model.ts"
+      - "apps/web/components/marketplace/commerce-design-lab/**"
+      - "apps/web/app/marketplace/(shop)/browse/design-lab/**"
+      - "apps/web/app/marketplace/(shop)/layout.tsx"
+      - "apps/web/tests/commerce-design-lab-*"
+      - ".github/workflows/commerce-design-lab.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  scaffold:
+    name: Scoped model, React interaction and lint checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.12.1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: apps/web/pnpm-lock.yaml
+      - name: Install locked web dependencies
+        working-directory: apps/web
+        run: pnpm install --frozen-lockfile
+      - name: Generate client
+        working-directory: apps/web
+        run: pnpm exec prisma generate
+      - name: Web TypeScript
+        working-directory: apps/web
+        run: pnpm type-check
+      - name: Test synthetic domain and accessible UI interactions
+        working-directory: apps/web
+        run: pnpm exec vitest run tests/commerce-design-lab-model.test.ts tests/commerce-design-lab-ui.test.tsx
+      - name: Scoped lint
+        working-directory: apps/web
+        env:
+          ESLINT_CI_LIGHT: "1"
+        run: |
+          pnpm exec eslint \
+            lib/marketplace/design-lab-model.ts \
+            components/marketplace/commerce-design-lab/CommerceDesignLab.tsx \
+            "app/marketplace/(shop)/browse/design-lab/page.tsx" \
+            tests/commerce-design-lab-model.test.ts \
+            tests/commerce-design-lab-ui.test.tsx --max-warnings 0
