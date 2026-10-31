@@ -5,13 +5,13 @@
  * No request to a commerce, payment, supplier, NDIS or account API occurs here.
  * View choice is not authentication or delegated authority.
  */
-import { useMemo, useState, type FormEvent } from "react";
 import {
   Accessibility, ArrowRight, BookOpen, Check, ClipboardList, Download,
   FileText, HandHelping, Headphones, Keyboard, LayoutGrid, List,
   MessageSquareText, Package, Search, ShieldAlert, ShoppingBag,
   SlidersHorizontal, Wrench, X,
 } from "lucide-react";
+import { useMemo, useState, type FormEvent } from "react";
 
 import {
   CATEGORY_LABELS, COMMERCE_LAB_OFFERS, EXEMPLAR_PATTERN, KIND_LABELS,
