@@ -14,7 +14,9 @@
     "dev:mobile:tunnel": "npm --prefix apps/mobile run start:tunnel",
     "mobile:web": "npm --prefix apps/mobile run web",
     "build:mobile-web": "npm --prefix apps/mobile run build:web",
-    "typecheck:mobile": "npm --prefix apps/mobile run typecheck"
+    "typecheck:mobile": "npm --prefix apps/mobile run typecheck",
+    "dev:workspace": "node tools/workspace-router/server.mjs",
+    "test:workspace": "node --test tools/workspace-router/*.test.mjs"
   },
   "packageManager": "pnpm@10.12.1"
 }
