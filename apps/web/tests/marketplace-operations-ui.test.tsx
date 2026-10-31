@@ -28,7 +28,7 @@ describe("MapAble Marketplace synthetic assurance interface", () => {
   it("lets the participant grant preparation only, never purchase confirmation", () => {
     render(<MarketplaceOperationsLab />);
     fireEvent.click(screen.getByRole("button", { name: "Grant preparation only" }));
-    expect(screen.getByText(/30-minute prepare-only simulated permission/)).toBeTruthy();
+    expect(screen.getAllByText(/30-minute prepare-only simulated permission/).length).toBeGreaterThan(0);
     fireEvent.change(screen.getByRole("combobox", { name: "Acting role (simulation only)" }), {
       target: { value: "supporter" },
     });

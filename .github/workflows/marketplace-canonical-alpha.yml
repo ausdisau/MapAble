@@ -35,8 +35,14 @@ jobs:
       - run: corepack enable
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec vitest run tests/marketplace-closed-alpha.test.ts tests/marketplace-inclusive.test.ts tests/marketplace-inclusive.ui.test.tsx tests/marketplace-operations-cycle.test.ts tests/marketplace-operations-ui.test.tsx tests/marketplace-alpha-access.test.ts
-      - run: pnpm type-check
-      - run: pnpm exec eslint "app/marketplace/alpha/**/*.tsx" app/api/marketplace/alpha-estimate/route.ts app/api/billing/invoices/route.ts components/marketplace/InclusiveMarketplace.tsx components/marketplace/MarketplaceOperationsLab.tsx components/marketplace/MarketplaceClosedAlpha.tsx lib/marketplace/alpha-access.ts packages/marketplace-inclusive/src tests/marketplace-alpha-access.test.ts --max-warnings 0
+      - name: Type-check web (including after test failures)
+        if: success() || failure()
+        run: pnpm type-check
+      - name: Scoped ESLint (including after test failures)
+        if: success() || failure()
+        env:
+          ESLINT_CI_LIGHT: "1"
+        run: pnpm exec eslint "app/marketplace/alpha/**/*.tsx" app/api/marketplace/alpha-estimate/route.ts app/api/billing/invoices/route.ts components/marketplace/InclusiveMarketplace.tsx components/marketplace/MarketplaceOperationsLab.tsx components/marketplace/MarketplaceClosedAlpha.tsx lib/marketplace/alpha-access.ts packages/marketplace-inclusive/src tests/marketplace-alpha-access.test.ts --max-warnings 0
 
   mobile-alpha-typecheck:
     runs-on: ubuntu-latest

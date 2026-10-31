@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-import { getApiUser } from "@/lib/auth/guards";
 import { jsonError, zodErrorResponse } from "@/lib/api/response";
+import { getApiUser } from "@/lib/auth/guards";
 import {
   alphaGateFromEnvironment,
   canAccessMarketplaceAlpha,
