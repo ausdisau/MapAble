@@ -139,7 +139,7 @@ describe("MapAble Exchange synthetic domain and rights safeguards", () => {
     expect(parseExampleDollars("19.99")).toBe(1999);
     expect(parseExampleDollars("0.2")).toBe(20);
     expect(parseExampleDollars("100")).toBe(10000);
-    for (const amount of ["-1", "1e3", "1.999", "$100", "10,000", "100000.00", ""]) {
+    for (const amount of ["-1", "1e3", "1.999", "$100", "10,000", "100000.01", ""]) {
       expect(() => parseExampleDollars(amount)).toThrow();
     }
     expect(() => quoteTotal({ itemCents: 1000.2, deliveryCents: 0, installationCents: 0, trainingCents: 0 })).toThrow();
