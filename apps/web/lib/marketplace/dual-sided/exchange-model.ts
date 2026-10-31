@@ -242,7 +242,8 @@ export function getVisibleRequests(
   const role = DEMO_ACTORS[actorId].role;
   return state.requests.filter((request) => request.status !== "closed" &&
     grantValid(request, actorId, role === "advisor" ? "advice" :
-      role === "coordinator" ? "support" : "quote", today));
+      role === "coordinator" ? "support" : "quote", today))
+    .map((request) => ({ ...request, grants: [] })); // redact other recipients' grant metadata
 }
 export function getVisibleQuotes(
   state: ExchangeState, request: ExchangeRequest, actorId: ExchangeActorId, today: string,
