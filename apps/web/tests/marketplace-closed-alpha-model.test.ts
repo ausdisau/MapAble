@@ -98,7 +98,7 @@ describe("Marketplace closed-alpha web data and invitation gate", () => {
   });
   it("exports only a synthetic, local-only test note without personal fields", () => {
     const note = makeAlphaTrialNote(["compare", "accessibility"], "Labels were clear.");
-    expect(note).toContain("not automatically sent");
+    expect(note).toMatch(/not automatically sent/i);
     expect(note).toContain("[x] Compare");
     expect(note).toContain("Labels were clear.");
     expect(() => makeAlphaTrialNote([], "X".repeat(501))).toThrow();

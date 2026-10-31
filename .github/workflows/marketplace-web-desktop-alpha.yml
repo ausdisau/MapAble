@@ -39,6 +39,8 @@ jobs:
         run: pnpm exec prisma generate
       - name: Check Next.js TypeScript
         working-directory: apps/web
+        env:
+          NODE_OPTIONS: "--max-old-space-size=4096"
         run: pnpm type-check
       - name: Test alpha, source gates and existing exchange
         working-directory: apps/web
