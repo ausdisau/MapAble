@@ -119,7 +119,9 @@ describe("MapAble Exchange synthetic domain and rights safeguards", () => {
     expect(state.quotes[0].totalCents).toBe(9900);
     expect(state.quotes[0].status).toBe("proposed");
     expect(state.quotes[0].fundingStatus).toBe("not_assessed");
-    expect(getVisibleQuotes(state, state.requests[0], "supplierBlue", TODAY)).toHaveLength(1);
+    const projected = getVisibleRequests(state, "supplierBlue", TODAY)[0];
+    expect(projected.grants).toEqual([]);
+    expect(getVisibleQuotes(state, projected, "supplierBlue", TODAY)).toHaveLength(1);
     expect(getVisibleQuotes(state, state.requests[0], "coordinator", TODAY)).toHaveLength(0);
   });
 
@@ -174,7 +176,9 @@ describe("MapAble Exchange synthetic domain and rights safeguards", () => {
       text: "A qualified clinical assessment and trial would need to be arranged.",
     });
     expect(state.advice[0].evidenceStatus).toBe("simulation_only_not_a_clinical_assessment");
-    expect(getVisibleAdvice(state, state.requests[0], "independentAdvisor", TODAY)).toHaveLength(1);
+    const projected = getVisibleRequests(state, "independentAdvisor", TODAY)[0];
+    expect(projected.grants).toEqual([]);
+    expect(getVisibleAdvice(state, projected, "independentAdvisor", TODAY)).toHaveLength(1);
     expect(getVisibleAdvice(state, state.requests[0], "supplierBlue", TODAY)).toHaveLength(0);
     expect(() => apply(withAdvisor, {
       type: "add_advice", actorId: "supplierBlue", requestId: "request-1",
@@ -193,6 +197,9 @@ describe("MapAble Exchange synthetic domain and rights safeguards", () => {
     });
     expect(helped.supportNotes[0].authority).toBe("assistance_only_no_purchase_authority");
     expect(getVisibleSupportNotes(helped, helped.requests[0], "participant", TODAY)).toHaveLength(1);
+    const projected = getVisibleRequests(helped, "coordinator", TODAY)[0];
+    expect(projected.grants).toEqual([]);
+    expect(getVisibleSupportNotes(helped, projected, "coordinator", TODAY)).toHaveLength(1);
     expect(getVisibleQuotes(helped, helped.requests[0], "coordinator", TODAY)).toHaveLength(0);
     expect(() => apply(helped, {
       type: "close_request", actorId: "coordinator", requestId: "request-1",
