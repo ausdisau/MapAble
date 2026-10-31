@@ -33,7 +33,7 @@ describe("MapAble web and desktop closed-alpha experience", () => {
     }));
     expect(screen.getByText(/Example saved privately/)).toBeTruthy();
     expect(screen.getByText(/Stripe and checkout disabled/)).toBeTruthy();
-    expect(screen.getByText("$28.00")).toBeTruthy();
+    expect(screen.getAllByText("$28.00").length).toBeGreaterThan(0);
   });
   it("compares a lower-risk option with specialist equipment without selling it", () => {
     render(<MarketplaceAlphaWeb />);
