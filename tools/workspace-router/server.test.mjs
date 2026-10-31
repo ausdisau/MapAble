@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { request as rawHttpRequest } from "node:http";
 
 import {
   APP_TARGETS, cleanLog, runnerCommand, validatedSearchQuery, workspacePort,
@@ -38,11 +39,27 @@ test("serves an honest dashboard with no CORS and a restrictive CSP", async (t) 
   assert.doesNotMatch(html, /__MAPABLE_ROUTER_TOKEN__/);
   assert.match(page.headers.get("content-security-policy"), /default-src 'none'/);
   assert.equal(page.headers.get("access-control-allow-origin"), null);
-  const invalidHost = await fetch(origin + "/api/state", { headers: {
-    Host: "untrusted.example",
-    "X-Workspace-Token": router.token,
-  }});
-  assert.equal(invalidHost.status, 403);
+  // The Fetch API controls Host itself; use a raw Node HTTP request to
+  // exercise actual DNS-rebinding Host validation.
+  const target = new URL(origin);
+  const hostileStatus = await new Promise((resolve, reject) => {
+    const req = rawHttpRequest({
+      host: target.hostname,
+      port: Number(target.port),
+      path: "/api/state",
+      method: "GET",
+      headers: {
+        Host: "untrusted.example",
+        "X-Workspace-Token": router.token,
+      },
+    }, (incoming) => {
+      incoming.resume();
+      incoming.on("end", () => resolve(incoming.statusCode));
+    });
+    req.on("error", reject);
+    req.end();
+  });
+  assert.equal(hostileStatus, 403);
 });
 
 test("requires local token for data and origin for mutating controls", async (t) => {
