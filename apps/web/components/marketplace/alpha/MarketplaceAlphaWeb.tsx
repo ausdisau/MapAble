@@ -110,6 +110,7 @@ function AlphaProductCard({
   </article>;
 }
 
+/* eslint-disable jsx-a11y/no-noninteractive-tabindex -- Scrollable comparison region must be keyboard focusable at high zoom. */
 function ComparePanel({
   ids, onRemove,
 }: { ids: readonly string[]; onRemove: (id: string) => void }) {
@@ -165,6 +166,7 @@ function ComparePanel({
   </section>;
 }
 
+/* eslint-enable jsx-a11y/no-noninteractive-tabindex */
 function TesterPanel() {
   const [completed, setCompleted] = useState<AlphaTrialTask[]>([]);
   const [observation, setObservation] = useState("");
