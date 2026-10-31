@@ -1,15 +1,15 @@
 import { describe, expect, it } from "vitest";
 
-import { isWebAlphaAllowed } from "@/lib/marketplace/alpha/web-alpha-access";
-import {
-  WEB_ALPHA_ITEMS, alphaPlanSubtotal, alphaWebFilter, makeAlphaTrialNote,
-  toggleCompareItem, togglePlanningItem,
-} from "@/lib/marketplace/alpha/web-alpha-model";
 import {
   BETA_CONNECTED_ADAPTERS, BETA_PUBLISHED_RECORDS, BETA_SOURCE_REGISTRY,
   publishExternalReadOnlyCandidate, resolveBetaPhase,
   type BetaFlags, type BetaPublicationReview, type ExternalCandidate,
 } from "@/lib/marketplace/alpha/open-beta-source-contract";
+import { isWebAlphaAllowed } from "@/lib/marketplace/alpha/web-alpha-access";
+import {
+  WEB_ALPHA_ITEMS, alphaPlanSubtotal, alphaWebFilter, makeAlphaTrialNote,
+  toggleCompareItem, togglePlanningItem,
+} from "@/lib/marketplace/alpha/web-alpha-model";
 
 const ALLOWED = {
   MAPABLE_MARKETPLACE_WEB_ALPHA_ENABLED: "true",

@@ -132,6 +132,8 @@ function ComparePanel({
     <p className="mt-2 text-[#40526e]">
       No automatic suitability scoring, paid ranking or prescriber endorsement.
     </p>
+    {/* Keyboard focus is necessary to scroll this table horizontally at high zoom. */}
+    {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
     <div className="mt-5 overflow-x-auto rounded-xl border border-[#cbd8ea]"
       role="region" aria-label="Scrollable example comparison table" tabIndex={0}>
       <table className="min-w-[560px] w-full border-collapse text-left text-sm">
