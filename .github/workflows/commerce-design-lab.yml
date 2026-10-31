@@ -37,6 +37,8 @@ jobs:
         run: pnpm exec prisma generate
       - name: Web TypeScript
         working-directory: apps/web
+        env:
+          NODE_OPTIONS: "--max-old-space-size=4096"
         run: pnpm type-check
       - name: Test synthetic domain and accessible UI interactions
         working-directory: apps/web
