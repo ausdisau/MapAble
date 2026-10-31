@@ -38,10 +38,10 @@ const views: ReadonlyArray<{ id: View; label: string }> = [
 ];
 
 const panel = "rounded-2xl border border-[#c7d6eb] bg-white p-5 shadow-sm sm:p-6";
-const button = "inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-[#073F97] px-4 py-2 text-sm font-bold text-[#073F97] hover:bg-[#e8f2ff] focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#f07b2e] disabled:cursor-not-allowed disabled:opacity-50";
+const button = "inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-[#073F97] px-4 py-2 text-sm font-bold text-[#073F97] hover:bg-[#e8f2ff] focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#963D07] disabled:cursor-not-allowed disabled:opacity-50";
 const primary = button + " bg-[#073F97] text-white hover:bg-[#092c6f]";
 const warning = "rounded-xl border border-[#c79963] bg-[#fff4e7] p-4 text-sm text-[#5f3309]";
-const input = "mt-1 block min-h-11 w-full rounded-xl border border-[#7c8da7] bg-white px-3 py-2 text-[#111d35] focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#f07b2e]";
+const input = "mt-1 block min-h-11 w-full rounded-xl border border-[#7c8da7] bg-white px-3 py-2 text-[#111d35] focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#963D07]";
 const label = "block text-sm font-semibold text-[#283955]";
 const actorNames: Record<ExchangeActorId, string> = Object.fromEntries(
   Object.entries(DEMO_ACTORS).map(([key, entry]) => [key, entry.name]),
@@ -164,7 +164,7 @@ function BuyerRequest({
     <section aria-labelledby={"grants-" + request.id} className="rounded-xl border border-[#dce3f0] p-4">
       <h4 id={"grants-" + request.id} className="font-extrabold">Who can view this example enquiry?</h4>
       <p className="mt-1 text-sm text-[#40516d]">
-        You control each time-limited share. Suppliers see this request's general description only;
+        You control each time-limited share. Suppliers see this request&apos;s general description only;
         advisors and coordinators have different scopes. No clinical records are shared.
       </p>
       <div className="mt-3 flex flex-wrap gap-2">
@@ -358,7 +358,7 @@ function SellerWorkspace({
       return <article key={request.id} className={panel + " space-y-3"}>
         <p className="text-xs font-bold text-[#5840a7]">{request.id} · Access granted, time-limited</p>
         <h3 className="text-xl font-extrabold">{offer.title}</h3>
-        <p className="text-sm text-[#40516d]">Participant's example question: {request.goal}</p>
+        <p className="text-sm text-[#40516d]">Participant&apos;s example question: {request.goal}</p>
         <p className="text-sm">Product evidence: <strong>unknown</strong>. Never infer clinical fit.</p>
         {quotes.map((quote) => <div key={quote.id} className="rounded-xl border border-[#ccd8e9] p-3">
           <p className="font-bold">{quote.id} — {quote.status}</p>
@@ -474,7 +474,7 @@ function ActivityHistory({ state }: { state: ExchangeState }) {
     </div>
     <p className="mt-2 text-[#40516d]">
       In-memory event history for this fictitious scenario. Summaries deliberately
-      omit the participant's questions and advisor notes. This is not a permanent
+      omit the participant&apos;s questions and advisor notes. This is not a permanent
       audit log, a legal record or independent evidence of consent.
     </p>
     <ol className="mt-5 space-y-3" aria-label="Synthetic exchange events">

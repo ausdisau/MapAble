@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { getCommerceOffer } from "@/lib/marketplace/design-lab-model";
 import {
   EMPTY_EXCHANGE, applyExchangeCommand, atCostBand, formatExampleDay,
   getVisibleAdvice, getVisibleQuotes, getVisibleRequests,
@@ -7,7 +8,6 @@ import {
   quoteTotal, sellerCanOffer,
   type ExchangeCommand, type ExchangeIntent, type ExchangeState,
 } from "@/lib/marketplace/dual-sided/exchange-model";
-import { getCommerceOffer } from "@/lib/marketplace/design-lab-model";
 
 const TODAY = "2026-10-31";
 function apply(state: ExchangeState, intent: ExchangeIntent, commandId?: string, today = TODAY): ExchangeState {

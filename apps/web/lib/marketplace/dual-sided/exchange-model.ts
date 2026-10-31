@@ -9,7 +9,6 @@
  * verified credential, message delivery, invoice, booking or seller approval.
  */
 import {
-  COMMERCE_LAB_OFFERS,
   getCommerceOffer,
   type CommerceOffer,
 } from "@/lib/marketplace/design-lab-model";
