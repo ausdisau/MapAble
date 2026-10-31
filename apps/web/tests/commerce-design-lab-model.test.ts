@@ -15,9 +15,9 @@ import {
 
 describe("MapAble commerce design lab: reference-driven domain", () => {
   it("uses its own default-off gate without enabling commerce checkout", () => {
-    expect(isCommerceDesignLabEnabled({})).toBe(false);
-    expect(isCommerceDesignLabEnabled({ MAPABLE_COMMERCE_DESIGN_LAB_ENABLED: "false" })).toBe(false);
-    expect(isCommerceDesignLabEnabled({ MAPABLE_COMMERCE_DESIGN_LAB_ENABLED: "true" })).toBe(true);
+    expect(isCommerceDesignLabEnabled("")).toBe(false);
+    expect(isCommerceDesignLabEnabled("false")).toBe(false);
+    expect(isCommerceDesignLabEnabled("true")).toBe(true);
   });
 
   it("only contains synthetic sellers and unverified evidence", () => {
