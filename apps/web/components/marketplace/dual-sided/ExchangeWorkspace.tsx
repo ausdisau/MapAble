@@ -48,7 +48,7 @@ const actorNames: Record<ExchangeActorId, string> = Object.fromEntries(
 ) as Record<ExchangeActorId, string>;
 
 function CostEvidence({ offer, quote }: { offer: CommerceOffer; quote: ExchangeQuote }) {
-  const band = atCostBand(quote.totalCents);
+  const band = atCostBand(quote.parts.itemCents);
   const classification = offer.kind === "service"
     ? "This is an illustrative service amount, not an NDIS claim or endorsed rate."
     : band === "high"
