@@ -149,13 +149,18 @@ function secureRecordUrl(value: string, domain: string): boolean {
 export function publishExternalReadOnlyCandidate(
   candidate: ExternalCandidate, review: BetaPublicationReview,
   flags: BetaFlags, nowISO: string,
+  reviewedRegistry: Readonly<Record<BetaSourceId, BetaSource>> = BETA_SOURCE_REGISTRY,
 ): ExternalPublishedListing {
   if (resolveBetaPhase(flags) !== "open-beta-readonly")
     throw new Error("External read-only publication is disabled.");
-  const source = BETA_SOURCE_REGISTRY[candidate.source];
+  const source = reviewedRegistry[candidate.source];
   if (!source || source.id !== review.sourceId ||
     source.classification !== candidate.claimedType)
     throw new Error("The source and record classification do not match.");
+  if (source.rightsStatus !== "approved")
+    throw new Error("The external source has not passed its licence gate.");
+  if (review.allowedDomain !== new URL(source.homepage).hostname)
+    throw new Error("The source domain is not approved.");
   if (!review.approvedByHuman || review.revocationActive ||
       !review.licenceDecisionId || !review.licenceDecisionId.trim() ||
       candidate.licenceDecisionId !== review.licenceDecisionId)
@@ -195,6 +200,17 @@ export function publishExternalReadOnlyCandidate(
       "NDIS registration currency, medical-device safety, stock or funding guarantee.",
     priceCents: null, verifiedSupplier: false, canPurchase: false,
   };
+}
+
+/** A proposed server-only ingestion interface; no adapters are implemented. */
+export interface OpenBetaSourceAdapter {
+  readonly sourceId: BetaSourceId;
+  readonly dataKind: BetaDataKind;
+  readonly rightsDecisionId: string;
+  loadCandidates(args: {
+    readonly signal: AbortSignal;
+    readonly maxRecords: number;
+  }): Promise<readonly ExternalCandidate[]>;
 }
 
 /** Both lists empty until a separately reviewed, audited source-ingestion PR. */

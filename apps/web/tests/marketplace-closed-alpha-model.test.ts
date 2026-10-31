@@ -43,6 +43,13 @@ const review: BetaPublicationReview = {
   approvedByHuman: true, revocationActive: false, maxAgeDays: 7,
 };
 const NOW = "2026-10-31T00:00:00.000Z";
+const APPROVED_SOURCES = {
+  ...BETA_SOURCE_REGISTRY,
+  "openstreetmap-places": {
+    ...BETA_SOURCE_REGISTRY["openstreetmap-places"],
+    rightsStatus: "approved" as const,
+  },
+};
 
 describe("Marketplace closed-alpha web data and invitation gate", () => {
   it("rejects absent, wildcard, wrong and unknown tester identity", () => {
@@ -116,12 +123,19 @@ describe("External data progression to open-beta is fail-closed", () => {
   });
   it("rejects an external record while any gate remains closed", () => {
     expect(() => publishExternalReadOnlyCandidate(record, review, {}, NOW)).toThrow(/disabled/);
+    expect(() => publishExternalReadOnlyCandidate(
+      record, review, BETA_ALLOWED, NOW,
+    )).toThrow(/licence gate/);
+    expect(() => publishExternalReadOnlyCandidate(
+      record, { ...review, allowedDomain: "unexpected.example" },
+      BETA_ALLOWED, NOW, APPROVED_SOURCES,
+    )).toThrow(/source domain/);
   });
   it("rejects unreviewed records, rights exceptions and forged source types", () => {
-    expect(() => publishExternalReadOnlyCandidate({ ...record, evidenceState: "external-unverified" }, review, BETA_ALLOWED, NOW)).toThrow();
-    expect(() => publishExternalReadOnlyCandidate(record, { ...review, revocationActive: true }, BETA_ALLOWED, NOW)).toThrow();
-    expect(() => publishExternalReadOnlyCandidate({ ...record, claimedType: "supplier-offer" }, review, BETA_ALLOWED, NOW)).toThrow();
-    expect(() => publishExternalReadOnlyCandidate({ ...record, licenceDecisionId: "wrong" }, review, BETA_ALLOWED, NOW)).toThrow();
+    expect(() => publishExternalReadOnlyCandidate({ ...record, evidenceState: "external-unverified" }, review, BETA_ALLOWED, NOW, APPROVED_SOURCES)).toThrow();
+    expect(() => publishExternalReadOnlyCandidate(record, { ...review, revocationActive: true }, BETA_ALLOWED, NOW, APPROVED_SOURCES)).toThrow();
+    expect(() => publishExternalReadOnlyCandidate({ ...record, claimedType: "supplier-offer" }, review, BETA_ALLOWED, NOW, APPROVED_SOURCES)).toThrow();
+    expect(() => publishExternalReadOnlyCandidate({ ...record, licenceDecisionId: "wrong" }, review, BETA_ALLOWED, NOW, APPROVED_SOURCES)).toThrow();
   });
   it("rejects cross-host, insecure, malformed and stale record URLs", () => {
     const urls = [
@@ -131,13 +145,13 @@ describe("External data progression to open-beta is fail-closed", () => {
       "javascript:alert(1)",
     ];
     for (const sourceUrl of urls) {
-      expect(() => publishExternalReadOnlyCandidate({ ...record, sourceUrl }, review, BETA_ALLOWED, NOW)).toThrow();
+      expect(() => publishExternalReadOnlyCandidate({ ...record, sourceUrl }, review, BETA_ALLOWED, NOW, APPROVED_SOURCES)).toThrow();
     }
     expect(() => publishExternalReadOnlyCandidate(record, review, BETA_ALLOWED,
-      "2027-01-01T00:00:00.000Z")).toThrow(/stale/);
+      "2027-01-01T00:00:00.000Z", APPROVED_SOURCES)).toThrow(/stale/);
   });
   it("permits only source-dated, read-only nonpayable directory evidence", () => {
-    const value = publishExternalReadOnlyCandidate(record, review, BETA_ALLOWED, NOW);
+    const value = publishExternalReadOnlyCandidate(record, review, BETA_ALLOWED, NOW, APPROVED_SOURCES);
     expect(value.id).toContain("openstreetmap-places");
     expect(value.kind).toBe("access-place");
     expect(value.priceCents).toBeNull();
