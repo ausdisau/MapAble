@@ -3,6 +3,7 @@ on:
   pull_request:
     paths:
       - "apps/mobile/App.tsx"
+      - "apps/mobile/env.d.ts"
       - "apps/mobile/src/components/MarketplaceAlphaScreen.tsx"
       - "apps/mobile/src/runtime/marketplaceAlpha.ts"
       - ".github/workflows/marketplace-mobile-alpha.yml"
