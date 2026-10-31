@@ -9,8 +9,8 @@ export default function MarketplaceCartPage() {
       <header>
         <h1 className="font-heading text-2xl font-bold">Your cart</h1>
         <p className="text-muted-foreground">
-          Review items before creating a billing invoice. Payment continues in the billing
-          centre.
+          Example cart only. Checkout and invoice creation are disabled pending
+          secure server-authoritative pricing, seller verification and release approval.
         </p>
       </header>
       <MarketplaceCartClient products={MARKETPLACE_CATALOG} />

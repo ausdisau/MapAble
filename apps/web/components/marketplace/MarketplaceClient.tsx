@@ -138,9 +138,6 @@ export function MarketplaceCartClient({
   products: MarketplaceProduct[];
 }) {
   const [cart, setCart] = useState<MarketplaceCartItem[]>([]);
-  const [busy, setBusy] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
-
   useEffect(() => {
     setCart(readMarketplaceCart());
     function sync() {
@@ -163,44 +160,11 @@ export function MarketplaceCartClient({
     0,
   );
 
-  async function checkout() {
-    if (lines.length === 0) return;
-    setBusy(true);
-    setMessage(null);
-    try {
-      const res = await fetch("/api/billing/invoices", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          serviceType: "marketplace",
-          lineItems: lines.map(({ item, product }) => ({
-            description: `${product.name} — ${product.sellerName}`,
-            quantity: item.quantity,
-            unitAmountCents: product.priceCents,
-            gstApplicable: product.gstApplicable,
-            ndisLineItem: product.ndisSupportItemCode,
-            metadata: { productId: product.id, slug: product.slug },
-          })),
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        setMessage(data.error ?? "Could not create order.");
-        setBusy(false);
-        return;
-      }
-      clearMarketplaceCart();
-      window.location.href = `/dashboard/billing/invoices/${data.invoice.id}`;
-    } catch {
-      setMessage("Checkout failed. Try again.");
-      setBusy(false);
-    }
-  }
 
   if (lines.length === 0) {
     return (
       <div className="rounded-xl border border-dashed p-8 text-center">
-        <p className="text-muted-foreground">Your cart is empty.</p>
+        <p className="text-muted-foreground">Your example cart is empty. Checkout is disabled.</p>
         <Link prefetch={false} href="/marketplace/browse" className="mt-3 inline-block text-primary underline">
           Browse products
         </Link>
@@ -243,23 +207,14 @@ export function MarketplaceCartClient({
       </ul>
       <div className="flex flex-wrap items-center justify-between gap-4">
         <p className="text-lg font-semibold">Total {formatMarketplacePrice(totalCents)}</p>
-        <button
-          type="button"
-          disabled={busy}
-          onClick={checkout}
-          className="inline-flex min-h-11 items-center rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-60 focus-visible:ring-2 focus-visible:ring-ring"
-        >
-          {busy ? "Creating order…" : "Create order & pay"}
-        </button>
+        <span className="rounded-xl border px-4 py-3 font-semibold" role="status">
+          Checkout disabled during the synthetic pilot
+        </span>
       </div>
-      {message ? (
-        <p className="text-sm text-destructive" role="alert">
-          {message}
-        </p>
-      ) : null}
       <p className="text-sm text-muted-foreground">
-        GST is calculated on checkout. NDIS plan-managed funding uses export instead of card
-        payment in the billing centre.
+        Amounts shown in this legacy demonstration are not payable and exclude verified GST,
+        delivery and seller evidence. Use the inclusive pilot to request an illustrative
+        server-calculated amount; it does not create an order or invoice.
       </p>
     </div>
   );
