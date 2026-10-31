@@ -58,6 +58,15 @@ describe("MapAble web and desktop closed-alpha experience", () => {
     expect(screen.getAllByRole("checkbox")).toHaveLength(5);
     expect(screen.getByRole("button", { name: "Save a local text note" })).toBeTruthy();
   });
+  it("shows read-only beta source readiness without a live data feed", () => {
+    render(<MarketplaceAlphaWeb />);
+    fireEvent.click(screen.getByRole("button", { name: "Data sources" }));
+    expect(screen.getByRole("heading", { name: "External data sources — not connected" })).toBeTruthy();
+    expect(screen.getByText(/0 approved live source adapters/)).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "NDIS Commission Provider Register" })).toBeTruthy();
+    expect(screen.queryByRole("button", { name: /import|activate feed|purchase/i })).toBeNull();
+  });
+
   it("connects the synthetic buyer/seller workspace without granting real roles", () => {
     render(<MarketplaceAlphaWeb />);
     fireEvent.click(screen.getByRole("button", { name: "Buyer–seller exchange" }));

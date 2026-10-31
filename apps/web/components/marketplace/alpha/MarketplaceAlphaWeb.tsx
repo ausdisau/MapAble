@@ -12,6 +12,7 @@ import {
 import { useState } from "react";
 
 import { ExchangeWorkspace } from "@/components/marketplace/dual-sided/ExchangeWorkspace";
+import { BETA_CONNECTED_ADAPTERS, BETA_SOURCE_REGISTRY } from "@/lib/marketplace/alpha/open-beta-source-contract";
 import {
   ALPHA_CLASSIFICATION_SOURCES, ALPHA_TRIAL_TASKS, WEB_ALPHA_ITEMS,
   alphaItem, alphaMoney, alphaPlanSubtotal, alphaWebFilter,
@@ -19,12 +20,13 @@ import {
   type AlphaItem, type AlphaRiskFilter, type AlphaTrialTask,
 } from "@/lib/marketplace/alpha/web-alpha-model";
 
-type View = "catalogue" | "compare" | "exchange" | "testing";
+type View = "catalogue" | "compare" | "exchange" | "testing" | "sources";
 const sections: Array<{ id: View; label: string }> = [
   { id: "catalogue", label: "Catalogue" },
   { id: "compare", label: "Compare" },
   { id: "exchange", label: "Buyer–seller exchange" },
   { id: "testing", label: "Alpha testing" },
+  { id: "sources", label: "Data sources" },
 ];
 const control = "inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-[#123D89] " +
   "px-4 py-2 text-sm font-bold text-[#123D89] hover:bg-[#eaf1ff] " +
@@ -230,6 +232,46 @@ function TesterPanel() {
   </section>;
 }
 
+function DataSourcesPanel() {
+  const sources = Object.values(BETA_SOURCE_REGISTRY);
+  return <section className={panel + " space-y-5"} aria-labelledby="source-panel-heading">
+    <div>
+      <p className="text-xs font-bold uppercase tracking-wide text-[#6243a8]">
+        Open beta transition · planning and evidence
+      </p>
+      <h2 id="source-panel-heading" className="mt-1 text-2xl font-extrabold">
+        External data sources — not connected
+      </h2>
+      <p className="mt-2 text-[#40526e]">
+        The closed alpha uses fictional products. In a separately approved open beta,
+        externally sourced information would be labelled with its origin, licence,
+        date, review status and correction route. A public record is not a verified seller.
+      </p>
+      <p className="mt-3 rounded-xl bg-[#fff3e5] p-3 text-sm font-bold text-[#6f3c0e]">
+        {BETA_CONNECTED_ADAPTERS.length} approved live source adapters.
+        No external data imports, sales or supplier onboarding are enabled.
+      </p>
+    </div>
+    <ul className="grid list-none gap-3 p-0 md:grid-cols-2">
+      {sources.map((source) => <li key={source.id}
+        className="rounded-xl border border-[#cad9ec] bg-[#f8faff] p-4">
+        <h3 className="font-extrabold text-[#123D89]">{source.label}</h3>
+        <p className="mt-2 text-sm text-[#40526e]">Dataset type: {source.classification}</p>
+        <p className="mt-2 text-sm text-[#40526e]">Rights: {source.rights}</p>
+        <p className="mt-2 text-sm font-bold text-[#6f3c0e]">
+          Licence status: {source.rightsStatus.replace("-", " ")}
+        </p>
+        <p className="mt-2 text-xs text-[#52607a]">Directory evidence only; not available for checkout.</p>
+      </li>)}
+    </ul>
+    <p className="text-sm text-[#40526e]">
+      Before any live feed: require explicit licence, privacy and security approvals,
+      dated source snapshots, human moderation, accessible corrections and a
+      reversible read-only beta release. Supplier prices and payments require separate approval.
+    </p>
+  </section>;
+}
+
 export function MarketplaceAlphaWeb() {
   const [view, setView] = useState<View>("catalogue");
   const [query, setQuery] = useState("");
@@ -394,6 +436,7 @@ export function MarketplaceAlphaWeb() {
     {view === "compare" ? <ComparePanel ids={compared} onRemove={compareItem}/> : null}
     {view === "exchange" ? <ExchangeWorkspace/> : null}
     {view === "testing" ? <TesterPanel/> : null}
+    {view === "sources" ? <DataSourcesPanel/> : null}
 
     <div className="flex items-start gap-3 rounded-2xl border border-[#e4c59e] bg-[#fff4e6] p-4">
       <ShieldAlert aria-hidden="true" className="h-6 w-6 shrink-0 text-[#864708]"/>
