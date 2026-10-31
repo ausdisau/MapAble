@@ -250,7 +250,7 @@ export function getVisibleQuotes(
 ): ExchangeQuote[] {
   const role = actorFor(actorId).role;
   if (actorId === "participant") return state.quotes.filter((quote) => quote.requestId === request.id);
-  if ((role === "supplier" || role === "provider") && grantValid(request, actorId, "quote", today))
+  if ((role === "supplier" || role === "provider") && grantValid(requestFor(state, request.id), actorId, "quote", today))
     return state.quotes.filter((quote) => quote.requestId === request.id && quote.sellerId === actorId);
   return []; // advisors/coordinators never see seller prices by default
 }
@@ -258,7 +258,7 @@ export function getVisibleAdvice(
   state: ExchangeState, request: ExchangeRequest, actorId: ExchangeActorId, today: string,
 ): ExchangeAdvice[] {
   if (actorId === "participant") return state.advice.filter((note) => note.requestId === request.id);
-  if (actorId === "independentAdvisor" && grantValid(request, actorId, "advice", today))
+  if (actorId === "independentAdvisor" && grantValid(requestFor(state, request.id), actorId, "advice", today))
     return state.advice.filter((note) => note.requestId === request.id && note.advisorId === actorId);
   return [];
 }
@@ -266,7 +266,7 @@ export function getVisibleSupportNotes(
   state: ExchangeState, request: ExchangeRequest, actorId: ExchangeActorId, today: string,
 ): ExchangeSupportNote[] {
   if (actorId === "participant") return state.supportNotes.filter((note) => note.requestId === request.id);
-  if (actorId === "coordinator" && grantValid(request, actorId, "support", today))
+  if (actorId === "coordinator" && grantValid(requestFor(state, request.id), actorId, "support", today))
     return state.supportNotes.filter((note) => note.requestId === request.id);
   return [];
 }
