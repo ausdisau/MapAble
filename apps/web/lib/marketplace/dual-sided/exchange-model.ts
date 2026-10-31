@@ -205,6 +205,17 @@ function findQuote(state: ExchangeState, requestId: string, quoteId: string): Ex
   ensure(quote, "This quotation does not belong to the enquiry.");
   return quote;
 }
+/** Strict text-to-cents conversion for sample quote entry, without float rounding. */
+export function parseExampleDollars(value: string): number {
+  ensure(typeof value === "string" && /^\d{1,6}(?:\.\d{1,2})?$/.test(value.trim()),
+    "Enter an amount such as 120 or 120.50 (no currency symbol).");
+  const [whole, fractional = ""] = value.trim().split(".");
+  const cents = Number(whole) * 100 + Number(fractional.padEnd(2, "0"));
+  ensure(Number.isSafeInteger(cents) && cents <= 10_000_000,
+    "This example amount is outside the permitted range.");
+  return cents;
+}
+
 export function quoteTotal(parts: QuoteParts): number {
   const values = [parts.itemCents, parts.deliveryCents, parts.installationCents, parts.trainingCents];
   ensure(values.every((value) => Number.isSafeInteger(value) && value >= 0 && value <= 10_000_000),
