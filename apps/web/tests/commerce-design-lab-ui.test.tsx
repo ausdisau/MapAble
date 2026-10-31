@@ -42,7 +42,7 @@ describe("MapAble commerce design lab: participant-facing UI", () => {
   it("supports independent comparison without determining suitability", () => {
     render(<CommerceDesignLab />);
     fireEvent.click(screen.getByRole("button", { name: "Compare: Easy-grip jar opener" }));
-    fireEvent.click(screen.getByRole("button", { name: "Compare" }));
+    fireEvent.click(screen.getByRole("button", { name: "Compare (1)" }));
     expect(screen.getByRole("heading", { name: "Side-by-side evidence" })).toBeTruthy();
     expect(screen.getByRole("table", { name: /Comparison of synthetic items/ })).toBeTruthy();
     expect(screen.getByText("Not assessed")).toBeTruthy();

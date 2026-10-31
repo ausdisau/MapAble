@@ -10,7 +10,7 @@ import {
   Accessibility, ArrowRight, BookOpen, Check, ClipboardList, Download,
   FileText, HandHelping, Headphones, Keyboard, LayoutGrid, List,
   MessageSquareText, Package, Search, ShieldAlert, ShoppingBag,
-  SlidersHorizontal, Store, Wrench, X,
+  SlidersHorizontal, Wrench, X,
 } from "lucide-react";
 
 import {
@@ -18,7 +18,7 @@ import {
   NEED_LABELS, ROUTE_LABELS, addPlanningLine, filterCommerceOffers,
   formatDemoPrice, getCommerceOffer, makePrivatePlanningNote,
   sellerConceptErrors, summaryOfPlanning, updatePlanningQuantity,
-  type AccessNeed, type CommerceOffer, type LabFilters, type OfferCategory,
+  type AccessNeed, type CommerceOffer, type OfferCategory,
   type OfferKind, type PlanningLine, type SellerConcept, type ShopperPerspective,
 } from "@/lib/marketplace/design-lab-model";
 
@@ -459,14 +459,14 @@ export function CommerceDesignLab() {
   const [compareIds, setCompareIds] = useState<string[]>([]);
   const [plan, setPlan] = useState<PlanningLine[]>([]);
   const [message, setMessage] = useState("Explore synthetic examples. No real checkout or seller contact.");
-  const filters: LabFilters = { search: searchText, category, kind, need, specialist, order };
-  const offers = useMemo(() => filterCommerceOffers(filters), [
-    searchText, category, kind, need, specialist, order,
-  ]);
+  const offers = useMemo(() => filterCommerceOffers({
+    search: searchText, category, kind, need, specialist, order,
+  }), [searchText, category, kind, need, specialist, order]);
 
   function planToggle(id: string) {
     try {
-      setPlan((current) => addPlanningLine(current, id));
+      const next = addPlanningLine(plan, id);
+      setPlan(next);
       setMessage(plan.some((line) => line.offerId === id)
         ? "Example removed from planning list."
         : "Example saved to your private planning list. Nothing was sent.");
@@ -476,7 +476,8 @@ export function CommerceDesignLab() {
   }
   function updateQuantity(id: string, amount: number) {
     try {
-      setPlan((current) => updatePlanningQuantity(current, id, amount));
+      const next = updatePlanningQuantity(plan, id, amount);
+      setPlan(next);
       setMessage("Planning quantity updated locally.");
     } catch (err) {
       setMessage(err instanceof Error ? err.message : "Invalid quantity.");
