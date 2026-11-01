@@ -223,6 +223,35 @@ class OpenBuildingsStageTest(unittest.TestCase):
         self.stage()
         self.assertFalse(Path(str(self.output) + ".lock").exists())
 
+    def test_qgis_cached_headerless_polygon_tile_respects_aoi_and_remains_research_only(self):
+        # QGIS Open Buildings Downloader 0.1.0 caches Google's original
+        # level-6 headerless tiles, not a clipped GeoPackage or GeoJSON.
+        inside = "POLYGON ((103.8317 1.3038, 103.8319 1.3038, 103.8319 1.3040, 103.8317 1.3040, 103.8317 1.3038))"
+        outside = "POLYGON ((103.8319 1.3040, 103.8321 1.3040, 103.8321 1.3042, 103.8319 1.3042, 103.8319 1.3040))"
+        self.write_gzip(
+            f'1.3039,103.8318,101.5,0.91,"{inside}",6PH57R3J+H5\n'
+            f'1.3041,103.8320,52.0,0.71,"{outside}",6PH57R3J+H6\n'
+        )
+        aoi = "POLYGON ((103.8316 1.3037,103.83185 1.3037,103.83185 1.30395,103.8316 1.30395,103.8316 1.3037))"
+        result = self.stage(data_type="polygons", headerless=True, aoi_wkt=aoi)
+        self.assertEqual(result["counts"]["read"], 2)
+        self.assertEqual(result["counts"]["staged"], 1)
+        self.assertEqual(result["counts"]["filteredForAoi"], 1)
+        self.assertEqual(self.features()[0]["geometry"]["type"], "Polygon")
+        self.assertFalse(self.features()[0]["properties"]["accessibilityVerified"])
+        self.assertFalse(self.features()[0]["properties"]["eligibleForRouting"])
+        self.assertIsNone(self.features()[0]["properties"]["physicalObservedAt"])
+
+    def test_qgis_both_mode_polygon_cache_must_not_be_staged_as_points_csv(self):
+        # GEOMETRY=2 reuses polygon tiles for both output layers. The file
+        # contains six columns and must not be silently parsed as a point tile.
+        poly = "POLYGON ((103.8317 1.3038,103.8319 1.3038,103.8319 1.3040,103.8317 1.3040,103.8317 1.3038))"
+        self.write_gzip(f'1.3039,103.8318,101.5,0.91,"{poly}",6PH57R3J+H5\n')
+        with self.assertRaisesRegex(module.StagingError, "columns"):
+            self.stage(data_type="points", headerless=True)
+        self.assertFalse(self.output.exists())
+        self.assertFalse(Path(str(self.output) + ".manifest.json").exists())
+
     def test_invalid_gzip_creates_no_files(self):
         self.input.write_bytes(b"not a gzip")
         with self.assertRaises(module.StagingError):
