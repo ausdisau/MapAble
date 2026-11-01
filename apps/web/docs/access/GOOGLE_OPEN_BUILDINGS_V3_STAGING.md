@@ -93,6 +93,54 @@ Do not cross-populate this content into `AccessObservationRecord` as `verified` 
 | Mixing ODbL/CC BY obligations without review | Licence and re-publication problems | Explicit licence selection, source records, steward/legal approval |
 | Sensitive humanitarian location disclosure | Protection, stigma or security risks | Separate area-level publication and safeguarding approval |
 
+## Optional QGIS Open Buildings Downloader interoperability (v0.1.0)
+
+The independently published **Open Buildings Downloader** QGIS plugin (package `open_buildings_downloader`) is an optional, human-operated way to acquire Google V3 data for this research pipeline. It is **not bundled, installed, invoked, or approved as a live feed** by MapAble.
+
+- Official QGIS listing: https://plugins.qgis.org/plugins/open_buildings_downloader/
+- Plugin source reviewed: https://github.com/ColdLabs/qgis-open-buildings/tree/808a8e412ad87fdd605194f19cea6d889b258491/open_buildings_downloader
+- Plugin software licence: **GPL-2.0-or-later**. The downloaded Google data remains dual-licensed under **CC BY 4.0 or ODbL 1.0**, with one explicit reuse pathway selected by the staging operator. Do not copy GPL plugin source into MapAble just to use its independent command-line interface.
+- The plugin declares **QGIS 3.38–4.99**, uses the registered Processing algorithm **`openbuildings:download`**, and exposes `EXTENT`, `AREA`, `GEOMETRY`, `MIN_CONFIDENCE`, `MAX_DOWNLOAD_MB`, `OUTPUT_POLYGONS` and `OUTPUT_POINTS`. `GEOMETRY=0` means polygons, `1` means points, and `2` means both.
+- The processing outputs are **GeoPackage/vector layers**, not the input CSV expected by this adapter. The plugin's **original cached V3 tiles**, however, are headerless CSV.gz in Google's original schema, which this adapter already supports. Only use a tile that a reviewer has permitted and scoped.
+- The plugin keeps a building if its **centroid** falls in the selected area; it does not clip the building polygon. Its cache stores **whole** S2-level-6 tiles (roughly 100 km across), not the selected area. A cached file may include records outside the requested AOI or even across borders. The adapter's `--country` field is **metadata only**, not a country-boundary check: always supply the approved AOI WKT when staging a whole tile.
+- The plugin limits **new download bytes**, default 2,000 MB, but cached files may still be large. Some polygon tiles are hundreds of MB. MapAble's offline staging adapter separately refuses inputs above 64 MiB by default and rejects more than 100,000 rows; **do not relax these controls without explicit data-steward/resource review**.
+
+### QGIS acquisition example (not executed by MapAble)
+
+In QGIS, install/enable the plugin from Plugins → Manage and Install Plugins, then confirm the Processing algorithm is registered. From a QGIS shell/profile, a bounded **illustrative** Singapore extent can be requested:
+
+```bash
+qgis_process run openbuildings:download -- \
+  EXTENT="103.80,103.95,1.25,1.35 [EPSG:4326]" \
+  GEOMETRY=2 MIN_CONFIDENCE=0.65 MAX_DOWNLOAD_MB=200 \
+  OUTPUT_POLYGONS="sgp_buildings.gpkg" \
+  OUTPUT_POINTS="sgp_centroids.gpkg"
+```
+
+The plugin may refuse the download if the intersecting full tiles exceed the 200 MB **new-download** cap. That is a safe outcome. It has not been run or installed on the user's device by this PR.
+
+After an authorised acquisition, identify a **single** actual cached tile in your QGIS profile. For `GEOMETRY=2`, the plugin downloads **polygon tiles** and derives centroid points from them. The correct input folder and type are therefore `polygons_s2_level_6_gzip_no_header` and `--data-type polygons`. For `GEOMETRY=1`, use the point-cache folder and `--data-type points`.
+
+```bash
+cd apps/web
+python scripts/access/stage_open_buildings_v3.py \
+  --input "/absolute/QGIS-profile/cache/open_buildings/polygons_s2_level_6_gzip_no_header/ACTUAL_TOKEN_buildings.csv.gz" \
+  --output "/absolute/research-output/singapore-part-01.geojsonl" \
+  --country SGP --data-type polygons --headerless --licence CC-BY-4.0 \
+  --aoi-wkt 'POLYGON ((103.80 1.25,103.95 1.25,103.95 1.35,103.80 1.35,103.80 1.25))'
+```
+
+Inspect the emitted manifest for SHA-256, record counts, attribution and **`eligibleForRouteGraph: false`** before any GIS review. The QGIS plugin needs no extra Python packages beyond QGIS, whereas the **separate** MapAble polygon staging script requires Shapely.
+
+### Explicit boundaries for dynamic mapping
+
+1. A **recent plugin download is not a recent building observation**: cached V3 tiles describe Google's May 2023 model inference and potentially older satellite images. No automatic cache refresh, official change sequence or live environmental update is established.
+2. Plugin **model confidence is building detection only**, not wheelchair accessibility. The plugin's colour ramp must not be translated into MapAble's access-assurance colours or claims.
+3. Any subsequent QGIS-created GeoPackage should **not** be passed directly to `--input`; this adapter only accepts CSV/CSV.gz. If a GIS analyst needs already-clipped GeoPackage input, design a separate, independently tested converter that records its CRS and data lineage.
+4. Field surveys, independently reviewed access measurements and suitable current operational feeds are needed for entrances, kerbs, paths, surfaces and lift conditions. A footprint must never silently enter the route graph.
+
+**Synthetic regression evidence:** The staging tests include a representative headerless polygon tile with an AOI filter and a fail-closed check that QGIS's polygon-cache output cannot be misread as a point-only tile. Neither test downloads Google data or runs QGIS.
+
 ## Next actions and release sequence
 
 1. **Source/data steward:** select an eligible country (India or Singapore as examples), exact licensed resource, small bounded AOI and one licence pathway. Verify scope and source metadata.
