@@ -56,7 +56,7 @@ jobs:
               command -v qgis_process
               qgis_process --version
               qgis_setup.sh open_buildings_downloader
-              qgis_process plugins enable open_buildings_downloader
+              # qgis_setup.sh already enables this plugin in the test profile.
               qgis_process help openbuildings:download > /tmp/openbuildings-help.txt
               grep -Fq "MIN_CONFIDENCE" /tmp/openbuildings-help.txt
               grep -Fq "MAX_DOWNLOAD_MB" /tmp/openbuildings-help.txt
