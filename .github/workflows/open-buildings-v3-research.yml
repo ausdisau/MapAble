@@ -1,0 +1,54 @@
+name: Open Buildings V3 research staging checks
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "apps/web/scripts/access/stage_open_buildings_v3.py"
+      - "apps/web/tests/access-infrastructure/test_open_buildings_v3_staging.py"
+      - "apps/web/docs/access/GOOGLE_OPEN_BUILDINGS_V3_STAGING.md"
+      - ".github/workflows/open-buildings-v3-research.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "apps/web/scripts/access/stage_open_buildings_v3.py"
+      - "apps/web/tests/access-infrastructure/test_open_buildings_v3_staging.py"
+      - "apps/web/docs/access/GOOGLE_OPEN_BUILDINGS_V3_STAGING.md"
+      - ".github/workflows/open-buildings-v3-research.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mapable-open-buildings-v3-research-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  synthetic-research-staging-tests:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install geometry test dependency
+        run: python -m pip install --disable-pip-version-check "shapely==2.1.2"
+
+      - name: Validate Python syntax
+        run: python -m py_compile scripts/access/stage_open_buildings_v3.py
+
+      - name: Run synthetic-only staging unit tests
+        run: python -m unittest discover -s tests/access-infrastructure -p 'test_open_buildings_v3_staging.py' -v
+
+      - name: Verify offline CLI help
+        run: python scripts/access/stage_open_buildings_v3.py --help
