@@ -15162,3 +15162,42 @@ model WorkplaceLocation {
   @@index([organisationId])
   @@map("workplace_locations")
 }
+
+model NdisCommissionRegisterImport {
+  id String @id @default(uuid()) @db.Uuid
+  sourceHash String @map("source_hash")
+  sourceUrl String @map("source_url")
+  rowCount Int @map("row_count")
+  recordCount Int @map("record_count")
+  importedBy String @map("imported_by")
+  status String
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  records NdisCommissionRegistration[]
+  publications NdisCommissionPublication[]
+  @@index([status, createdAt])
+  @@map("ndis_commission_register_imports")
+}
+model NdisCommissionRegistration {
+  importId String @map("import_id") @db.Uuid
+  registrationId String @map("registration_id")
+  legalName String @map("legal_name")
+  businessName String? @map("business_name")
+  abn String?
+  registrationStatus String @map("registration_status")
+  registrationEnd String? @map("registration_end")
+  registrationGroups String[] @default([]) @map("registration_groups")
+  rowHash String @map("row_hash")
+  source NdisCommissionRegisterImport @relation(fields:[importId],references:[id],onDelete:Cascade)
+  @@id([importId,registrationId])
+  @@index([importId,abn])
+  @@index([importId,registrationStatus])
+  @@map("ndis_commission_registrations")
+}
+model NdisCommissionPublication {
+  code String @id
+  importId String @map("import_id") @db.Uuid
+  publishedAt DateTime @default(now()) @map("published_at") @db.Timestamptz(6)
+  publishedBy String @map("published_by")
+  source NdisCommissionRegisterImport @relation(fields:[importId],references:[id],onDelete:Restrict)
+  @@map("ndis_commission_publications")
+}
