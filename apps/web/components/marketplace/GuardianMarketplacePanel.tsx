@@ -48,7 +48,8 @@ export function GuardianMarketplacePanel({ scenario }: { scenario: "care_support
       {choices.map((option) => <option value={option.id} key={option.id}>{option.label}</option>)}
     </select>
     <button type="button" className={focusButton} onClick={evaluate}>Review this fictional action</button>
-    {review ? <div className="mt-4 space-y-3 rounded-xl border border-slate-300 bg-[#f2f7f9] p-4" role="status" aria-live="polite">
+    {review ? <div className="mt-4 space-y-3 rounded-xl border border-slate-300 bg-[#f2f7f9] p-4">
+      <p role="status" aria-live="polite" className="font-semibold">Review outcome: {review.decision.replaceAll("_", " ")}. No real action can execute.</p>
       <h3 className="text-lg font-bold">Decision: {review.decision.replaceAll("_", " ")}</h3>
       <p>{review.rationale}</p>
       <p><strong>NDIS funding:</strong> Not determined. Individual plan and current support-list review needed.</p>
