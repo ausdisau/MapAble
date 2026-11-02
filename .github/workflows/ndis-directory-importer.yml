@@ -50,6 +50,10 @@ jobs:
         run: pnpm exec prisma validate && pnpm exec prisma generate
       - name: Deterministic NDIA normalisation tests
         run: pnpm exec vitest run tests/ndis-directory-import-core.test.ts
+      - name: Full bundled 45 MB source preview, no writes
+        env:
+          NODE_OPTIONS: --max-old-space-size=6144
+        run: pnpm exec tsx scripts/ndis-directory-importer.ts --mode preview --source bundled
       - name: Full web TypeScript validation
         run: pnpm type-check
       - name: Targeted importer lint
