@@ -2,8 +2,8 @@
  * Read-only published NDIA snapshot facade for future Provider Finder/Marketplace.
  * Never reads failed/staging runs. Never exposes raw or implies registration.
  */
-import { prisma } from "@/lib/prisma";
 import { PUBLICATION_CODE } from "@/lib/ingestion/ndis-outlet-import-service";
+import { prisma } from "@/lib/prisma";
 
 export type PublishedOutletFilter = {
   readonly name?: string;
