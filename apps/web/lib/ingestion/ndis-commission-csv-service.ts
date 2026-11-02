@@ -1,6 +1,7 @@
 import { readFile, stat } from "node:fs/promises";
-import { prisma } from "@/lib/prisma";
+
 import { previewCommissionCsv, REGISTRY_CSV_MAX_BYTES, COMMISSION_REGISTER_CSV_URL, type ColumnMap } from "@/lib/ingestion/ndis-commission-csv";
+import { prisma } from "@/lib/prisma";
 
 export function requireCommissionWriteGate(env:Record<string,string|undefined>=process.env){
  if(env.NDIS_COMMISSION_CSV_WRITES_ENABLED!=="true")throw Error("COMMISSION_WRITE_GATE_OFF");
