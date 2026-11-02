@@ -1,0 +1,71 @@
+name: Verify QGIS 3.44 LTR and Open Buildings Processing
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/qgis-toolchain-validation.yml"
+      - "apps/web/docs/access/QGIS_INSTALL_AND_VALIDATION.md"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mapable-qgis-toolchain-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  qgis-toolchain:
+    name: qgis-install-and-plugin-discovery
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      # Official desktop image (QGIS LTR, Debian 13). Ephemeral CI installation.
+      QGIS_IMAGE: qgis/qgis:3.44.15-trixie
+    steps:
+      - name: Check out the MapAble repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Check out upstream QGIS plugin source at a fixed revision
+        uses: actions/checkout@v4
+        with:
+          repository: ColdLabs/qgis-open-buildings
+          ref: 808a8e412ad87fdd605194f19cea6d889b258491
+          path: upstream-qgis-plugin
+          persist-credentials: false
+
+      - name: Verify plugin version and minimum supported QGIS
+        run: |
+          set -euo pipefail
+          grep -Fxq 'version=0.1.0' upstream-qgis-plugin/open_buildings_downloader/metadata.txt
+          grep -Fxq 'qgisMinimumVersion=3.38' upstream-qgis-plugin/open_buildings_downloader/metadata.txt
+
+      - name: Install and verify QGIS LTR in an official isolated container
+        run: |
+          set -euo pipefail
+          docker pull "${QGIS_IMAGE}"
+          docker run --rm \
+            -e QT_QPA_PLATFORM=offscreen \
+            -v "${GITHUB_WORKSPACE}/upstream-qgis-plugin/open_buildings_downloader:/tests_directory/open_buildings_downloader:ro" \
+            --entrypoint bash "${QGIS_IMAGE}" -lc '
+              set -euo pipefail
+              command -v qgis_process
+              qgis_process --version
+              qgis_setup.sh open_buildings_downloader
+              # qgis_setup.sh already enables this plugin in the test profile.
+              qgis_process help openbuildings:download > /tmp/openbuildings-help.txt
+              grep -Fq "MIN_CONFIDENCE" /tmp/openbuildings-help.txt
+              grep -Fq "MAX_DOWNLOAD_MB" /tmp/openbuildings-help.txt
+              grep -Fq "OUTPUT_POLYGONS" /tmp/openbuildings-help.txt
+              grep -Fq "OUTPUT_POINTS" /tmp/openbuildings-help.txt
+              echo "QGIS LTR + Open Buildings Downloader processing integration verified."
+            '
+
+      - name: State limits
+        run: |
+          echo 'QGIS is installed only in this isolated, ephemeral CI container.'
+          echo 'No live Google data was downloaded, no local Windows install was performed, and no routes were updated.'
