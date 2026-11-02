@@ -49,7 +49,7 @@ async function main(): Promise<void> {
   const mode = argument("mode") ?? "preview";
   if (mode === "preview") {
     const preview = await previewNdisDirectory(readSource());
-    console.log(JSON.stringify({ mode, ...preview }, null, 2));
+    console.log(JSON.stringify(preview, null, 2));
     if (!preview.meetsQualityGate) process.exitCode = 2;
     return;
   }
