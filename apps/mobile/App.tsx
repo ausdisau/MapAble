@@ -14,6 +14,7 @@ import { createStaticNavigation } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import { MobileIdentityCard } from './src/components/MobileIdentityCard';
+import { ArcHubScreen } from './src/features/arc/ArcHubScreen';
 import {
   isMapAbleApiConfigured,
   searchMapAblePlaces,
@@ -516,6 +517,7 @@ const Tabs = createBottomTabNavigator({
     Today: TodayScreen,
     Home: HomeScreen,
     Indy: IndyScreen,
+    ARC: ArcHubScreen,
     More: MoreScreen,
   },
 });
