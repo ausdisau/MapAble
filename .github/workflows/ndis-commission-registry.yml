@@ -1,0 +1,73 @@
+name: NDIS Commission CSV registry importer validation
+
+on:
+  pull_request:
+    branches:
+      - main
+      - feat/ndis-directory-importer-deployable-20261102
+    paths:
+      - "apps/web/lib/ingestion/ndis-commission-csv*.ts"
+      - "apps/web/scripts/ndis-commission-csv.ts"
+      - "apps/web/tests/ndis-commission-csv.test.ts"
+      - "apps/web/prisma/schema.prisma"
+      - "apps/web/prisma/migrations/20261103010000_ndis_commission_registry/**"
+      - ".github/workflows/ndis-commission-registry.yml"
+      - "docs/ndis-commission-csv-integration.md"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    defaults:
+      run:
+        working-directory: apps/web
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mapable_ndia_ci?schema=public
+      DIRECT_URL: postgresql://postgres:postgres@localhost:5432/mapable_ndia_ci?schema=public
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
+      - name: Validate generated Prisma types
+        run: pnpm exec prisma validate && pnpm exec prisma generate
+      - name: Run Commission CSV parser tests
+        run: pnpm exec vitest run tests/ndis-commission-csv.test.ts
+      - name: Verify TypeScript
+        run: pnpm type-check
+      - name: Targeted lint
+        env:
+          NODE_OPTIONS: --max-old-space-size=6144
+        run: pnpm exec eslint lib/ingestion/ndis-commission-csv.ts lib/ingestion/ndis-commission-csv-service.ts scripts/ndis-commission-csv.ts tests/ndis-commission-csv.test.ts --max-warnings 0
+
+  migration-sql:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: mapable_ndia_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres -d mapable_ndia_ci"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+    env:
+      PGPASSWORD: postgres
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply dependent import schema and separate registry schema in disposable Postgres
+        run: |
+          psql -h localhost -U postgres -d mapable_ndia_ci -v ON_ERROR_STOP=1 -f apps/web/prisma/migrations/20261102130000_ndis_directory_versioned_import/migration.sql
+          psql -h localhost -U postgres -d mapable_ndia_ci -v ON_ERROR_STOP=1 -f apps/web/prisma/migrations/20261103010000_ndis_commission_registry/migration.sql
