@@ -1,0 +1,58 @@
+{
+  "date": "12 October 2026",
+  "data": [
+    {
+      "ABN": "91636315930",
+      "Prov_N": "Synthetic NDIS Provider One (demo)",
+      "Outletname": "Demo Outlet Latrobe",
+      "Flag": "O",
+      "Active": 1,
+      "Address": "Some Test Rd, Latrobe TAS 7307",
+      "State_cd": "TAS",
+      "Post_cd": 7307,
+      "Latitude": -41.2,
+      "Longitude": 146.4,
+      "RegGroup": [
+        33
+      ],
+      "prfsn": "Accountant/Bookkeeper",
+      "Phone": "1300 000 111",
+      "opnhrs": "Mon-Fri"
+    },
+    {
+      "ABN": "91636315930",
+      "Prov_N": "Synthetic NDIS Provider One (demo)",
+      "Outletname": "Demo Outlet Sydney",
+      "Flag": "O",
+      "Active": 1,
+      "Address": "Synthetic Square, Sydney NSW 2000",
+      "State_cd": "NSW",
+      "Post_cd": 2000,
+      "Latitude": -33.8,
+      "Longitude": 151.2,
+      "RegGroup": [
+        33,
+        34
+      ],
+      "prfsn": "Support coordinator|Accountant/Bookkeeper",
+      "Phone": "1300 000 222"
+    },
+    {
+      "ABN": "92735268277",
+      "Prov_N": "Synthetic NDIS Provider Two (demo)",
+      "Outletname": "Demo Care Outlet",
+      "Flag": "H",
+      "Active": 1,
+      "Head_Office": "Gosford NSW 2250",
+      "State_cd": "NSW",
+      "Post_cd": 2250,
+      "Latitude": 0,
+      "Longitude": 0,
+      "RegGroup": [
+        5,
+        8
+      ],
+      "prfsn": "Disability Support Worker"
+    }
+  ]
+}

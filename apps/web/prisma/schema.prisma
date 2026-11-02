@@ -447,6 +447,99 @@ model NdisProvider {
   @@map("ndis_providers")
 }
 
+
+/// Immutable, versioned staging runs for the NDIA Provider Finder DIRECTORY.
+/// They do not imply current registration, availability or worker clearance.
+model NdisDirectoryImportRun {
+  id                String   @id @default(uuid()) @db.Uuid
+  sourceMode        String   @map("source_mode")
+  sourceUrl         String   @map("source_url")
+  sourceSha256      String   @map("source_sha256")
+  sourceDate        String?  @map("source_date")
+  sourceBytes       Int      @map("source_bytes")
+  inputRowCount     Int      @map("input_row_count")
+  recognisedRows    Int      @map("recognised_rows")
+  rejectedRows      Int      @map("rejected_rows")
+  organisationCount Int      @map("organisation_count")
+  outletCount       Int      @map("outlet_count")
+  warnings          Json     @default("[]")
+  status            String
+  operator          String
+  startedAt         DateTime @default(now()) @map("started_at") @db.Timestamptz(6)
+  finishedAt        DateTime? @map("finished_at") @db.Timestamptz(6)
+  errorCode         String?  @map("error_code")
+
+  organisations     NdisDirectoryOrganisation[]
+  publishedPointers NdisDirectoryPublication[]
+
+  @@index([status, startedAt])
+  @@index([sourceSha256])
+  @@map("ndis_directory_import_runs")
+}
+
+/// Organisation grouping only. ABN identity is validated; fallback keys remain
+/// explicitly unverified rather than merging unrelated providers by name.
+model NdisDirectoryOrganisation {
+  runId              String  @map("run_id") @db.Uuid
+  organisationKey    String  @map("organisation_key")
+  name               String
+  abn                String?
+  identityBasis      String  @map("identity_basis")
+  registrationGroups String[] @default([]) @map("registration_groups")
+
+  run                NdisDirectoryImportRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+  outlets            NdisDirectoryOutlet[]
+
+  @@id([runId, organisationKey])
+  @@index([abn])
+  @@map("ndis_directory_organisations")
+}
+
+/// Outlet at an import version, never an independently credentialled worker.
+/// sourceActiveFlag is an NDIA directory field, NOT Commission registration.
+model NdisDirectoryOutlet {
+  runId              String   @map("run_id") @db.Uuid
+  outletKey          String   @map("outlet_key")
+  organisationKey    String   @map("organisation_key")
+  outletName         String   @map("outlet_name")
+  address            String?
+  headOffice         String?  @map("head_office")
+  suburb             String?
+  state              String?
+  postcode           String?
+  latitude           Float?
+  longitude          Float?
+  phone              String?
+  email              String?
+  website            String?
+  flag               String?
+  sourceActiveFlag   Boolean? @map("source_active_flag")
+  registrationGroups String[] @default([]) @map("registration_groups")
+  professions        String[] @default([])
+  openingHours       String?  @map("opening_hours")
+  recordHash         String   @map("record_hash")
+  raw                Json
+
+  organisation NdisDirectoryOrganisation @relation(fields: [runId, organisationKey], references: [runId, organisationKey], onDelete: Cascade)
+
+  @@id([runId, outletKey])
+  @@index([runId, state, postcode])
+  @@index([runId, organisationKey])
+  @@map("ndis_directory_outlets")
+}
+
+/// Atomic publication pointer. Failed/partial staging runs are never visible.
+model NdisDirectoryPublication {
+  code        String   @id
+  runId       String   @map("run_id") @db.Uuid
+  publishedAt DateTime @default(now()) @map("published_at") @db.Timestamptz(6)
+  publishedBy String   @map("published_by")
+
+  run NdisDirectoryImportRun @relation(fields: [runId], references: [id], onDelete: Restrict)
+
+  @@map("ndis_directory_publications")
+}
+
 model ProviderProfileService {
   id                String          @id @default(cuid())
   providerProfileId String

@@ -1,0 +1,98 @@
+name: NDIS provider and outlet importer validation
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "apps/web/prisma/schema.prisma"
+      - "apps/web/prisma/migrations/20261102130000_ndis_directory_versioned_import/**"
+      - "apps/web/lib/ingestion/ndis-outlet-import-*.ts"
+      - "apps/web/lib/ndis/published-directory-read.ts"
+      - "apps/web/app/api/admin/ndis-directory-outlets/**"
+      - "apps/web/app/api/admin/ingest/ndis-provider-outlets/**"
+      - "apps/web/app/admin/ndis-outlet-importer/**"
+      - "apps/web/components/admin/NdisOutletImportPanel.tsx"
+      - "apps/web/scripts/ndis-directory-importer.ts"
+      - "apps/web/scripts/ci/verify-ndis-directory-stage.ts"
+      - "apps/web/tests/ndis-directory-import-core.test.ts"
+      - "apps/web/tests/fixtures/ndis-directory-versioned-small.json"
+      - "docs/ndis-directory-importer-runbook.md"
+      - ".github/workflows/ndis-directory-importer.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ndis-directory-import-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  static-and-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    defaults:
+      run:
+        working-directory: apps/web
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mapable_ndia_ci?schema=public
+      DIRECT_URL: postgresql://postgres:postgres@localhost:5432/mapable_ndia_ci?schema=public
+      NEXTAUTH_SECRET: ci-only-not-production-ndis-directory-secret-32
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: corepack enable
+      - name: Install frozen deps
+        run: pnpm install --frozen-lockfile
+      - name: Validate Prisma schema and generate types
+        run: pnpm exec prisma validate && pnpm exec prisma generate
+      - name: Deterministic NDIA normalisation tests
+        run: pnpm exec vitest run tests/ndis-directory-import-core.test.ts
+      - name: Full web TypeScript validation
+        run: pnpm type-check
+      - name: Targeted importer lint
+        run: pnpm exec eslint lib/ingestion/ndis-outlet-import-core.ts lib/ingestion/ndis-outlet-import-service.ts lib/ndis/published-directory-read.ts app/api/admin/ndis-directory-outlets/route.ts app/api/admin/ingest/ndis-provider-outlets/route.ts app/admin/ndis-outlet-importer/page.tsx components/admin/NdisOutletImportPanel.tsx scripts/ndis-directory-importer.ts scripts/ci/verify-ndis-directory-stage.ts tests/ndis-directory-import-core.test.ts --max-warnings 0
+
+  staged-postgres-integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: mapable_ndia_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres -d mapable_ndia_ci"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+    defaults:
+      run:
+        working-directory: apps/web
+    env:
+      CI: "true"
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mapable_ndia_ci?schema=public
+      DIRECT_URL: postgresql://postgres:postgres@localhost:5432/mapable_ndia_ci?schema=public
+      PGPASSWORD: postgres
+      NDIS_DIRECTORY_CI_SYNTHETIC_ONLY: "true"
+      NDIS_DIRECTORY_IMPORT_WRITES_ENABLED: "true"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: corepack enable
+      - name: Install frozen deps
+        run: pnpm install --frozen-lockfile
+      - name: Apply additive migration in disposable Postgres
+        run: psql -h localhost -U postgres -d mapable_ndia_ci -v ON_ERROR_STOP=1 -f prisma/migrations/20261102130000_ndis_directory_versioned_import/migration.sql
+      - name: Generate Prisma client
+        run: pnpm exec prisma generate
+      - name: Exercise stage and publication with synthetic records only
+        run: pnpm exec tsx scripts/ci/verify-ndis-directory-stage.ts
