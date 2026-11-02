@@ -1,5 +1,5 @@
 -- Additive and inert until a source release is manually validated and activated.
--- A separate Commission register snapshot; existing NDIA/outlet and worker tables are untouched.
+-- A separate Commission register snapshot. Existing NDIA/outlet and worker tables are untouched.
 CREATE TABLE "ndis_commission_releases" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "source_url" TEXT NOT NULL,
