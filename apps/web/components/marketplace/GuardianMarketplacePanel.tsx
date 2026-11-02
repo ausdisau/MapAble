@@ -1,5 +1,7 @@
 "use client";
+
 import { useState } from "react";
+
 import {
   reviewMarketplaceGovernance, RESEARCH_GOVERNANCE_LEDGER,
   type GovernanceAction, type PublicGovernanceDecision,
