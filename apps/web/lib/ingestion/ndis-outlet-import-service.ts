@@ -11,10 +11,10 @@ import { readFile, stat } from "node:fs/promises";
 
 import type { Prisma } from "@prisma/client";
 
-import { NDIS_LIST_PROVIDERS_URL_WWW, resolveNdisListProvidersPath } from "@/lib/ndis/list-providers-source";
 import {
   normaliseNdisDirectory, sha256Hex, type NdisDirectoryBatch,
 } from "@/lib/ingestion/ndis-outlet-import-core";
+import { NDIS_LIST_PROVIDERS_URL_WWW, resolveNdisListProvidersPath } from "@/lib/ndis/list-providers-source";
 import { prisma } from "@/lib/prisma";
 
 export const NDIS_DIRECTORY_SOURCE_MAX_BYTES = 80 * 1024 * 1024;
