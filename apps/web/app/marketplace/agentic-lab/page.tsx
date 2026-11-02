@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+
 import { AgenticMarketplaceLab } from "@/components/marketplace/AgenticMarketplaceLab";
 import { requireAuth } from "@/lib/auth/guards";
 import { canOpenLab, readLabGate } from "@/lib/marketplace/agentic-lab/access";
