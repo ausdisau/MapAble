@@ -15069,3 +15069,42 @@ model WorkplaceLocation {
   @@index([organisationId])
   @@map("workplace_locations")
 }
+
+/** Commission register source release. Separate from NDIA finder and worker screening. */
+model NdisCommissionRelease {
+  id                String   @id @default(uuid()) @db.Uuid
+  sourceUrl         String   @map("source_url")
+  sourceHash        String   @unique @map("source_hash")
+  sourceAsOf        DateTime @map("source_as_of") @db.Date
+  headerNames       String[] @map("header_names")
+  columnMap         Json     @map("column_map")
+  rowCount          Int      @default(0) @map("row_count")
+  status            String   @default("staging")
+  reviewedBy        String?  @map("reviewed_by")
+  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  validatedAt       DateTime? @map("validated_at") @db.Timestamptz(6)
+  activatedAt       DateTime? @map("activated_at") @db.Timestamptz(6)
+  entries           NdisCommissionEntry[]
+
+  @@index([status, activatedAt])
+  @@map("ndis_commission_releases")
+}
+
+model NdisCommissionEntry {
+  releaseId          String   @map("release_id") @db.Uuid
+  rowNumber          Int      @map("row_number")
+  abn                String?
+  registrationNumber String?  @map("registration_number")
+  legalName          String   @map("legal_name")
+  businessName       String?  @map("business_name")
+  registrationStatus String   @map("registration_status")
+  state              String?
+  raw                Json
+  release            NdisCommissionRelease @relation(fields: [releaseId], references: [id], onDelete: Cascade)
+
+  @@id([releaseId, rowNumber])
+  @@index([releaseId, registrationStatus])
+  @@index([releaseId, abn])
+  @@index([releaseId, state])
+  @@map("ndis_commission_entries")
+}
