@@ -1,13 +1,14 @@
 import { describe, expect, it } from "vitest";
+
+import { readLabGate, canOpenLab } from "@/lib/marketplace/agentic-lab/access";
 import {
   compareSyntheticOffers, createLabSession, matchingSyntheticOffers,
   runLocalSequence, transitionLab, type LabAction, type LabActor, type LabSession,
 } from "@/lib/marketplace/agentic-lab/engine";
-import { CURATED_AGENT_TOOLS, reviewAgentTool, REMOTE_A2A_ENABLED, REMOTE_MCP_ENABLED, EXTERNAL_PURCHASE_ENABLED }
-  from "@/lib/marketplace/agentic-lab/tool-gateway";
 import { projectSaleorProduct, reviewSaleorWrite, SALEOR_NETWORK_ADAPTER_ENABLED }
   from "@/lib/marketplace/agentic-lab/saleor-contract";
-import { readLabGate, canOpenLab } from "@/lib/marketplace/agentic-lab/access";
+import { CURATED_AGENT_TOOLS, reviewAgentTool, REMOTE_A2A_ENABLED, REMOTE_MCP_ENABLED, EXTERNAL_PURCHASE_ENABLED }
+  from "@/lib/marketplace/agentic-lab/tool-gateway";
 
 function advance(s: LabSession, kind: LabAction["kind"], actor: LabActor, offerId?: string, id?: string) {
   return transitionLab(s, { kind, actor, offerId, expectedRevision: s.revision, id: id ?? "test-" + (s.revision + 1) });
