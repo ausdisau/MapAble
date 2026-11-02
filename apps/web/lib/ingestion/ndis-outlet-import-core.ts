@@ -86,7 +86,7 @@ function first(o: Record<string, unknown>, names: string[], max = 300): string |
 }
 function normal(s: string): string {
   return s.normalize("NFKC").toLocaleLowerCase("en-AU")
-    .replace(/[^a-z0-9]+/g, " ").trim().replace(/\s+/g, " ");
+    .replace(/[^\p{L}\p{N}]+/gu, " ").trim().replace(/\s+/g, " ");
 }
 function number(v: unknown): number | null {
   if (typeof v === "number" && Number.isFinite(v)) return v;
