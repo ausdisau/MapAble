@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+
+import { GuardianMarketplacePanel } from "@/components/marketplace/GuardianMarketplacePanel";
 import {
   compareSyntheticOffers, createLabSession, matchingSyntheticOffers,
   runLocalSequence, transitionLab, type LabAction, type LabPhase, type LabScenario,
@@ -10,7 +12,6 @@ import {
   CURATED_AGENT_TOOLS, reviewAgentTool, REMOTE_A2A_ENABLED,
   REMOTE_MCP_ENABLED, EXTERNAL_PURCHASE_ENABLED,
 } from "@/lib/marketplace/agentic-lab/tool-gateway";
-import { GuardianMarketplacePanel } from "@/components/marketplace/GuardianMarketplacePanel";
 
 const button = "inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-[#164678] px-4 py-3 font-semibold text-[#164678] focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#164678] disabled:opacity-60 disabled:cursor-not-allowed";
 const primary = button + " bg-[#164678] text-white";
