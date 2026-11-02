@@ -62,6 +62,13 @@ describe("NDIA directory source parser", () => {
     expect(first.organisations).toEqual(second.organisations);
     expect(first.outlets).toEqual(second.outlets);
   });
+  it("preserves distinct non-English outlet names at the same address", () => {
+    const p = {...A, Outletname: "北區服務中心"};
+    const q = {...A, Outletname: "南區服務中心"};
+    const result = normalise([p,q]);
+    expect(result.outlets).toHaveLength(2);
+    expect(result.organisations).toHaveLength(1);
+  });
   it("does not use row index as an outlet identity", () => {
     const first = normalise([A,B]).outlets.map(x=>x.outletKey);
     const second = normalise([B,A]).outlets.map(x=>x.outletKey);
