@@ -1,3 +1,5 @@
+import { isSafeInternalRedirectPath } from "@/lib/auth/safe-internal-redirect";
+
 /** Normalize email for credential lookup (matches authorize + register API). */
 export function normalizeAuthEmail(email: string): string {
   return email.trim().toLowerCase();
@@ -11,10 +13,12 @@ export function safeAuthCallbackPath(
   callbackUrl: string | null | undefined,
   fallback = "/dashboard"
 ): string {
-  if (!callbackUrl) return fallback;
+  const safeFallback = isSafeInternalRedirectPath(fallback)
+    ? fallback
+    : "/dashboard";
+  if (!callbackUrl) return safeFallback;
   const path = callbackUrl.trim();
-  if (!path.startsWith("/") || path.startsWith("//")) return fallback;
-  return path;
+  return isSafeInternalRedirectPath(path) ? path : safeFallback;
 }
 
 /** Full navigation after auth so middleware sees the new session cookie. */
