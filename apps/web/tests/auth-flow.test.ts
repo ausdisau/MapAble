@@ -25,7 +25,9 @@ describe("auth-flow helpers", () => {
     expect(safeAuthCallbackPath("/\\\\external.example")).toBe("/dashboard");
     expect(safeAuthCallbackPath("/dashboard\nnext")).toBe("/dashboard");
     expect(safeAuthCallbackPath("/dashboard\u0000x")).toBe("/dashboard");
-    expect(safeAuthCallbackPath("/dashboard", "//bad.example")).toBe("/dashboard");
+    expect(safeAuthCallbackPath("/dashboard", "//bad.example")).toBe(
+      "/dashboard",
+    );
   });
 
   it("keeps safe local paths, query strings, and fragments", () => {
