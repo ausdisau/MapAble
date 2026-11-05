@@ -1,0 +1,46 @@
+name: Unified workspace router checks
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "apps/web/app/workspace/**"
+      - "apps/web/components/workspace/**"
+      - "apps/web/lib/workspace/**"
+      - "apps/web/tests/workspace-router.test.ts"
+      - "scripts/workspace/**"
+      - "docs/unified-workspace-router.md"
+      - ".github/workflows/unified-workspace-router.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  local-runner:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: node --check scripts/workspace/dev.mjs
+      - run: node --test scripts/workspace/dev.test.mjs
+
+  web-contract:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec vitest run tests/workspace-router.test.ts
+      - run: pnpm exec eslint app/workspace/page.tsx components/workspace/UnifiedWorkspaceRouter.tsx lib/workspace/targets.ts tests/workspace-router.test.ts --max-warnings 0
+      - run: pnpm exec prettier --check app/workspace/page.tsx components/workspace/UnifiedWorkspaceRouter.tsx lib/workspace/targets.ts tests/workspace-router.test.ts
+      - run: pnpm type-check
