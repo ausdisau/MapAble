@@ -1,0 +1,71 @@
+{
+  "schemaVersion": "maira_care_support_v1",
+  "expressedIntent": "Request limited breakfast setup assistance before transport",
+  "participantStatements": [
+    {
+      "text": "My support worker has not arrived",
+      "evidenceIds": [
+        "ev_participant_001"
+      ]
+    },
+    {
+      "text": "Don't contact my family",
+      "evidenceIds": [
+        "ev_participant_001"
+      ]
+    }
+  ],
+  "supportTaskCandidates": [
+    {
+      "task": "Open breakfast packaging",
+      "domain": "mealtime",
+      "assistanceType": "physical_assistance",
+      "context": "Before transport",
+      "evidenceIds": [
+        "ev_participant_001"
+      ],
+      "uncertainty": "Amount and exact timing of assistance are unknown"
+    }
+  ],
+  "explicitRestrictions": [
+    {
+      "restriction": "Do not contact family",
+      "evidenceIds": [
+        "ev_participant_001"
+      ]
+    }
+  ],
+  "competingInterpretations": [
+    {
+      "hypothesis": "Worker may be delayed or unavailable",
+      "evidenceIds": [
+        "ev_participant_001"
+      ],
+      "contradictingEvidenceIds": []
+    }
+  ],
+  "missingInformation": [
+    "Verified roster status",
+    "Exact pickup time"
+  ],
+  "clarifyingQuestions": [
+    "Do you need urgent help right now?",
+    "Would you like a text message drafted for review?"
+  ],
+  "proposalOptions": [
+    {
+      "optionType": "draft_provider_message",
+      "description": "Draft text for participant review only, do not send.",
+      "evidenceIds": [
+        "ev_participant_001"
+      ],
+      "requiresParticipantReview": true
+    }
+  ],
+  "humanReviewFlags": [
+    "support_continuity",
+    "time_sensitive_essential_support"
+  ],
+  "actionAuthority": "none",
+  "requiresParticipantReview": true
+}

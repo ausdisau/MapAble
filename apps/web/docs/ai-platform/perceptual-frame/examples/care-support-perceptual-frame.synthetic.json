@@ -1,0 +1,204 @@
+{
+  "metadata": {
+    "frame_id": "csf_synthetic_001",
+    "schema_version": "1.0.0",
+    "created_at": "2026-11-06T00:00:00Z",
+    "updated_at": "2026-11-06T00:00:00Z",
+    "lifecycle_status": "awaiting_participant_review",
+    "purpose": "continuity_planning",
+    "source_mapping_status": "source_not_extracted",
+    "regulatory_effect": "not_an_ndia_assessment_or_funding_determination"
+  },
+  "subject": {
+    "participant_scope_id": "demo_participant_001",
+    "tenant_id": "demo_tenant_001",
+    "record_class": "synthetic",
+    "diagnosis_required": false
+  },
+  "input": {
+    "utterance_record_ref": "synthetic_utterance_001",
+    "modality": "aac",
+    "participant_statement": {
+      "text": "My support worker hasn't arrived. I need help opening breakfast packaging before transport. Text me first. Don't contact my family.",
+      "evidence_ids": [
+        "ev_participant_001"
+      ],
+      "confirmation_status": "participant_confirmed"
+    },
+    "language_tag": "en-AU"
+  },
+  "perception": {
+    "expressed_goals": [
+      {
+        "text": "Get ready for transport on time",
+        "evidence_ids": [
+          "ev_participant_001"
+        ],
+        "confirmation_status": "participant_confirmed"
+      }
+    ],
+    "activities_and_support": [
+      {
+        "requirement_id": "req_breakfast_001",
+        "domain": "mealtime",
+        "task": "Open breakfast packaging",
+        "assistance_type": [
+          "physical_assistance"
+        ],
+        "context": "Before scheduled transport",
+        "participant_preference": "Do the rest of breakfast independently",
+        "frequency_description": "This morning",
+        "amount_description": null,
+        "agency_goal": "Prepare for travel with minimal assistance",
+        "status": "expressed",
+        "evidence_ids": [
+          "ev_participant_001"
+        ],
+        "requires_human_competency_review": false
+      }
+    ],
+    "situational_context": [
+      {
+        "context_id": "ctx_roster_001",
+        "kind": "service_dependency",
+        "description": "Participant reports worker has not arrived",
+        "evidence_ids": [
+          "ev_participant_001"
+        ],
+        "verification_status": "participant_reported"
+      },
+      {
+        "context_id": "ctx_transport_001",
+        "kind": "transport_dependency",
+        "description": "Transport is planned after breakfast; exact pickup time not yet checked",
+        "evidence_ids": [
+          "ev_participant_001"
+        ],
+        "verification_status": "participant_reported"
+      }
+    ],
+    "provider_record_refs": []
+  },
+  "rights": {
+    "communication_methods": [
+      "text",
+      "aac"
+    ],
+    "communication_adjustments": [
+      "Allow time for AAC correction and confirmation"
+    ],
+    "expressed_contact_exclusions": [
+      "Do not contact family"
+    ],
+    "other_explicit_restrictions": [
+      "Text participant before contacting a provider"
+    ],
+    "chosen_supporters_refs": [],
+    "decision_support_preference": "self_directed",
+    "legal_capacity_inference": "prohibited",
+    "dignity_of_risk": {
+      "participant_expressed_choice": null,
+      "risks_discussed": [],
+      "safeguards_offered": [],
+      "unresolved_rights_issue": null,
+      "risk_choice_is_not_incapacity": true
+    }
+  },
+  "evidence": [
+    {
+      "evidence_id": "ev_participant_001",
+      "source_kind": "synthetic_fixture",
+      "claim_status": "synthetic_fixture",
+      "statement": "Participant expresses support need, worker nonarrival, transport timing concern, and no-family-contact preference.",
+      "record_ref": "synthetic_utterance_001",
+      "record_version": "1",
+      "recorded_at": "2026-11-06T00:00:00Z",
+      "observed_at": "2026-11-06T00:00:00Z",
+      "valid_until": null,
+      "conflict_status": "unknown",
+      "synthetic": true
+    }
+  ],
+  "maira_interpretation": {
+    "expressed_intent_summary": "Participant requests limited breakfast assistance before transport, while preserving communication and contact preferences.",
+    "hypotheses": [
+      {
+        "hypothesis_id": "hyp_worker_001",
+        "interpretation": "The worker may be delayed, absent or the roster may be incorrect.",
+        "supporting_evidence_ids": [
+          "ev_participant_001"
+        ],
+        "contradicting_evidence_ids": [],
+        "confidence_qualifier": "not_assessed",
+        "status": "model_hypothesis"
+      }
+    ],
+    "uncertainties": [
+      "Roster status has not been independently verified",
+      "Transport pickup time is unconfirmed"
+    ],
+    "clarifying_questions": [
+      {
+        "question_id": "q1",
+        "question": "Are you safe and do you need urgent help right now?",
+        "why_needed": "Confirm whether there is an immediate unmet essential support need",
+        "preferred_responder": "participant",
+        "priority": "time_sensitive"
+      },
+      {
+        "question_id": "q2",
+        "question": "Would you like to review a text to your provider?",
+        "why_needed": "Preserve participant direction and contact boundaries",
+        "preferred_responder": "participant",
+        "priority": "routine"
+      }
+    ],
+    "model_output": false,
+    "not_an_official_support_needs_assessment": true
+  },
+  "proposed_options": [
+    {
+      "option_id": "opt1",
+      "action_type": "draft_provider_message",
+      "description": "Prepare a message for participant review, without sending it",
+      "potential_benefit": "Clarify shift continuity and request assistance",
+      "material_uncertainty": "No current worker availability or roster verification",
+      "evidence_ids": [
+        "ev_participant_001"
+      ],
+      "requires_participant_review": true,
+      "execution_state": "not_executed"
+    }
+  ],
+  "safeguards": {
+    "human_review_triggers": [
+      "support_continuity",
+      "time_sensitive_essential_support"
+    ],
+    "suggested_escalation": "offer_human_support",
+    "clinical_decision_authority": "none",
+    "restrictive_practice_authority": "none",
+    "ndis_funding_authority": "none"
+  },
+  "review": {
+    "status": "not_started",
+    "participant_corrections": [],
+    "reviewed_at": null,
+    "accessible_summary": "You said your worker has not arrived and that you need help opening breakfast packaging before transport. I will not contact your family. I can prepare a message for your review.",
+    "non_ai_route_available": true
+  },
+  "governance": {
+    "actor_ref": "synthetic_actor_001",
+    "auth_projection_ref": "synthetic_auth_projection_001",
+    "purpose_authorised": true,
+    "consent_receipt_refs": [
+      "synthetic_consent_001"
+    ],
+    "model_processing_permission": "denied",
+    "stop_aura_active": false,
+    "allowed_model_authority": "none",
+    "execution_mode": "proposal_only",
+    "participant_approval_required_for_consequential_actions": true,
+    "last_policy_check_at": "2026-11-06T00:00:00Z"
+  }
+}

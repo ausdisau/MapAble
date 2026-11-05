@@ -1,0 +1,249 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "enum": [
+        "maira_care_support_v1"
+      ]
+    },
+    "expressedIntent": {
+      "type": "string"
+    },
+    "participantStatements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "evidenceIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "text",
+          "evidenceIds"
+        ]
+      }
+    },
+    "supportTaskCandidates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "task": {
+            "type": "string"
+          },
+          "domain": {
+            "type": "string",
+            "enum": [
+              "daily_living",
+              "personal_care",
+              "mealtime",
+              "communication",
+              "mobility",
+              "transport",
+              "home_living",
+              "community_participation",
+              "work_or_study",
+              "health_support_interface",
+              "self_management",
+              "other"
+            ]
+          },
+          "assistanceType": {
+            "type": "string",
+            "enum": [
+              "physical_assistance",
+              "setup_assistance",
+              "communication_access",
+              "prompting",
+              "equipment_or_technology",
+              "transport_assistance",
+              "supervision_requested",
+              "other",
+              "to_be_clarified"
+            ]
+          },
+          "context": {
+            "type": "string"
+          },
+          "evidenceIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "uncertainty": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "task",
+          "domain",
+          "assistanceType",
+          "context",
+          "evidenceIds",
+          "uncertainty"
+        ]
+      }
+    },
+    "explicitRestrictions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "restriction": {
+            "type": "string"
+          },
+          "evidenceIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "restriction",
+          "evidenceIds"
+        ]
+      }
+    },
+    "competingInterpretations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "hypothesis": {
+            "type": "string"
+          },
+          "evidenceIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "contradictingEvidenceIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "hypothesis",
+          "evidenceIds",
+          "contradictingEvidenceIds"
+        ]
+      }
+    },
+    "missingInformation": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "clarifyingQuestions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "proposalOptions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "optionType": {
+            "type": "string",
+            "enum": [
+              "explain_options",
+              "ask_clarification",
+              "draft_provider_message",
+              "read_only_provider_search",
+              "request_human_support",
+              "draft_continuity_plan",
+              "request_authorised_record_check"
+            ]
+          },
+          "description": {
+            "type": "string"
+          },
+          "evidenceIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "requiresParticipantReview": {
+            "type": "boolean",
+            "enum": [
+              true
+            ]
+          }
+        },
+        "required": [
+          "optionType",
+          "description",
+          "evidenceIds",
+          "requiresParticipantReview"
+        ]
+      }
+    },
+    "humanReviewFlags": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "support_continuity",
+          "time_sensitive_essential_support",
+          "clinical_scope_uncertainty",
+          "alleged_abuse_or_neglect",
+          "restrictive_practice_related",
+          "authority_dispute",
+          "privacy_disclosure_risk",
+          "no_verified_provider_match",
+          "other"
+        ]
+      }
+    },
+    "actionAuthority": {
+      "type": "string",
+      "enum": [
+        "none"
+      ]
+    },
+    "requiresParticipantReview": {
+      "type": "boolean",
+      "enum": [
+        true
+      ]
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "expressedIntent",
+    "participantStatements",
+    "supportTaskCandidates",
+    "explicitRestrictions",
+    "competingInterpretations",
+    "missingInformation",
+    "clarifyingQuestions",
+    "proposalOptions",
+    "humanReviewFlags",
+    "actionAuthority",
+    "requiresParticipantReview"
+  ],
+  "description": "Only generated interpretation and suggestions. No permission, consent, capacity, funding, clinical, worker-assignment or safeguarding determination authority."
+}
