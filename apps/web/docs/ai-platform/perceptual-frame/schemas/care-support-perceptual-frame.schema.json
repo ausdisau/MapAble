@@ -1,0 +1,954 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:mapable:schemas:care-support-perceptual-frame:1.0.0",
+  "title": "MapAble Care and Support Perceptual Frame v1.0",
+  "description": "Participant-directed, evidence-aware representation of care/support needs for AURA x MAIRA. Not an official NDIS support needs assessment or funding decision. Server supplies governance; models may only propose interpretations.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "metadata": {
+      "$ref": "#/$defs/metadata"
+    },
+    "subject": {
+      "$ref": "#/$defs/subject"
+    },
+    "input": {
+      "$ref": "#/$defs/input"
+    },
+    "perception": {
+      "$ref": "#/$defs/perception"
+    },
+    "rights": {
+      "$ref": "#/$defs/rights"
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/evidence"
+      },
+      "description": "No raw medical records or unrelated identity information."
+    },
+    "maira_interpretation": {
+      "$ref": "#/$defs/interpretation"
+    },
+    "proposed_options": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/option"
+      }
+    },
+    "safeguards": {
+      "$ref": "#/$defs/safeguards"
+    },
+    "review": {
+      "$ref": "#/$defs/review"
+    },
+    "governance": {
+      "$ref": "#/$defs/governance"
+    }
+  },
+  "required": [
+    "metadata",
+    "subject",
+    "input",
+    "perception",
+    "rights",
+    "evidence",
+    "maira_interpretation",
+    "proposed_options",
+    "safeguards",
+    "review",
+    "governance"
+  ],
+  "$defs": {
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "frame_id": {
+          "type": "string"
+        },
+        "schema_version": {
+          "type": "string",
+          "const": "1.0.0"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "lifecycle_status": {
+          "type": "string",
+          "enum": [
+            "draft",
+            "awaiting_participant_review",
+            "participant_corrected",
+            "participant_confirmed",
+            "superseded"
+          ]
+        },
+        "purpose": {
+          "type": "string",
+          "enum": [
+            "support_request_drafting",
+            "support_matching_advisory",
+            "support_plan_discussion",
+            "continuity_planning",
+            "access_and_transport_planning",
+            "other_advisory"
+          ]
+        },
+        "source_mapping_status": {
+          "type": "string",
+          "enum": [
+            "source_not_extracted",
+            "mapping_in_progress",
+            "source_fields_verified"
+          ]
+        },
+        "regulatory_effect": {
+          "const": "not_an_ndia_assessment_or_funding_determination"
+        }
+      },
+      "required": [
+        "frame_id",
+        "schema_version",
+        "created_at",
+        "updated_at",
+        "lifecycle_status",
+        "purpose",
+        "source_mapping_status",
+        "regulatory_effect"
+      ]
+    },
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "participant_scope_id": {
+          "type": "string",
+          "description": "Pseudonymous identifier; controlled by MapAble identity service."
+        },
+        "tenant_id": {
+          "type": "string",
+          "description": "Trusted server-side tenant identifier."
+        },
+        "record_class": {
+          "type": "string",
+          "enum": [
+            "synthetic",
+            "participant_authorised"
+          ]
+        },
+        "diagnosis_required": {
+          "const": false
+        }
+      },
+      "required": [
+        "participant_scope_id",
+        "tenant_id",
+        "record_class",
+        "diagnosis_required"
+      ]
+    },
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "utterance_record_ref": {
+          "type": "string"
+        },
+        "modality": {
+          "type": "string",
+          "enum": [
+            "text",
+            "aac",
+            "speech_transcript",
+            "document",
+            "mixed"
+          ]
+        },
+        "participant_statement": {
+          "$ref": "#/$defs/participantStatement"
+        },
+        "language_tag": {
+          "type": "string",
+          "description": "BCP47 preferred language tag, e.g. en-AU."
+        }
+      },
+      "required": [
+        "utterance_record_ref",
+        "modality",
+        "participant_statement",
+        "language_tag"
+      ]
+    },
+    "participantStatement": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "text": {
+          "type": "string",
+          "description": "Verbatim or directly confirmed participant expression."
+        },
+        "evidence_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "confirmation_status": {
+          "type": "string",
+          "enum": [
+            "reported",
+            "participant_confirmed",
+            "awaiting_review"
+          ]
+        }
+      },
+      "required": [
+        "text",
+        "evidence_ids",
+        "confirmation_status"
+      ]
+    },
+    "supportRequirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "requirement_id": {
+          "type": "string"
+        },
+        "domain": {
+          "type": "string",
+          "enum": [
+            "daily_living",
+            "personal_care",
+            "mealtime",
+            "communication",
+            "mobility",
+            "transport",
+            "home_living",
+            "community_participation",
+            "work_or_study",
+            "health_support_interface",
+            "self_management",
+            "other"
+          ]
+        },
+        "task": {
+          "type": "string",
+          "description": "Task or participation objective rather than diagnosis."
+        },
+        "assistance_type": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "physical_assistance",
+              "setup_assistance",
+              "communication_access",
+              "prompting",
+              "equipment_or_technology",
+              "transport_assistance",
+              "supervision_requested",
+              "other",
+              "to_be_clarified"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "context": {
+          "type": "string",
+          "description": "Situational and environmental circumstances."
+        },
+        "participant_preference": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "frequency_description": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Participant-expressed frequency; not a funding decision."
+        },
+        "amount_description": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Descriptive amount of assistance, not official assessed hours."
+        },
+        "agency_goal": {
+          "type": "string",
+          "description": "What the participant wants to do independently or with support."
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "expressed",
+            "confirmed",
+            "needs_clarification"
+          ]
+        },
+        "evidence_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "requires_human_competency_review": {
+          "type": "boolean",
+          "description": "Flag only, no clinical or competency decision."
+        }
+      },
+      "required": [
+        "requirement_id",
+        "domain",
+        "task",
+        "assistance_type",
+        "context",
+        "participant_preference",
+        "frequency_description",
+        "amount_description",
+        "agency_goal",
+        "status",
+        "evidence_ids",
+        "requires_human_competency_review"
+      ]
+    },
+    "contextItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "context_id": {
+          "type": "string"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "environmental_barrier",
+            "equipment",
+            "transport_dependency",
+            "service_dependency",
+            "temporal_constraint",
+            "personal_preference",
+            "social_context",
+            "other"
+          ]
+        },
+        "description": {
+          "type": "string"
+        },
+        "evidence_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "verification_status": {
+          "type": "string",
+          "enum": [
+            "participant_reported",
+            "verified",
+            "unknown",
+            "contested"
+          ]
+        }
+      },
+      "required": [
+        "context_id",
+        "kind",
+        "description",
+        "evidence_ids",
+        "verification_status"
+      ]
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "evidence_id": {
+          "type": "string",
+          "description": "Opaque evidence identifier used by other objects."
+        },
+        "source_kind": {
+          "type": "string",
+          "enum": [
+            "participant_statement",
+            "service_record",
+            "qualified_professional_document",
+            "provider_statement",
+            "public_registry",
+            "environment_observation",
+            "model_hypothesis",
+            "synthetic_fixture"
+          ]
+        },
+        "claim_status": {
+          "type": "string",
+          "enum": [
+            "participant_confirmed",
+            "participant_reported",
+            "record_verified",
+            "third_party_reported",
+            "provider_claimed",
+            "unverified",
+            "model_hypothesis",
+            "synthetic_fixture"
+          ]
+        },
+        "statement": {
+          "type": "string",
+          "description": "A minimal, relevant assertion; avoid unrelated clinical details."
+        },
+        "record_ref": {
+          "type": "string",
+          "description": "Reference to access-controlled source-of-truth record, not its contents."
+        },
+        "record_version": {
+          "type": "string"
+        },
+        "recorded_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "observed_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "valid_until": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "conflict_status": {
+          "type": "string",
+          "enum": [
+            "none",
+            "contested",
+            "stale",
+            "unknown"
+          ]
+        },
+        "synthetic": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "evidence_id",
+        "source_kind",
+        "claim_status",
+        "statement",
+        "record_ref",
+        "record_version",
+        "recorded_at",
+        "observed_at",
+        "valid_until",
+        "conflict_status",
+        "synthetic"
+      ]
+    },
+    "perception": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "expressed_goals": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/participantStatement"
+          }
+        },
+        "activities_and_support": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/supportRequirement"
+          }
+        },
+        "situational_context": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/contextItem"
+          }
+        },
+        "provider_record_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Optional source pointers only; actual provider capability remains provider_rag."
+        }
+      },
+      "required": [
+        "expressed_goals",
+        "activities_and_support",
+        "situational_context",
+        "provider_record_refs"
+      ]
+    },
+    "rights": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "communication_methods": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "text",
+              "speech",
+              "aac",
+              "auslan",
+              "interpreter",
+              "easy_read",
+              "symbols",
+              "large_text",
+              "screen_reader",
+              "switch",
+              "eye_gaze",
+              "other",
+              "not_yet_known"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "communication_adjustments": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "expressed_contact_exclusions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "other_explicit_restrictions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "chosen_supporters_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "References only; no presumed decision-making authority."
+        },
+        "decision_support_preference": {
+          "type": "string",
+          "enum": [
+            "self_directed",
+            "chosen_supporter",
+            "legal_authority_review_required",
+            "not_yet_known"
+          ]
+        },
+        "legal_capacity_inference": {
+          "const": "prohibited"
+        },
+        "dignity_of_risk": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "participant_expressed_choice": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "risks_discussed": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "safeguards_offered": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "unresolved_rights_issue": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "risk_choice_is_not_incapacity": {
+              "const": true
+            }
+          },
+          "required": [
+            "participant_expressed_choice",
+            "risks_discussed",
+            "safeguards_offered",
+            "unresolved_rights_issue",
+            "risk_choice_is_not_incapacity"
+          ]
+        }
+      },
+      "required": [
+        "communication_methods",
+        "communication_adjustments",
+        "expressed_contact_exclusions",
+        "other_explicit_restrictions",
+        "chosen_supporters_refs",
+        "decision_support_preference",
+        "legal_capacity_inference",
+        "dignity_of_risk"
+      ]
+    },
+    "hypothesis": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "hypothesis_id": {
+          "type": "string"
+        },
+        "interpretation": {
+          "type": "string",
+          "description": "Explicitly model-generated candidate, not an established fact."
+        },
+        "supporting_evidence_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "contradicting_evidence_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "confidence_qualifier": {
+          "type": "string",
+          "enum": [
+            "low",
+            "moderate",
+            "high",
+            "not_assessed"
+          ]
+        },
+        "status": {
+          "type": "string",
+          "const": "model_hypothesis"
+        }
+      },
+      "required": [
+        "hypothesis_id",
+        "interpretation",
+        "supporting_evidence_ids",
+        "contradicting_evidence_ids",
+        "confidence_qualifier",
+        "status"
+      ]
+    },
+    "question": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "question_id": {
+          "type": "string"
+        },
+        "question": {
+          "type": "string"
+        },
+        "why_needed": {
+          "type": "string"
+        },
+        "preferred_responder": {
+          "type": "string",
+          "enum": [
+            "participant",
+            "provider",
+            "authorised_worker",
+            "qualified_professional",
+            "other"
+          ]
+        },
+        "priority": {
+          "type": "string",
+          "enum": [
+            "routine",
+            "time_sensitive",
+            "urgent_human_follow_up"
+          ]
+        }
+      },
+      "required": [
+        "question_id",
+        "question",
+        "why_needed",
+        "preferred_responder",
+        "priority"
+      ]
+    },
+    "interpretation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "expressed_intent_summary": {
+          "type": "string"
+        },
+        "hypotheses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/hypothesis"
+          }
+        },
+        "uncertainties": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "clarifying_questions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/question"
+          }
+        },
+        "model_output": {
+          "type": "boolean"
+        },
+        "not_an_official_support_needs_assessment": {
+          "const": true
+        }
+      },
+      "required": [
+        "expressed_intent_summary",
+        "hypotheses",
+        "uncertainties",
+        "clarifying_questions",
+        "model_output",
+        "not_an_official_support_needs_assessment"
+      ]
+    },
+    "option": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "option_id": {
+          "type": "string"
+        },
+        "action_type": {
+          "type": "string",
+          "enum": [
+            "explain_options",
+            "ask_clarification",
+            "draft_provider_message",
+            "read_only_provider_search",
+            "request_human_support",
+            "draft_continuity_plan",
+            "request_authorised_record_check"
+          ]
+        },
+        "description": {
+          "type": "string"
+        },
+        "potential_benefit": {
+          "type": "string"
+        },
+        "material_uncertainty": {
+          "type": "string"
+        },
+        "evidence_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "requires_participant_review": {
+          "const": true
+        },
+        "execution_state": {
+          "const": "not_executed"
+        }
+      },
+      "required": [
+        "option_id",
+        "action_type",
+        "description",
+        "potential_benefit",
+        "material_uncertainty",
+        "evidence_ids",
+        "requires_participant_review",
+        "execution_state"
+      ]
+    },
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "not_started",
+            "participant_correction_requested",
+            "participant_confirmed",
+            "human_support_requested"
+          ]
+        },
+        "participant_corrections": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/participantStatement"
+          }
+        },
+        "reviewed_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "accessible_summary": {
+          "type": "string"
+        },
+        "non_ai_route_available": {
+          "const": true
+        }
+      },
+      "required": [
+        "status",
+        "participant_corrections",
+        "reviewed_at",
+        "accessible_summary",
+        "non_ai_route_available"
+      ]
+    },
+    "safeguards": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "human_review_triggers": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "support_continuity",
+              "time_sensitive_essential_support",
+              "clinical_scope_uncertainty",
+              "alleged_abuse_or_neglect",
+              "restrictive_practice_related",
+              "authority_dispute",
+              "privacy_disclosure_risk",
+              "no_verified_provider_match",
+              "other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "suggested_escalation": {
+          "type": "string",
+          "enum": [
+            "none",
+            "offer_human_support",
+            "urgent_human_review",
+            "emergency_services_guidance_only"
+          ]
+        },
+        "clinical_decision_authority": {
+          "const": "none"
+        },
+        "restrictive_practice_authority": {
+          "const": "none"
+        },
+        "ndis_funding_authority": {
+          "const": "none"
+        }
+      },
+      "required": [
+        "human_review_triggers",
+        "suggested_escalation",
+        "clinical_decision_authority",
+        "restrictive_practice_authority",
+        "ndis_funding_authority"
+      ]
+    },
+    "governance": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "actor_ref": {
+          "type": "string",
+          "description": "Trusted session actor reference, populated by deterministic server only."
+        },
+        "auth_projection_ref": {
+          "type": "string",
+          "description": "Signed or verifiable server-side authority decision; never model output."
+        },
+        "purpose_authorised": {
+          "type": "boolean"
+        },
+        "consent_receipt_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Existing MapAble ConsentRecord references, never new consent records invented by MAIRA."
+        },
+        "model_processing_permission": {
+          "type": "string",
+          "enum": [
+            "allowed",
+            "denied",
+            "not_checked"
+          ]
+        },
+        "stop_aura_active": {
+          "type": "boolean"
+        },
+        "allowed_model_authority": {
+          "const": "none"
+        },
+        "execution_mode": {
+          "const": "proposal_only"
+        },
+        "participant_approval_required_for_consequential_actions": {
+          "const": true
+        },
+        "last_policy_check_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "actor_ref",
+        "auth_projection_ref",
+        "purpose_authorised",
+        "consent_receipt_refs",
+        "model_processing_permission",
+        "stop_aura_active",
+        "allowed_model_authority",
+        "execution_mode",
+        "participant_approval_required_for_consequential_actions",
+        "last_policy_check_at"
+      ]
+    }
+  }
+}
