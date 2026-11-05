@@ -1,0 +1,28 @@
+name: Care Support RAG shadow contract
+
+on:
+  pull_request:
+    paths:
+      - 'apps/web/lib/ai/platform/retrieval/care-support/**'
+      - 'apps/web/tests/ai-platform/care-support-rag.contract.test.mjs'
+      - 'apps/web/docs/ai-platform/care-support-rag/**'
+      - '.github/workflows/care-support-rag-contract.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  synthetic-rag-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.16.0'
+      - name: Run synthetic-only RAG authorisation tests
+        run: node --experimental-strip-types --test apps/web/tests/ai-platform/care-support-rag.contract.test.mjs
+      - name: Check pure TypeScript boundary contract
+        run: |
+          npx --yes --package typescript@5.9.3 tsc --noEmit --target ES2022 --lib ES2022,DOM --module ESNext --moduleResolution Bundler --strict apps/web/lib/ai/platform/retrieval/care-support/care-support-rag.ts
