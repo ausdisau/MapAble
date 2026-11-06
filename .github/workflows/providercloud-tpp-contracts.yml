@@ -1,0 +1,27 @@
+name: ProviderCloud TPP REST contracts (no network)
+
+on:
+  push:
+    paths:
+      - 'apps/web/lib/provider-cloud/tpp-wholesale/**'
+      - 'apps/web/tests/standalone/provider-cloud-tpp-contract.test.mjs'
+      - '.github/workflows/providercloud-tpp-contracts.yml'
+  pull_request:
+    paths:
+      - 'apps/web/lib/provider-cloud/tpp-wholesale/**'
+      - 'apps/web/tests/standalone/provider-cloud-tpp-contract.test.mjs'
+      - '.github/workflows/providercloud-tpp-contracts.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  contract-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run deterministic TPP REST contract tests (no secrets or live API)
+        run: node --experimental-strip-types --test apps/web/tests/standalone/provider-cloud-tpp-contract.test.mjs
