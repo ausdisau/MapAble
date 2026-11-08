@@ -136,7 +136,7 @@ export function CalendarReadPanel() {
           )}
           {result.truncated ? (
             <p className="text-sm">
-              Only part of this day's calendar may be shown. Open the full
+              Only part of this day&apos;s calendar may be shown. Open the full
               calendar to check for additional entries.
             </p>
           ) : null}
