@@ -20,6 +20,7 @@ export function MapAbleAppShell({
   variant = "marketing",
   children,
   secondaryNav,
+  sidebar,
   headerTitle,
   headerActions,
   logoHref,
@@ -27,6 +28,7 @@ export function MapAbleAppShell({
   variant?: MapAbleAppShellVariant;
   children: ReactNode;
   secondaryNav?: ReactNode;
+  sidebar?: ReactNode;
   headerTitle?: string;
   headerActions?: ReactNode;
   logoHref?: string;
@@ -73,9 +75,20 @@ export function MapAbleAppShell({
         logoHref={logoHref ?? "/dashboard"}
       />
       {secondaryNav}
-      <main id="main-content" className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">
-        {children}
-      </main>
+      {sidebar ? (
+        <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-6 px-4 py-6 md:flex-row md:items-start md:gap-8 md:py-8">
+          <aside aria-label="Workspace menu" className="w-full shrink-0 md:sticky md:top-4 md:w-64">
+            {sidebar}
+          </aside>
+          <main id="main-content" className="w-full min-w-0 flex-1">
+            {children}
+          </main>
+        </div>
+      ) : (
+        <main id="main-content" className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">
+          {children}
+        </main>
+      )}
       <MapAbleCareSlimFooter />
     </div>
   );

@@ -24,7 +24,7 @@ export function DashboardAppShell({
       headerTitle="Dashboard"
       logoHref="/dashboard"
       headerActions={<MapAbleUserBar userName={userName} role={role} />}
-      secondaryNav={
+      sidebar={
         <DashboardNav
           userName={userName}
           role={role}
