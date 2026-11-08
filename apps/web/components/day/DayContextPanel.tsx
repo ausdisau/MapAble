@@ -60,7 +60,7 @@ export function DayContextPanel() {
       <form className="mt-4 space-y-4" onSubmit={reviewDraft}>
         <div>
           <label htmlFor="day-context-goal" className="block text-sm font-semibold">
-            Today's priority (optional)
+            Today&apos;s priority (optional)
           </label>
           <textarea
             id="day-context-goal"
