@@ -1,14 +1,11 @@
+import { ParticipantDashboardViews } from "@/components/dashboard/ParticipantDashboardViews";
 import { CoreHubCard } from "@/components/core/CoreHubCard";
 import { adaptParticipantDashboard } from "@/lib/access/adaptive";
 import { requireAuth } from "@/lib/auth/guards";
-import { roleLabel } from "@/lib/auth/roles";
-import { caseListWhereForUser } from "@/lib/cases/case-access";
-import { caseManagementConfig } from "@/lib/config/case-management";
-import { isEngagementPlatformEnabled } from "@/lib/config/engagement";
-import { countOpenSubmissions } from "@/lib/engagement/engagement-submission-service";
 import { prisma } from "@/lib/prisma";
+import { getMapAbleIntelligenceConfig } from "@/intelligence/config";
 
-export const metadata = { title: "Control panel | MapAble Core" };
+export const metadata = { title: "My workspace | MapAble Core" };
 
 export default async function DashboardPage() {
   const user = await requireAuth();
@@ -19,51 +16,29 @@ export default async function DashboardPage() {
     careBookingsCount,
     transportTripsCount,
     unreadNotifications,
-    incidentCount,
     openSupportCount,
-    openCaseCount,
-    openEngagementCount,
   ] = await Promise.all([
     prisma.participantProfile.findUnique({ where: { userId: user.id } }),
     prisma.booking.count({ where: { participantId: user.id } }),
     prisma.careBooking.count({ where: { participantId: user.id } }),
     prisma.transportTrip.count({ where: { participantId: user.id } }),
-    prisma.notification.count({
-      where: { userId: user.id, readAt: null },
-    }),
-    prisma.incidentReport.count({
-      where: {
-        OR: [{ participantId: user.id }, { reportedById: user.id }],
-      },
-    }),
+    prisma.notification.count({ where: { userId: user.id, readAt: null } }),
     prisma.supportTicket.count({
       where: {
         OR: [{ createdById: user.id }, { participantId: user.id }],
         status: { notIn: ["resolved", "closed"] },
       },
     }),
-    caseManagementConfig.enabled
-      ? prisma.case.count({
-          where: {
-            AND: [
-              caseListWhereForUser(user.id, user.primaryRole),
-              { status: { not: "closed" } },
-            ],
-          },
-        })
-      : Promise.resolve(0),
-    isEngagementPlatformEnabled()
-      ? countOpenSubmissions(user.id)
-      : Promise.resolve(0),
   ]);
 
-  // Presentation adapter only — flags default off; does not alter dashboard meaning.
   const presentation = adaptParticipantDashboard({ profile: null });
   const densityClass =
     presentation.applied &&
     presentation.policy?.informationDensity === "low"
       ? "max-w-2xl space-y-10"
       : "space-y-8";
+
+  const displayName = profile?.preferredName ?? profile?.displayName;
 
   return (
     <div
@@ -72,109 +47,59 @@ export default async function DashboardPage() {
       data-adapt-variant={presentation.policy?.componentVariant ?? "default"}
     >
       <header>
-        <h1 className="font-heading text-3xl font-bold">Your control panel</h1>
-        <p className="mt-2 max-w-2xl text-muted-foreground">
-          Welcome to MapAble Core. You are signed in as a{" "}
-          <strong>{roleLabel(user.primaryRole)}</strong>. Manage your profile,
-          accessibility preferences, consent, bookings and transport trips from
-          here.
+        <h1 className="font-heading text-3xl font-bold">
+          {displayName ? "Welcome back, " + displayName : "My MapAble workspace"}
+        </h1>
+        <p className="mt-2 max-w-2xl text-slate-700">
+          Your care, transport and accessibility information in one place.
+          You decide what to do next.
         </p>
       </header>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <CoreHubCard
-          title="Billing centre"
-          description="Invoices, funding sources and payments"
-          href="/dashboard/billing"
-        />
-        <CoreHubCard
-          title="Safety centre"
-          description={
-            openSupportCount || incidentCount
-              ? `${incidentCount} incident report(s) · ${openSupportCount} open support ticket(s)`
-              : "Incident reports and support tickets"
-          }
-          href="/dashboard/safety"
-        />
-        {isEngagementPlatformEnabled() ? (
+      <ParticipantDashboardViews
+        careOsEnabled={getMapAbleIntelligenceConfig().enabled}
+        counts={{
+          bookings: bookingsCount,
+          careBookings: careBookingsCount,
+          transportTrips: transportTripsCount,
+          unreadNotifications,
+          openSupportTickets: openSupportCount,
+        }}
+      />
+
+      <section aria-labelledby="workspace-services-heading" className="space-y-4">
+        <h2 id="workspace-services-heading" className="font-heading text-2xl font-bold">
+          My services
+        </h2>
+        <div className="grid gap-4 sm:grid-cols-2">
           <CoreHubCard
-            title="Your voice"
-            description={
-              openEngagementCount
-                ? `${openEngagementCount} open feedback or complaint item(s)`
-                : "Feedback, complaints, and improvement updates"
-            }
-            href="/dashboard/engagement"
+            title="My care"
+            description="Find and review support arrangements"
+            href="/care/bookings"
           />
-        ) : null}
-        <CoreHubCard
-          title="MapAble Care"
-          description={
-            careBookingsCount
-              ? `${careBookingsCount} care booking(s)`
-              : "Request disability supports and track service delivery"
-          }
-          href="/care/bookings"
-        />
-        <CoreHubCard
-          title="Transport trips"
-          description={
-            transportTripsCount
-              ? `${transportTripsCount} scheduled transport trip(s)`
-              : "Request and track scheduled transport"
-          }
-          href="/dashboard/transport"
-        />
-        <CoreHubCard
-          title="Profile"
-          description={
-            profile
-              ? `Display name: ${profile.displayName}`
-              : "Set up your participant profile"
-          }
-          href="/dashboard/profile"
-        />
-        <CoreHubCard
-          title="Accessibility"
-          description="Your access needs travel with you across MapAble services"
-          href="/dashboard/accessibility"
-        />
-        <CoreHubCard
-          title="Consent"
-          description="Control who can see your information"
-          href="/dashboard/consent"
-        />
-        <CoreHubCard
-          title="My CareOS"
-          description="Coordinate care and transport with participant-controlled recommendations"
-          href="/dashboard/careos"
-        />
-        <CoreHubCard
-          title="Bookings"
-          description={`${bookingsCount} booking request(s)`}
-          href="/dashboard/bookings"
-        />
-        <CoreHubCard
-          title="Notifications"
-          description={
-            unreadNotifications
-              ? `${unreadNotifications} unread`
-              : "No unread notifications"
-          }
-          href="/dashboard/notifications"
-        />
-        {caseManagementConfig.enabled ? (
           <CoreHubCard
-            title="Cases (AI)"
-            description={
-              openCaseCount
-                ? `${openCaseCount} open case(s) · AI insights are advisory only`
-                : "AI-enabled case management for support coordination"
-            }
-            href="/dashboard/cases"
+            title="My transport"
+            description="Request or review accessible trips"
+            href="/dashboard/transport"
           />
-        ) : null}
-      </div>
+          <CoreHubCard
+            title="Accessible places"
+            description="Browse access information and known limitations"
+            href="/accessibility-map"
+          />
+          <CoreHubCard
+            title="Find support"
+            description="Explore support providers with clear verification information"
+            href="/dashboard/find-support"
+          />
+        </div>
+      </section>
+
+      <p className="text-sm text-slate-700">
+        Looking for account settings, privacy, documents or billing? Use the
+        <strong> My profile and settings </strong>section in the workspace menu.
+        For urgent danger in Australia, call 000.
+      </p>
     </div>
   );
 }
