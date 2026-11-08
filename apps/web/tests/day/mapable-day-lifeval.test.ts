@@ -104,4 +104,51 @@ describe("MapAble Day v0.1 LifeVal-inspired synthetic evaluations", () => {
     assessDayPlan(plan);
     expect(JSON.stringify(plan)).toBe(before);
   });
+  it("does not treat missing worker evidence as an approved care shift", () => {
+    const plan = makeSyntheticDayPlan("baseline");
+    const care = plan.activities.find((item) => item.id === "morning-care");
+    if (!care) throw new Error("MISSING_FIXTURE");
+    care.workerEvidence = "not_applicable";
+    const assessment = assessDayPlan(plan);
+    expect(assessment.activities.find((item) => item.activityId === "morning-care")?.readiness).toBe("blocked");
+  });
+
+  it("marks transport without vehicle evidence for review", () => {
+    const plan = makeSyntheticDayPlan("baseline");
+    const trip = plan.activities.find((item) => item.id === "outbound-trip");
+    if (!trip) throw new Error("MISSING_FIXTURE");
+    trip.vehicleEvidence = "not_applicable";
+    const assessment = assessDayPlan(plan);
+    expect(assessment.activities.find((item) => item.activityId === "outbound-trip")?.readiness).toBe("review");
+    expect(assessment.activities.find((item) => item.activityId === "appointment")?.readiness).toBe("review");
+  });
+
+  it("flags a journey when its appointment begins before the trip ends", () => {
+    const plan = makeSyntheticDayPlan("baseline");
+    const appointment = plan.activities.find((item) => item.id === "appointment");
+    if (!appointment) throw new Error("MISSING_FIXTURE");
+    appointment.startTime = "09:30";
+    const assessment = assessDayPlan(plan);
+    expect(assessment.activities.find((item) => item.activityId === "appointment")?.readiness).toBe("review");
+  });
+
+  it("does not call impossible, cross-midnight or duplicate activities ready", () => {
+    const plan = makeSyntheticDayPlan("baseline");
+    const care = plan.activities.find((item) => item.id === "morning-care");
+    if (!care) throw new Error("MISSING_FIXTURE");
+    care.startTime = "25:00";
+    expect(assessDayPlan(plan).activities.find((item) => item.activityId === "morning-care")?.readiness).toBe("blocked");
+
+    care.startTime = "23:30";
+    care.endTime = "00:30";
+    expect(assessDayPlan(plan).activities.find((item) => item.activityId === "morning-care")?.readiness).toBe("blocked");
+
+    care.startTime = "08:00";
+    care.endTime = "09:00";
+    plan.activities.push({ ...care, dependsOn: [] });
+    const duplicates = assessDayPlan(plan).activities.filter((item) => item.activityId === "morning-care");
+    expect(duplicates).toHaveLength(2);
+    expect(duplicates.every((item) => item.readiness === "blocked")).toBe(true);
+  });
+
 });
