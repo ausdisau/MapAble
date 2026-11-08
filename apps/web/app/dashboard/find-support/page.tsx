@@ -6,7 +6,7 @@ import { isParticipantMatchingPreviewEnabled } from "@/lib/matching/participant-
 import { searchCareProviders } from "@/lib/search/provider-search-service";
 
 export default async function FindSupportPage() {
-  await requireAuth();
+  const user = await requireAuth();
   const results = await searchCareProviders({});
 
   return (
@@ -15,7 +15,8 @@ export default async function FindSupportPage() {
       <p className="text-muted-foreground">
         Controlled search — list view. Private worker credentials are not shown.
       </p>
-      {isParticipantMatchingPreviewEnabled() ? (
+      {isParticipantMatchingPreviewEnabled() &&
+      (user.roles.includes("participant") || user.primaryRole === "mapable_admin") ? (
         <p className="rounded-lg border border-amber-400 bg-amber-50 p-4">
           <Link
             href="/dashboard/matching-preview"

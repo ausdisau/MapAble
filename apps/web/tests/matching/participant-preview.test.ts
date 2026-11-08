@@ -5,7 +5,6 @@ import {
   FICTIONAL_WORKERS,
   reviewFictionalWorker,
   type FictionalWorker,
-  type ScreeningState,
 } from "@/lib/matching/participant-preview";
 
 const worker = FICTIONAL_WORKERS[0]!;
@@ -23,12 +22,12 @@ describe("participant matching preview (fictional, read only)", () => {
     expect(JSON.stringify(result)).not.toContain("matchScore");
   });
 
-  it.each<ScreeningState>([
+  it.each([
     "Interim bar",
     "Exclusion",
     "Suspension",
     "No valid clearance",
-  ])("does not progress restricted fictional status %s", (status) => {
+  ] as const)("does not progress restricted fictional status %s", (status) => {
     const result = reviewFictionalWorker(EMPTY_CRITERIA, {
       ...worker,
       fictionalScreening: status,
@@ -40,7 +39,7 @@ describe("participant matching preview (fictional, read only)", () => {
 
   it.each<ScreeningState>([
     "Clearance", "Pending", "Not independently verified",
-  ])("never upgrades the fictional label %s into verified clearance", (status) => {
+  ] as const)("never upgrades the fictional label %s into verified clearance", (status) => {
     const result = reviewFictionalWorker(EMPTY_CRITERIA, {
       ...worker,
       fictionalScreening: status,

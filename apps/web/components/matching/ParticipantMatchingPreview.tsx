@@ -37,7 +37,7 @@ function toggle<T>(items: T[], value: T): T[] {
   return items.includes(value) ? items.filter((item) => item !== value) : [...items, value];
 }
 
-const inputClass = "min-h-11 rounded-lg border border-slate-400 px-4 py-2 text-[#0C1833] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#F8C51C]/50";
+const inputClass = "min-h-11 rounded-lg border border-slate-400 px-4 py-2 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#F8C51C]/50";
 
 export function ParticipantMatchingPreview() {
   const [criteria, setCriteria] = useState<ParticipantCriteria>({ ...EMPTY_CRITERIA });
@@ -107,7 +107,7 @@ export function ParticipantMatchingPreview() {
           <label htmlFor="match-time" className="block font-semibold">Preferred time</label>
           <select
             id="match-time"
-            className={inputClass + " w-full bg-white"}
+            className={inputClass + " w-full bg-white text-[#0C1833]"}
             value={criteria.preferredWindow}
             onChange={(event) => setCriteria((current) => ({
               ...current,
@@ -120,7 +120,7 @@ export function ParticipantMatchingPreview() {
 
         <button
           type="button"
-          className={inputClass + " bg-white font-semibold"}
+          className={inputClass + " bg-white font-semibold text-[#0C1833]"}
           onClick={() => { setCriteria({ ...EMPTY_CRITERIA }); setDiscussionList([]); }}
         >
           Reset the preview
