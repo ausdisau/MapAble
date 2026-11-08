@@ -1,0 +1,63 @@
+name: MapAble Day validation
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "apps/web/app/dashboard/day/**"
+      - "apps/web/app/api/day/**"
+      - "apps/web/components/day/**"
+      - "apps/web/lib/day/**"
+      - "apps/web/tests/day/**"
+      - "docs/product/MAPABLE-DAY-LIFEVAL-V01.md"
+      - ".github/workflows/mapable-day-validation.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mapable-day-validation-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  evaluate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - name: Check out MapAble branch
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Enable pinned pnpm
+        run: corepack enable
+
+      - name: Install frozen dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma types
+        run: pnpm prisma generate
+
+      - name: Run reproducible MapAble Day evaluations
+        run: pnpm exec vitest run tests/day
+
+      - name: Check TypeScript integration
+        run: pnpm type-check
+
+      - name: Lint Day implementation and tests
+        run: >-
+          pnpm exec eslint
+          app/api/day/calendar/route.ts
+          app/dashboard/day/page.tsx
+          components/day
+          lib/day
+          tests/day
+          --max-warnings 0

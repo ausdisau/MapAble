@@ -149,6 +149,13 @@ export default async function DashboardPage() {
           description="Coordinate care and transport with participant-controlled recommendations"
           href="/dashboard/careos"
         />
+        {process.env.MAPABLE_DAY_DEMO_ENABLED === "true" ? (
+          <CoreHubCard
+            title="MapAble Day (preview)"
+            description="Explore care, transport and participation dependencies in a synthetic, participant-controlled day planner"
+            href="/dashboard/day"
+          />
+        ) : null}
         <CoreHubCard
           title="Bookings"
           description={`${bookingsCount} booking request(s)`}
