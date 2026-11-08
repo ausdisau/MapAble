@@ -50,16 +50,20 @@ const CAREOS_LINKS = [
 export function DashboardNav({
   role,
   showCareOsNav = false,
+  showMapAbleIdNav = false,
 }: {
   userName: string;
   role: UserRole;
   showCareOsNav?: boolean;
+  showMapAbleIdNav?: boolean;
 }) {
   const pathname = usePathname();
   const links = [
     BASE_LINKS[0]!,
     ...(showCareOsNav ? CAREOS_LINKS : []),
-    ...BASE_LINKS.slice(1),
+    ...BASE_LINKS.slice(1, 2),
+    ...(showMapAbleIdNav ? [{ href: "/dashboard/identity", label: "MapAbleID (read-only preview)" }] : []),
+    ...BASE_LINKS.slice(2),
     ...(role === "mapable_admin" ? [{ href: "/admin", label: "Admin" }] : []),
   ];
 
