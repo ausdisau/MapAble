@@ -82,6 +82,12 @@ function highest(a: DayReadiness, b: DayReadiness): DayReadiness {
   return priority[a] >= priority[b] ? a : b;
 }
 
+function minuteOfDay(clock: string): number | null {
+  if (!/^([01][0-9]|2[0-3]):[0-5][0-9]$/.test(clock)) return null;
+  const [hour, minute] = clock.split(":").map(Number);
+  return hour * 60 + minute;
+}
+
 /**
  * Evaluate the actual dependency graph, not just a checklist.
  * Unknown is not equivalent to cancelled. A blocked dependency propagates
@@ -89,6 +95,10 @@ function highest(a: DayReadiness, b: DayReadiness): DayReadiness {
  */
 export function assessDayPlan(plan: DayPlan): DayPlanAssessment {
   const byId = new Map(plan.activities.map((item) => [item.id, item]));
+  const idCounts = new Map<string, number>();
+  for (const activity of plan.activities) {
+    idCounts.set(activity.id, (idCounts.get(activity.id) ?? 0) + 1);
+  }
   const cache = new Map<string, DayActivityAssessment>();
 
   function visit(id: string, ancestors: Set<string>): DayActivityAssessment {
@@ -117,6 +127,23 @@ export function assessDayPlan(plan: DayPlan): DayPlanAssessment {
     const reasons: string[] = [];
     const affectedBy: string[] = [];
     let readiness: DayReadiness = "ready";
+    const startMinute = minuteOfDay(item.startTime);
+    const endMinute = minuteOfDay(item.endTime);
+
+    if ((idCounts.get(id) ?? 0) > 1) {
+      readiness = "blocked";
+      reasons.push("This activity identifier is duplicated. Human review is needed.");
+    }
+    if (
+      startMinute === null ||
+      endMinute === null ||
+      endMinute <= startMinute
+    ) {
+      readiness = "blocked";
+      reasons.push(
+        "Activity time is invalid or crosses midnight. A dated schedule is needed.",
+      );
+    }
 
     if (item.status === "cancelled") {
       readiness = "blocked";
@@ -129,7 +156,7 @@ export function assessDayPlan(plan: DayPlan): DayPlanAssessment {
       reasons.push("This arrangement has not been verified.");
     }
 
-    if (item.kind === "care" && item.workerEvidence === "unverified") {
+    if (item.kind === "care" && item.workerEvidence !== "verified") {
       readiness = "blocked";
       reasons.push("A suitable worker has not been verified. Do not assume cover.");
     }
@@ -137,7 +164,7 @@ export function assessDayPlan(plan: DayPlan): DayPlanAssessment {
     if (item.kind === "transport" && item.vehicleEvidence === "incompatible") {
       readiness = "blocked";
       reasons.push("The proposed vehicle does not meet the stated access requirements.");
-    } else if (item.kind === "transport" && item.vehicleEvidence === "unknown") {
+    } else if (item.kind === "transport" && item.vehicleEvidence !== "compatible") {
       readiness = highest(readiness, "review");
       reasons.push("Vehicle accessibility has not been checked.");
     }
@@ -151,6 +178,19 @@ export function assessDayPlan(plan: DayPlan): DayPlanAssessment {
     nextAncestors.add(id);
     for (const dependencyId of item.dependsOn) {
       const dependency = visit(dependencyId, nextAncestors);
+      const predecessor = byId.get(dependencyId);
+      const predecessorEnd = predecessor
+        ? minuteOfDay(predecessor.endTime)
+        : null;
+      if (
+        startMinute !== null &&
+        predecessorEnd !== null &&
+        predecessorEnd > startMinute
+      ) {
+        readiness = highest(readiness, "review");
+        affectedBy.push(dependencyId);
+        reasons.push("A dependent activity begins before its prerequisite ends.");
+      }
       if (dependency.readiness !== "ready") {
         readiness = highest(readiness, dependency.readiness);
         affectedBy.push(dependencyId);
