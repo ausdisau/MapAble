@@ -1,0 +1,25 @@
+name: NDIA gateway fail-closed contract
+
+on:
+  pull_request:
+    paths:
+      - "apps/web/lib/ndis/api-gateway/**"
+      - "apps/web/tests/ndis/ndia-gateway-contract.test.mjs"
+      - "apps/web/app/api/admin/ndia-adapter-readiness/**"
+      - "apps/web/lib/integrations/adapters/ndia-adapter.ts"
+      - ".github/workflows/ndia-gateway-contract.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Execute zero-network NDIA adapter contract
+        run: node --experimental-strip-types --test apps/web/tests/ndis/ndia-gateway-contract.test.mjs
