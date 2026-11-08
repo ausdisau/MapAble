@@ -1,5 +1,7 @@
 import { cookies } from "next/headers";
 
+import { isSafeInternalRedirectPath } from "@/lib/auth/safe-internal-redirect";
+
 const KEYCLOAK_STATE_COOKIE = "keycloak_oauth_state";
 
 export async function setKeycloakOAuthState(state: string) {
@@ -23,8 +25,5 @@ export async function consumeKeycloakOAuthState(
 }
 
 export function isSafeRedirect(path: string): boolean {
-  if (!path.startsWith("/")) return false;
-  if (path.startsWith("//")) return false;
-  if (path.includes("://")) return false;
-  return true;
+  return isSafeInternalRedirectPath(path) && !path.includes("://");
 }
