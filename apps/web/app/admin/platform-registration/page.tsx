@@ -73,6 +73,10 @@ export default async function PlatformRegistrationPage() {
         <Link className="underline" href="/admin/ndia-readiness">
           NDIA API readiness
         </Link>
+        {" · "}
+        <Link className="underline" href="/admin/ndis-platform-adapter">
+          NDIS integration adapter
+        </Link>
       </p>
     </div>
   );

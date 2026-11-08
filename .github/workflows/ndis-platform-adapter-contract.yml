@@ -1,0 +1,24 @@
+name: MapAble NDIS adapter contract
+
+on:
+  pull_request:
+    paths:
+      - "apps/web/lib/ndis/platform-adapter/**"
+      - "apps/web/tests/ndis/ndis-platform-adapter.contract.test.mjs"
+      - "apps/web/app/api/admin/ndis-platform-adapter/**"
+      - ".github/workflows/ndis-platform-adapter-contract.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  synthetic-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Verify fail-closed, zero-network source contracts
+        run: node --experimental-strip-types --test apps/web/tests/ndis/ndis-platform-adapter.contract.test.mjs
