@@ -1,0 +1,43 @@
+name: Agentic marketplace synthetic sandbox validation
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "apps/web/lib/marketplace/agentic-lab/**"
+      - "apps/web/components/marketplace/AgenticMarketplaceLab.tsx"
+      - "apps/web/components/marketplace/GuardianMarketplacePanel.tsx"
+      - "apps/web/app/marketplace/agentic-lab/**"
+      - "apps/web/tests/marketplace-agentic-lab.test.ts"
+      - "apps/web/tests/marketplace-governance.test.ts"
+      - "apps/web/tests/marketplace-agentic-integration.test.ts"
+      - "apps/web/tests/marketplace-agentic-ui.test.tsx"
+      - "docs/marketplace-agentic-lab.md"
+      - "docs/marketplace-agentic-next-gates.md"
+      - ".github/workflows/marketplace-agentic-lab.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: mapable-agentic-marketplace-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  verify-agentic-marketplace:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: corepack enable
+      - name: Install locked dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Run synthetic governance and fairness tests
+        run: pnpm vitest run tests/marketplace-agentic-lab.test.ts tests/marketplace-governance.test.ts tests/marketplace-agentic-integration.test.ts tests/marketplace-agentic-ui.test.tsx
+      - name: Type-check canonical web application
+        run: pnpm type-check
+      - name: Check targeted source lint
+        run: pnpm eslint components/marketplace/AgenticMarketplaceLab.tsx components/marketplace/GuardianMarketplacePanel.tsx lib/marketplace/agentic-lab app/marketplace/agentic-lab tests/marketplace-agentic-lab.test.ts tests/marketplace-governance.test.ts tests/marketplace-agentic-integration.test.ts tests/marketplace-agentic-ui.test.tsx --max-warnings 0
