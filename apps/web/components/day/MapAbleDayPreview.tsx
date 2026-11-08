@@ -3,6 +3,7 @@
 import Link from "next/link";
 
 import { CalendarReadPanel } from "@/components/day/CalendarReadPanel";
+import { DayContextPanel } from "@/components/day/DayContextPanel";
 import { useMemo, useState } from "react";
 
 import {
@@ -123,6 +124,8 @@ export function MapAbleDayPreview({
           {plan.description}
         </p>
       </section>
+
+      <DayContextPanel />
 
       <div className="grid gap-4 sm:grid-cols-3">
         <SummaryStat value={assessment.readyCount} label="Ready in example" />
