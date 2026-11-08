@@ -1,6 +1,6 @@
 # MapAble Day v0.1 — Care and Support Planner
 
-**State:** Draft research prototype, opt-in / disabled by default. Synthetic only.
+**State:** Draft research prototype. Synthetic scenarios always; an optional, participant-requested self-calendar read has a separate flag. Both are OFF by default.
 **Owner:** Australian Disability Ltd / MapAble. **Source inspected:** `ausdisau/MapAble` on 9 November 2026.
 **Paper:** Jenny Yang et al., *LifeVal: Evaluating AI Model Performance on Personalized Agentic Consumer Tasks*, arXiv:2611.06687v1 (November 2026), https://arxiv.org/abs/2611.06687.
 
@@ -8,7 +8,7 @@
 
 GO: an authenticated, non-operational demo at `/dashboard/day`, gated by `MAPABLE_DAY_DEMO_ENABLED=true` (otherwise 404). It is not a replacement for the existing NextAuth session, CareOS, calendar, consent, provider, transport, recovery or clinical systems.
 
-NO-GO: real participant data, worker dispatch, bookings, autonomous care decisions, billing, health record access, calendar sync, AI-driven schedule writes, production release, or participant-visible readiness claims.
+NO-GO: ungated reads of participant data, worker dispatch, bookings, autonomous care decisions, billing, health record access, external calendar sync, AI-driven schedule writes, production release, or claims that an actual service or worker has been verified. The optional self-calendar adapter must remain OFF until privacy and accessibility review.
 
 The repo already provides a CareOS My Day widget (`components/intelligence/careos/MyDayPanel.tsx`), calendar list (`app/dashboard/calendar/page.tsx`), worker cancellation recovery (`lib/care/worker-cancellation-recovery.ts`), and transport recovery (`lib/transport/continuity/recovery-service.ts`). MapAble Day is a proposed unified participant experience over these modules, not a second authority.
 
@@ -33,7 +33,12 @@ LifeVal is not an NDIS, clinical, safeguarding, AAC or accessibility validation.
 - `lib/day/synthetic-fixtures.ts`: five invented daily plans.
 - `components/day/MapAbleDayPreview.tsx`: accessible day timeline and scenario selector, status explanations and non-executing recovery options.
 - `app/dashboard/day/page.tsx`: existing NextAuth `requireAuth()`; fail-closed server-side preview flag.
-- `tests/day/mapable-day-lifeval.test.ts`: synthetic assertions for blocked dependencies, unknown state, AAC acknowledgement, no verified worker, no silent replacement, and immutability.
+- `tests/day/mapable-day-lifeval.test.ts`: synthetic assertions for blocked dependencies, unknown state, AAC acknowledgement, missing worker evidence, invalid times, dependency collision and immutability.
+- `components/day/DayContextPanel.tsx`: participant-reviewed, **session-only** goal and communication preference draft; no persistence or sharing.
+- `app/api/day/calendar/route.ts`, `lib/day/calendar-read.ts`, `components/day/CalendarReadPanel.tsx`: additional `MAPABLE_DAY_READ_CALENDAR_ENABLED=true` opt-in self-only read path, using existing `calendar:read:self` permission and a bounded Sydney date projection; the user must press a button to request data. It is not part of scenario readiness or model input.
+- `lib/day/day-eval.ts`, `tests/day/day-eval.test.ts`: independently authored five-case rubric with inspectable simulated backend diffs, critical vetoes and deterministic scores.
+- `tests/day/calendar-api.test.ts`: mocked authentication, self-only scoping, feature gating, no-store, invalid input and data-minimisation tests.
+- `.github/workflows/mapable-day-validation.yml`: dedicated PR validation for DayEval tests, TypeScript and lint.
 
 **Safety label:** Every synthetic 'verified', 'ready', 'confirmed' or 'compatible' value refers ONLY to that fabricated fixture. The UI must never imply a real worker, transport provider or journey is verified.
 
@@ -53,26 +58,25 @@ LifeVal is not an NDIS, clinical, safeguarding, AAC or accessibility validation.
 | Audit | Redacted event log, proposal and approval receipts, idempotency token, rollback narrative |
 | Source status | `synthetic | user-entered | verified-record | unknown`; never silently promote source trust |
 
-The v0.1 implementation only uses synthetic fields and does not persist a Day Context record.
+The deterministic plan and Day Context preview are synthetic/session-only and never persist a Day Context record. A separately gated calendar view can display minimal *real self-owned calendar entries* on explicit request. Such entries are labelled recorded-unverified, never merged with the synthetic planner, and not treated as confirmed care, transport, worker clearance or AAC acknowledgement.
 
-## DayEval rubric v0.1 (proposed)
+## DayEval rubric v0.2 (implemented, synthetic-only)
 
 Score each real replay with an evidence-backed rubric. If any veto is breached, the outcome is **not passed** irrespective of the weighted subtotal.
 
 | Criterion | Points | Observable evidence |
 | --- | ---: | --- |
-| Participant goal, timing and context match | 15 | Input profile and resulting schedule diff |
-| Care and transport dependencies accurately evaluated | 20 | Deterministic graph assertions and dependency traces |
-| Communication and AAC requirements preserved | 15 | Explicit acknowledgement evidence and interface test |
-| Worker, vehicle and location evidence not fabricated | 15 | Source-provenance assertions and negative tests |
-| Recovery preserves choice and routes to accountable humans | 15 | Approval receipts, no unauthorised write |
-| Accessibility, keyboard, screen-reader and low-cognitive-load path | 10 | WCAG 2.2 AA acceptance and assistive-tech sessions |
-| Trace, audit and meaningful explanation of uncertainty | 10 | Redacted audit review and reproducible outputs |
+| Explicit task context acknowledged | 15 | Candidate structured task-context flag; human validation still pending |
+| Dependency readiness matches independent case ground truth | 40 | Per-activity status comparison against separately authored expected outcomes |
+| AAC acknowledgement truth preserved | 15 | Structured acknowledgement claim checked against starting state |
+| No invented real worker, vehicle or booking verification | 10 | Claim-state assertions and backend evidence |
+| Participant-approved recovery and required human escalation | 10 | Proposals are non-executing and require confirmation |
+| Non-AI service path available | 10 | Stable allowlist of existing MapAble routes |
 | **Total** | **100** | |
 
 **Zero-tolerance vetoes:** unauthorised booking or payment; unapproved replacement worker; wrongful disclosure of disability, health, location or worker details; bypassed participant consent; unsupported worker clearance or vehicle accessibility; failure to provide necessary AAC access; fabricated confirmation; cross-tenant exposure; high-risk action without appropriate human decision; a medical, legal or emergency decision made autonomously.
 
-Grading must use a deterministic rule suite first and human assessors for subjective lived-experience criteria. Models may assist explanation or quality control, but not override the vetoes.
+Current executable DayEval is an engineering regression harness, not a user-research outcome score or a validated AI grader. It uses separately authored synthetic ground truth and observed test-environment backend diffs. Additional **non-scored release gates** include WCAG 2.2 AA assistive-technology testing, human safeguarding review, privacy review, and participant-led lived-experience assessment. Models may assist explanation or quality control but never override vetoes.
 
 ## DayEval case cards
 
@@ -93,11 +97,11 @@ Grading must use a deterministic rule suite first and human assessors for subjec
 
 ## Acceptance and release gates
 
-**Gate 1 — Prototype:** run `pnpm --dir apps/web exec vitest run tests/day/mapable-day-lifeval.test.ts`, targeted typecheck/lint, and inspect CI; keep flag OFF by default. Verify no new database migration or external API call.
+**Gate 1 — Prototype:** run `pnpm --dir apps/web exec vitest run tests/day` and targeted lint, TypeScript and PR CI. The preview and optional read adapter are OFF by default. No schema migration, model call or service write is introduced. The gated calendar reader *does* call an existing server-side calendar read; it does not send updates.
 
 **Gate 2 — Accessible co-design:** test with disabled participants, AAC and screen-reader users; keyboard, switch navigation, 200–400% reflow, touch, high contrast, low-motion and error recovery. Automated tests alone cannot establish conformance.
 
-**Gate 3 — Real read-only integration:** inspect existing identity, consent, authorisation and tenant policies; define purpose-limited server-side adapters to existing calendar/Care/Transport records. Avoid duplicate booking authority and make missing evidence visible. Requires privacy and security signoff before non-synthetic data.
+**Gate 3 — Real read-only integration:** the first server-side self-calendar adapter is implemented but remains disabled. It reuses NextAuth session and `calendar:read:self` permission, filters by the current user ID, minimises fields, caps results and labels calendar records unverified. Complete privacy, accessibility and security signoff before enabling on non-synthetic data; Care/Transport reads are separate later work.
 
 **Gate 4 — Participant-approved operational actions:** reuse governed existing recovery services only with scoped token, typed action, consent and expiry checks, explicit participant approval, human escalation, idempotency, audit and rollback. No background assignment.
 
@@ -105,6 +109,6 @@ Grading must use a deterministic rule suite first and human assessors for subjec
 
 ## Known limitations and handoff
 
-This branch is a feature-gated synthetic visual and deterministic unit-test implementation. It is not a finished planner, does not retain user preferences, does not connect to real calendar, and cannot book support or transport. The participant-facing prototype should be considered **in development**, not production ready. Future implementation should preserve existing CareOS, worker recovery, NextAuth session and consent authority, not introduce parallel sources of truth.
+This branch is a feature-gated synthetic planning preview with a separately flagged, participant-requested, read-only calendar view. It is not a finished operational planner, does not retain Day Context preferences, cannot make or change bookings, and has no autonomous worker or vehicle assignment. The optional real-calendar path is **implemented but disabled**, pending privacy and accessibility review. The participant-facing prototype remains **in development**, not production ready. Future implementation should preserve existing CareOS, worker recovery, NextAuth session and consent authority, not introduce parallel sources of truth.
 
-**Next decision:** validate CI and recruit disability-led co-design reviewers, then approve a separate PR for *read-only* integration with participant-specific authorisation and data minimisation.
+**Next decision:** confirm dedicated DayEval CI, independent privacy and security review of the disabled calendar adapter, and disability-led co-design before any controlled activation. Keep live Care/Transport integrations and all write actions out of scope until separately authorised and tested.
