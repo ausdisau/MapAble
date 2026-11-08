@@ -29,7 +29,7 @@ export default async function ProfilePage() {
           Edit profile →
         </Link>
         {process.env.NODE_ENV !== "production" &&
-        process.env.MAPABLEID_READ_ONLY_ENABLED === "true" ? (
+        process.env.MAPABLE_ID_DASHBOARD_ENABLED === "true" ? (
           <Link
             href="/dashboard/identity"
             className="mt-2 ml-4 inline-block text-sm font-medium text-primary hover:underline"

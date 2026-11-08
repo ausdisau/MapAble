@@ -1,10 +1,12 @@
 /**
- * Shadow-stage account display only. Production is deliberately hard-disabled
- * until accessibility, incident/recovery and identity-authority release gates pass.
+ * Single MapAbleID v0.3 preview flag, reconciled with merged legacy PR #676.
+ * No login authority or authentication settings are changed by this flag.
+ *
+ * Shadow preview is deliberately blocked in production even when true.
  */
 export type MapAbleIdFlagEnvironment = {
   NODE_ENV?: string;
-  MAPABLEID_READ_ONLY_ENABLED?: string;
+  MAPABLE_ID_DASHBOARD_ENABLED?: string;
 };
 
 export function isMapAbleIdReadOnlyEnabled(
@@ -12,6 +14,6 @@ export function isMapAbleIdReadOnlyEnabled(
 ): boolean {
   return (
     env.NODE_ENV !== "production" &&
-    env.MAPABLEID_READ_ONLY_ENABLED === "true"
+    env.MAPABLE_ID_DASHBOARD_ENABLED === "true"
   );
 }

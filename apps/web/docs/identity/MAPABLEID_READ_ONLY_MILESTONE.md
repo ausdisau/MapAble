@@ -1,12 +1,12 @@
 # MapAbleID v0.3 — current-session read-only identity milestone
 
-Status: draft implementation; code review and end-to-end security/accessibility testing required. **No identity federation, account migration, extra MFA enforcement, or Neon schema writes.**
+Status: consolidated draft based on merged legacy PR #676 and canonical draft PR #31; code review and end-to-end security/accessibility testing required. **No identity federation, account migration, extra MFA enforcement, or Neon schema writes.**
 
 ## Product decision
 
 Expose a participant-first MapAbleID account summary using the **existing MapAble NextAuth v4 signed session** and **current Prisma application database**. This is not a new login issuer. The term "server_verified_read_only" means the web server obtained a valid current MapAble session and loaded its own user from Prisma. It **does not attest** original sign-in method, renewed MFA challenge, session revocation state, YubiKey hardware enrolment, identity proofing or AD.iD SSO.
 
-Feature flag: \`MAPABLEID_READ_ONLY_ENABLED=true\` outside production only; default false and production hard disabled.
+Feature flag: \`MAPABLE_ID_DASHBOARD_ENABLED=true\` outside production only; default false and production hard disabled.
 
 ## Verified current canonical source (main SHA 4b8e848d8dae958e925cc46a158ac3485988ec53)
 
@@ -56,6 +56,21 @@ Feature flag: \`MAPABLEID_READ_ONLY_ENABLED=true\` outside production only; defa
 **GO:** draft PR, code review, synthetic/sanitised development test using verified existing auth.
 **NO-GO:** production activation, cross-app SSO, passkey/MFA enforcement, account migration, live AD.iD token exchange, delegate invitations or database schema writes.
 
-Rollback: leave or set \`MAPABLEID_READ_ONLY_ENABLED=false\` and revert branch changes. Existing login, profile, passkeys and consent centre remain unchanged.
+Rollback: leave or set \`MAPABLE_ID_DASHBOARD_ENABLED=false\` and revert branch changes. Existing login, profile, passkeys and consent centre remain unchanged.
 
 Owner for the next gate: MapAble identity/security owner and participant accessibility reviewers. They must reconcile production \`DATABASE_URL\`, canonical Prisma models, current sessions, incident/recovery design, cross-region AD.iD posture, admin support workflows and explicit release approval.
+
+## Reconciliation of legacy PR #676 into canonical PR #31
+
+- **Single flag:** `MAPABLE_ID_DASHBOARD_ENABLED`, matching the merged legacy implementation. Previous `MAPABLEID_READ_ONLY_ENABLED` is no longer recognised by this canonical feature. It remains off by default and hard-off in production.
+- **Six sections:** overview, sign-in/security, trusted people, connected services, privacy/consent and accessible recovery, adapted from legacy `MapAbleIDScreen.tsx` without introducing a second `main` landmark or misdirected links.
+- **Canonical data minimisation retained:** account, passkey count and consent count from the existing NextAuth/Prisma server identity. No synthetic JWT session ID, invented expiry, credential identity or token proof.
+- **Adapter status added safely:** NextAuth existing authority; WebAuthn existing separate routes; Google Identity Platform MFA and AD.iD federation disabled. No new auth adapter executes, authenticates users or grants rights.
+- **Service descriptions:** other AD Ltd services are not marked connected based on an email or MapAble login.
+- **Legacy policy not adopted as a live enforcement gate:** its externally supplied `verifiedByServer` and synthetic `nextauth:userId` session reference are inappropriate for authenticating an API request. The existing `requireApiSession` and own-user Prisma queries remain authoritative. A future policy engine needs verified issuer/subject, genuine session-binding evidence and proven revocation semantics before enforcement.
+- **Legacy migration is PROPOSED only:** the separate legacy SQL must not be applied to Neon. Existing Prisma entities take precedence; resolve overlaps through review, not duplicate grants/consents tables.
+- **Security correction:** legacy `passkeys > 0` must not label a physical YubiKey configured. Canonical screen only reports stored passkey count and attestation unknown.
+- **Review goals:** test keyboard focus when switching sections, screen-reader announcement, content at 200–400% zoom, reduced-motion, assistive technology and participant-led recoverability. Inaccessible or missing reset pathways block rollout.
+
+Merged reference: https://github.com/ausdisau/mapableau-new/pull/676
+Canonical draft: https://github.com/ausdisau/MapAble/pull/31

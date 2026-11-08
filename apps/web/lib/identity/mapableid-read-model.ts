@@ -1,9 +1,10 @@
 /**
- * Participant-owned account metadata only. Does not certify the original login
- * method, MFA, identity proofing, service federation or delegate authority.
+ * MapAbleID v0.3: own-account read model for the EXISTING MapAble session.
+ * Do not infer OIDC claims, verified second factor, session revocation,
+ * YubiKey hardware, delegate authority or cross-app entitlements.
  *
- * This is a pure presenter: caller MUST obtain identity from the authenticated
- * MapAble server session, never a browser-provided userId or role.
+ * Caller obtains identity from requireAuth/requireApiSession, not a browser-
+ * supplied id, email, issuer or role. Inputs here are data presentation only.
  */
 export type MapAbleIdReadInput = {
   displayName: string;
@@ -11,6 +12,13 @@ export type MapAbleIdReadInput = {
   roleLabel: string;
   storedPasskeyCredentials: number;
   activeRecipientConsents: number;
+};
+
+export type IdentityAdapterReadStatus = {
+  id: "nextauth" | "webauthn_yubikey" | "google_identity_mfa" | "adid_oidc";
+  label: string;
+  state: "existing_authority" | "existing_flow_separate" | "disabled";
+  reason: string;
 };
 
 export type MapAbleIdReadSnapshot = {
@@ -35,10 +43,12 @@ export type MapAbleIdReadSnapshot = {
     activeRecipientConsentCount: number;
     delegateAuthority: "not_determined";
   };
-  services: readonly [
-    { id: "mapable"; label: "MapAble"; state: "current_workspace" },
-    { id: "adid"; label: "AD.iD federation"; state: "not_independently_verified" },
-  ];
+  services: ReadonlyArray<{
+    id: "mapable" | "providercloud" | "accessibooks" | "cripsquare" | "adid";
+    label: string;
+    state: "current_workspace" | "not_independently_verified";
+  }>;
+  adapters: ReadonlyArray<IdentityAdapterReadStatus>;
   recovery: {
     configuredMethod: "not_attested";
     humanSupportRoute: "/dashboard/safety/support";
@@ -80,24 +90,66 @@ export function buildMapAbleIdReadSnapshot(
       mfaAssurance: "not_attested",
     },
     passkeys: {
-      storedCredentialCount: validCount(input.storedPasskeyCredentials, "PASSKEY_COUNT"),
+      storedCredentialCount: validCount(
+        input.storedPasskeyCredentials,
+        "PASSKEY_COUNT",
+      ),
       usabilityOrRecentVerification: "not_attested",
     },
     sharing: {
-      activeRecipientConsentCount: validCount(input.activeRecipientConsents, "CONSENT_COUNT"),
+      activeRecipientConsentCount: validCount(
+        input.activeRecipientConsents,
+        "CONSENT_COUNT",
+      ),
       delegateAuthority: "not_determined",
     },
     services: [
       { id: "mapable", label: "MapAble", state: "current_workspace" },
+      {
+        id: "providercloud",
+        label: "ProviderCloud",
+        state: "not_independently_verified",
+      },
+      { id: "accessibooks", label: "AccessiBooks", state: "not_independently_verified" },
+      { id: "cripsquare", label: "CripSquare", state: "not_independently_verified" },
       { id: "adid", label: "AD.iD federation", state: "not_independently_verified" },
+    ],
+    adapters: [
+      {
+        id: "nextauth",
+        label: "MapAble NextAuth",
+        state: "existing_authority",
+        reason: "Current application session verified by MapAble's existing server guard.",
+      },
+      {
+        id: "webauthn_yubikey",
+        label: "WebAuthn and YubiKey",
+        state: "existing_flow_separate",
+        reason:
+          "Existing passkey routes are separate. A stored passkey does not attest " +
+          "YubiKey hardware, recent sign-in or additional-factor verification.",
+      },
+      {
+        id: "google_identity_mfa",
+        label: "Google Identity Platform MFA",
+        state: "disabled",
+        reason: "No Google MFA verification or enforcement by MapAbleID.",
+      },
+      {
+        id: "adid_oidc",
+        label: "AD.iD federation",
+        state: "disabled",
+        reason:
+          "No federation, token exchange or automatic account linking to AD.iD.",
+      },
     ],
     recovery: {
       configuredMethod: "not_attested",
       humanSupportRoute: "/dashboard/safety/support",
     },
     explanation:
-      "MapAble confirms your current application session and counts its own stored records. " +
-      "This page does not certify the sign-in method, MFA, a functioning passkey, delegate authority, " +
-      "AD.iD federation, or access to other applications.",
+      "MapAble confirms your existing application session and counts its own stored records. " +
+      "This page does not attest your original sign-in method, recent MFA, YubiKey hardware, " +
+      "legal delegate authority or AD.iD access. None of these records grants a new permission.",
   };
 }

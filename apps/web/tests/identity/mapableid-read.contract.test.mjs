@@ -18,8 +18,8 @@ const USER = {
 
 test("shadow display is disabled by default and in every production environment", () => {
   assert.equal(isMapAbleIdReadOnlyEnabled({}), false);
-  assert.equal(isMapAbleIdReadOnlyEnabled({ NODE_ENV: "test", MAPABLEID_READ_ONLY_ENABLED: "true" }), true);
-  assert.equal(isMapAbleIdReadOnlyEnabled({ NODE_ENV: "production", MAPABLEID_READ_ONLY_ENABLED: "true" }), false);
+  assert.equal(isMapAbleIdReadOnlyEnabled({ NODE_ENV: "test", MAPABLE_ID_DASHBOARD_ENABLED: "true" }), true);
+  assert.equal(isMapAbleIdReadOnlyEnabled({ NODE_ENV: "production", MAPABLE_ID_DASHBOARD_ENABLED: "true" }), false);
 });
 
 test("returns current-account metadata without inferring sign-in or federation", () => {
@@ -32,6 +32,11 @@ test("returns current-account metadata without inferring sign-in or federation",
   assert.equal(out.session.originalSignInMethod, "not_attested");
   assert.equal(out.session.mfaAssurance, "not_attested");
   assert.equal(out.services[1].state, "not_independently_verified");
+  assert.equal(out.services.length, 5);
+  assert.equal(out.adapters.find((item) => item.id === "nextauth")?.state, "existing_authority");
+  assert.equal(out.adapters.find((item) => item.id === "adid_oidc")?.state, "disabled");
+  assert.equal(out.adapters.find((item) => item.id === "google_identity_mfa")?.state, "disabled");
+  assert.equal(out.adapters.find((item) => item.id === "webauthn_yubikey")?.state, "existing_flow_separate");
   assert.equal(out.sharing.delegateAuthority, "not_determined");
 });
 
@@ -41,6 +46,7 @@ test("zero is a valid credential or consent count, not a claim of no recovery", 
   });
   assert.equal(out.passkeys.storedCredentialCount, 0);
   assert.equal(out.recovery.configuredMethod, "not_attested");
+  assert.equal(out.session.mfaAssurance, "not_attested");
 });
 
 test("never serializes secrets or personal identifiers that do not belong in a summary", () => {
@@ -78,4 +84,10 @@ test("invalid empty, overlong and non-finite input fails closed", () => {
     () => buildMapAbleIdReadSnapshot({ ...USER, activeRecipientConsents: Number.NaN }),
     /INVALID_CONSENT_COUNT/,
   );
+});
+
+
+test("legacy flag cannot enable MapAbleID and production stays blocked", () => {
+  assert.equal(isMapAbleIdReadOnlyEnabled({ NODE_ENV: "test", MAPABLEID_READ_ONLY_ENABLED: "true" }), false);
+  assert.equal(isMapAbleIdReadOnlyEnabled({ NODE_ENV: "production", MAPABLE_ID_DASHBOARD_ENABLED: "true" }), false);
 });
