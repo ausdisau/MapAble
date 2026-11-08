@@ -1,0 +1,26 @@
+name: MapAble NDIS official-directory read contract
+
+on:
+  pull_request:
+    paths:
+      - "apps/web/lib/ndis/platform-adapter/official-directory-policy.ts"
+      - "apps/web/lib/ndis/platform-adapter/official-provider-directory.ts"
+      - "apps/web/app/api/ndis/provider-directory/**"
+      - "apps/web/app/ndis/official-providers/**"
+      - "apps/web/tests/ndis/official-directory-policy.contract.test.mjs"
+      - ".github/workflows/ndis-official-directory-read.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Verify source gate, approval, freshness, and search inputs
+        run: node --experimental-strip-types --test apps/web/tests/ndis/official-directory-policy.contract.test.mjs

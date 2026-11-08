@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { readOfficialProviderDirectoryReadiness } from "@/lib/ndis/platform-adapter/official-provider-directory";
 
 import { requireAdmin } from "@/lib/auth/guards";
 import { getNdisPlatformAdapterStatus } from "@/lib/ndis/platform-adapter/ndis-platform-adapter";
@@ -8,6 +9,7 @@ export const metadata = { title: "NDIS platform adapter readiness | MapAble" };
 export default async function NdisPlatformAdapterPage() {
   await requireAdmin();
   const state = getNdisPlatformAdapterStatus();
+  const officialProviderDirectory = await readOfficialProviderDirectoryReadiness();
 
   return (
     <div className="space-y-6">
@@ -51,6 +53,29 @@ export default async function NdisPlatformAdapterPage() {
             </li>
           ))}
         </ul>
+      </section>
+
+      <section aria-labelledby="real-provider-data-heading" className="space-y-3 rounded-xl border border-slate-300 bg-white p-4">
+        <h2 id="real-provider-data-heading" className="text-xl font-bold">
+          Real public NDIS provider data
+        </h2>
+        <p className="text-sm text-slate-700">
+          Status: {officialProviderDirectory.ready
+            ? "Operator-approved official-source snapshot available"
+            : "No approved or current official-source snapshot (" + officialProviderDirectory.reason.replaceAll("_", " ") + ")"}.
+          This does not verify a particular worker or current registration.
+        </p>
+        {officialProviderDirectory.ready ? (
+          <p className="text-sm text-slate-700">
+            Imported on: {officialProviderDirectory.evidence.retrievedAt.slice(0, 10)}.
+            Imported records: {officialProviderDirectory.evidence.providerCountInImport}.
+            Source hash: {officialProviderDirectory.evidence.snapshotSha256.slice(0, 12)}.
+          </p>
+        ) : null}
+        <Link href="/ndis/official-providers"
+          className="inline-flex min-h-11 items-center font-semibold text-[#005B7F] underline underline-offset-4">
+          Browse real public provider records
+        </Link>
       </section>
 
       <section aria-labelledby="ndis-adapter-limitations" className="space-y-2">
