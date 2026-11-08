@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+
+import { CalendarReadPanel } from "@/components/day/CalendarReadPanel";
 import { useMemo, useState } from "react";
 
 import {
@@ -35,7 +37,11 @@ const TYPE_LABELS: Record<DayActivity["kind"], string> = {
   personal: "Personal time",
 };
 
-export function MapAbleDayPreview() {
+export function MapAbleDayPreview({
+  calendarReadEnabled = false,
+}: {
+  calendarReadEnabled?: boolean;
+}) {
   const [scenarioId, setScenarioId] = useState<MapAbleDayScenarioId>("baseline");
   const [selectedActivityId, setSelectedActivityId] = useState("morning-care");
   const [preferredProposalId, setPreferredProposalId] = useState<string | null>(null);
@@ -66,7 +72,7 @@ export function MapAbleDayPreview() {
     <div className="mx-auto max-w-7xl space-y-6 pb-12">
       <header className="space-y-3">
         <div className="inline-flex rounded-full border border-amber-400 bg-amber-50 px-3 py-1 text-sm font-semibold text-amber-950">
-          Synthetic preview only — no live bookings or participant data
+          Synthetic scenario — no live support or booking information in the example
         </div>
         <h1 className="font-heading text-3xl font-bold text-foreground">
           MapAble Day
@@ -317,6 +323,7 @@ export function MapAbleDayPreview() {
           </section>
         </aside>
       </div>
+      {calendarReadEnabled ? <CalendarReadPanel /> : null}
     </div>
   );
 }
