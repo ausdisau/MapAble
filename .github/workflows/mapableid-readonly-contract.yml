@@ -1,0 +1,26 @@
+name: MapAbleID readonly contract
+
+on:
+  pull_request:
+    paths:
+      - "apps/web/lib/identity/**"
+      - "apps/web/components/identity/**"
+      - "apps/web/app/dashboard/identity/**"
+      - "apps/web/app/api/identity/me/**"
+      - "apps/web/tests/identity/mapableid-read.contract.test.mjs"
+      - ".github/workflows/mapableid-readonly-contract.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  shadow-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Test fail-closed MapAbleID presentation contract
+        run: node --experimental-strip-types --test apps/web/tests/identity/mapableid-read.contract.test.mjs
