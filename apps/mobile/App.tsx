@@ -15,6 +15,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import { MobileIdentityCard } from './src/components/MobileIdentityCard';
 import { ArcHubScreen } from './src/features/arc/ArcHubScreen';
+import { ProviderFinderScreen } from './src/features/provider-finder/ProviderFinderScreen';
 import {
   isMapAbleApiConfigured,
   searchMapAblePlaces,
@@ -518,6 +519,7 @@ const Tabs = createBottomTabNavigator({
     Home: HomeScreen,
     Indy: IndyScreen,
     ARC: ArcHubScreen,
+    Providers: ProviderFinderScreen,
     More: MoreScreen,
   },
 });

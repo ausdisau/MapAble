@@ -1,0 +1,26 @@
+name: Commission registry CSV parser tests
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "apps/web/lib/commission-register/**"
+      - "apps/web/tests/commission-register-csv.test.ts"
+      - ".github/workflows/commission-register-unit-tests.yml"
+permissions:
+  contents: read
+jobs:
+  csv-parser:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm vitest run tests/commission-register-csv.test.ts
