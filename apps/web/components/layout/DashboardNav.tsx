@@ -49,16 +49,26 @@ function linkIsActive(pathname: string, link: DashboardLink): boolean {
 export function DashboardNav({
   role,
   showCareOsNav = false,
+  showMatchingPreviewNav = false,
 }: {
   userName: string;
   role: UserRole;
   showCareOsNav?: boolean;
+  showMatchingPreviewNav?: boolean;
 }) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const navId = useId();
+  const services: DashboardLink[] = [
+    SERVICE_LINKS[0]!,
+    ...(showMatchingPreviewNav && (role === "participant" || role === "mapable_admin")
+      ? [{ href: "/dashboard/matching-preview", label: "Worker matching preview (demo)" }]
+      : []),
+    ...SERVICE_LINKS.slice(1),
+  ];
+
   const groups = [
-    { title: "My services", links: SERVICE_LINKS },
+    { title: "My services", links: services },
     { title: "My profile and settings", links: PROFILE_LINKS },
     { title: "Help and updates", links: HELP_LINKS },
     ...(showCareOsNav

@@ -12,11 +12,13 @@ export function DashboardAppShell({
   userName,
   role,
   showCareOsNav = false,
+  showMatchingPreviewNav = false,
 }: {
   children: ReactNode;
   userName: string;
   role: UserRole;
   showCareOsNav?: boolean;
+  showMatchingPreviewNav?: boolean;
 }) {
   return (
     <MapAbleAppShell
@@ -29,6 +31,7 @@ export function DashboardAppShell({
           userName={userName}
           role={role}
           showCareOsNav={showCareOsNav}
+          showMatchingPreviewNav={showMatchingPreviewNav}
         />
       }
     >
