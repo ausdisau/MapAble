@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
 
-import { assessDayPlan, recoveryProposalsFor } from "@/lib/day/day-planner";
 import {
   DAY_EVAL_CASES,
   gradeDayEval,
   type DayEvalCandidate,
   type DayEvalObservedEffects,
 } from "@/lib/day/day-eval";
+import { assessDayPlan, recoveryProposalsFor } from "@/lib/day/day-planner";
 import { makeSyntheticDayPlan } from "@/lib/day/synthetic-fixtures";
 
 const noEffects: DayEvalObservedEffects = {
