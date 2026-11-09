@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import { SignalCommunityStudio } from "@/components/signal/SignalCommunityStudio";
 import { MapAbleCareMarketingShell } from "@/components/marketing/MapAbleCareMarketingShell";
+import { SignalCommunityStudio } from "@/components/signal/SignalCommunityStudio";
 import { isSignalCommunityDemoEnabled } from "@/lib/signal/community/engine";
 
 export const metadata: Metadata = {
