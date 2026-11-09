@@ -13,6 +13,8 @@ export const CSP_EXTERNAL_ORIGINS = {
     "https://www.googletagmanager.com",
     "https://js.stripe.com",
     "https://va.vercel-scripts.com",
+    // Explicitly loaded FormHug survey embeds.
+    "https://formhug.ai",
   ],
   styles: ["https://fonts.googleapis.com"],
   fonts: ["https://fonts.gstatic.com"],
@@ -46,6 +48,7 @@ export const CSP_EXTERNAL_ORIGINS = {
     "https://googleads.g.doubleclick.net",
     "https://tpc.googlesyndication.com",
     "https://www.google.com",
+    "https://formhug.ai",
   ],
   workers: ["blob:"],
 } as const;

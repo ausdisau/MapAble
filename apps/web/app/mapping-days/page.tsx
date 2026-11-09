@@ -79,6 +79,9 @@ export default function MappingDaysPage() {
               >
                 Add access info
               </Link>
+              <Link href="/access/community-survey" className="mt-4 block w-fit min-h-11 rounded-xl border border-[#005B7F] px-4 py-3 text-sm font-black text-[#005B7F] underline underline-offset-4">
+                Community accessibility survey (pilot)
+              </Link>
             </div>
             <div className="rounded-2xl border border-slate-200 p-5">
               <h2 className="text-xl font-black">Partner with council / university / community</h2>
