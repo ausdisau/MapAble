@@ -5,6 +5,10 @@ import { useMemo, useState } from "react";
 
 import { CalendarReadPanel } from "@/components/day/CalendarReadPanel";
 import { DayContextPanel } from "@/components/day/DayContextPanel";
+import { SignalDayParticipationPanel } from "@/components/day/SignalDayParticipationPanel";
+import { getSignalEvidenceExample, projectSignalEvidenceForDay, type SignalDayAccessProjection } from "@/lib/access/signal/day-evidence-projection";
+import type { SignalParticipationChoice } from "@/lib/core/signal/participation";
+import { addSignalPracticeToDay } from "@/lib/day/signal-participation-bridge";
 import {
   assessDayPlan,
   recoveryProposalsFor,
@@ -39,14 +43,23 @@ const TYPE_LABELS: Record<DayActivity["kind"], string> = {
 
 export function MapAbleDayPreview({
   calendarReadEnabled = false,
+  signalBridgeEnabled = false,
 }: {
   calendarReadEnabled?: boolean;
+  signalBridgeEnabled?: boolean;
 }) {
   const [scenarioId, setScenarioId] = useState<MapAbleDayScenarioId>("baseline");
   const [selectedActivityId, setSelectedActivityId] = useState("morning-care");
   const [preferredProposalId, setPreferredProposalId] = useState<string | null>(null);
 
-  const plan = useMemo(() => makeSyntheticDayPlan(scenarioId), [scenarioId]);
+  const [signalChoice, setSignalChoice] = useState<SignalParticipationChoice | null>(null);
+  const [signalEvidence, setSignalEvidence] = useState<SignalDayAccessProjection>(() =>
+    projectSignalEvidenceForDay(getSignalEvidenceExample("unknown")),
+  );
+  const plan = useMemo(() => {
+    const base = makeSyntheticDayPlan(scenarioId);
+    return signalBridgeEnabled ? addSignalPracticeToDay(base, signalChoice, signalEvidence) : base;
+  }, [scenarioId, signalBridgeEnabled, signalChoice, signalEvidence]);
   const assessment = useMemo(() => assessDayPlan(plan), [plan]);
   const selected = plan.activities.find((item) => item.id === selectedActivityId);
   const selectedAssessment = assessment.activities.find(
@@ -125,6 +138,17 @@ export function MapAbleDayPreview({
       </section>
 
       <DayContextPanel />
+
+      {signalBridgeEnabled ? (
+        <SignalDayParticipationPanel
+          choice={signalChoice}
+          onChange={(choice, evidence) => {
+            setSignalChoice(choice);
+            setSignalEvidence(evidence);
+            setPreferredProposalId(null);
+          }}
+        />
+      ) : null}
 
       <div className="grid gap-4 sm:grid-cols-3">
         <SummaryStat value={assessment.readyCount} label="Ready in example" />
