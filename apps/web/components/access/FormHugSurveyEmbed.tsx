@@ -29,8 +29,9 @@ export function FormHugSurveyEmbed({ survey }: { survey: FormHugSurveyKind }) {
       <h2 id="formhug-title" className="text-2xl font-bold">{config.title}</h2>
       <p className="mt-3 text-base leading-relaxed text-slate-700">
         FormHug is an external service. Loading this survey connects your browser
-        to FormHug. Your answers are not automatically shared with MapAble,
-        PalsyPod or Mailchimp. You decide whether to submit.
+        to FormHug. Survey responses are processed by FormHug for the survey owner, not
+        automatically published to MapAble maps, PalsyPod or Mailchimp. You
+        decide whether to submit.
       </p>
       {!active ? (
         <button type="button" onClick={() => setActive(true)}
