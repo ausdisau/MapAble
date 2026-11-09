@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 
 import { MapAbleDayPreview } from "@/components/day/MapAbleDayPreview";
 import { requireAuth } from "@/lib/auth/guards";
+import { isSignalDayPreviewEnabled } from "@/lib/core/signal/participation";
 
 export const metadata = {
   title: "MapAble Day — Care and Support Planner | MapAble",
@@ -21,6 +22,7 @@ export default async function MapAbleDayPage() {
   return (
     <MapAbleDayPreview
       calendarReadEnabled={process.env.MAPABLE_DAY_READ_CALENDAR_ENABLED === "true"}
+      signalBridgeEnabled={isSignalDayPreviewEnabled()}
     />
   );
 }
