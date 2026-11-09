@@ -8,6 +8,7 @@ import {
   projectSignalEvidenceForDay,
   SIGNAL_EVIDENCE_EXAMPLE_IDS,
   type SignalEvidenceExampleId,
+  type SignalDayAccessProjection,
 } from "@/lib/access/signal/day-evidence-projection";
 import {
   makeSignalParticipationChoice,
@@ -50,7 +51,7 @@ export function SignalDayParticipationPanel({
   onChange,
 }: {
   choice: SignalParticipationChoice | null;
-  onChange: (choice: SignalParticipationChoice | null) => void;
+  onChange: (choice: SignalParticipationChoice | null, access: SignalDayAccessProjection) => void;
 }) {
   const [challenge, setChallenge] = useState<SignalChallengeId>("journeys");
   const [mode, setMode] = useState<SignalParticipationMode>("remote");
@@ -72,7 +73,7 @@ export function SignalDayParticipationPanel({
         startTime: time,
         participantReviewed: true,
       });
-      onChange(draft);
+      onChange(draft, projection);
       setMessage("You added a fictional activity to this screen only. Nothing was booked or shared.");
     } catch {
       setMessage("This example could not be added. Choose a valid combination.");
@@ -80,7 +81,7 @@ export function SignalDayParticipationPanel({
   }
 
   function removeLocalChoice() {
-    onChange(null);
+    onChange(null, projection);
     setMessage("The fictional activity was removed from your example day.");
   }
 
