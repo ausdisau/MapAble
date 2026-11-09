@@ -10,6 +10,9 @@ on:
       - "apps/web/components/day/**"
       - "apps/web/lib/day/**"
       - "apps/web/tests/day/**"
+      - "apps/web/lib/core/signal/**"
+      - "apps/web/lib/access/signal/**"
+      - "docs/product/MAPABLE-SIGNAL-CORE-ACCESS-DAY-V01.md"
       - "docs/product/MAPABLE-DAY-LIFEVAL-V01.md"
       - ".github/workflows/mapable-day-validation.yml"
   workflow_dispatch:
@@ -59,5 +62,7 @@ jobs:
           app/dashboard/day/page.tsx
           components/day
           lib/day
+          lib/core/signal
+          lib/access/signal
           tests/day
           --max-warnings 0
