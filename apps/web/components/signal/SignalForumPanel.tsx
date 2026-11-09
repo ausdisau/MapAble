@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type FormEvent } from "react";
 
 import type { LocalReply, LocalTopic } from "@/lib/signal/community/types";
 import { mapableCareFocusRing } from "@/lib/marketing/mapable-care-tokens";
@@ -39,7 +39,7 @@ export function SignalForumPanel({
   const selected = filtered.find((topic) => topic.id === selectedId) ?? filtered[0];
   const selectedReplies = replies.filter((reply) => reply.topicId === selected?.id);
 
-  function startTopic(event: React.FormEvent<HTMLFormElement>) {
+  function startTopic(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
     try {
@@ -51,7 +51,7 @@ export function SignalForumPanel({
     }
   }
 
-  function startReply(event: React.FormEvent<HTMLFormElement>) {
+  function startReply(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setReplyError("");
     if (!selected) return;
