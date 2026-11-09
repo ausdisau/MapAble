@@ -41,6 +41,8 @@ export const CSP_EXTERNAL_ORIGINS = {
     "https://www.google-analytics.com",
     "https://*.google-analytics.com",
     "https://www.googletagmanager.com",
+    // Explicit opt-in survey embeds may communicate with FormHug.
+    "https://formhug.ai",
   ],
   frames: [
     "https://js.stripe.com",
