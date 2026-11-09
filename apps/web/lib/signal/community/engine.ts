@@ -18,8 +18,8 @@ export function isSignalCommunityDemoEnabled(
   env: Record<string, string | undefined> = process.env,
 ): boolean {
   return env.MAPABLE_SIGNAL_COMMUNITY_DEMO_ENABLED === "true" &&
-    env.NODE_ENV !== "production" &&
-    env.VERCEL_ENV !== "production";
+    (env.VERCEL_ENV === "preview" ||
+      (env.NODE_ENV === "development" && env.VERCEL_ENV !== "production"));
 }
 
 export function surveyPages(schema: FormHugSurveySchema = formHugAccessSurvey): SurveyPage[] {
