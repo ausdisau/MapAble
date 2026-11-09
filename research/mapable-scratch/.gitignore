@@ -1,0 +1,4 @@
+research-output/
+__pycache__/
+.env
+*.safetensors
