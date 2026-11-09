@@ -17,7 +17,7 @@ Date: 9 November 2026. Status: DRAFT. No production deployment, mailing or resea
 1. Community survey reports physical or communication access to places and journeys. Trust Index asks about NDIS service and policy experiences. Never merge respondent identities or datasets.
 2. Third-party FormHug JavaScript loads after a visitor clicks an explicit button. Use external direct-link fallback when the embedded experience fails or is inaccessible.
 3. Research recruitment is disabled by default: only the exact server variable MAPABLE_TRUST_INDEX_RECRUITMENT_APPROVED=true enables its public embed. No release approval is conveyed by the existence of the form or this PR.
-4. FormHug owns initial response processing; no MapAble ingestion, file upload copy, data sync or public map publication is implemented.
+4. FormHug hosts initial response processing for the survey operator; no MapAble platform ingestion, file upload copy, data sync or public map publication is implemented. The operator must verify FormHug data terms and access controls.
 5. To publish access observations later, implement a consent-scoped review service with provenance, dates, correction/dispute states, data minimisation, expiry and human approval. Unknown is never automatically Green, and N/A is never scored as failure.
 6. Marketing opt-in is separate from survey participation. No FormHug-to-Mailchimp export, no profiling by disability/diagnosis/NDIS status, and no automatic political audience targeting. PalsyPod appearances require separate participant permission and editorial confirmation.
 7. Privacy, data residency, retention/deletion, contact and withdrawal statements must be independently approved. No blanket promise is made about FormHug's hosting or legal compliance.
