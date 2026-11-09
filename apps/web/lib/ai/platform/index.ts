@@ -96,3 +96,23 @@ export type {
   DeviceCapabilitySnapshot,
   EdgeBrokerResult,
 } from "./edge";
+
+/**
+ * Read-only ATPU cost estimator and ledger contracts.
+ * Never activates a provider, changes gateway routing, or grants authority.
+ */
+export {
+  ATPU_RATE_SNAPSHOT_VERSION,
+  getAtpuRateMetadata,
+  isAtpuCostTelemetryEnabled,
+  pricingKeyForGatewayModel,
+  normalizeAiSdkUsage,
+  estimateAtpuEventCost,
+  summarizeAtpuCost,
+} from "./telemetry/atpu-cost";
+export type {
+  ServerMeteredEvent,
+  TokenUsage,
+  CostResult,
+  AiSdkUsage,
+} from "./telemetry/atpu-cost";
