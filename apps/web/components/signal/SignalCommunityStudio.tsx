@@ -1,11 +1,12 @@
 "use client";
 
+import { ClipboardCheck, MessageSquareText, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-import { ClipboardCheck, MessageSquareText, ShieldCheck } from "lucide-react";
 
 import { SignalForumPanel } from "@/components/signal/SignalForumPanel";
 import { SignalSurveyPanel } from "@/components/signal/SignalSurveyPanel";
+import { mapableCareFocusRing } from "@/lib/marketing/mapable-care-tokens";
 import {
   DEMO_FORUM_TOPICS,
   changeLocalTopicModeration,
@@ -20,7 +21,6 @@ import type {
   LocalTopic,
   SurveyReview,
 } from "@/lib/signal/community/types";
-import { mapableCareFocusRing } from "@/lib/marketing/mapable-care-tokens";
 
 type View = "discussions" | "survey" | "review";
 const focus = mapableCareFocusRing;
