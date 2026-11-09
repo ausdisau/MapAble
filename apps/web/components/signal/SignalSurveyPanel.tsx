@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 
-import { formHugAccessSurvey } from "@/lib/signal/community/formhug-schema";
+import { mapableCareFocusRing } from "@/lib/marketing/mapable-care-tokens";
 import {
   PUBLIC_FORMHUG_URL,
   SENSITIVE_CAPTURE_FIELDS,
@@ -13,10 +13,10 @@ import {
   summariseLocalSurvey,
   validateSurveyPage,
 } from "@/lib/signal/community/engine";
+import { formHugAccessSurvey } from "@/lib/signal/community/formhug-schema";
 import type {
   FormHugQuestion, SurveyAnswer, SurveyAnswers, SurveyReview,
 } from "@/lib/signal/community/types";
-import { mapableCareFocusRing } from "@/lib/marketing/mapable-care-tokens";
 
 const focus = mapableCareFocusRing;
 const SAFE_HELP =
@@ -220,7 +220,7 @@ export function SignalSurveyPanel({
         </p>
         <p className="mt-2 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-950">
           {SAFE_HELP} Email, precise locations and media are deliberately disabled
-          here. A real FormHug response is made only on FormHug's separate site.
+          here. A real FormHug response is made only on FormHug&apos;s separate site.
         </p>
       </div>
 
@@ -325,7 +325,7 @@ export function SignalSurveyPanel({
         <a href={PUBLIC_FORMHUG_URL} target="_blank" rel="noopener noreferrer" className={`font-bold text-[#005B7F] underline ${focus}`}>
           Open the FormHug accessibility survey
         </a>.
-        This leaves MapAble and uses FormHug's real submission and privacy controls.
+        This leaves MapAble and uses FormHug&apos;s real submission and privacy controls.
       </p>
     </section>
   );
