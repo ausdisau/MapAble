@@ -135,7 +135,7 @@ export function MapathonWorkspace() {
     }
     const draft: PracticeDraft = {
       ...proposed,
-      id: `practice-${drafts.length + 1}`,
+      id: `practice-${Date.now()}-${Math.random().toString(36).slice(2)}`,
       detail: detail.trim(),
       state: "local_practice_draft",
       synthetic: true,
@@ -274,7 +274,7 @@ export function MapathonWorkspace() {
               <div className="grid gap-2 sm:grid-cols-3">
                 {ROLE_OPTIONS.map((item) => (
                   <label key={item.id} className={`flex min-h-12 cursor-pointer items-start gap-2 rounded-xl border-2 bg-white p-3 ${role === item.id ? "border-[#005B7F]" : "border-slate-200"}`}>
-                    <input type="radio" name="mapathon-role" checked={role === item.id} onChange={() => setRole(item.id)} className="mt-1 h-5 w-5 accent-[#005B7F]" />
+                    <input type="radio" name="mapathon-role" checked={role === item.id} onChange={() => { setRole(item.id); setReviewing(false); }} className="mt-1 h-5 w-5 accent-[#005B7F]" />
                     <span className="text-sm"><strong className="block">{item.label}</strong><span className="mt-1 block text-xs text-slate-600">{item.help}</span></span>
                   </label>
                 ))}
@@ -335,7 +335,7 @@ export function MapathonWorkspace() {
               {view === "list" ? (
                 <div className="grid gap-3 sm:grid-cols-2" role="group" aria-label="Fictional place options">
                   {places.map((item) => (
-                    <button key={item.id} type="button" aria-pressed={place.id === item.id} onClick={() => setPlaceId(item.id)} className={`min-h-28 rounded-xl border-2 bg-white p-4 text-left ${focusRing} ${place.id === item.id ? "border-[#005B7F]" : "border-slate-200 hover:border-[#005B7F]"}`}>
+                    <button key={item.id} type="button" aria-pressed={place.id === item.id} onClick={() => { setPlaceId(item.id); setReviewing(false); }} className={`min-h-28 rounded-xl border-2 bg-white p-4 text-left ${focusRing} ${place.id === item.id ? "border-[#005B7F]" : "border-slate-200 hover:border-[#005B7F]"}`}>
                       <span className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-[#005B7F]"><MapPin className="h-4 w-4" aria-hidden="true" /> {item.category}</span>
                       <span className="block text-base font-black">{item.name}</span>
                       <span className="mt-1 block text-sm text-slate-600">{item.description}</span>
