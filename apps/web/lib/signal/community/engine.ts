@@ -10,7 +10,6 @@ export const PUBLIC_FORMHUG_URL = "https://formhug.ai/f/f50pAQ";
 export const SENSITIVE_CAPTURE_FIELDS = new Set(["field_17", "field_28", "field_29", "field_33"]);
 export const NO_EXTERNAL_UPLOAD = true;
 const ACCEPTED_CONSENT = "hjpY";
-const DECLINED_CONSENT = "X3ej";
 const PUBLIC_CONSIDERATION_YES = "lDLp";
 const MEASURED_SOURCE = "cZDm";
 
