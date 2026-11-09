@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { useMemo, useState, type FormEvent } from "react";
 
-import type { LocalReply, LocalTopic } from "@/lib/signal/community/types";
 import { mapableCareFocusRing } from "@/lib/marketing/mapable-care-tokens";
+import type { LocalReply, LocalTopic } from "@/lib/signal/community/types";
 
 const focus = mapableCareFocusRing;
 const phrases = [
