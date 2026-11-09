@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
 
-import { formHugAccessSurvey } from "@/lib/signal/community/formhug-schema";
 import {
   DEMO_FORUM_TOPICS,
   SENSITIVE_CAPTURE_FIELDS,
@@ -16,6 +15,7 @@ import {
   validateFullSurvey,
   validateSurveyPage,
 } from "@/lib/signal/community/engine";
+import { formHugAccessSurvey } from "@/lib/signal/community/formhug-schema";
 import type { SurveyAnswers } from "@/lib/signal/community/types";
 
 const good: SurveyAnswers = {
