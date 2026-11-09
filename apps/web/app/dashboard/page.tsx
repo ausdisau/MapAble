@@ -4,6 +4,7 @@ import { requireAuth } from "@/lib/auth/guards";
 import { roleLabel } from "@/lib/auth/roles";
 import { caseListWhereForUser } from "@/lib/cases/case-access";
 import { caseManagementConfig } from "@/lib/config/case-management";
+import { isMySupportPreviewEnabled } from "@/lib/config/my-support";
 import { isEngagementPlatformEnabled } from "@/lib/config/engagement";
 import { countOpenSubmissions } from "@/lib/engagement/engagement-submission-service";
 import { prisma } from "@/lib/prisma";
@@ -82,6 +83,13 @@ export default async function DashboardPage() {
       </header>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {isMySupportPreviewEnabled() ? (
+          <CoreHubCard
+            title="My Support"
+            description="Review my care and transport records, permissions and support choices"
+            href="/dashboard/my-support"
+          />
+        ) : null}
         <CoreHubCard
           title="Billing centre"
           description="Invoices, funding sources and payments"
