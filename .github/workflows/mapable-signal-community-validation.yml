@@ -1,0 +1,52 @@
+name: MapAble Signal community preview validation
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "apps/web/app/signal/community/**"
+      - "apps/web/components/signal/**"
+      - "apps/web/lib/signal/community/**"
+      - "apps/web/tests/signal-community/**"
+      - "docs/product/MAPABLE-SIGNAL-COMMUNITY-FORUM-SURVEY-V01.md"
+      - ".github/workflows/mapable-signal-community-validation.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: signal-community-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Enable pinned pnpm
+        run: corepack enable
+      - name: Install frozen dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Generate Prisma types
+        run: pnpm prisma generate
+      - name: Run Signal community tests
+        run: pnpm exec vitest run tests/signal-community
+      - name: Type-check MapAble web
+        run: pnpm type-check
+      - name: Lint Signal community routes and domain
+        run: >-
+          pnpm exec eslint
+          app/signal/community/page.tsx
+          components/signal
+          lib/signal/community
+          tests/signal-community
+          --max-warnings 0
