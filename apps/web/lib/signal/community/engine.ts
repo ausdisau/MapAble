@@ -117,7 +117,7 @@ export function validateSurveyPage(
     if (!isAnswerPresent(answer)) continue;
     if (field.choices.length) {
       const allowed = new Set(field.choices.map((item) => item.code));
-      const values = Array.isArray(answer) ? answer : [answer];
+      const values: string[] = Array.isArray(answer) ? answer : typeof answer === "string" ? [answer] : [];
       if (values.some((value) => !allowed.has(value))) {
         errors.push(field.label + " — an unsupported choice was selected.");
       }
