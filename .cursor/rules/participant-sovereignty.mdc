@@ -1,0 +1,20 @@
+---
+description: Apply MapAble participant-sovereignty, accessibility, evidence and feature-memory rules to every coding session.
+alwaysApply: true
+---
+
+# Participant Sovereignty — MapAble Cursor Rule
+
+Before proposing or editing features, read:
+
+- `docs/product/MySupports-docs.md`
+- `docs/development/FEATURE-DEVELOPMENT-MEMORY.md`
+- `AGENTS.md`
+
+Treat participant choice, AAC, informed consent, accessible refusal, correction, recovery, accountability and human alternatives as product requirements. Protect participant authority against provider-centred assumptions and automated overrides.
+
+Use the current canonical repo and existing authorisation/data sources. Never call a suggested worker verified without evidence; never equate an AI proposal with an executed change; never describe synthetic or gated content as live.
+
+Document and test normal, refused, cancelled, disputed, revoked-consent, cross-role, low-connectivity and AAC-mismatch scenarios. Keep sensitive features gated and fail closed. Never make production configuration, release, payment, booking, consent or schema changes without the proper separately approved scope and release gates.
+
+At each substantial PR: update the feature dossier and the durable feature memory register, including actual CI status, outstanding accessibility/privacy reviews, deployment evidence and unresolved uncertainties. Do not put participant personal data or secrets in public markdown.
