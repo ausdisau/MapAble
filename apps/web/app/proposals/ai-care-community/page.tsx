@@ -5,7 +5,6 @@ import {
   firstPilot,
   foundingPrinciples,
   proposal,
-  proposalOnlyCapabilities,
   researchThemes,
   stages,
   stakeholders,
@@ -331,8 +330,6 @@ export default function AiCareCommunityProposalPage() {
           </div>
         </footer>
       </div>
-      {/* Keep proposal capability flags authoritative for static review and tests. */}
-      {proposalOnlyCapabilities.publicPage ? null : null}
     </>
   );
 }
