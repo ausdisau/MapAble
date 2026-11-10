@@ -18,7 +18,7 @@ describe("LocalLinks public knowledge bridge", () => {
     expect(makeDisapediaSearchUrl("http://disapedia.au", "rights")).toBeNull();
     expect(makeDisapediaSearchUrl("https://evil.example", "rights")).toBeNull();
     expect(makeDisapediaSearchUrl("https://disapedia.au@evil.example", "rights")).toBeNull();
-    expect(makeDisapediaSearchUrl("https://disapedia.au:443", "rights")).toBeNull();
+    expect(makeDisapediaSearchUrl("https://disapedia.au:444", "rights")).toBeNull();
     expect(makeDisapediaSearchUrl("https://disapedia.au/foo", "rights")).toBeNull();
     expect(makeDisapediaSearchUrl("https://disapedia.au", "rights")?.searchParams.get("gsrsearch")).toBe("rights");
   });
