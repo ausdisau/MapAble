@@ -6,6 +6,7 @@ import {
   foundingPrinciples,
   proposal,
   researchThemes,
+  rightsAndAiQuestions,
   stages,
   stakeholders,
 } from "@/lib/proposals/ai-care-community-content";
@@ -29,6 +30,7 @@ const inPageLinks = [
   { label: "The case", href: "#the-case" },
   { label: "The network", href: "#the-network" },
   { label: "Research", href: "#research" },
+  { label: "AI accountability", href: "#ai-accountability" },
   { label: "Approach", href: "#approach" },
   { label: "Invitation", href: "#invitation" },
 ] as const;
@@ -216,6 +218,35 @@ export default function AiCareCommunityProposalPage() {
                   <p className={styles.measure}><strong>Explore:</strong> {theme.measure}</p>
                 </article>
               ))}
+            </div>
+          </section>
+
+          <section
+            className={styles.assuranceSection}
+            id="ai-accountability"
+            aria-labelledby="ai-accountability-heading"
+          >
+            <div className={styles.assuranceInner}>
+              <div className={styles.assuranceIntro}>
+                <p className={styles.kicker}>{rightsAndAiQuestions.eyebrow}</p>
+                <h2 id="ai-accountability-heading">{rightsAndAiQuestions.title}</h2>
+                <p>{rightsAndAiQuestions.intro}</p>
+                <p className={styles.capabilityNote}>{rightsAndAiQuestions.capabilityBoundary}</p>
+              </div>
+              <ol className={styles.assuranceQuestions}>
+                {rightsAndAiQuestions.prompts.map((item, index) => (
+                  <li key={item.question}>
+                    <span aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
+                    <div>
+                      <h3>{item.question}</h3>
+                      <p>{item.explanation}</p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+              <p className={styles.assuranceCaveat} role="note">
+                {rightsAndAiQuestions.caveat}
+              </p>
             </div>
           </section>
 
