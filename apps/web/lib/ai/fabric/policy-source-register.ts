@@ -14,7 +14,7 @@ export const policySourceSchema = z.strictObject({
   instrumentType: z.enum([
     "executive_order", "government_plan", "government_review", "research_index"
   ]),
-  publishedOn: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  publishedOn: z.union([z.string().regex(/^\d{4}-\d{2}-\d{2}$/), z.null()]),
   consultedOn: z.literal("2026-11-10"),
   bindingScope: z.string().min(10),
   status: z.enum(["published", "recommendations_not_law", "secondary_analysis"]),
@@ -52,7 +52,7 @@ export const AI_POLICY_SOURCES: readonly PolicySource[] = [
     title: "PM&C: Rapid Review of Australian Government Arrangements for an AI-driven Cyber Incident — Recommendations",
     url: "https://www.pmc.gov.au/resources/rapid-review-australian-government-arrangements-ai-driven-cyber-incident/rapid-review-australian-government-arrangements-ai-driven-cyber-incident-recommendations",
     jurisdiction: "AU", evidenceTier: "government_primary",
-    instrumentType: "government_review", publishedOn: "2026-10-01",
+    instrumentType: "government_review", publishedOn: null,
     consultedOn: "2026-11-10",
     bindingScope: "Recommendations for Australian Government consideration; not standalone enforceable obligations",
     status: "recommendations_not_law", licensing: "unverified_no_training",
@@ -63,7 +63,7 @@ export const AI_POLICY_SOURCES: readonly PolicySource[] = [
     title: "Global Institute for National Capability: National AI Strategies",
     url: "https://www.ginc.org/tag/national-ai-strategies/",
     jurisdiction: "comparative", evidenceTier: "secondary_research",
-    instrumentType: "research_index", publishedOn: "2026-01-09",
+    instrumentType: "research_index", publishedOn: null,
     consultedOn: "2026-11-10",
     bindingScope: "Independent comparative research index, not a government legal or policy authority",
     status: "secondary_analysis", licensing: "unverified_no_training",
