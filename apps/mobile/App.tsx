@@ -15,6 +15,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import { MobileIdentityCard } from './src/components/MobileIdentityCard';
 import { ArcHubScreen } from './src/features/arc/ArcHubScreen';
+import { MySupportScreen } from './src/features/my-support/MySupportScreen';
 import {
   isMapAbleApiConfigured,
   searchMapAblePlaces,
@@ -509,12 +510,13 @@ function Permission({ name, status }: { name: string; status: string }) {
 const Tabs = createBottomTabNavigator({
   screenOptions: {
     headerShown: false,
-    tabBarLabelStyle: { fontSize: 13, fontWeight: '700' },
+    tabBarLabelStyle: { fontSize: 12, fontWeight: '700' },
     tabBarStyle: { minHeight: 64, paddingBottom: 8, paddingTop: 6 },
     tabBarActiveTintColor: colours.primary,
   },
   screens: {
     Today: TodayScreen,
+    Support: MySupportScreen,
     Home: HomeScreen,
     Indy: IndyScreen,
     ARC: ArcHubScreen,

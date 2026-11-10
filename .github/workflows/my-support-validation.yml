@@ -1,0 +1,66 @@
+name: My Support preview validation
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "apps/mobile/**"
+      - "apps/web/app/dashboard/my-support/**"
+      - "apps/web/app/dashboard/page.tsx"
+      - "apps/web/components/my-support/**"
+      - "apps/web/lib/my-support/**"
+      - "apps/web/lib/config/my-support.ts"
+      - "apps/web/tests/my-support/**"
+      - "docs/product/MY-SUPPORT-PARTICIPANT-CONTROL-V01.md"
+      - ".github/workflows/my-support-validation.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: my-support-validation-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  web:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Set up Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 24
+
+      - name: Enable pnpm
+        run: corepack enable
+
+      - name: Install locked dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: pnpm prisma generate
+
+      - name: Run My Support status tests
+        run: pnpm exec vitest run tests/my-support
+
+      - name: Check web types
+        run: pnpm type-check
+
+      - name: Lint scoped implementation
+        run: >-
+          pnpm exec eslint
+          app/dashboard/my-support/page.tsx
+          app/dashboard/page.tsx
+          components/my-support/DecisionWorkbenchPreview.tsx
+          lib/config/my-support.ts
+          lib/my-support/support-status.ts
+          tests/my-support/support-status.test.ts
+          --max-warnings 0
