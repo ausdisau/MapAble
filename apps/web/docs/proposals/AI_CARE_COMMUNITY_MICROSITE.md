@@ -77,3 +77,18 @@ WCAG 2.2 AA is the target and requires independent checking, not self-certificat
 ## Release governance and rollback
 
 Do not merge, deploy, index, expand partner names, add signup forms, link the main nav or launch events without Australian Disability Ltd's approval. Keep this as a DRAFT review artifact. For rollback, remove this isolated route and its supporting modules; existing care, transport and AI runtime flows remain untouched.
+
+## Research framing added from supplied paper — 11 November 2026
+
+A user-supplied 31 October 2026 research paper on artificial superintelligence, Australian disability care and community services informed a new **AI accountability** section of the proposal. It is not copied into this public repository, and no public link or attribution to the private source is assumed.
+
+Concepts retained as *research questions*, not verified findings:
+- bring disability rights and AI governance into the same research agenda;
+- require accessible reasons, effective challenge and supported decision-making;
+- compare human and algorithmic judgements while evaluating automation bias;
+- consider impact on support workers, relationships, privacy and participant access;
+- distinguish current automated decision-making from hypothetical general or superintelligent systems.
+
+**Evidence limits:** The paper itself says its assessment of the enacted wording of the NDIS 2026 automated decision-making provisions was not independently verified against final legislation. The public site therefore contains no definitive claim about that law, the Support at Home algorithm, a particular regulator, a specific death, court outcome or regulatory breach. Before publishing a separate legal explainer or stronger current-affairs claims, independently verify primary legislation, official inquiries, dates and responses. Check permissions before publishing the uploaded paper or linking to it.
+
+**Workflow note:** This change is confined to editorial content, public-facing presentation CSS and proposal-only tests. It does not turn the proposal into an operational AI research service, and does not change membership, partnership or deployment status.
