@@ -73,6 +73,46 @@ export const researchThemes = [
   }
 ] as const;
 
+
+/**
+ * Research framing developed from a supplied 31 October 2026 discussion
+ * paper. The private paper itself is NOT published or copied into this site.
+ * Its legal analysis has NOT been independently verified against enacted law.
+ * These are proposed questions, not findings or legal conclusions.
+ */
+export const rightsAndAiQuestions = {
+  eyebrow: "A research challenge for the care economy",
+  title: "More capable AI is not automatically more accountable care.",
+  intro:
+    "Discussion about artificial superintelligence can obscure the decisions already being automated. For disability care, the more immediate question is how to ensure that technology remains open to challenge, informed by lived experience and accountable to the people whose lives it affects.",
+  capabilityBoundary:
+    "Artificial superintelligence is a hypothetical future capability, not an established feature of MapAble or this proposal. We propose evaluating present-day systems before considering more autonomous ones.",
+  prompts: [
+    {
+      question: "Whose decision is it?",
+      explanation:
+        "How should a person express, review, refuse or correct what an AI system proposes—using their preferred communication method, including AAC?"
+    },
+    {
+      question: "Can it be challenged?",
+      explanation:
+        "What evidence, accessible reasons, independent assessment and effective human intervention should be available when automated recommendations are wrong?"
+    },
+    {
+      question: "What happens to care relationships?",
+      explanation:
+        "Do proposed tools strengthen the quality and continuity of care, or shift more risk, unpaid work and surveillance onto participants and workers?"
+    },
+    {
+      question: "Who controls the information?",
+      explanation:
+        "Can research protect purpose-bound consent, prevent unexpected reuse of disability data and let people withdraw without losing essential services?"
+    }
+  ],
+  caveat:
+    "These are proposed research questions, not findings about particular agencies, enacted legislation or an operational AI system. Any legal analysis would be independently checked against current primary sources before public policy recommendations."
+} as const;
+
 export const foundingPrinciples = [
   "People with disability and workers must be paid contributors and research decision-makers.",
   "No model makes clinical, safeguarding, funding, worker-screening or care-assignment decisions.",
