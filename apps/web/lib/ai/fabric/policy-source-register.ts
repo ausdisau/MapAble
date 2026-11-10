@@ -87,8 +87,9 @@ export function getAiPolicySource(id: string): PolicySource | undefined {
 }
 
 /** Secondary sources may lead to research questions, never primary legal proof. */
-export function maySupportPrimaryLegalClaim(source: PolicySource): boolean {
-  return source.evidenceTier === "government_primary" &&
+export function maySupportPrimaryLegalClaim(source: PolicySource, targetJurisdiction: "AU" | "US"): boolean {
+  return source.jurisdiction === targetJurisdiction &&
+    source.evidenceTier === "government_primary" &&
     source.instrumentType === "executive_order" &&
     source.status === "published";
 }
