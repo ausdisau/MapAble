@@ -4,8 +4,8 @@ import { requireAuth } from "@/lib/auth/guards";
 import { roleLabel } from "@/lib/auth/roles";
 import { caseListWhereForUser } from "@/lib/cases/case-access";
 import { caseManagementConfig } from "@/lib/config/case-management";
-import { isMySupportPreviewEnabled } from "@/lib/config/my-support";
 import { isEngagementPlatformEnabled } from "@/lib/config/engagement";
+import { isMySupportPreviewEnabled } from "@/lib/config/my-support";
 import { countOpenSubmissions } from "@/lib/engagement/engagement-submission-service";
 import { prisma } from "@/lib/prisma";
 
