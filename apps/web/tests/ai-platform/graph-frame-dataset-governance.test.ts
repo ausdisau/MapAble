@@ -48,9 +48,10 @@ describe("AI policy source provenance", () => {
     validatePolicySourceRegister();
     expect(AI_POLICY_SOURCES.length).toBeGreaterThanOrEqual(4);
     expect(getAiPolicySource("ginc-national-ai-strategies")?.evidenceTier).toBe("secondary_research");
-    expect(maySupportPrimaryLegalClaim(getAiPolicySource("ginc-national-ai-strategies")!)).toBe(false);
-    expect(maySupportPrimaryLegalClaim(getAiPolicySource("au-pmc-ai-cyber-review-2026")!)).toBe(false);
+    expect(maySupportPrimaryLegalClaim(getAiPolicySource("ginc-national-ai-strategies")!, "US")).toBe(false);
+    expect(maySupportPrimaryLegalClaim(getAiPolicySource("au-pmc-ai-cyber-review-2026")!, "AU")).toBe(false);
     expect(getAiPolicySource("us-eo-14434-2026")?.jurisdiction).toBe("US");
+    expect(maySupportPrimaryLegalClaim(getAiPolicySource("us-eo-14434-2026")!, "AU")).toBe(false);
   });
 });
 
