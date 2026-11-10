@@ -1,6 +1,6 @@
 # My Support — Participant Sovereignty and Development Doctrine
 
-**Document file:** \`docs/product/MySupports-docs.md\`  
+**Document file:** `docs/product/MySupports-docs.md`  
 **Product name:** My Support (two words); "MySupports-docs.md" is the requested durable filename.  
 **Steward:** Australian Disability Ltd / MapAble  
 **Version:** 1.0 — 10 November 2026 (Australia/Sydney)  
@@ -62,19 +62,19 @@ Shared MapAble Core services should own identity, consent, audit, notifications 
 ## 5. Current implementation and evidence ledger
 
 **Canonical repository:** [ausdisau/MapAble](https://github.com/ausdisau/MapAble)  
-**My Support draft:** [PR #38](https://github.com/ausdisau/MapAble/pull/38), branch \`feature/my-support-sovereignty-web-native-v01\`.  
+**My Support draft:** [PR #38](https://github.com/ausdisau/MapAble/pull/38), branch `feature/my-support-sovereignty-web-native-v01`.  
 **My Day dependency reference:** [PR #32](https://github.com/ausdisau/MapAble/pull/32), draft and unmerged when reviewed on 10 November 2026.  
-**Legacy imported web repository:** [ausdisau/mapableau-new](https://github.com/ausdisau/mapableau-new), for historical provenance; canonical development is in \`ausdisau/MapAble\`.
+**Legacy imported web repository:** [ausdisau/mapableau-new](https://github.com/ausdisau/mapableau-new), for historical provenance; canonical development is in `ausdisau/MapAble`.
 
 | Capability | Evidence path / record | Status as of document date |
 | --- | --- | --- |
-| Web My Support preview | \`apps/web/app/dashboard/my-support/page.tsx\` in PR #38 | **In development**: authenticated, server-flagged, read-only |
-| Evidence labels | \`apps/web/lib/my-support/support-status.ts\` in PR #38 | **Implemented in draft code**, not independent service verification |
-| Fictional decision practice | \`apps/web/components/my-support/DecisionWorkbenchPreview.tsx\` | **Synthetic/local-only**; not a real decision receipt |
-| Expo mobile Support tab | \`apps/mobile/src/features/my-support/MySupportScreen.tsx\` | **Synthetic/local-only**; not live mobile care/consent integration |
-| Preview flag | \`apps/web/lib/config/my-support.ts\` | Off unless server enables \`MAPABLE_MY_SUPPORT_PREVIEW_ENABLED=true\` |
-| Existing care and transport records | Prisma \`CareBooking\` and \`TransportTrip\`; selected by signed-in \`participantId\` | Source record states; **not** delivery or worker-credential proof |
-| My Day dependency evaluation | Draft PR #32, \`apps/web/lib/day/day-planner.ts\` and DayEval harness | Separate research prototype, not merged into My Support |
+| Web My Support preview | `apps/web/app/dashboard/my-support/page.tsx` in PR #38 | **In development**: authenticated, server-flagged, read-only |
+| Evidence labels | `apps/web/lib/my-support/support-status.ts` in PR #38 | **Implemented in draft code**, not independent service verification |
+| Fictional decision practice | `apps/web/components/my-support/DecisionWorkbenchPreview.tsx` | **Synthetic/local-only**; not a real decision receipt |
+| Expo mobile Support tab | `apps/mobile/src/features/my-support/MySupportScreen.tsx` | **Synthetic/local-only**; not live mobile care/consent integration |
+| Preview flag | `apps/web/lib/config/my-support.ts` | Off unless server enables `MAPABLE_MY_SUPPORT_PREVIEW_ENABLED=true` |
+| Existing care and transport records | Prisma `CareBooking` and `TransportTrip`; selected by signed-in `participantId` | Source record states; **not** delivery or worker-credential proof |
+| My Day dependency evaluation | Draft PR #32, `apps/web/lib/day/day-planner.ts` and DayEval harness | Separate research prototype, not merged into My Support |
 | Operational decision receipts | None established in PR #38 | **Proposed only** |
 | Live native participant consent/worker actions | No such capability established in PR #38 | **Not implemented** |
 
@@ -110,9 +110,9 @@ A decision receipt is **not merely an on-screen confirmation animation**. For a 
 
 Example **conceptual** state machine (not the current database contract):
 
-\`draft → participant_reviewed → instruction_submitted → acknowledged → action_verified\`
+`draft → participant_reviewed → instruction_submitted → acknowledged → action_verified`
 
-Add terminal or parallel states such as \`declined\`, \`withdrawn\`, \`disputed\`, \`delivery_failed\` and \`human_review_required\`. Do not jump automatically from submitted to completed. Irreversible external events cannot be rolled back merely by deleting a receipt.
+Add terminal or parallel states such as `declined`, `withdrawn`, `disputed`, `delivery_failed` and `human_review_required`. Do not jump automatically from submitted to completed. Irreversible external events cannot be rolled back merely by deleting a receipt.
 
 ### 6.5 Accessible care routine and handover
 
@@ -132,11 +132,11 @@ Keep worker observations, participant reports, provider assertions, verified sys
 
 **Separate five concepts in typed contracts:**
 
-1. \`ParticipantIntent\`: chosen goal, preferences, boundaries and provenance.
-2. \`SupportEvidence\`: source record, time, actor, verification level, uncertainty.
-3. \`PermissionGrant\`: subject, scope, purpose, expiry, active/revoked state.
-4. \`ActionProposal\`: proposed change, dependencies, risk and required approvers.
-5. \`ExecutionReceipt\`: an independently observed, authorised outcome — **future only**.
+1. `ParticipantIntent`: chosen goal, preferences, boundaries and provenance.
+2. `SupportEvidence`: source record, time, actor, verification level, uncertainty.
+3. `PermissionGrant`: subject, scope, purpose, expiry, active/revoked state.
+4. `ActionProposal`: proposed change, dependencies, risk and required approvers.
+5. `ExecutionReceipt`: an independently observed, authorised outcome — **future only**.
 
 A generated proposal is **not** an execution receipt. A consent checkbox is **not** proof of actual consent from an authorised person. A closed provider ticket is **not** proof that the participant has support.
 
@@ -181,7 +181,7 @@ Never describe support as a reward for compliance or services as privileges awar
 1. Open [FEATURE-DEVELOPMENT-MEMORY.md](../development/FEATURE-DEVELOPMENT-MEMORY.md) and the relevant feature dossier **before touching code**.
 2. Establish the participant's goal, options, boundaries, communication needs, source-of-truth services, and a meaningful human fallback. Note who retains actual decision authority.
 3. Inventory existing implementation, dependencies, feature flags, CI, Vercel deployment boundaries and source provenance.
-4. Create or update a short feature dossier (\`docs/product/<feature>-docs.md\`, retaining exact user-requested filenames). Label every feature as verified live, in development, proposed, synthetic or unknown.
+4. Create or update a short feature dossier (`docs/product/<feature>-docs.md`, retaining exact user-requested filenames). Label every feature as verified live, in development, proposed, synthetic or unknown.
 5. Include one normal and several adverse user journeys; test refusal, loss of consent, incomplete evidence, downstream cancellation and cross-role access.
 6. Keep the first vertical slice narrow, default-disabled when it uses sensitive or unverified services, and reversible where possible.
 7. Report actual tests, accessibility reviews and security checks, distinguishing code inspection from real-device/user validation.
