@@ -17,7 +17,7 @@
 
 The product outcome is **effective participant agency**, not a greater count of taps, automated shifts, completed checklists, or an "autonomy score". Accessible human service and a working no-AI path are core requirements.
 
-**My Day** expresses what a participant wants to do and the dependencies involved. **My Support** expresses the participant's choices, boundaries, permissions, evidence, accountability and remedies regarding the services that make the day possible. Do not create two competing sources of truth.
+**My Day** expresses the participant's desired activities and the dependencies involved. **My Support** expresses the participant's choices, boundaries, permissions, evidence, accountability and remedies regarding the services that make the day possible. Do not create two competing sources of truth.
 
 ## 2. Seven practical powers to design for
 
@@ -156,7 +156,7 @@ Accessibility is not only visual conformity: measure whether someone can **expre
 
 ## 9. Rights, safeguarding and operating boundaries
 
-Apply a disability-rights-led approach informed by supported decision-making, dignity of risk, informed consent, privacy, safe service continuity and Article 19 of the UN Convention on the Rights of Persons with Disabilities. Check current Australian/NSW and NDIS requirements for each service and transaction; a design document does not grant regulatory approval.
+Apply a disability-rights-led approach informed by supported decision-making, dignity of risk, informed consent, privacy, safe service continuity and Article 19 of the UN Convention on the Rights of Persons with Disabilities. Verify current official Australian/NSW and NDIS requirements for each service and transaction; rules and guidance may change. A design document does not grant regulatory approval.
 
 No autonomous worker credential determinations, emergency dispatch, medication decisions, restrictive practice approvals, provider suspension, financial charge approvals or high-impact legal advice. Human review is required where clinical safety, workforce safeguards, provider obligations, participant rights or unresolved service gaps are at stake.
 
