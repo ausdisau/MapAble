@@ -1,6 +1,7 @@
 /**
  * Research-only dataset governance. Records source lineage and permitted uses,
  * not unconsented training authority. No live dataset connector is created here.
+ * Revision digests stay null until real source manifests are materialised and hashed.
  */
 import { z } from "zod";
 import { getAiPolicySource } from "./policy-source-register";
@@ -8,7 +9,7 @@ import { getAiPolicySource } from "./policy-source-register";
 export const governedDatasetSchema = z.strictObject({
   datasetId: z.string().regex(/^[a-z0-9][a-z0-9_.-]{2,80}$/),
   version: z.string().regex(/^\d+\.\d+\.\d+$/),
-  revisionDigest: z.string().regex(/^[a-f0-9]{64}$/),
+  revisionDigest: z.union([z.string().regex(/^[a-f0-9]{64}$/), z.null()]),
   recordKind: z.enum(["synthetic_graph", "policy_source_index"]),
   provenanceIds: z.array(z.string()).max(100),
   allowedPurposes: z.array(z.enum([
@@ -29,7 +30,7 @@ export type DatasetPurpose = GovernedDataset["allowedPurposes"][number];
 export const GOVERNED_DATASETS: readonly GovernedDataset[] = [
   {
     datasetId: "mapable-synthetic-graph-v1",
-    version: "1.0.0", revisionDigest: "1".repeat(64),
+    version: "1.0.0", revisionDigest: null,
     recordKind: "synthetic_graph", provenanceIds: [],
     allowedPurposes: ["schema_validation", "synthetic_graph_eval", "multimodal_eval"],
     approval: "synthetic_test", privacyClass: "synthetic",
@@ -38,7 +39,7 @@ export const GOVERNED_DATASETS: readonly GovernedDataset[] = [
   },
   {
     datasetId: "national-ai-strategies-source-index-v1",
-    version: "1.0.0", revisionDigest: "2".repeat(64),
+    version: "1.0.0", revisionDigest: null,
     recordKind: "policy_source_index",
     provenanceIds: [
       "ginc-national-ai-strategies",
