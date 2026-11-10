@@ -7,6 +7,7 @@ import {
   proposal,
   proposalOnlyCapabilities,
   researchThemes,
+  rightsAndAiQuestions,
   stages,
   stakeholders
 } from "@/lib/proposals/ai-care-community-content";
@@ -61,6 +62,19 @@ describe("AI-Enabled Care & Support Community of Practice microsite", () => {
     expect(proposalOnlyCapabilities.automatedActions).toBe(false);
     expect(proposalOnlyCapabilities.liveDataSharing).toBe(false);
     expect(proposalOnlyCapabilities.deployedPilot).toBe(false);
+  });
+
+  it("distinguishes speculative ASI from current governance research", () => {
+    expect(rightsAndAiQuestions.capabilityBoundary).toContain("hypothetical");
+    expect(rightsAndAiQuestions.capabilityBoundary).toContain("not an established feature");
+    expect(rightsAndAiQuestions.prompts).toHaveLength(4);
+    const questions = rightsAndAiQuestions.prompts.map((item) => item.question).join(" ");
+    expect(questions).toContain("decision");
+    expect(questions).toContain("challenged");
+    expect(questions).toContain("information");
+    expect(rightsAndAiQuestions.intro).toContain("challenge");
+    expect(rightsAndAiQuestions.caveat).toContain("not findings");
+    expect(rightsAndAiQuestions.caveat).toContain("independently checked");
   });
 
   it("shows verified public research context as sources, not affiliations", () => {
