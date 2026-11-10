@@ -43,6 +43,12 @@ npm run typecheck:mobile
 
 Replit launches the web platform by default. The mobile app can be run separately with the root mobile scripts.
 
+## Feature development memory and participant autonomy
+
+All new MapAble features should apply [My Support's participant-sovereignty design doctrine](docs/product/MySupports-docs.md) and the [Feature Development Memory](docs/development/FEATURE-DEVELOPMENT-MEMORY.md). These are referenced by [AGENTS.md](AGENTS.md) and the always-applied Cursor rule in `.cursor/rules/participant-sovereignty.mdc`.
+
+For each significant feature, maintain a rights- and evidence-grounded Markdown dossier, verify who can make decisions, preserve AAC and non-AI/human paths, test refusals and failure cases, report actual CI/accessibility/security gates, and keep production claims and deployment approvals separate from prototype code.
+
 ## Development boundaries
 
 - Keep web dependencies scoped to `apps/web`.
