@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-
 import { useId, useState } from "react";
 
 import { RelationalFitDisclosure } from "@/components/support-builder/RelationalFitDisclosure";
