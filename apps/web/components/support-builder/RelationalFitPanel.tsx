@@ -4,13 +4,11 @@ import Link from "next/link";
 import { useId, useState } from "react";
 
 import { RelationalFitDisclosure } from "@/components/support-builder/RelationalFitDisclosure";
-
 import {
   COMMUNICATION_MODES,
   DEFAULT_FIT_REQUEST,
   type ParticipantFitRequest,
 } from "@/lib/support-builder/relational-fit";
-
 
 type Candidate = {
   workerId: string;
@@ -189,7 +187,7 @@ export function RelationalFitPanel({ locality }: { locality: string }) {
                 onChange={(event) => updateDimension(dimension.key, event.target.value, "importance")}
               >
                 <option value="preferred">Preferred — a difference is worth discussing</option>
-                <option value="essential">Essential — don't include workers without it</option>
+                <option value="essential">Essential — don&apos;t include workers without it</option>
               </select>
             </label>
           )}
