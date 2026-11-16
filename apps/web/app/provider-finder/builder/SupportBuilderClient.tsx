@@ -13,7 +13,6 @@ import {
   Search,
   ShieldCheck,
   Square,
-  Trash2,
 } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 
