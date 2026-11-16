@@ -4,13 +4,14 @@ import Link from "next/link";
 
 import { useId, useState } from "react";
 
+import { RelationalFitDisclosure } from "@/components/support-builder/RelationalFitDisclosure";
+
 import {
   COMMUNICATION_MODES,
   DEFAULT_FIT_REQUEST,
   type ParticipantFitRequest,
 } from "@/lib/support-builder/relational-fit";
 
-import { RelationalFitDisclosure } from "./RelationalFitDisclosure";
 
 type Candidate = {
   workerId: string;
