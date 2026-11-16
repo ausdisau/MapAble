@@ -13,9 +13,7 @@ export const maxDuration = 30;
 const MessageInput = z.object({
   id: z.string().max(128),
   role: z.enum(["user", "assistant"]),
-  parts: z.array(
-    z.object({ type: z.literal("text"), text: z.string().max(1800) }),
-  ).min(1).max(3),
+  parts: z.array(z.unknown()).min(1).max(24),
 });
 const ChatInput = z.object({
   messages: z.array(MessageInput).min(1).max(10),
@@ -54,7 +52,11 @@ export async function POST(request: Request) {
 
   let raw: unknown;
   try {
-    raw = await request.json();
+    const body = await request.text();
+    if (body.length > 40_000) {
+      return Response.json({ error: "Conversation is too long." }, { status: 413 });
+    }
+    raw = JSON.parse(body);
   } catch {
     return Response.json({ error: "Invalid message format." }, { status: 400 });
   }
@@ -66,7 +68,22 @@ export async function POST(request: Request) {
   const configuredModel = process.env.MAPABLE_SUPPORT_BUILDER_MODEL || "openai/gpt-oss-20b";
   const modelId = MODELS.has(configuredModel) ? configuredModel : "openai/gpt-oss-20b";
 
-  const messages = parsed.data.messages as UIMessage[];
+  // AI SDK UI messages can contain step-start and other non-text parts.
+  // Only pass bounded, validated text to the model; never trust client tool parts.
+  const messages = parsed.data.messages.flatMap((message) => {
+    const parts = message.parts.flatMap((part) => {
+      if (!part || typeof part !== "object" || !("type" in part) || !("text" in part)) {
+        return [];
+      }
+      if (part.type !== "text" || typeof part.text !== "string") return [];
+      const text = part.text.trim().slice(0, 1800);
+      return text ? [{ type: "text" as const, text }] : [];
+    });
+    return parts.length ? [{ id: message.id, role: message.role, parts }] : [];
+  }) as UIMessage[];
+  if (messages.at(-1)?.role !== "user") {
+    return Response.json({ error: "Message text is required." }, { status: 400 });
+  }
   try {
     const result = streamText({
       model: gateway(modelId),
