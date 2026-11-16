@@ -5,6 +5,11 @@ import {
   proposeCompetencyFromAcademy,
   proposeCompetencyFromTrainingCompletion,
 } from "@/lib/careos/opportunities/workforce-passport-adapter";
+import {
+  assertProviderOrgAccess,
+  loadWorkerOrThrow,
+} from "@/lib/workforce/access";
+import { handleCapabilityError } from "@/lib/workforce/http";
 
 export async function POST(request: Request) {
   const user = await requireApiSession();
@@ -22,6 +27,10 @@ export async function POST(request: Request) {
   }
 
   try {
+    const worker = await loadWorkerOrThrow(body.workerProfileId);
+    if (worker.userId !== user.id) {
+      await assertProviderOrgAccess(user, worker);
+    }
     if (body.trainingCompletionId) {
       const result = await proposeCompetencyFromTrainingCompletion({
         workerProfileId: body.workerProfileId,
@@ -42,7 +51,6 @@ export async function POST(request: Request) {
     });
     return NextResponse.json(result, { status: 201 });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "PROPOSE_FAILED";
-    return NextResponse.json({ error: message }, { status: 400 });
+    return handleCapabilityError(error);
   }
 }

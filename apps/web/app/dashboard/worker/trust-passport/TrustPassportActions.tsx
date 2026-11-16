@@ -12,7 +12,7 @@ export function TrustPassportActions({
   const [status, setStatus] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  async function presentAndVerify() {
+  async function presentMock() {
     setLoading(true);
     setStatus(null);
     try {
@@ -28,19 +28,9 @@ export function TrustPassportActions({
       const presentData = await presentRes.json();
       if (!presentRes.ok) throw new Error(presentData.error ?? "Present failed");
 
-      const verifyRes = await fetch("/api/trust-passport", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "verify",
-          credentialId: presentData.credential.id,
-        }),
-      });
-      const verifyData = await verifyRes.json();
-      if (!verifyRes.ok) throw new Error(verifyData.error ?? "Verify failed");
-
-      setStatus("Credential verified (pilot mock issuer).");
-      window.location.reload();
+      setStatus(
+        "Mock presentation recorded. This is not a worker screening clearance, WWCC, or competence assessment.",
+      );
     } catch (e) {
       setStatus(e instanceof Error ? e.message : "Something went wrong");
     } finally {
@@ -50,16 +40,24 @@ export function TrustPassportActions({
 
   return (
     <div className="space-y-2">
+      <p className="text-sm text-muted-foreground" role="note">
+        One-tap present records a mock credential only. It does not verify screening
+        and does not write clearance onto your worker profile.
+      </p>
       <Button
         type="button"
         variant="default"
-        size="default"
+        size="lg"
         disabled={loading}
-        onClick={presentAndVerify}
+        onClick={presentMock}
       >
-        {loading ? "Presenting…" : "One-tap present (pilot)"}
+        {loading ? "Presenting…" : "Present mock credential (not clearance)"}
       </Button>
-      {status ? <p className="text-sm text-muted-foreground">{status}</p> : null}
+      {status ? (
+        <p className="text-sm text-muted-foreground" aria-live="polite" role="status">
+          {status}
+        </p>
+      ) : null}
     </div>
   );
 }

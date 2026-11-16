@@ -2,10 +2,7 @@ import { createAuditEvent } from "@/lib/audit/audit-event-service";
 import { y3NationalTrustConfig } from "@/lib/config/y3-national-trust";
 import { prisma } from "@/lib/prisma";
 
-import {
-  getTrustPassportIssuerAdapter,
-  mapClaimsToWorkerStatuses,
-} from "./issuer-adapter";
+import { getTrustPassportIssuerAdapter } from "./issuer-adapter";
 
 export function isTrustPassportPilotEnabled() {
   return y3NationalTrustConfig.trustPassportPilotEnabled;
@@ -60,7 +57,11 @@ export async function presentCredential(params: {
     action: "trust_passport.presented",
     entityType: "WorkerTrustCredential",
     entityId: credential.id,
-    metadata: { credentialType: params.credentialType, issuerDid: presentation.issuerDid },
+    metadata: {
+      credentialType: params.credentialType,
+      issuerDid: presentation.issuerDid,
+      mockNotClearance: true,
+    },
   });
 
   return { credential, reused: false };
@@ -94,19 +95,13 @@ export async function verifyPresentation(params: {
     throw new Error("CREDENTIAL_EXPIRED");
   }
 
-  const claims = credential.claimsJson as Record<string, unknown>;
-  const statusUpdates = mapClaimsToWorkerStatuses(claims);
-
-  const [updatedCredential] = await Promise.all([
-    prisma.workerTrustCredential.update({
-      where: { id: credential.id },
-      data: { status: "verified" },
-    }),
-    prisma.workerProfile.update({
-      where: { id: credential.workerProfileId },
-      data: statusUpdates,
-    }),
-  ]);
+  const updatedCredential = await prisma.workerTrustCredential.update({
+    where: { id: credential.id },
+    data: {
+      status: "verified",
+      verificationMethod: "mock_not_independently_verified",
+    },
+  });
 
   await createAuditEvent({
     actorUserId: params.actorUserId,
@@ -114,6 +109,7 @@ export async function verifyPresentation(params: {
     entityType: "WorkerTrustCredential",
     entityId: credential.id,
     organisationId: credential.workerProfile.organisationId,
+    metadata: { mockNotClearance: true, workerProfileUpdated: false },
   });
 
   return updatedCredential;
@@ -133,7 +129,8 @@ export async function getTrustPassportSummary(workerProfileId: string) {
   return {
     enabled: true,
     credentials,
-    pilotNotice: "Pilot credentials use a mock issuer — not production accreditation.",
+    pilotNotice:
+      "Pilot credentials use a mock issuer only. Mock presentations are not a worker screening clearance, WWCC, first-aid certificate, insurance confirmation, or competence assessment.",
   };
 }
 

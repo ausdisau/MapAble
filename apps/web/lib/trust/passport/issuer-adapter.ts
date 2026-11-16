@@ -14,7 +14,7 @@ export interface TrustPassportIssuerAdapter {
   }): Promise<IssuerPresentation>;
 }
 
-/** Mock issuer for pilot — not a production OID4VCI integration. */
+/** Mock issuer for pilot — not a production OID4VCI integration and not clearance. */
 export class MockIssuerAdapter implements TrustPassportIssuerAdapter {
   async issuePresentation(params: {
     workerProfileId: string;
@@ -24,11 +24,13 @@ export class MockIssuerAdapter implements TrustPassportIssuerAdapter {
     const claims: Record<string, unknown> = {
       workerProfileId: params.workerProfileId,
       credentialType: params.credentialType,
-      workerScreeningStatus: "verified",
-      wwccStatus: "verified",
-      firstAidStatus: "verified",
-      insuranceStatus: "verified",
-      verificationStatus: "verified",
+      workerScreeningStatus: "mock_unverified",
+      wwccStatus: "not_independently_verified",
+      firstAidStatus: "not_independently_verified",
+      insuranceStatus: "not_independently_verified",
+      verificationStatus: "mock_unverified",
+      independentlyVerified: false,
+      mockIssuer: true,
     };
 
     return {
@@ -44,8 +46,12 @@ export function getTrustPassportIssuerAdapter(): TrustPassportIssuerAdapter {
   return new MockIssuerAdapter();
 }
 
+/**
+ * Mock and unverified claims must never promote WorkerProfile screening,
+ * WWCC, first-aid, insurance, or verification fields.
+ */
 export function mapClaimsToWorkerStatuses(
-  claims: Record<string, unknown>
+  _claims: Record<string, unknown>,
 ): Partial<{
   workerScreeningStatus: "verified";
   wwccStatus: "verified";
@@ -53,17 +59,7 @@ export function mapClaimsToWorkerStatuses(
   insuranceStatus: "verified";
   verificationStatus: "verified";
 }> {
-  const out: Record<string, "verified"> = {};
-  for (const key of [
-    "workerScreeningStatus",
-    "wwccStatus",
-    "firstAidStatus",
-    "insuranceStatus",
-    "verificationStatus",
-  ] as const) {
-    if (claims[key] === "verified") out[key] = "verified";
-  }
-  return out;
+  return {};
 }
 
 export type { WorkerTrustCredential };

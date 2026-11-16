@@ -48,6 +48,29 @@ describe("provider and workforce evidence policies", () => {
     expect(result.reasonCodes).toContain("CREDENTIAL_EXPIRED_OR_REVOKED:wwcc");
   });
 
+  it("does not let a revoked row hide a later valid credential of the same type", () => {
+    const result = evaluateWorkforceEvidence({
+      evidence: [
+        {
+          credentialType: "wwcc",
+          verificationStatus: "revoked",
+          expiresAt: null,
+          revokedAt: "2025-06-01T00:00:00.000Z",
+        },
+        {
+          credentialType: "wwcc",
+          verificationStatus: "verified",
+          expiresAt: "2027-01-01T00:00:00.000Z",
+          revokedAt: null,
+        },
+      ],
+      requiredCredentialTypes: ["wwcc"],
+      now: new Date("2026-01-01T00:00:00.000Z"),
+    });
+    expect(result.eligible).toBe(true);
+    expect(result.reasonCodes).toEqual([]);
+  });
+
   it("excludes participant-blocked candidates before options are shown", () => {
     const candidates = filterParticipantControlledCandidates({
       candidates: [

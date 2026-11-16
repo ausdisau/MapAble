@@ -1,6 +1,7 @@
 import { requireApiSession } from "@/lib/api/auth-handler";
 import { checkIpRateLimit, getClientIp } from "@/lib/api/ip-rate-limit";
 import { createAuditEvent } from "@/lib/audit/audit-event-service";
+import { isCapabilityPassportPreviewEnabled } from "@/lib/config/capability-passport";
 import { buildParticipantRightsSnapshot } from "@/lib/intelligence/careos/context/participant-rights";
 import { prisma } from "@/lib/prisma";
 import {
@@ -172,6 +173,11 @@ export async function POST(request: Request) {
           "Screening and provider status are recorded internally; current status must be independently verified through authorised channels.",
           "Availability, task-specific qualifications, suitability, worker acceptance and the participant's final choice are not confirmed.",
           "Preferences and approaches are worker-declared, not independently tested or assessed.",
+          ...(isCapabilityPassportPreviewEnabled()
+            ? [
+                "Limited readiness view only: training is not competence, and mock claims are not clearance. Current screening status: NOT INDEPENDENTLY VERIFIED unless confirmed through authorised channels.",
+              ]
+            : []),
         ],
         selectionStatus: "review_required" as const,
       }];
