@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { useId, useState } from "react";
 
 import {
@@ -262,9 +264,9 @@ export function RelationalFitPanel({ locality }: { locality: string }) {
       <RelationalFitDisclosure />
       <p className="text-xs text-muted-foreground">
         Workers may volunteer and withdraw their profile using the
-        {" "}<a href="/provider-finder/builder/worker-profile" className="text-primary underline">
+        {" "}<Link href="/provider-finder/builder/worker-profile" className="text-primary underline">
           worker workstyle settings
-        </a>.
+        </Link>.
       </p>
     </section>
   );
