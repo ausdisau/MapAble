@@ -1,0 +1,64 @@
+name: Verify Support Builder
+
+on:
+  pull_request:
+    branches:
+      - main
+      - "feature/provider-finder-support-builder-ai-sdk-neon-20261117"
+    paths:
+      - "apps/web/app/provider-finder/builder/**"
+      - "apps/web/app/api/provider-finder/builder/**"
+      - "apps/web/lib/support-builder/**"
+      - "apps/web/tests/support-builder-core.test.ts"
+      - "apps/web/tests/relational-fit.test.ts"
+      - "apps/web/tests/relational-fit-boundary.test.ts"
+      - "apps/web/components/support-builder/**"
+      - "apps/web/prisma/schema.prisma"
+      - "apps/web/prisma/migrations/20261117000000_relational_fit_worker_opt_in/**"
+      - "apps/web/docs/support-builder-v1.md"
+      - "apps/web/.env.example"
+      - ".github/workflows/support-builder.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  support-builder-checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Enable pnpm
+        run: corepack enable
+
+      - name: Install locked dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Unit test support draft safeguards
+        run: pnpm exec vitest run tests/support-builder-core.test.ts tests/relational-fit.test.ts tests/relational-fit-boundary.test.ts
+
+      - name: Type check canonical web workspace
+        run: pnpm type-check
+
+      - name: Lint new feature paths with low-memory configuration
+        env:
+          ESLINT_CI_LIGHT: "1"
+          NODE_OPTIONS: "--max-old-space-size=4096"
+        run: |
+          pnpm exec eslint lib/support-builder/core.ts lib/support-builder/discovery.ts lib/support-builder/relational-fit.ts tests/support-builder-core.test.ts tests/relational-fit.test.ts tests/relational-fit-boundary.test.ts --max-warnings 0
+          pnpm exec eslint app/api/provider-finder/builder/chat/route.ts app/api/provider-finder/builder/search/route.ts --max-warnings 0
+          pnpm exec eslint app/api/provider-finder/builder/relational-fit/matches/route.ts app/api/provider-finder/builder/relational-fit/worker-profile/route.ts --max-warnings 0
+          pnpm exec eslint app/provider-finder/builder/page.tsx app/provider-finder/builder/SupportBuilderClient.tsx --max-warnings 0
+          pnpm exec eslint app/provider-finder/builder/worker-profile/page.tsx app/provider-finder/builder/worker-profile/WorkerRelationalFitClient.tsx --max-warnings 0
+          pnpm exec eslint components/support-builder/RelationalFitPanel.tsx components/support-builder/RelationalFitDisclosure.tsx --max-warnings 0
