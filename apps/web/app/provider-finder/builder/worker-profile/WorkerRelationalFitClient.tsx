@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { useEffect, useId, useState } from "react";
 
 import { COMMUNICATION_MODES, type WorkerFitDeclaration } from "@/lib/support-builder/relational-fit";
@@ -177,9 +179,9 @@ export default function WorkerRelationalFitClient() {
 
   return (
     <main aria-labelledby={titleId} className="mx-auto max-w-2xl space-y-5 px-4 py-7">
-      <a href="/provider-finder/builder" className="text-sm text-primary underline">
+      <Link href="/provider-finder/builder" className="text-sm text-primary underline">
         Back to Support Builder
-      </a>
+      </Link>
       <header>
         <h1 id={titleId} className="font-heading text-2xl font-semibold">
           Voluntary worker workstyle settings
