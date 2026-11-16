@@ -39,6 +39,7 @@ export async function POST(request: Request) {
   // Both flags default OFF. Preview deployments must additionally require
   // Vercel Authentication and a shared/distributed rate limit before public use.
   if (
+    process.env.VERCEL_ENV === "production" ||
     process.env.MAPABLE_SUPPORT_BUILDER_ENABLED !== "true" ||
     process.env.MAPABLE_SUPPORT_BUILDER_AI_ENABLED !== "true"
   ) {
