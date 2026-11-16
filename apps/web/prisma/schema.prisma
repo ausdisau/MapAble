@@ -2185,6 +2185,10 @@ model WorkerProfile {
   credentialEvidence WorkerCredentialEvidence[]
   relationalFitProfile RelationalFitWorkerProfile?
   equipmentEvidence WorkerEquipmentEvidence[]
+  screeningRecords WorkerScreeningRecord[]
+  capabilityReviewCases CapabilityReviewCase[]
+  evidenceDisputes WorkerEvidenceDispute[]
+  passportSharePreference WorkerPassportSharePreference?
 }
 
 model RelationalFitWorkerProfile {
@@ -2202,6 +2206,121 @@ model RelationalFitWorkerProfile {
 
   @@index([consentedAt])
   @@map("relational_fit_worker_profiles")
+}
+
+/// Official NDIS Worker Screening outcomes. Distinct from WorkerCredentialStatus.
+/// Default display is NOT INDEPENDENTLY VERIFIED. Never infer clearance.
+enum OfficialNdisScreeningOutcome {
+  clearance
+  pending
+  interim_bar
+  exclusion
+  suspension
+  no_valid_clearance
+  not_independently_verified
+}
+
+enum CapabilityReviewKind {
+  screening_verification
+  credential_discrepancy
+  competency_assessment
+  refresher
+  revocation
+  participant_preparation
+  dispute
+}
+
+enum CapabilityReviewDecision {
+  hold
+  request_evidence
+  refer_for_assessment
+  escalate
+  approve
+  reject
+}
+
+/// Official screening record. Not a WorkerTrustCredential and never inferred
+/// from academy completions, mock presentations, screenshots or provider relationship.
+model WorkerScreeningRecord {
+  id                         String                       @id @default(cuid())
+  workerProfileId            String
+  workerProfile              WorkerProfile                @relation(fields: [workerProfileId], references: [id], onDelete: Cascade)
+  officialOutcome            OfficialNdisScreeningOutcome @default(not_independently_verified)
+  expiresAt                  DateTime?
+  /// Nullable on purpose. Never infer eligible-to-work from other evidence.
+  eligibleToWork             Boolean?
+  identityLinked             Boolean                      @default(false)
+  verifyingOrganisationId    String?
+  authorisedReviewerUserId   String?
+  source                     String
+  reviewedAt                 DateTime?
+  createdAt                  DateTime                     @default(now())
+  updatedAt                  DateTime                     @updatedAt
+
+  @@index([workerProfileId, officialOutcome])
+  @@index([expiresAt])
+  @@map("worker_screening_records")
+}
+
+model CapabilityReviewCase {
+  id                      String                    @id @default(cuid())
+  workerProfileId         String
+  workerProfile           WorkerProfile             @relation(fields: [workerProfileId], references: [id], onDelete: Cascade)
+  organisationId          String
+  kind                    CapabilityReviewKind
+  evidenceIds             String[]                  @default([])
+  scope                   String
+  policyVersion           String                    @default("capability-passport-v1")
+  participantId           String?
+  decision                CapabilityReviewDecision  @default(hold)
+  decisionReason          String?
+  accountableHumanUserId  String?
+  limitations             String[]                  @default([])
+  /// Exclusion and hard participant blocks cannot be flipped by approve.
+  legalProhibition        Boolean                   @default(false)
+  status                  String                    @default("open")
+  createdByUserId         String
+  reviewedByUserId        String?
+  reviewedAt              DateTime?
+  createdAt               DateTime                  @default(now())
+  updatedAt               DateTime                  @updatedAt
+
+  @@index([workerProfileId, status])
+  @@index([organisationId, kind, status])
+  @@index([participantId])
+  @@map("capability_review_cases")
+}
+
+model WorkerEvidenceDispute {
+  id              String        @id @default(cuid())
+  workerProfileId String
+  workerProfile   WorkerProfile @relation(fields: [workerProfileId], references: [id], onDelete: Cascade)
+  evidenceKind    String
+  evidenceId      String
+  reason          String
+  status          String        @default("open")
+  createdByUserId String
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([workerProfileId, status])
+  @@index([evidenceKind, evidenceId])
+  @@map("worker_evidence_disputes")
+}
+
+model WorkerPassportSharePreference {
+  workerProfileId          String        @id
+  workerProfile            WorkerProfile @relation(fields: [workerProfileId], references: [id], onDelete: Cascade)
+  shareWithProviders       Boolean       @default(false)
+  shareWithParticipants    Boolean       @default(false)
+  shareScreeningSummary    Boolean       @default(false)
+  shareQualifications      Boolean       @default(false)
+  shareTraining            Boolean       @default(false)
+  shareCompetencies        Boolean       @default(false)
+  createdAt                DateTime      @default(now())
+  updatedAt                DateTime      @updatedAt
+
+  @@map("worker_passport_share_preferences")
 }
 
 enum WorkerOrganisationInviteStatus {
