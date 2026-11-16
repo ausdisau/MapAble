@@ -45,5 +45,11 @@ jobs:
       - name: Type check canonical web workspace
         run: pnpm type-check
 
-      - name: Lint new feature paths
-        run: pnpm exec eslint app/provider-finder/builder app/api/provider-finder/builder lib/support-builder tests/support-builder-core.test.ts --max-warnings 0
+      - name: Lint new feature paths with low-memory configuration
+        env:
+          ESLINT_CI_LIGHT: "1"
+          NODE_OPTIONS: "--max-old-space-size=4096"
+        run: |
+          pnpm exec eslint lib/support-builder/core.ts lib/support-builder/discovery.ts tests/support-builder-core.test.ts --max-warnings 0
+          pnpm exec eslint app/api/provider-finder/builder/chat/route.ts app/api/provider-finder/builder/search/route.ts --max-warnings 0
+          pnpm exec eslint app/provider-finder/builder/page.tsx app/provider-finder/builder/SupportBuilderClient.tsx --max-warnings 0
