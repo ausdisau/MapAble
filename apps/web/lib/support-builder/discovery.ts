@@ -3,9 +3,11 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 
 import {
+  detectSupportKinds,
   readableWebsite,
   type ProviderCandidate,
   type ProviderDiscovery,
+  type SupportKind,
 } from "./core";
 
 /**
@@ -17,6 +19,7 @@ import {
 export async function discoverSupportBuilderProviders(input: {
   locality: string;
   query: string;
+  kinds: SupportKind[];
   limit?: number;
 }): Promise<ProviderDiscovery> {
   const locality = input.locality.trim().slice(0, 100);
@@ -82,6 +85,9 @@ export async function discoverSupportBuilderProviders(input: {
         name: row.providerName,
         locationLabel: [row.suburb, row.state, row.postcode].filter(Boolean).join(" ") || "Location not supplied",
         serviceSignals: row.services.slice(0, 5),
+        relatedKinds: detectSupportKinds(row.services.join(" ") + " " + row.providerName).filter(
+          (kind) => input.kinds.includes(kind),
+        ),
         website: readableWebsite(row.website),
         sourceLabel: "MapAble imported provider record",
         sourceUrl: readableWebsite(row.sourceUrl),
@@ -152,6 +158,9 @@ export async function discoverSupportBuilderProviders(input: {
             [location?.city, location?.state, location?.postcode]
               .filter(Boolean).join(" ") || "Office location not supplied",
           serviceSignals: [...row.serviceAreas, ...row.specialisations].slice(0, 5),
+          relatedKinds: detectSupportKinds([row.name, row.description ?? ""].join(" ")).filter(
+            (kind) => input.kinds.includes(kind),
+          ),
           website: readableWebsite(row.website),
           sourceLabel: "MapAble provider record; external source not established",
           sourceUrl: null,
@@ -167,6 +176,8 @@ export async function discoverSupportBuilderProviders(input: {
       sourcesChecked.push("MapAble Provider table unavailable");
     }
   }
+
+  candidates.sort((a, b) => b.relatedKinds.length - a.relatedKinds.length);
 
   return {
     providers: candidates,
