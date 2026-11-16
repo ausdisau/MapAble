@@ -4,8 +4,8 @@ import Link from "next/link";
 
 import { useEffect, useId, useState } from "react";
 
-import { COMMUNICATION_MODES, type WorkerFitDeclaration } from "@/lib/support-builder/relational-fit";
 import { RelationalFitDisclosure } from "@/components/support-builder/RelationalFitDisclosure";
+import { COMMUNICATION_MODES, type WorkerFitDeclaration } from "@/lib/support-builder/relational-fit";
 
 type Existing = {
   communicationModes: string[];
@@ -133,6 +133,10 @@ export default function WorkerRelationalFitClient() {
         setMessage("Your workstyle settings were not saved. Check sign-in, consent and preview availability.");
         return;
       }
+      setProfiles((old) => old.map((profile) => profile.id === selectedId ? {
+        ...profile,
+        relationalFitProfile: { ...values, consentedAt: new Date().toISOString() },
+      } : profile));
       setMessage("Voluntary workstyle settings saved. They may appear in authorised participant matching previews.");
       setConsent(false);
       // Refreshing the profile preserves server truth; no client-side fake save.
@@ -158,6 +162,10 @@ export default function WorkerRelationalFitClient() {
         setMessage("Withdrawal could not be confirmed. Contact human support.");
         return;
       }
+      setProfiles((old) => old.map((profile) => profile.id === selectedId ? {
+        ...profile,
+        relationalFitProfile: null,
+      } : profile));
       setValues(emptyProfile);
       setConsent(false);
       setMessage("Workstyle participation withdrawn and the stored declarations removed.");
