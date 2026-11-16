@@ -2,11 +2,13 @@ import { z } from "zod";
 
 import { checkIpRateLimit, getClientIp } from "@/lib/api/ip-rate-limit";
 import { discoverSupportBuilderProviders } from "@/lib/support-builder/discovery";
+import { SUPPORT_KINDS } from "@/lib/support-builder/core";
 
 export const dynamic = "force-dynamic";
 const Params = z.object({
   locality: z.string().max(100).default(""),
   query: z.string().max(100).default(""),
+  kinds: z.array(z.enum(SUPPORT_KINDS.map((kind) => kind.id) as [typeof SUPPORT_KINDS[number]["id"], ...Array<typeof SUPPORT_KINDS[number]["id"]>])).max(6).default([]),
 });
 
 export async function GET(request: Request) {
@@ -21,6 +23,7 @@ export async function GET(request: Request) {
   const input = Params.safeParse({
     locality: url.searchParams.get("locality") ?? "",
     query: url.searchParams.get("query") ?? "",
+    kinds: url.searchParams.getAll("kind"),
   });
   if (!input.success) {
     return Response.json({ error: "Invalid search terms." }, { status: 400 });
