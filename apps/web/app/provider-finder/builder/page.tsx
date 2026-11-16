@@ -13,7 +13,10 @@ export const metadata: Metadata = {
 };
 
 export default function SupportBuilderPage() {
-  if (process.env.MAPABLE_SUPPORT_BUILDER_ENABLED !== "true") {
+  if (
+    process.env.VERCEL_ENV === "production" ||
+    process.env.MAPABLE_SUPPORT_BUILDER_ENABLED !== "true"
+  ) {
     notFound();
   }
 
