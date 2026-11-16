@@ -274,9 +274,12 @@ export default function WorkerRelationalFitClient() {
               onChange={(event) => setConsent(event.target.checked)}
             />
             <span>
-              I choose to share these workstyle declarations with authorised
-              participant matching previews. I understand I can withdraw.
-              This is not consent to AI personality profiling or employment screening.
+              I voluntarily allow my worker display name, organisation,
+              declared services and regions, and these workstyle choices to
+              appear to signed-in participants in private matching previews.
+              These declarations are not independent competency proof. I may
+              withdraw at any time. I do not consent to AI personality
+              profiling or automated employment decisions.
             </span>
           </label>
           <button
