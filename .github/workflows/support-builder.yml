@@ -1,0 +1,49 @@
+name: Verify Support Builder
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "apps/web/app/provider-finder/builder/**"
+      - "apps/web/app/api/provider-finder/builder/**"
+      - "apps/web/lib/support-builder/**"
+      - "apps/web/tests/support-builder-core.test.ts"
+      - "apps/web/docs/support-builder-v1.md"
+      - "apps/web/.env.example"
+      - ".github/workflows/support-builder.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  support-builder-checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Enable pnpm
+        run: corepack enable
+
+      - name: Install locked dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Unit test support draft safeguards
+        run: pnpm exec vitest run tests/support-builder-core.test.ts
+
+      - name: Type check canonical web workspace
+        run: pnpm type-check
+
+      - name: Lint new feature paths
+        run: pnpm exec eslint app/provider-finder/builder app/api/provider-finder/builder lib/support-builder tests/support-builder-core.test.ts --max-warnings 0
