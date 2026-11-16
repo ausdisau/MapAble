@@ -17,6 +17,7 @@ import {
 import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
 
+import { RelationalFitPanel } from "@/components/support-builder/RelationalFitPanel";
 import {
   composeDraftSummary,
   detectSupportKinds,
@@ -42,7 +43,13 @@ const FREQUENCIES: Array<{ value: SupportDraft["frequency"]; label: string }> = 
   { value: "daily", label: "Daily" },
 ];
 
-export default function SupportBuilderClient({ aiEnabled }: { aiEnabled: boolean }) {
+export default function SupportBuilderClient({
+  aiEnabled,
+  relationalFitEnabled,
+}: {
+  aiEnabled: boolean;
+  relationalFitEnabled: boolean;
+}) {
   const [draft, setDraft] = useState<SupportDraft>(EMPTY_SUPPORT_DRAFT);
   const [input, setInput] = useState("");
   const [mobileView, setMobileView] = useState<"chat" | "builder">("chat");
@@ -556,6 +563,7 @@ export default function SupportBuilderClient({ aiEnabled }: { aiEnabled: boolean
                 </p>
               )}
             </div>
+            {relationalFitEnabled && <RelationalFitPanel locality={draft.locality} />}
             <div className="rounded-lg border border-border bg-card p-3 text-xs text-muted-foreground">
               <p className="font-semibold text-foreground">You stay in control</p>
               <p className="mt-1">

@@ -2183,7 +2183,25 @@ model WorkerProfile {
   shiftOffers ShiftOffer[]
   competencyEvidence WorkerCompetencyEvidence[]
   credentialEvidence WorkerCredentialEvidence[]
+  relationalFitProfile RelationalFitWorkerProfile?
   equipmentEvidence WorkerEquipmentEvidence[]
+}
+
+model RelationalFitWorkerProfile {
+  // Separate, opt-in declaration; no psychometrics or inferred traits.
+  workerProfileId   String        @id
+  workerProfile     WorkerProfile @relation(fields: [workerProfileId], references: [id], onDelete: Cascade)
+  communicationModes String[]     @default([])
+  routineStyle      String       @default("not_stated")
+  interactionStyle  String       @default("not_stated")
+  initiativeStyle   String       @default("not_stated")
+  continuityStyle   String       @default("not_stated")
+  consentVersion    String       @default("v1")
+  consentedAt       DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  @@index([consentedAt])
+  @@map("relational_fit_worker_profiles")
 }
 
 enum WorkerOrganisationInviteStatus {
