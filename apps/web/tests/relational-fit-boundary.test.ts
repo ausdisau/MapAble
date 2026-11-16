@@ -202,6 +202,33 @@ describe("Relational Fit v1 access and consent boundary", () => {
     expect(mocks.audit).toHaveBeenCalledTimes(1);
   });
 
+  it("does not bypass essential credential evidence", async () => {
+    mocks.rights.mockResolvedValue({ ...rights, requiredWorkerCredentials: ["role_training"] });
+    const response = await callMatch();
+    const result = await response.json();
+    expect(response.status).toBe(200);
+    expect(result.candidates).toEqual([]);
+  });
+
+  it("holds unknown participant hard exclusions for human-assisted discovery", async () => {
+    mocks.rights.mockResolvedValue({
+      ...rights,
+      participantHardExclusions: ["Must avoid a specific situation"],
+    });
+    const response = await callMatch();
+    const result = await response.json();
+    expect(result.humanReviewRequired).toBe(true);
+    expect(result.candidates).toEqual([]);
+    expect(mocks.workerFindMany).not.toHaveBeenCalled();
+  });
+
+  it("fails closed if the participant rights store is unavailable", async () => {
+    mocks.rights.mockRejectedValue(new Error("Unavailable"));
+    const response = await callMatch();
+    expect(response.status).toBe(503);
+    expect(mocks.workerFindMany).not.toHaveBeenCalled();
+  });
+
   it("requires explicit worker opt-in before saving", async () => {
     const response = await callSave({ ...declaration, consentToMatching: false });
     expect(response.status).toBe(400);
@@ -227,6 +254,15 @@ describe("Relational Fit v1 access and consent boundary", () => {
     );
   });
 
+  it("does not allow a different worker to withdraw another person's profile", async () => {
+    mocks.workerFindFirst.mockResolvedValue(null);
+    const response = await withdraw(new Request(
+      BASE + "/api/provider-finder/builder/relational-fit/worker-profile?workerProfileId=worker-2",
+      { method: "DELETE", headers: { origin: BASE } },
+    ));
+    expect(response.status).toBe(403);
+    expect(mocks.deleteMany).not.toHaveBeenCalled();
+  });
   it("withdraws worker declarations only after verifying ownership", async () => {
     const response = await withdraw(new Request(
       BASE + "/api/provider-finder/builder/relational-fit/worker-profile?workerProfileId=worker-1",
