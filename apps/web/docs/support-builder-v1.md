@@ -13,7 +13,7 @@ Participants should be able to describe a life goal, select their own support co
 1. Describe a goal or select a starter prompt, using text input (future AAC/voice adapters optional).
 2. See automatically suggested support *categories* from a deterministic keyword helper; manually tick or untick choices.
 3. Enter suburb/region/postcode, frequency and an optional provider/service term.
-4. Request a read-only database search. Results show record source, stated office locality, source-date, and explicit unknowns.
+4. Request a read-only database search. Selected components add transparent related-category labels and ordering; they do not create a verified suitability score or hard-filter incomplete records. Results show record source, stated locality, date and explicit unknowns.
 5. Review, copy or manually revise an unsaved package. Use the existing Provider Finder for additional discovery.
 6. No automatic enquiry, booking, payment, registration determination, worker matching or sharing.
 
@@ -30,6 +30,7 @@ Participants should be able to describe a life goal, select their own support co
 | `lib/support-builder/core.ts` | Shared types, deterministic category suggestions, URL safety |
 | `lib/support-builder/discovery.ts` | Existing Prisma provider tables and conservative provenance mapper |
 | `tests/support-builder-core.test.ts` | Non-inferential, unsent-draft and URL safety tests |
+| `.github/workflows/support-builder.yml` | Pull-request focused tests, TypeScript and lint checks |
 
 ## Neon data inspected on 17 November 2026
 
