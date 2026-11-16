@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import {
@@ -170,9 +172,9 @@ export default function SupportBuilderClient({ aiEnabled }: { aiEnabled: boolean
           className="hidden w-60 shrink-0 flex-col gap-4 border-r border-border bg-muted/30 p-4 lg:flex"
           aria-label="Support Builder navigation"
         >
-          <a href="/provider-finder" className="text-sm text-primary underline underline-offset-4">
+          <Link href="/provider-finder" className="text-sm text-primary underline underline-offset-4">
             MapAble Provider Finder
-          </a>
+          </Link>
           <div>
             <h1 className="font-heading text-lg font-semibold">Build my support</h1>
             <p className="mt-1 text-xs text-muted-foreground">
@@ -562,9 +564,9 @@ export default function SupportBuilderClient({ aiEnabled }: { aiEnabled: boolean
                 sharing of your draft. Save-and-return requires separate
                 participant-authorised implementation.
               </p>
-              <a href="/provider-finder" className="mt-2 inline-block text-primary underline">
+              <Link href="/provider-finder" className="mt-2 inline-block text-primary underline">
                 Open the existing Provider Finder
-              </a>
+              </Link>
             </div>
           </div>
         </section>
