@@ -25,6 +25,7 @@ export type ProviderCandidate = {
   name: string;
   locationLabel: string;
   serviceSignals: string[];
+  relatedKinds: SupportKind[];
   website: string | null;
   sourceLabel: string;
   sourceUrl: string | null;
@@ -41,11 +42,11 @@ export type ProviderDiscovery = {
 };
 
 const KEYWORDS: Record<SupportKind, RegExp> = {
-  "personal-assistance": /\b(personal care|shower|dressing|getting ready|morning routine|daily living|personal assistance)\b/i,
-  "community-participation": /\b(community|social|activity|activities|sport|gym|going out|shopping|friends)\b/i,
+  "personal-assistance": /\b(personal care|personal support|shower|dressing|getting ready|morning routine|daily living|assistance with daily|personal assistance)\b/i,
+  "community-participation": /\b(community participation|community|social|activity|activities|sport|gym|going out|shopping|friends)\b/i,
   "accessible-transport": /\b(transport|taxi|accessible vehicle|driving|drive me|getting there|journey|travel to)\b/i,
   therapy: /\b(therapy|physiotherapy|physio|occupational therapy|speech therapy|allied health|ot appointment)\b/i,
-  "support-coordination": /\b(support coordinat|plan coordinat|manage my providers|find workers)\b/i,
+  "support-coordination": /\b(support coordinat|support coordination|plan coordinat|manage my providers|find workers)\b/i,
   employment: /\b(job|employment|workplace|career|work experience|finding work)\b/i,
 };
 
