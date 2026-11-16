@@ -1,7 +1,5 @@
 "use client";
 
-import Link from "next/link";
-
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import {
@@ -16,10 +14,10 @@ import {
   ShieldCheck,
   Square,
 } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
 
 import { RelationalFitPanel } from "@/components/support-builder/RelationalFitPanel";
-
 import {
   composeDraftSummary,
   detectSupportKinds,
