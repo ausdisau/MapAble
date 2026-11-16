@@ -55,7 +55,7 @@ MAPABLE_SUPPORT_BUILDER_MODEL=openai/gpt-oss-20b
 # AI_GATEWAY_API_KEY=<secret if Vercel OIDC authentication is not used>
 ```
 
-These flags are absent / false by default. Model choice is allowlisted to `openai/gpt-oss-20b` or `openai/gpt-oss-120b`; both were visible in the Vercel AI Gateway model catalog on 17 November 2026. The gateway's actual processing location, subprocessors, logging and residency must be verified separately. A Sydney-region database does not itself make the AI flow Australian sovereign.
+These flags are absent / false by default. In addition, the page and both APIs hard-disable themselves when VERCEL_ENV is production; enabling public production would require a separate reviewed code change. Model choice is allowlisted to `openai/gpt-oss-20b` or `openai/gpt-oss-120b`; both were visible in the Vercel AI Gateway model catalog on 17 November 2026. The gateway's actual processing location, subprocessors, logging and residency must be verified separately. A Sydney-region database does not itself make the AI flow Australian sovereign.
 
 ## Deployment mapping: blocker
 
