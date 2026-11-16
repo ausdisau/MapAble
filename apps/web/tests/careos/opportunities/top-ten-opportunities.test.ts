@@ -26,6 +26,9 @@ const {
   lifespanCreate,
   tenantDenialCreate,
   workerEvidenceUpdate,
+  workerProfileFindUnique,
+  orgMemberFindFirst,
+  screeningFindMany,
 } = vi.hoisted(() => ({
   platformPackCreate: vi.fn(),
   platformPackFindUnique: vi.fn(),
@@ -52,6 +55,9 @@ const {
   lifespanCreate: vi.fn(),
   tenantDenialCreate: vi.fn(),
   workerEvidenceUpdate: vi.fn(),
+  workerProfileFindUnique: vi.fn(),
+  orgMemberFindFirst: vi.fn(),
+  screeningFindMany: vi.fn(),
 }));
 
 vi.mock("@/lib/prisma", () => ({
@@ -100,6 +106,20 @@ vi.mock("@/lib/prisma", () => ({
       findMany: vi.fn().mockResolvedValue([]),
     },
     providerAcademyEnrollment: { findFirst: academyEnrollmentFindFirst },
+    workerProfile: { findUnique: workerProfileFindUnique },
+    organisationMember: { findFirst: orgMemberFindFirst },
+    workerScreeningRecord: { findMany: screeningFindMany },
+    $transaction: vi.fn(async (fn: (tx: unknown) => Promise<unknown>) =>
+      fn({
+        academyCompetencyProposal: {
+          findUnique: academyProposalFindUnique,
+          update: academyProposalUpdate,
+        },
+        workerProfile: { findUnique: workerProfileFindUnique },
+        workerScreeningRecord: { findMany: screeningFindMany },
+        workerCompetencyEvidence: { update: workerEvidenceUpdate },
+      }),
+    ),
     accessPlace: { findMany: accessPlaceFindMany },
     careOSEvidenceReference: { findMany: careosEvidenceFindMany },
     lifespanLiaisonBrief: {
@@ -114,19 +134,26 @@ vi.mock("@/lib/audit/audit-event-service", () => ({
   createAuditEvent: vi.fn().mockResolvedValue(undefined),
 }));
 
+import { MAPABLE_PROHIBITED_AI_USES } from "@/intelligence/policies/prohibited-uses";
+import { queryAccessEvidenceGraph } from "@/lib/careos/opportunities/access-evidence-graph";
+import { issueWalletAuthorityCredential } from "@/lib/careos/opportunities/consent-wallet";
+import { createLifespanLiaisonBrief } from "@/lib/careos/opportunities/lifespan-liaison";
 import {
   createPlatformRegistrationPack,
   exportPlatformRegistrationPack,
 } from "@/lib/careos/opportunities/platform-registration-pack";
-import { issueWalletAuthorityCredential } from "@/lib/careos/opportunities/consent-wallet";
+import {
+  assertSafetyGatePassed,
+  runCareOSSafetyGate,
+} from "@/lib/careos/opportunities/safety-evaluation-gate";
 import {
   buildSchemeNavigationBrief,
   tagMissionSchemes,
 } from "@/lib/careos/opportunities/scheme-coordination";
 import {
-  assertSafetyGatePassed,
-  runCareOSSafetyGate,
-} from "@/lib/careos/opportunities/safety-evaluation-gate";
+  assertMandatoryTenantContext,
+  TenantIsolationError,
+} from "@/lib/careos/opportunities/tenant-isolation";
 import {
   explainThinMarketCapacity,
   recordThinMarketSignal,
@@ -135,18 +162,11 @@ import {
   proposeCompetencyFromAcademy,
   verifyCompetencyProposal,
 } from "@/lib/careos/opportunities/workforce-passport-adapter";
-import { queryAccessEvidenceGraph } from "@/lib/careos/opportunities/access-evidence-graph";
-import { createLifespanLiaisonBrief } from "@/lib/careos/opportunities/lifespan-liaison";
-import {
-  assertMandatoryTenantContext,
-  TenantIsolationError,
-} from "@/lib/careos/opportunities/tenant-isolation";
 import {
   UNIFIED_PROHIBITED_USES,
   isUnifiedProhibitedUse,
 } from "@/lib/careos/policy/unified-prohibited-uses";
 import { PROHIBITED_CAREOS_CAPABILITIES } from "@/lib/intelligence/careos/policy/prohibited-uses";
-import { MAPABLE_PROHIBITED_AI_USES } from "@/intelligence/policies/prohibited-uses";
 
 const OPPORTUNITY_ENV_FLAGS = [
   "MAPABLE_CAREOS_PLATFORM_REGISTRATION_ENABLED",
@@ -302,10 +322,19 @@ describe("CareOS top-ten opportunity MVPs", () => {
   });
 
   it("O8 proposes pending competency and requires human verify", async () => {
+    workerProfileFindUnique.mockResolvedValue({
+      id: "wp1",
+      userId: "worker-user",
+      organisationId: "org1",
+    });
+    orgMemberFindFirst.mockResolvedValue({ id: "m1" });
+    screeningFindMany.mockResolvedValue([]);
     academyEnrollmentFindFirst.mockResolvedValue({
       id: "en1",
       courseId: "c1",
+      userId: "worker-user",
       status: "completed",
+      completedAt: new Date("2026-01-15T00:00:00.000Z"),
       course: { code: "SAFEGUARDING-101" },
     });
     competencyEvidenceCreate.mockResolvedValue({

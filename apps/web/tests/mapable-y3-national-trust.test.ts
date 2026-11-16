@@ -38,13 +38,13 @@ describe("Non-advisory budget guardrails", () => {
 });
 
 describe("Trust passport mock issuer", () => {
-  it("maps verified claims to worker profile statuses", () => {
+  it("does not map mock or verified-looking claims onto worker screening fields", () => {
     const mapped = mapClaimsToWorkerStatuses({
       workerScreeningStatus: "verified",
       verificationStatus: "verified",
     });
-    expect(mapped.workerScreeningStatus).toBe("verified");
-    expect(mapped.verificationStatus).toBe("verified");
+    expect(mapped.workerScreeningStatus).toBeUndefined();
+    expect(mapped.verificationStatus).toBeUndefined();
   });
 });
 

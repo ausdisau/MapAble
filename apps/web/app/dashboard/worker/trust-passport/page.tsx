@@ -25,7 +25,12 @@ export default async function WorkerTrustPassportPage() {
       <h1 className="font-heading text-2xl font-bold">Trust passport (pilot)</h1>
       <p className="text-sm text-muted-foreground">
         {summary.pilotNotice ??
-          "Present portable credentials to speed up verification. Pilot uses a mock issuer only."}
+          "Present portable credentials to speed up verification. Pilot uses a mock issuer only. Mock presentations are not a worker screening clearance."}
+      </p>
+      <p>
+        <a className="text-sm font-medium underline" href="/dashboard/worker/capability-passport">
+          Open My Capability Passport
+        </a>
       </p>
 
       {!summary.enabled ? (
