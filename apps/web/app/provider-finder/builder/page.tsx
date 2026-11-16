@@ -23,6 +23,7 @@ export default function SupportBuilderPage() {
   return (
     <SupportBuilderClient
       aiEnabled={process.env.MAPABLE_SUPPORT_BUILDER_AI_ENABLED === "true"}
+      relationalFitEnabled={process.env.MAPABLE_RELATIONAL_FIT_ENABLED === "true"}
     />
   );
 }
