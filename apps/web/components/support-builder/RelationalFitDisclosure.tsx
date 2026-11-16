@@ -72,7 +72,7 @@ export function RelationalFitDisclosure() {
               correction. This tool does not determine eligibility for NDIS
               funding or create legal or clinical advice. Nothing in this
               notice removes statutory rights, employment protections,
-              privacy obligations or a provider's duty of care.
+              privacy obligations or a provider&apos;s duty of care.
             </p>
           </section>
           <section>
