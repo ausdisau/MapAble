@@ -11,6 +11,7 @@ on:
       - "apps/web/lib/support-builder/**"
       - "apps/web/tests/support-builder-core.test.ts"
       - "apps/web/tests/relational-fit.test.ts"
+      - "apps/web/tests/relational-fit-boundary.test.ts"
       - "apps/web/components/support-builder/**"
       - "apps/web/prisma/schema.prisma"
       - "apps/web/prisma/migrations/20261117000000_relational_fit_worker_opt_in/**"
@@ -45,7 +46,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Unit test support draft safeguards
-        run: pnpm exec vitest run tests/support-builder-core.test.ts tests/relational-fit.test.ts
+        run: pnpm exec vitest run tests/support-builder-core.test.ts tests/relational-fit.test.ts tests/relational-fit-boundary.test.ts
 
       - name: Type check canonical web workspace
         run: pnpm type-check
@@ -55,7 +56,7 @@ jobs:
           ESLINT_CI_LIGHT: "1"
           NODE_OPTIONS: "--max-old-space-size=4096"
         run: |
-          pnpm exec eslint lib/support-builder/core.ts lib/support-builder/discovery.ts lib/support-builder/relational-fit.ts tests/support-builder-core.test.ts tests/relational-fit.test.ts --max-warnings 0
+          pnpm exec eslint lib/support-builder/core.ts lib/support-builder/discovery.ts lib/support-builder/relational-fit.ts tests/support-builder-core.test.ts tests/relational-fit.test.ts tests/relational-fit-boundary.test.ts --max-warnings 0
           pnpm exec eslint app/api/provider-finder/builder/chat/route.ts app/api/provider-finder/builder/search/route.ts --max-warnings 0
           pnpm exec eslint app/api/provider-finder/builder/relational-fit/matches/route.ts app/api/provider-finder/builder/relational-fit/worker-profile/route.ts --max-warnings 0
           pnpm exec eslint app/provider-finder/builder/page.tsx app/provider-finder/builder/SupportBuilderClient.tsx --max-warnings 0
