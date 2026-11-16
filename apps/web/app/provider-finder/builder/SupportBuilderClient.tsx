@@ -22,6 +22,7 @@ import {
   EMPTY_SUPPORT_DRAFT,
   SUPPORT_KINDS,
   type ProviderDiscovery,
+  supportKindLabel,
   type SupportDraft,
   type SupportKind,
 } from "@/lib/support-builder/core";
@@ -132,6 +133,7 @@ export default function SupportBuilderClient({ aiEnabled }: { aiEnabled: boolean
       locality: draft.locality.trim(),
       query: draft.query.trim(),
     });
+    draft.kinds.forEach((kind) => params.append("kind", kind));
     try {
       const response = await fetch(
         "/api/provider-finder/builder/search?" + params.toString(),
@@ -509,6 +511,13 @@ export default function SupportBuilderClient({ aiEnabled }: { aiEnabled: boolean
                       <p className="text-xs text-muted-foreground">
                         Availability and service-area coverage: not confirmed
                       </p>
+                      {draft.kinds.length > 0 && (
+                        <p className="text-xs">
+                          {provider.relatedKinds.length
+                            ? "Related categories mentioned in record: " + provider.relatedKinds.map(supportKindLabel).join(", ")
+                            : "The selected support categories are not established by this record."}
+                        </p>
+                      )}
                       {!!provider.serviceSignals.length && (
                         <p className="text-xs text-muted-foreground">
                           Listed signals: {provider.serviceSignals.join(", ")}
