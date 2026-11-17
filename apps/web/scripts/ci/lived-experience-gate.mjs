@@ -8,6 +8,8 @@
  *    --manifest docs/co-design/reviews/pr-123.json \
  *    --expected-code-digest <sha256> --expected-change-id pr-123
  *
+ * The expected code digest + change ID MUST be supplied by the trusted caller,
+ * never extracted from the untrusted manifest. Missing values block.
  * Trusted public-key registry + revocations MUST be supplied by an independent
  * authorised control (e.g. GitHub protected environment secret) and never by
  * a pull-request file or AI-generated content. No keys = HOLD.
@@ -70,8 +72,8 @@ function run() {
     manifest,
     trustedRegistry,
     changedPaths,
-    expectedCodeDigest: option("--expected-code-digest") ?? undefined,
-    expectedChangeId: option("--expected-change-id") ?? undefined,
+    expectedCodeDigest: option("--expected-code-digest") ?? "__MISSING_TRUSTED_DIGEST__",
+    expectedChangeId: option("--expected-change-id") ?? "__MISSING_TRUSTED_CHANGE_ID__",
   });
   // Do not print review narratives, names, private documents or registry keys.
   const result = {
