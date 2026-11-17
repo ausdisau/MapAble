@@ -1,0 +1,78 @@
+name: LEIL disability-led co-design governance
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  leil:
+    name: Lived-experience evidence gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out untrusted candidate (no secrets)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Prepare diff, content digest, and expected identity
+        id: scope
+        shell: bash
+        env:
+          BASE_SHA: \${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: \${{ github.sha }}
+          CHANGE_ID: \${{ github.event.pull_request.number }}
+        run: |
+          set -eu
+          if [ -z "$BASE_SHA" ]; then
+            echo "Workflow dispatch has no trusted PR scope; cannot approve release."
+            exit 2
+          fi
+          git diff --name-only -z "$BASE_SHA" "$HEAD_SHA" > "$RUNNER_TEMP/leil-paths.z"
+          node - "$RUNNER_TEMP/leil-paths.z" "$RUNNER_TEMP/leil-digest.txt" <<'NODE'
+          const fs = require("node:fs");
+          const crypto = require("node:crypto");
+          const paths = fs.readFileSync(process.argv[2]).toString("utf8").split("\0")
+            .filter(Boolean).filter(path => !path.startsWith("apps/web/docs/co-design/reviews/"))
+            .sort();
+          const hash = crypto.createHash("sha256");
+          for (const path of paths) {
+            const stat = fs.existsSync(path) ? fs.statSync(path) : null;
+            hash.update(path + "\0" + (stat?.isFile() ? "file" : "deleted") + "\0");
+            if (stat?.isFile()) {
+              const bytes = fs.readFileSync(path);
+              hash.update(String(bytes.length) + "\0");
+              hash.update(bytes);
+            }
+          }
+          fs.writeFileSync(process.argv[3], hash.digest("hex"));
+          NODE
+          echo "digest=$(cat "$RUNNER_TEMP/leil-digest.txt")" >> "$GITHUB_OUTPUT"
+          echo "expected_id=PR-$CHANGE_ID" >> "$GITHUB_OUTPUT"
+      - name: Setup Node for read-only deterministic gate
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Validate co-design evidence without privileged secrets
+        shell: bash
+        working-directory: apps/web
+        env:
+          LEIL_TRUST_REGISTRY_JSON: ""
+          CODE_DIGEST: \${{ steps.scope.outputs.digest }}
+          CHANGE_ID: \${{ steps.scope.outputs.expected_id }}
+          PR_NUMBER: \${{ github.event.pull_request.number }}
+        run: |
+          set -eu
+          node --experimental-strip-types scripts/ci/lived-experience-gate.mjs \
+            --paths "$RUNNER_TEMP/leil-paths.z" \
+            --manifest "docs/co-design/reviews/PR-$PR_NUMBER.json" \
+            --expected-code-digest "$CODE_DIGEST" \
+            --expected-change-id "$CHANGE_ID"
+      # Deliberately no secret-backed approval in a pull_request workflow:
+      # untrusted PR content can modify executable files.
+      # Human-trusted attestation verification must be performed by an
+      # independently controlled release service against an immutable SHA.
