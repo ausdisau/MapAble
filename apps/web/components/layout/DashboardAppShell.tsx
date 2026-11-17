@@ -21,7 +21,7 @@ export function DashboardAppShell({
   return (
     <MapAbleAppShell
       variant="app"
-      headerTitle="Dashboard"
+      headerTitle="My MapAble"
       logoHref="/dashboard"
       headerActions={<MapAbleUserBar userName={userName} role={role} />}
       secondaryNav={

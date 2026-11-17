@@ -3,49 +3,105 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { MapAbleRoleNav } from "@/components/layout/MapAbleRoleNav";
+import {
+  MapAbleRoleNav,
+  type MapAbleRoleNavGroup,
+} from "@/components/layout/MapAbleRoleNav";
 import type { UserRole } from "@/types/mapable";
 
-const BASE_LINKS = [
-  { href: "/dashboard", label: "Control panel", exact: true },
-  { href: "/dashboard/profile", label: "Profile" },
-  { href: "/dashboard/accessibility", label: "Accessibility" },
-  { href: "/dashboard/consent", label: "Consent" },
-  { href: "/dashboard/bookings", label: "Bookings" },
-  { href: "/care", label: "Care", matchPrefix: "/care" },
-  { href: "/dashboard/transport", label: "Transport trips", matchPrefix: "/dashboard/transport" },
-  { href: "/dashboard/jobs", label: "Jobs" },
-  { href: "/dashboard/calendar", label: "Calendar" },
-  { href: "/dashboard/find-support", label: "Find support" },
-  { href: "/dashboard/find-transport", label: "Find transport" },
-  { href: "/dashboard/timesheets", label: "Timesheets" },
-  { href: "/dashboard/safety", label: "Safety centre" },
-  { href: "/dashboard/engagement", label: "Your voice" },
-  { href: "/dashboard/cases", label: "Cases (AI)" },
-  { href: "/dashboard/notifications", label: "Notifications" },
-  { href: "/dashboard/messages", label: "Messages" },
-  { href: "/dashboard/documents", label: "Documents" },
-  { href: "/dashboard/billing", label: "Billing centre" },
-  { href: "/dashboard/settings/notifications", label: "Notification settings" },
-] as const;
+function link(
+  href: string,
+  label: string,
+  options?: { exact?: boolean; matchPrefix?: string },
+) {
+  return {
+    href,
+    label,
+    exact: options?.exact,
+    matchPrefix: options?.matchPrefix ?? href,
+  };
+}
 
-const CAREOS_LINKS = [
-  {
-    href: "/careos/appointment",
-    label: "CareOS appointment mission",
-    matchPrefix: "/careos/appointment",
-  },
-  {
-    href: "/careos/missions",
-    label: "CareOS missions",
-    matchPrefix: "/careos/missions",
-  },
-  {
-    href: "/dashboard/careos",
-    label: "My CareOS",
-    matchPrefix: "/dashboard/careos",
-  },
-] as const;
+export function buildDashboardNavGroups(input: {
+  role: UserRole;
+  showCareOsNav?: boolean;
+}): MapAbleRoleNavGroup[] {
+  const workspaceLinks = [
+    link("/dashboard", "Home", { exact: true }),
+    link("/dashboard/profile", "Profile"),
+    link("/dashboard/accessibility", "Accessibility"),
+    link("/dashboard/consent", "Consent"),
+    link("/dashboard/settings/notifications", "Notification settings"),
+  ];
+
+  const discoverLinks = [
+    link("/", "Explore MapAble", { exact: true }),
+    link("/accessibility-map", "Accessible places"),
+    link("/dashboard/find-support", "Find support"),
+    link("/dashboard/find-transport", "Find transport"),
+    link("/provider-finder", "Provider finder"),
+  ];
+
+  const activityLinks = [
+    link("/dashboard/bookings", "Bookings"),
+    link("/care", "Care", { matchPrefix: "/care" }),
+    link("/dashboard/transport", "Transport trips", {
+      matchPrefix: "/dashboard/transport",
+    }),
+    link("/dashboard/jobs", "Jobs"),
+    link("/dashboard/calendar", "Calendar"),
+    link("/dashboard/timesheets", "Timesheets"),
+    link("/dashboard/documents", "Documents"),
+    link("/dashboard/billing", "Billing centre"),
+  ];
+
+  const safetyLinks = [
+    link("/dashboard/safety", "Safety centre"),
+    link("/dashboard/engagement", "Your voice"),
+    link("/dashboard/cases", "Cases (AI)"),
+    link("/dashboard/notifications", "Notifications"),
+    link("/dashboard/messages", "Messages"),
+  ];
+
+  const careOsLinks = input.showCareOsNav
+    ? [
+        link("/careos/appointment", "CareOS appointment mission", {
+          matchPrefix: "/careos/appointment",
+        }),
+        link("/careos/missions", "CareOS missions", {
+          matchPrefix: "/careos/missions",
+        }),
+        link("/dashboard/careos", "My CareOS", {
+          matchPrefix: "/dashboard/careos",
+        }),
+      ]
+    : [];
+
+  const groups: MapAbleRoleNavGroup[] = [
+    { id: "workspace", label: "My MapAble", links: workspaceLinks },
+    { id: "discover", label: "Discover", links: discoverLinks },
+    { id: "activity", label: "My activity", links: activityLinks },
+    { id: "safety", label: "Safety and support", links: safetyLinks },
+  ];
+
+  if (careOsLinks.length > 0) {
+    groups.push({
+      id: "careos",
+      label: "CareOS (when enabled)",
+      links: careOsLinks,
+    });
+  }
+
+  if (input.role === "mapable_admin") {
+    groups.push({
+      id: "admin",
+      label: "Administration",
+      links: [link("/admin", "Admin")],
+    });
+  }
+
+  return groups;
+}
 
 export function DashboardNav({
   role,
@@ -56,23 +112,13 @@ export function DashboardNav({
   showCareOsNav?: boolean;
 }) {
   const pathname = usePathname();
-  const links = [
-    BASE_LINKS[0]!,
-    ...(showCareOsNav ? CAREOS_LINKS : []),
-    ...BASE_LINKS.slice(1),
-    ...(role === "mapable_admin" ? [{ href: "/admin", label: "Admin" }] : []),
-  ];
+  const groups = buildDashboardNavGroups({ role, showCareOsNav });
 
   return (
     <MapAbleRoleNav
       label="Dashboard"
-      title="Your control panel"
-      links={links.map((link) => ({
-        href: link.href,
-        label: link.label,
-        exact: "exact" in link ? link.exact : undefined,
-        matchPrefix: "matchPrefix" in link ? link.matchPrefix : link.href,
-      }))}
+      title="My MapAble"
+      groups={groups}
       trailing={
         pathname.startsWith("/provider-finder") ? null : (
           <Link

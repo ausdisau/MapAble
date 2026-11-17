@@ -6,6 +6,7 @@ import React, { useEffect, useMemo, useRef, useState, type ReactNode } from "rea
 
 import { GuidedSearchDialogue } from "@/components/guided-search/GuidedSearchDialogue";
 import type { GuidedSearchSessionFields } from "@/components/guided-search/types";
+import { MapAbleUserBar } from "@/components/layout/MapAbleUserBar";
 import { MarketingPrimaryNav } from "@/components/marketing/home/MarketingPrimaryNav";
 import { ArrowIcon, ChevronDown, SearchIcon } from "@/components/marketing/mapable-care-icons";
 import {
@@ -55,29 +56,6 @@ function useDismissOnOutsideAndEscape(
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, [containerRef, onClose, open]);
-}
-
-function MarketingAuthLinks({ compact = false }: { compact?: boolean }) {
-  const className = compact
-    ? "flex flex-col gap-2"
-    : "flex items-center gap-3";
-  const loginClassName = compact
-    ? "rounded-xl border-2 border-[#0C1833] px-4 py-2 text-center text-sm font-black transition hover:bg-slate-50 focus:outline-none focus:ring-4 focus:ring-[#F8C51C]/40"
-    : "rounded-xl border-2 border-[#0C1833] px-5 py-3 text-sm font-black transition hover:bg-slate-50 focus:outline-none focus:ring-4 focus:ring-[#F8C51C]/40";
-  const registerClassName = compact
-    ? "rounded-xl bg-[#005B7F] px-4 py-2 text-center text-sm font-black text-white shadow-sm transition hover:bg-[#004766] focus:outline-none focus:ring-4 focus:ring-[#F8C51C]/40"
-    : "rounded-xl bg-[#005B7F] px-5 py-3 text-sm font-black text-white shadow-sm transition hover:bg-[#004766] focus:outline-none focus:ring-4 focus:ring-[#F8C51C]/40";
-
-  return (
-    <div className={className}>
-      <Link href="/login" className={loginClassName}>
-        Log in
-      </Link>
-      <Link href="/register" className={registerClassName}>
-        Get started
-      </Link>
-    </div>
-  );
 }
 
 function SparkIcon() {
@@ -177,7 +155,7 @@ export function LogoMenu() {
             ))}
           </div>
           <div className="border-t border-slate-100 p-3 md:hidden">
-            <MarketingAuthLinks compact />
+            <MapAbleUserBar compact />
           </div>
         </div>
       )}
