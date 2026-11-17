@@ -1,4 +1,7 @@
+import { generateKeyPairSync, sign } from "node:crypto";
+
 import { describe, expect, it } from "vitest";
+
 import {
   assessCoDesign,
   canonicalJson,
@@ -11,7 +14,6 @@ import {
   type GovernedChange,
   type TrustedRegistry,
 } from "@/lib/governance/lived-experience-loop/agent";
-import { generateKeyPairSync, sign } from "node:crypto";
 
 const NOW = new Date("2026-11-17T10:00:00.000Z");
 const { publicKey, privateKey } = generateKeyPairSync("ed25519");
