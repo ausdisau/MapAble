@@ -145,7 +145,7 @@ export function requiresLivedExperienceGate(paths: string[]): boolean {
     const path = untrusted.replaceAll("\\", "/").replace(/^\.?\//, "");
     if (path.startsWith("apps/web/tests/") || path.startsWith("apps/web/docs/co-design/reviews/")) return false;
     if (path === "package.json" || path.startsWith("apps/mobile/") || path.startsWith("apps/web/packages/")) return true;
-    if (path.startsWith("apps/web/docs/co-design/") || path === "apps/web/docs/co-design-protocol.md") return true;
+    if (path.startsWith("apps/web/docs/co-design/") || path.startsWith("apps/web/docs/governance/") || path.startsWith("apps/web/docs/ai-platform/") || path === "apps/web/docs/co-design-protocol.md") return true;
     if (path === "apps/web/docs/innovation/PORTFOLIO_STAGE_GATES.md") return true;
     if (path.startsWith(".github/workflows/")) return true;
     return /^(apps\/web\/(app|components|lib|mcp|prisma|packages|scripts\/ci)\/)/.test(path);
@@ -266,8 +266,10 @@ export function assessCoDesign(input: {
   const digest = proposalDigest(change);
   base.changeDigest = digest;
   base.requiredStages = requiredStagesFor(change.milestone);
-  if (input.expectedChangeId && change.changeId !== input.expectedChangeId) reasons.push("change_id_mismatch");
-  if (input.expectedCodeDigest && change.codeDigest !== input.expectedCodeDigest) reasons.push("code_digest_mismatch");
+  if (!input.expectedChangeId) reasons.push("missing_independent_change_id");
+  else if (change.changeId !== input.expectedChangeId) reasons.push("change_id_mismatch");
+  if (!input.expectedCodeDigest || !SHA256.test(input.expectedCodeDigest)) reasons.push("missing_independent_code_digest");
+  else if (change.codeDigest !== input.expectedCodeDigest) reasons.push("code_digest_mismatch");
   if (!input.trustedRegistry?.keys?.length) reasons.push("no_human_vetted_reviewer_registry");
   if (!input.trustedRegistry?.revokedReceiptIds) reasons.push("missing_revocation_registry");
   if (input.trustedRegistry?.keys?.length && input.trustedRegistry.revokedReceiptIds) {
