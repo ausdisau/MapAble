@@ -52,8 +52,9 @@ Every sign-off binds to an exact proposal digest, including the independently ca
 - apps/web/scripts/ci/lived-experience-gate.mjs
 - apps/web/tests/lived-experience-loop.test.ts
 - .github/workflows/lived-experience-co-design.yml
+- apps/web/app/dashboard/governance/lived-experience/page.tsx (disabled-by-default, admin-only synthetic preview)
 
-The agent has only three outcomes: NOT_APPLICABLE, HOLD_FOR_CO_DESIGN and EVIDENCE_READY_FOR_HUMAN_RELEASE_REVIEW. All outcomes set productionAuthorised to false.
+The governance preview requires MAPABLE_LEIL_PREVIEW_ENABLED=true in a non-production environment and an authenticated mapable_admin user. It contains no participant information, review uploads, approvals or production controls. The agent has only three outcomes: NOT_APPLICABLE, HOLD_FOR_CO_DESIGN and EVIDENCE_READY_FOR_HUMAN_RELEASE_REVIEW. All outcomes set productionAuthorised to false.
 
 A signed record contains pseudonymous reviewer key and organisation identifiers, S0–S6 stage, decision, proposal digest, date, evidence reference, remuneration and access-arrangements acknowledgements, plus Ed25519 signature. The trusted public key registry and revocation list must be administered separately, not contained in any PR. Do not commit contributor identities, payment records, health details or raw interview recordings. Signed receipt metadata is not the full research record.
 
