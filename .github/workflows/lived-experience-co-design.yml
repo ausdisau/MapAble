@@ -33,10 +33,12 @@ jobs:
         run: pnpm install --frozen-lockfile --ignore-scripts
       - name: Test LEIL policies
         run: pnpm exec vitest run tests/lived-experience-loop.test.ts
-      - name: Typecheck application and governance preview
-        run: pnpm exec tsc --noEmit --pretty false
       - name: Lint LEIL code and governance preview
         run: ESLINT_CI_LIGHT=1 NODE_OPTIONS=--max-old-space-size=4096 pnpm exec eslint lib/governance/lived-experience-loop/agent.ts app/dashboard/governance/lived-experience/page.tsx tests/lived-experience-loop.test.ts --max-warnings 0
+      - name: Generate Prisma client without applying migrations
+        run: pnpm exec prisma generate
+      - name: Typecheck application and governance preview
+        run: pnpm exec tsc --noEmit --pretty false
   leil:
     name: Lived-experience evidence gate
     runs-on: ubuntu-latest
