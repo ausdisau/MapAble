@@ -26,8 +26,10 @@ const PREVIEW: GovernedChange = {
 
 export default async function LivedExperienceGovernancePage() {
   // Governance preview is never available in production.
-  if (process.env.MAPABLE_LEIL_PREVIEW_ENABLED !== "true" ||
-      process.env.VERCEL_ENV === "production") notFound();
+  const allowedEnvironment =
+    process.env.VERCEL_ENV === "preview" ||
+    (process.env.NODE_ENV === "development" && !process.env.VERCEL_ENV);
+  if (process.env.MAPABLE_LEIL_PREVIEW_ENABLED !== "true" || !allowedEnvironment) notFound();
 
   const user = await getCurrentUser();
   if (!user || !userHasRole(user, "mapable_admin")) notFound();
