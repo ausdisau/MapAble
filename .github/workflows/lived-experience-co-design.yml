@@ -23,9 +23,9 @@ jobs:
         id: scope
         shell: bash
         env:
-          BASE_SHA: \${{ github.event.pull_request.base.sha }}
-          HEAD_SHA: \${{ github.sha }}
-          CHANGE_ID: \${{ github.event.pull_request.number }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.sha }}
+          CHANGE_ID: ${{ github.event.pull_request.number }}
         run: |
           set -eu
           if [ -z "$BASE_SHA" ]; then
@@ -62,9 +62,9 @@ jobs:
         working-directory: apps/web
         env:
           LEIL_TRUST_REGISTRY_JSON: ""
-          CODE_DIGEST: \${{ steps.scope.outputs.digest }}
-          CHANGE_ID: \${{ steps.scope.outputs.expected_id }}
-          PR_NUMBER: \${{ github.event.pull_request.number }}
+          CODE_DIGEST: ${{ steps.scope.outputs.digest }}
+          CHANGE_ID: ${{ steps.scope.outputs.expected_id }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
           set -eu
           node --experimental-strip-types scripts/ci/lived-experience-gate.mjs \
