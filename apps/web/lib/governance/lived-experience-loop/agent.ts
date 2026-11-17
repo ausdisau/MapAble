@@ -126,7 +126,7 @@ export function canonicalJson(value: unknown): string {
       .map((key) => JSON.stringify(key) + ":" + canonicalJson(value[key]))
       .join(",") + "}";
   }
-  return JSON.stringify(value);
+  return JSON.stringify(value) ?? "null";
 }
 
 export function proposalDigest(change: GovernedChange): string {
@@ -144,6 +144,7 @@ export function requiresLivedExperienceGate(paths: string[]): boolean {
   return paths.some((untrusted) => {
     const path = untrusted.replaceAll("\\", "/").replace(/^\.?\//, "");
     if (path.startsWith("apps/web/tests/") || path.startsWith("apps/web/docs/co-design/reviews/")) return false;
+    if (path === "package.json" || path.startsWith("apps/mobile/") || path.startsWith("apps/web/packages/")) return true;
     if (path.startsWith("apps/web/docs/co-design/") || path === "apps/web/docs/co-design-protocol.md") return true;
     if (path === "apps/web/docs/innovation/PORTFOLIO_STAGE_GATES.md") return true;
     if (path.startsWith(".github/workflows/")) return true;
