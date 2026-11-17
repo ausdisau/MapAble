@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { z } from "zod";
 
+import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import {
   AccessGraphError,
   createAccessObservation,
@@ -10,7 +11,6 @@ import {
 import {
   ACCESS_OBSERVATION_SOURCE_TYPES,
 } from "@/lib/access/infrastructure/provenance";
-import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 
 export const dynamic = "force-dynamic";
 

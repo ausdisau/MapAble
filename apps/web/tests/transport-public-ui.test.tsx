@@ -3,7 +3,7 @@
  */
 import { cleanup, render, screen, within } from "@testing-library/react";
 import React from "react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { MapAbleCareMarketingHeader } from "@/components/marketing/mapable-care-shared";
 import { TransportPublicLanding } from "@/components/transport/public/TransportPublicLanding";
@@ -19,6 +19,11 @@ import {
 
 vi.mock("next/navigation", () => ({
   usePathname: () => "/",
+}));
+
+vi.mock("next-auth/react", () => ({
+  useSession: () => ({ status: "unauthenticated", data: null }),
+  signOut: vi.fn(),
 }));
 
 vi.mock("next/link", () => ({
@@ -38,6 +43,18 @@ vi.mock("next/link", () => ({
 
 afterEach(() => {
   cleanup();
+  vi.unstubAllGlobals();
+});
+
+beforeEach(() => {
+  vi.stubGlobal(
+    "fetch",
+    vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({}),
+    }),
+  );
 });
 
 describe("Transport public copy CTAs", () => {

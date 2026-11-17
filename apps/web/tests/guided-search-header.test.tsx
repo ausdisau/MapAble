@@ -11,6 +11,11 @@ vi.mock("next/navigation", () => ({
   usePathname: () => "/",
 }));
 
+vi.mock("next-auth/react", () => ({
+  useSession: () => ({ status: "unauthenticated", data: null }),
+  signOut: vi.fn(),
+}));
+
 vi.mock("next/link", () => ({
   default: ({
     href,
@@ -28,10 +33,19 @@ vi.mock("next/link", () => ({
 
 afterEach(() => {
   cleanup();
+  vi.unstubAllGlobals();
 });
 
 describe("MapAbleCareMarketingHeader", () => {
   it("renders primary nav instead of embedded GuidedSearch", () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: async () => ({}),
+      }),
+    );
     render(<MapAbleCareMarketingHeader />);
 
     expect(screen.getByRole("navigation", { name: "Primary" })).toBeTruthy();
@@ -41,15 +55,26 @@ describe("MapAbleCareMarketingHeader", () => {
     expect(screen.queryByLabelText("Search MapAble")).toBeNull();
   });
 
-  it("renders auth links in header", () => {
+  it("renders session-aware sign-in actions in header", () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: async () => ({}),
+      }),
+    );
     render(<MapAbleCareMarketingHeader />);
 
+    const signIn = screen.getByRole("link", { name: "Sign in" });
+    expect(signIn.getAttribute("href")).toContain("/login?callbackUrl=");
     expect(
-      screen.getByRole("link", { name: "Log in" }).getAttribute("href"),
-    ).toBe("/login");
+      decodeURIComponent(signIn.getAttribute("href") ?? ""),
+    ).toContain("/login?callbackUrl=/");
     expect(
       screen.getByRole("link", { name: "Get started" }).getAttribute("href"),
-    ).toBe("/register");
+    ).toContain("/register?callbackUrl=");
+    expect(screen.getByTestId("mapable-user-bar-trigger")).toBeTruthy();
   });
 
   it("renders donate link to Australian Disability", () => {
