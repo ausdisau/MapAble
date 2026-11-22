@@ -56,3 +56,22 @@ Replit launches the web platform by default. The mobile app can be run separatel
 ## Repository provenance
 
 The web platform originated in `ausdisau/mapableau-new`; the AdaptAble mobile application originated in `ausdisau/MapAble`. The amalgamation record is documented in `docs/repository-amalgamation.md`.
+
+## Local unified workspace router (development only)
+
+The optional local dashboard gives developers truthful start/stop controls for two
+allowlisted development commands. This is a localhost tool and is never exposed
+by Next.js as a public process-execution API.
+
+- Start with: npm run dev:workspace
+- Visit: http://127.0.0.1:4317 on the same computer
+- Controls launch the existing pnpm dev:web and npm run dev:mobile scripts
+- Run security checks: npm run test:workspace
+
+Requires Node.js 20+, the existing pnpm and npm dependencies installed
+separately for each app. Do not proxy, expose or deploy this local process manager.
+
+See tools/workspace-router/README.md for boundaries and acceptance criteria.
+
+The router does not synchronise later commits from ausdisau/mapableau-new;
+the documented import snapshot is e0a8b6907b25b23eda82fcbc3b722c088861b704.

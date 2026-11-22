@@ -1,0 +1,30 @@
+name: Unified local workspace router
+
+on:
+  pull_request:
+    paths:
+      - "tools/workspace-router/**"
+      - ".github/workflows/workspace-router.yml"
+      - "package.json"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  workspace-router:
+    name: Local router auth, source syntax and API tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Check safe process runner syntax
+        run: |
+          node --check tools/workspace-router/config.mjs
+          node --check tools/workspace-router/server.mjs
+          node --check tools/workspace-router/app.js
+      - name: Check local router security and request boundaries
+        run: node --test tools/workspace-router/server.test.mjs

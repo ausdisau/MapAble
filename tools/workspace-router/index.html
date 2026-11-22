@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <meta name="workspace-token" content="__MAPABLE_ROUTER_TOKEN__">
+  <title>MapAble Unified — Local Workspace Router</title>
+  <meta name="description" content="Local-only development dashboard for the MapAble web platform and AdaptAble mobile app.">
+  <link rel="stylesheet" href="/styles.css">
+  <script defer src="/app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to workspace controls</a>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand" aria-label="MapAble Unified local development workspace">
+        <span class="brand-mark" aria-hidden="true">M</span>
+        <div class="brand-name">MapAble <span class="brand-sub">Unified</span></div>
+      </div>
+      <div class="topbar-status">
+        <span class="local-indicator" aria-hidden="true"></span>
+        <span>Local development workspace</span>
+      </div>
+    </div>
+  </header>
+  <main id="main" class="workspace-grid">
+    <aside class="side-stack" aria-label="Workspace context">
+      <section class="panel provenance" aria-labelledby="provenance-heading">
+        <h2 id="provenance-heading" class="eyebrow">Repository provenance</h2>
+        <p class="provenance-title">Verified repository layout</p>
+        <p>The documented canonical repository is <a href="https://github.com/ausdisau/MapAble" target="_blank" rel="noreferrer noopener">ausdisau/MapAble</a>.
+          The former standalone web source was imported into the <code>apps/web</code> subtree.
+        </p>
+        <dl class="facts">
+          <div><dt>Imported source commit</dt><dd><code>e0a8b690</code></dd></div>
+          <div><dt>Web application</dt><dd><code>apps/web</code></dd></div>
+          <div><dt>Mobile application</dt><dd><code>apps/mobile</code></dd></div>
+          <div><dt>Package manager</dt><dd><code>pnpm@10.12.1</code> root / web</dd></div>
+          <div><dt>Mobile stack</dt><dd>Expo SDK 57 / React 19</dd></div>
+        </dl>
+        <p class="caution"><strong>Synchronization unverified.</strong> The migration snapshot is documented, but this router does not check that later standalone commits and draft PRs have been imported.</p>
+        <a class="text-link" href="https://github.com/ausdisau/MapAble/blob/main/docs/repository-amalgamation.md" target="_blank" rel="noreferrer noopener">Read the migration record</a>
+      </section>
+      <section class="panel" aria-labelledby="integration-heading">
+        <h2 id="integration-heading" class="eyebrow">Integration boundary</h2>
+        <p>Web and mobile retain separate dependencies. The mobile client can query a configured MapAble host using text-only search.</p>
+        <div class="code-row">
+          <strong>GET /api/access/search</strong>
+          <span>Read-only place discovery</span>
+        </div>
+        <div class="code-row">
+          <strong>EXPO_PUBLIC_MAPABLE_API_URL</strong>
+          <span>Public base URL, never a secret</span>
+        </div>
+        <p class="subtle">No device coordinates or location permissions are used by this dashboard.</p>
+      </section>
+      <section class="panel boundary" aria-labelledby="boundary-heading">
+        <h2 id="boundary-heading" class="eyebrow">Operational boundaries</h2>
+        <ul class="bullets">
+          <li>Runs locally on <code>127.0.0.1</code> only.</li>
+          <li>Starts only the two allowlisted scripts.</li>
+          <li>Cannot execute arbitrary shell commands.</li>
+          <li>Keep React 18 web and React 19 mobile dependencies separate.</li>
+          <li>Do not expose this development utility via a reverse proxy or public deployment.</li>
+        </ul>
+      </section>
+    </aside>
+    <div class="content-stack">
+      <section class="panel main-panel" aria-labelledby="router-heading">
+        <div class="panel-head">
+          <div>
+            <p class="eyebrow">Developer controls</p>
+            <h1 id="router-heading">Unified app router</h1>
+            <p class="subtle">Launch allowlisted services on this computer. Status reflects actual managed processes, not a simulation.</p>
+          </div>
+          <span class="version-label">Local runner v1</span>
+        </div>
+        <div class="app-grid">
+          <article class="app-card" aria-labelledby="web-title">
+            <div class="app-header">
+              <span class="app-icon" aria-hidden="true">W</span>
+              <div>
+                <h2 id="web-title">MapAble web platform</h2>
+                <p class="subtle">Next.js App Router · Web Core</p>
+              </div>
+              <span class="state-tag" data-state="stopped" id="status-web">Stopped</span>
+            </div>
+            <div class="chips"><code>pnpm dev:web</code><code>localhost:3000</code></div>
+            <div class="actions">
+              <button type="button" class="btn btn-primary" id="start-web">Start web</button>
+              <button type="button" class="btn btn-outline" id="stop-web" disabled>Stop web</button>
+              <a class="btn btn-quiet" id="open-web" target="_blank" rel="noopener noreferrer" href="http://127.0.0.1:3000" hidden>Open local web</a>
+            </div>
+            <p class="app-note" id="ready-web">HTTP readiness has not been checked.</p>
+          </article>
+          <article class="app-card" aria-labelledby="mobile-title">
+            <div class="app-header">
+              <span class="app-icon app-icon-mobile" aria-hidden="true">A</span>
+              <div>
+                <h2 id="mobile-title">AdaptAble mobile</h2>
+                <p class="subtle">Expo SDK 57 · React Native</p>
+              </div>
+              <span class="state-tag" data-state="stopped" id="status-mobile">Stopped</span>
+            </div>
+            <div class="chips"><code>npm run dev:mobile</code><code>Metro / Expo</code></div>
+            <div class="actions">
+              <button type="button" class="btn btn-primary" id="start-mobile">Start mobile</button>
+              <button type="button" class="btn btn-outline" id="stop-mobile" disabled>Stop mobile</button>
+            </div>
+            <p class="app-note">A running Metro process does not prove a public tunnel or device connection.</p>
+          </article>
+        </div>
+        <div class="terminal-head">
+          <div>
+            <h2 id="terminal-heading">Local process log</h2>
+            <p class="subtle">Bounded, redacted output from managed local processes.</p>
+          </div>
+          <button type="button" id="clear-logs" class="btn btn-quiet">Clear log</button>
+        </div>
+        <ol id="terminal-log" class="terminal" role="log" aria-labelledby="terminal-heading" aria-live="off" tabindex="0">
+          <li>Connecting to local workspace…</li>
+        </ol>
+        <div id="workspace-message" class="feedback" role="status" aria-live="polite" aria-atomic="true">Checking local process status.</div>
+      </section>
+      <section class="panel sandbox" aria-labelledby="sandbox-heading">
+        <div class="panel-head">
+          <div>
+            <p class="eyebrow">Read-only integration test</p>
+            <h2 id="sandbox-heading">Accessible places search</h2>
+          </div>
+          <span class="version-label">No automatic location</span>
+        </div>
+        <p>Search the locally running MapAble web API using only the place or suburb text you enter. No location is automatically detected or transmitted.</p>
+        <form id="search-form" class="search-form">
+          <label for="place-query">Place, suburb or accessibility category</label>
+          <div class="search-controls">
+            <input id="place-query" name="query" type="search" minlength="2" maxlength="100" required autocomplete="off" placeholder="For example, Chatswood station">
+            <button class="btn btn-primary" type="submit" id="run-search">Run local search</button>
+          </div>
+        </form>
+        <div id="search-feedback" class="feedback" role="status" aria-live="polite" aria-atomic="true">The local web server must be running before searching.</div>
+        <ul id="search-results" class="results" aria-label="Local MapAble search results"></ul>
+        <p class="subtle">
+          Want to inspect a map? <a href="https://www.openstreetmap.org/#map=12/-33.8688/151.2093" target="_blank" rel="noreferrer noopener">Open Sydney in OpenStreetMap</a>.
+          This opens an external site only when selected.
+        </p>
+      </section>
+    </div>
+  </main>
+  <footer class="footer">
+    <p>MapAble Unified · Development utility for Australian Disability Ltd · No production service status, payment availability or NDIS eligibility is asserted.</p>
+  </footer>
+</body>
+</html>
