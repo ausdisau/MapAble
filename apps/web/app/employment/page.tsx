@@ -1,6 +1,7 @@
 import { ModuleCanvasSection } from "@/components/canvas/ModuleCanvasSection";
 import { PublicModulePage } from "@/components/marketing/PublicModulePage";
 import { canonicalAlternate } from "@/lib/config/canonical-url";
+import { supportAreaLandingRoutes } from "@/lib/marketing/mapable-care-routes";
 
 export const metadata = {
   title: "MapAble Employment | Inclusive work pathways",
@@ -32,11 +33,11 @@ export default function EmploymentPage() {
           "Reasonable adjustment request workflow and employment goals.",
         ]}
         safetyNote="Job seekers will control whether disability, access needs or adjustment information is shared. MapAble will not support automated rejection based on access needs."
-        primaryCta={{ label: "Join pilot", href: "/contact" }}
-        secondaryCta={{
-          label: "Explore provider finder",
-          href: "/providers?service=employment",
+        primaryCta={{
+          label: "Find employment support providers",
+          href: supportAreaLandingRoutes.Jobs,
         }}
+        secondaryCta={{ label: "Ask about the pilot", href: "/contact" }}
       />
       <ModuleCanvasSection module="employment" />
     </>

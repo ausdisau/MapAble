@@ -157,6 +157,43 @@ export default function ProviderFinderClient({
   const mapSource = getProviderFinderMapSourceClient();
   const pageSize = 12;
 
+  const replaceFinderParams = (mutate: (params: URLSearchParams) => void) => {
+    const params = new URLSearchParams(searchParams.toString());
+    mutate(params);
+    const qs = params.toString();
+    router.replace(qs ? `/provider-finder?${qs}` : "/provider-finder");
+  };
+
+  const clearSupportFilter = () => {
+    setSupportType("all");
+    setPage(1);
+    replaceFinderParams((params) => {
+      params.delete("area");
+      params.delete("supportType");
+    });
+  };
+
+  const clearAllResultFilters = () => {
+    setSupportType("all");
+    setAccessNeeds([]);
+    setFunding("all");
+    setQuery("");
+    setProviderName("");
+    setServiceQuery("");
+    setAccessQuery("");
+    setPage(1);
+    replaceFinderParams((params) => {
+      params.delete("area");
+      params.delete("supportType");
+      params.delete("q");
+      params.delete("location");
+      params.delete("access");
+      params.delete("service");
+      params.delete("provider");
+      params.delete("accessNeeds");
+    });
+  };
+
   useEffect(() => {
     const area = searchParams.get("area");
     if (area === "Places") {
@@ -181,6 +218,8 @@ export default function ProviderFinderClient({
     if (areaSupportType && !support) {
       setSupportType(areaSupportType);
       setSearchSubmitted(true);
+    } else if (!area && !support) {
+      setSupportType("all");
     }
 
     if (q) {
@@ -712,6 +751,29 @@ export default function ProviderFinderClient({
                 </p>
               ) : null}
 
+              {supportType !== "all" ? (
+                <p
+                  role="status"
+                  className="rounded-lg border border-primary/30 bg-primary/5 p-3 text-sm"
+                  data-testid="active-support-filter"
+                  data-support-type={supportType}
+                >
+                  Active support filter:{" "}
+                  <strong>
+                    {SUPPORT_TYPES.find((type) => type.id === supportType)?.label ??
+                      supportType}
+                  </strong>
+                  . Results are narrowed on the imported directory after it loads.
+                  <button
+                    type="button"
+                    className="ml-2 inline-flex min-h-11 items-center rounded-md border border-input bg-background px-3 text-sm font-medium underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    onClick={clearSupportFilter}
+                  >
+                    Clear support filter
+                  </button>
+                </p>
+              ) : null}
+
               <LazyMapPanel
                 view={resultsView}
                 onViewChange={setResultsView}
@@ -725,11 +787,32 @@ export default function ProviderFinderClient({
                 }
                 list={
                   total === 0 ? (
-                    <Card variant="outlined" className="p-8 text-center">
+                    <Card
+                      variant="outlined"
+                      className="p-8 text-center"
+                      data-testid="provider-finder-empty-state"
+                    >
                       <h3 className="text-lg font-semibold">No providers found</h3>
                       <p className="mt-2 text-sm text-muted-foreground">
-                        Try broadening your search or removing a filter.
+                        {supportType !== "all"
+                          ? `No matches for ${SUPPORT_TYPES.find((type) => type.id === supportType)?.label ?? supportType}. Try clearing the support filter, broadening your search, or asking for help.`
+                          : "Try broadening your search or removing a filter."}
                       </p>
+                      <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={clearAllResultFilters}
+                        >
+                          Refine search — clear filters
+                        </Button>
+                        <a
+                          href="/contact"
+                          className="inline-flex min-h-11 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        >
+                          Ask for human help
+                        </a>
+                      </div>
                     </Card>
                   ) : (
                     <ul className="space-y-4">

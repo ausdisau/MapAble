@@ -1,6 +1,7 @@
 import { ModuleCanvasSection } from "@/components/canvas/ModuleCanvasSection";
 import { PublicModulePage } from "@/components/marketing/PublicModulePage";
 import { canonicalAlternate } from "@/lib/config/canonical-url";
+import { supportAreaLandingRoutes } from "@/lib/marketing/mapable-care-routes";
 
 export const metadata = {
   title: "MapAble Care — NDIS providers & disability support",
@@ -32,8 +33,11 @@ export default function CareHubPage() {
           "Service logs, participant confirmation and dispute workflows.",
         ]}
         safetyNote="NDIS plan documents will be optional and shared only with consent. MapAble does not auto-approve supports, funding or invoices; high-risk decisions stay subject to human review."
-        primaryCta={{ label: "Explore provider finder", href: "/providers" }}
-        secondaryCta={{ label: "Join pilot", href: "/contact" }}
+        primaryCta={{
+          label: "Find personal care providers",
+          href: supportAreaLandingRoutes.Care,
+        }}
+        secondaryCta={{ label: "Ask about the pilot", href: "/contact" }}
       />
       <ModuleCanvasSection module="care" />
     </>
