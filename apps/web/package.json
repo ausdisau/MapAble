@@ -101,6 +101,7 @@
     "@ai-sdk/google": "^3.0.80",
     "@ai-sdk/openai-compatible": "^3.0.14",
     "@ai-sdk/react": "^3.0.198",
+    "@anthropic-ai/sdk": "1.14.0",
     "@chat-adapter/slack": "^4.30.0",
     "@chat-adapter/state-memory": "^4.30.0",
     "@mapable/domain-transport": "workspace:*",

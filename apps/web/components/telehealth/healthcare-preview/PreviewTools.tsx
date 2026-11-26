@@ -10,6 +10,7 @@ import {
 import Link from "next/link";
 import { useEffect, useRef, useState, type Dispatch } from "react";
 
+import type { PracticeCoachProvider } from "@/packages/contracts/src/healthcare-practice-coach";
 import {
   accessOptions,
   type HealthcarePreview,
@@ -108,11 +109,11 @@ export function AccessPreferences({
 
 export function HelpAndAlternatives({
   callback,
-  museAvailable,
+  coachProviders,
   onCallback,
 }: {
   callback: boolean;
-  museAvailable: boolean;
+  coachProviders: readonly PracticeCoachProvider[];
   onCallback: () => void;
 }) {
   return (
@@ -164,7 +165,7 @@ export function HelpAndAlternatives({
           </li>
         </ul>
       </section>
-      <PracticeCoach museAvailable={museAvailable} />
+      <PracticeCoach providers={coachProviders} />
     </div>
   );
 }

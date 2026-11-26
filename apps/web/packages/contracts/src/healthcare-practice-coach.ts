@@ -47,3 +47,18 @@ export type PracticeScenario = keyof typeof practiceScenarios;
 export function isPracticeScenario(value: unknown): value is PracticeScenario {
   return typeof value === "string" && Object.hasOwn(practiceScenarios, value);
 }
+
+export const practiceCoachProviders = {
+  muse: { label: "Muse Spark", recipient: "Meta" },
+  claude: { label: "Claude", recipient: "Anthropic" },
+} as const;
+
+export type PracticeCoachProvider = keyof typeof practiceCoachProviders;
+
+export function isPracticeCoachProvider(
+  value: unknown,
+): value is PracticeCoachProvider {
+  return (
+    typeof value === "string" && Object.hasOwn(practiceCoachProviders, value)
+  );
+}

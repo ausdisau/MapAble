@@ -6,32 +6,18 @@ import {
 } from "@/packages/contracts/src/healthcare-practice-coach";
 
 import {
-  isLocalHealthcarePreview,
-  isLocalHealthcarePreviewRequest,
-} from "./healthcare-local-preview";
+  practiceReplySchema,
+  readApprovedPracticeReply,
+  replySelectionInstructions,
+} from "./healthcare-reply-selection";
 
 const museModel = "muse-spark-1.3";
-
-function museApiKey() {
-  return process.env.MAPABLE_HEALTHCARE_MUSE_ENABLED === "true"
-    ? process.env.MODEL_API_KEY?.trim()
-    : undefined;
-}
-
-export function isHealthcareMuseAvailable(host: string | null) {
-  return isLocalHealthcarePreview(host) && Boolean(museApiKey());
-}
-
-export function getHealthcareMuseRequestKey(headers: Headers) {
-  return isLocalHealthcarePreviewRequest(headers) ? museApiKey() : undefined;
-}
 
 export async function selectMusePracticeReply(
   scenario: PracticeScenario,
   apiKey: string,
   transport: typeof fetch = fetch,
 ) {
-  const { phrase, replies } = practiceScenarios[scenario];
   const provider = createOpenAICompatible({
     name: "meta-model-api",
     baseURL: "https://api.meta.ai/v1",
@@ -45,17 +31,14 @@ export async function selectMusePracticeReply(
     }),
   });
 
-  // The SDK receives only authored text and returns an identifier for an approved reply.
   const result = await provider.chatModel(museModel).doGenerate({
     prompt: [
-      {
-        role: "system",
-        content:
-          "Select the approved reply that best respects the speaker's communication choice in a fictional practice conversation. Return only its ID as replyId.",
-      },
+      { role: "system", content: replySelectionInstructions },
       {
         role: "user",
-        content: [{ type: "text", text: JSON.stringify({ phrase, replies }) }],
+        content: [
+          { type: "text", text: JSON.stringify(practiceScenarios[scenario]) },
+        ],
       },
     ],
     maxOutputTokens: 256,
@@ -63,29 +46,12 @@ export async function selectMusePracticeReply(
     responseFormat: {
       type: "json",
       name: "practice_reply",
-      schema: {
-        type: "object",
-        properties: {
-          replyId: { type: "string", enum: replies.map(({ id }) => id) },
-        },
-        required: ["replyId"],
-        additionalProperties: false,
-      },
+      schema: practiceReplySchema(scenario),
     },
   });
 
   const text = result.content.find((part) => part.type === "text")?.text;
   if (result.finishReason.unified !== "stop" || !text) return undefined;
 
-  const selection: unknown = JSON.parse(text);
-  if (
-    !selection ||
-    typeof selection !== "object" ||
-    !("replyId" in selection) ||
-    Object.keys(selection).length !== 1
-  ) {
-    return undefined;
-  }
-
-  return replies.find(({ id }) => id === selection.replyId)?.text;
+  return readApprovedPracticeReply(scenario, text);
 }

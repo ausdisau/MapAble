@@ -921,5 +921,11 @@
   width: 100%;
 }
 .coachStatus:empty {
-  display: none;
+  position: absolute;
+}
+.practiceCoach button[aria-disabled="true"] {
+  color: #4e5e67;
+  background: #e9efee;
+  border-color: #819995;
+  cursor: wait;
 }

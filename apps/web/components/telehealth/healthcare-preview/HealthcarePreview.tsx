@@ -17,6 +17,7 @@ import Image from "next/image";
 import { useEffect, useReducer, useRef, useState } from "react";
 
 import { MAPABLE_LOGO_MARK_SRC } from "@/lib/brand/constants";
+import type { PracticeCoachProvider } from "@/packages/contracts/src/healthcare-practice-coach";
 import {
   accessOptions,
   startHealthcarePreview,
@@ -65,10 +66,10 @@ const visitButton = {
 
 export function HealthcarePreview({
   mediaLab = false,
-  museAvailable = false,
+  coachProviders = [],
 }: {
   mediaLab?: boolean;
-  museAvailable?: boolean;
+  coachProviders?: readonly PracticeCoachProvider[];
 }) {
   const [view, setView] = useState<View>("appointments");
   const [draft, setDraft] = useState("");
@@ -348,7 +349,7 @@ export function HealthcarePreview({
           {view === "help" && (
             <HelpAndAlternatives
               callback={state.callback}
-              museAvailable={museAvailable}
+              coachProviders={coachProviders}
               onCallback={() => dispatch({ type: "callback" })}
             />
           )}

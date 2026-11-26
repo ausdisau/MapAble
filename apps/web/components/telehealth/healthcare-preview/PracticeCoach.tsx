@@ -5,31 +5,45 @@ import { useRef, useState } from "react";
 
 import {
   isPracticeScenario,
+  practiceCoachProviders,
   practiceScenarios,
+  type PracticeCoachProvider,
   type PracticeScenario,
 } from "@/packages/contracts/src/healthcare-practice-coach";
 
 import styles from "./healthcare.module.css";
 
-type Reply = { text: string; source: "muse" | "sample"; fallback?: boolean };
+type Reply = {
+  text: string;
+  source: PracticeCoachProvider | "sample";
+  unavailableProvider?: PracticeCoachProvider;
+};
 
-export function PracticeCoach({ museAvailable }: { museAvailable: boolean }) {
+export function PracticeCoach({
+  providers,
+}: {
+  providers: readonly PracticeCoachProvider[];
+}) {
   const [scenario, setScenario] = useState<PracticeScenario>("moreTime");
   const [reply, setReply] = useState<Reply>();
-  const [pending, setPending] = useState(false);
+  const [pending, setPending] = useState<PracticeCoachProvider>();
   const activeRequest = useRef(false);
   const firstReply = practiceScenarios[scenario].replies[0].text;
+  const recipients = providers.map((id) => {
+    const { label, recipient } = practiceCoachProviders[id];
+    return `${recipient} for ${label}`;
+  });
 
-  async function askMuse() {
+  async function askProvider(provider: PracticeCoachProvider) {
     if (activeRequest.current) return;
     activeRequest.current = true;
-    setPending(true);
+    setPending(provider);
     setReply(undefined);
     try {
       const response = await fetch("/telehealth/preview/coach", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ scenario }),
+        body: JSON.stringify({ scenario, provider }),
         cache: "no-store",
       });
       if (!response.ok) throw new Error("Practice coach unavailable");
@@ -37,14 +51,18 @@ export function PracticeCoach({ museAvailable }: { museAvailable: boolean }) {
       const approved = practiceScenarios[scenario].replies.find(
         ({ text }) => text === result.text,
       );
-      if (result.source !== "muse" || !approved)
-        throw new Error("No Muse selection");
-      setReply({ text: approved.text, source: "muse" });
+      if (result.source !== provider || !approved)
+        throw new Error("No approved selection");
+      setReply({ text: approved.text, source: provider });
     } catch {
-      setReply({ text: firstReply, source: "sample", fallback: true });
+      setReply({
+        text: firstReply,
+        source: "sample",
+        unavailableProvider: provider,
+      });
     } finally {
       activeRequest.current = false;
-      setPending(false);
+      setPending(undefined);
     }
   }
 
@@ -61,7 +79,7 @@ export function PracticeCoach({ museAvailable }: { museAvailable: boolean }) {
       <label htmlFor="healthcare-coach-scenario">Practice phrase</label>
       <select
         id="healthcare-coach-scenario"
-        disabled={pending}
+        disabled={Boolean(pending)}
         value={scenario}
         onChange={(event) => {
           const value = event.target.value;
@@ -76,46 +94,52 @@ export function PracticeCoach({ museAvailable }: { museAvailable: boolean }) {
           </option>
         ))}
       </select>
-      {museAvailable && (
-        <p>
-          Choosing Muse Spark sends this sample phrase and the prepared replies
-          to Meta.
+      {recipients.length > 0 && (
+        <p id="healthcare-coach-provider-disclosure">
+          Asking an online model sends this sample phrase and its prepared
+          replies to {recipients.join(" or ")}.
         </p>
       )}
       <div className={styles.actions}>
         <button
           type="button"
           className={styles.button}
-          disabled={pending}
+          disabled={Boolean(pending)}
           onClick={() => setReply({ text: firstReply, source: "sample" })}
         >
           Show a sample reply
         </button>
-        {museAvailable && (
+        {providers.map((provider) => (
           <button
+            key={provider}
             type="button"
             className={`${styles.button} ${styles.secondary}`}
-            disabled={pending}
-            onClick={() => void askMuse()}
+            aria-disabled={Boolean(pending)}
+            aria-describedby="healthcare-coach-provider-disclosure"
+            onClick={() => void askProvider(provider)}
           >
-            Ask Muse Spark
+            Ask {practiceCoachProviders[provider].label}
           </button>
-        )}
+        ))}
       </div>
       <div role="status" className={styles.coachStatus}>
-        {pending && <p>Getting a sample reply…</p>}
+        {pending && (
+          <p>
+            Getting a sample reply from {practiceCoachProviders[pending].label}…
+          </p>
+        )}
         {reply && (
           <div className={styles.summary}>
             <strong>
-              {reply.source === "muse"
-                ? "Sample reply selected by Muse Spark"
-                : "Sample reply"}
+              {reply.source === "sample"
+                ? "Sample reply"
+                : `Sample reply selected by ${practiceCoachProviders[reply.source].label}`}
             </strong>
             <p>{reply.text}</p>
-            {reply.fallback && (
+            {reply.unavailableProvider && (
               <p>
-                Muse Spark was unavailable. This reply came from MapAble’s
-                practice library.
+                {practiceCoachProviders[reply.unavailableProvider].label} was
+                unavailable. This reply came from MapAble’s practice library.
               </p>
             )}
           </div>
