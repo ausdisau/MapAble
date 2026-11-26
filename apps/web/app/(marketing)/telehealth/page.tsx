@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { PublicModulePage } from "@/components/marketing/PublicModulePage";
 
 export const metadata = {
@@ -7,6 +9,7 @@ export const metadata = {
 };
 
 export default function TelehealthPage() {
+  const preview = process.env.MAPABLE_HEALTHCARE_PREVIEW_ENABLED === "true";
   return (
     <PublicModulePage
       eyebrow="MapAble Telehealth"
@@ -21,15 +24,37 @@ export default function TelehealthPage() {
         "Public module information and pilot contact pathway.",
         "Signed-in pilot routes where enabled for invited users.",
         "Accessibility-first appointment design principles.",
+        ...(preview
+          ? [
+              "A synthetic web practice visit for exploring the participant journey.",
+            ]
+          : []),
       ]}
       comingSoon={[
         "Waiting room, consent prompts and appointment reminders.",
         "Telehealth session evidence and service log linkage.",
         "Provider operations controls for appointment management.",
       ]}
-      safetyNote="Telehealth records and appointment details are sensitive. MapAble will keep clinical and support information out of identity-provider metadata and restrict access by role and consent."
+      safetyNote={
+        <>
+          Telehealth records and appointment details are sensitive. MapAble will
+          keep clinical and support information out of identity-provider
+          metadata and restrict access by role and consent.
+          {preview && (
+            <p className="mt-2">
+              <Link className="underline" href="/for-providers">
+                Register as a provider
+              </Link>
+            </p>
+          )}
+        </>
+      }
       primaryCta={{ label: "Join pilot", href: "/contact" }}
-      secondaryCta={{ label: "Register as provider", href: "/for-providers" }}
+      secondaryCta={
+        preview
+          ? { label: "Try a practice visit", href: "/telehealth/preview" }
+          : { label: "Register as provider", href: "/for-providers" }
+      }
     />
   );
 }
