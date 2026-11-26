@@ -65,8 +65,10 @@ const visitButton = {
 
 export function HealthcarePreview({
   mediaLab = false,
+  museAvailable = false,
 }: {
   mediaLab?: boolean;
+  museAvailable?: boolean;
 }) {
   const [view, setView] = useState<View>("appointments");
   const [draft, setDraft] = useState("");
@@ -346,6 +348,7 @@ export function HealthcarePreview({
           {view === "help" && (
             <HelpAndAlternatives
               callback={state.callback}
+              museAvailable={museAvailable}
               onCallback={() => dispatch({ type: "callback" })}
             />
           )}

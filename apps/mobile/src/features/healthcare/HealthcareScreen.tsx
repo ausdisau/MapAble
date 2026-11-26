@@ -20,6 +20,7 @@ import {
   visit,
   visitModes,
 } from '../../../../web/packages/contracts/src/healthcare-preview';
+import { practiceScenarios, type PracticeScenario } from '../../../../web/packages/contracts/src/healthcare-practice-coach';
 
 const stageTitles = {
   prepare: 'Prepare for your visit',
@@ -108,6 +109,7 @@ export function HealthcareScreen({ onExit }: { onExit: () => void }) {
   const [draft, setDraft] = useState('');
   const [captions, setCaptions] = useState<boolean | undefined>(undefined);
   const [relayError, setRelayError] = useState(false);
+  const [coachScenario, setCoachScenario] = useState<PracticeScenario>();
   const scroll = useRef<ScrollView>(null);
   const previousHeading = useRef('');
   const heading = panel === 'visit' ? stageTitles[state.stage] : {
@@ -263,6 +265,7 @@ export function HealthcareScreen({ onExit }: { onExit: () => void }) {
       )}
 
       {panel === 'help' && (
+        <>
         <Card title="Choose another way to attend">
           <Text style={styles.body}>For a real appointment, ask your clinic about text, a phone call, relay or an in-person visit.</Text>
           <Action label={state.callback ? 'Callback simulated' : 'Simulate a callback request'} disabled={state.callback} onPress={() => dispatch({ type: 'callback' })} />
@@ -273,6 +276,17 @@ export function HealthcareScreen({ onExit }: { onExit: () => void }) {
           {relayError && <Text accessibilityRole="alert" style={styles.body}>Couldn’t open the National Relay Service website. Its address is accesshub.gov.au.</Text>}
           <Text style={styles.body}>For a medical emergency, call Triple Zero (000).</Text>
         </Card>
+        <Card title="Practise asking for what you need">
+          <Text style={styles.body}>Choose a practice phrase to see a sample reply.</Text>
+          {(Object.keys(practiceScenarios) as PracticeScenario[]).map((value) => (
+            <Action key={value} label={practiceScenarios[value].phrase} secondary selected={coachScenario === value} onPress={() => {
+              setCoachScenario(value);
+              if (Platform.OS === 'ios') AccessibilityInfo.announceForAccessibility(practiceScenarios[value].replies[0].text);
+            }} />
+          ))}
+          {coachScenario && <Text accessibilityLiveRegion="polite" style={styles.caption}>{practiceScenarios[coachScenario].replies[0].text}</Text>}
+        </Card>
+        </>
       )}
     </ScrollView>
   );

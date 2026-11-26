@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 
 import { AccessToken, TrackSource } from "livekit-server-sdk";
 
+import { readBoundedRequestBody } from "@/lib/security/read-bounded-body";
 import {
   isHealthcareMediaLabRequest,
   labRoomCode,
@@ -19,43 +20,25 @@ export async function POST(request: Request) {
     );
   }
 
-  // Read at most the small, fixed payload this local endpoint accepts.
-  const stream = request.body?.getReader();
-  const tooLarge = () =>
+  const invalidRoomCode = () =>
     Response.json(
       { error: "Invalid lab room code." },
       { status: 400, headers: responseHeaders },
     );
-  if (!stream || request.headers.get("content-type") !== "application/json")
-    return tooLarge();
 
-  let payload = "";
-  const decoder = new TextDecoder();
-  try {
-    let length = 0;
-    for (;;) {
-      const { done, value } = await stream.read();
-      if (done) break;
-      length += value.byteLength;
-      if (length > 128) {
-        await stream.cancel();
-        return tooLarge();
-      }
-      payload += decoder.decode(value, { stream: true });
-    }
-    payload += decoder.decode();
-  } catch {
-    return tooLarge();
-  }
+  if (request.headers.get("content-type") !== "application/json")
+    return invalidRoomCode();
+  const bounded = await readBoundedRequestBody(request, { maxBytes: 128 });
+  if (!bounded.ok) return invalidRoomCode();
 
   let roomCode: unknown;
   try {
-    roomCode = JSON.parse(payload)?.roomCode;
+    roomCode = JSON.parse(new TextDecoder().decode(bounded.bytes))?.roomCode;
   } catch {
-    return tooLarge();
+    return invalidRoomCode();
   }
   if (typeof roomCode !== "string" || !labRoomCode.test(roomCode))
-    return tooLarge();
+    return invalidRoomCode();
 
   // These are LiveKit's published local development credentials.
   const token = new AccessToken("devkey", "secret", {

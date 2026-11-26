@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 
 import { HealthcarePreview } from "@/components/telehealth/healthcare-preview/HealthcarePreview";
 import { isHealthcareMediaLabEnabled } from "@/lib/telehealth/healthcare-media-lab";
+import { isHealthcareMuseAvailable } from "@/lib/telehealth/healthcare-muse";
 
 export const metadata: Metadata = {
   title: "Healthcare practice visit",
@@ -18,6 +19,7 @@ export default async function HealthcarePreviewPage() {
   return (
     <HealthcarePreview
       mediaLab={isHealthcareMediaLabEnabled(requestHeaders.get("host"))}
+      museAvailable={isHealthcareMuseAvailable(requestHeaders.get("host"))}
     />
   );
 }

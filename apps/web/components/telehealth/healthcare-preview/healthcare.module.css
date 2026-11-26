@@ -900,3 +900,26 @@
   font-size: 0.86rem;
   color: var(--body);
 }
+
+.practiceCoach {
+  grid-column: 1 / -1;
+}
+.practiceCoach select {
+  background: #fff;
+  border: 1px solid #688785;
+  border-radius: 0.6rem;
+  color: var(--ink);
+  font: inherit;
+  min-height: 48px;
+  max-width: 100%;
+  padding: 0.65rem 0.8rem;
+}
+.practiceCoach label {
+  font-weight: 700;
+}
+.coachStatus {
+  width: 100%;
+}
+.coachStatus:empty {
+  display: none;
+}

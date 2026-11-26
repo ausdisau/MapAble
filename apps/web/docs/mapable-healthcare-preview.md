@@ -25,6 +25,16 @@ MAPABLE_HEALTHCARE_PREVIEW_ENABLED=true MAPABLE_HEALTHCARE_MEDIA_LAB_ENABLED=tru
 
 Open `/telehealth/preview/media` via `http://127.0.0.1:3000`, create a room and paste the code into a second local tab. Camera and microphone publish only after a user action. There is also a typed data channel. The lab creates five-minute join JWTs with a random identity and camera, microphone and text permissions for that room. It requires a same-origin loopback request and refuses to issue tokens in production builds. The media lab is separate from MapAble's existing Virtual Care Hub and its video-provider selection.
 
+## Enable Muse Spark in the local conversation coach
+
+The **Help and alternatives** screen includes a conversation practice exercise on web and mobile. Without a credential it shows authored replies to three AAC-friendly sample phrases.
+
+For the web development lab, place a Meta Model API key in `MODEL_API_KEY` in `apps/web/.env.local` and set `MAPABLE_HEALTHCARE_MUSE_ENABLED=true` with the practice-visit flag enabled. Bind Next.js to loopback as in the media lab command above. **Ask Muse Spark** then appears in the web coach. The React Native rehearsal uses the offline replies.
+
+The coach uses the repository's OpenAI-compatible TypeScript SDK with [Meta's Chat Completions endpoint](https://dev.meta.ai/docs/protocols/chat-completions) and the Standard `muse-spark-1.3` model. A same-origin development endpoint accepts a bounded scenario identifier. It sends only an authored sample phrase and its approved reply options. The model selects an identifier and MapAble renders the corresponding authored reply. The coach falls back to its local sample if the provider is unavailable or returns an invalid selection. Successful selections are reused for the current development process.
+
+The key stays server-side. Consult chat, voice, transcripts, access preferences, appointment details and clinical records stay outside this adapter. The hosted API is an optional part of the local development lab. Pricing and access are handled through the developer's Meta account. See [Meta Model API data commitments](https://dev.meta.ai/legal/commitments) for retention terms.
+
 ## Data and provenance
 
 | Source                                                                                                                                                                        | Use in this build                                                                                                                                                                                                                                                     |

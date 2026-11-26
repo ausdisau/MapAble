@@ -19,6 +19,7 @@ import {
 
 import { healthcareEvidence, healthcareSourceLinks } from "./evidence";
 import styles from "./healthcare.module.css";
+import { PracticeCoach } from "./PracticeCoach";
 
 export function AccessPreferences({
   state,
@@ -107,9 +108,11 @@ export function AccessPreferences({
 
 export function HelpAndAlternatives({
   callback,
+  museAvailable,
   onCallback,
 }: {
   callback: boolean;
+  museAvailable: boolean;
   onCallback: () => void;
 }) {
   return (
@@ -161,6 +164,7 @@ export function HelpAndAlternatives({
           </li>
         </ul>
       </section>
+      <PracticeCoach museAvailable={museAvailable} />
     </div>
   );
 }
