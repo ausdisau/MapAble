@@ -1,6 +1,7 @@
-import React, { createContext, useContext, useMemo, useState } from 'react';
+import React, { createContext, useCallback, useContext, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
+  BackHandler,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -10,11 +11,12 @@ import {
   View,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { createStaticNavigation } from '@react-navigation/native';
+import { createStaticNavigation, useFocusEffect } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import { MobileIdentityCard } from './src/components/MobileIdentityCard';
 import { ArcHubScreen } from './src/features/arc/ArcHubScreen';
+import { HealthcareScreen } from './src/features/healthcare/HealthcareScreen';
 import {
   isMapAbleApiConfigured,
   searchMapAblePlaces,
@@ -405,6 +407,19 @@ function MapAbleSearchCard() {
 
 function MoreScreen() {
   const suite = useSuite();
+  const [healthcareOpen, setHealthcareOpen] = useState(false);
+  const closeHealthcare = useCallback(() => setHealthcareOpen(false), []);
+
+  useFocusEffect(useCallback(() => {
+    if (!healthcareOpen) return;
+    const listener = BackHandler.addEventListener('hardwareBackPress', () => {
+      closeHealthcare();
+      return true;
+    });
+    return () => listener.remove();
+  }, [closeHealthcare, healthcareOpen]));
+
+  if (healthcareOpen) return <HealthcareScreen onExit={closeHealthcare} />;
 
   return (
     <Screen>
@@ -420,6 +435,11 @@ function MoreScreen() {
       />
 
       <SectionTitle>MapAble</SectionTitle>
+      <Card>
+        <Text style={styles.cardTitle}>MapAble Healthcare</Text>
+        <Text style={styles.body}>Practise joining a telehealth visit with your communication preferences.</Text>
+        <Button label="Open healthcare preview" primary onPress={() => setHealthcareOpen(true)} />
+      </Card>
       <MapAbleSearchCard />
 
       <SectionTitle>AccessiBooks</SectionTitle>

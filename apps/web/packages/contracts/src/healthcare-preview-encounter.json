@@ -1,0 +1,10 @@
+{
+  "source": "george-essam-ai/synthea-healthcare-dataset",
+  "upstream": "synthetichealth/synthea",
+  "license": "Apache-2.0",
+  "revision": "a960cceb488b7a56a7ffabfd9d84f827bc684a5c",
+  "file": "encounters.parquet",
+  "zeroBasedRow": 9,
+  "encounterClass": "ambulatory",
+  "durationMinutes": 30
+}
